@@ -1,0 +1,10 @@
+git-portable/
+__pycache__/
+*.pyc
+.gemini/
+.tempmediaStorage/
+.agents/
+*.log
+~*
+*.tmp
+winget_log.txt
