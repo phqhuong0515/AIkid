@@ -24,7 +24,8 @@ def main():
         "base": {
             "male": "",
             "female": ""
-        }
+        },
+        "faces": {}
     }
     
     clothes_dir = os.path.join(base_dir, "Skin tone (clothes)")
@@ -53,8 +54,15 @@ def main():
             with open(f_path, 'r', encoding='utf-8') as f:
                 svg_db["presets"]["female"][i] = clean_svg(f.read())
 
+    # Load 6 Faces SVGs
+    for i in range(1, 7):
+        face_path = os.path.join(base_dir, "facial", f"face_{i}.svg")
+        if os.path.exists(face_path):
+            with open(face_path, 'r', encoding='utf-8') as f:
+                svg_db["faces"][i] = clean_svg(f.read())
+
     # Load Facial features database and rename conflicting classes
-    facial_db = {"eyes": [], "eyebrows": []}
+    facial_db = {"eyes": [], "eyebrows": [], "noses": [], "mouths": []}
     facial_path = os.path.join(base_dir, "facial_features.json")
     if os.path.exists(facial_path):
         with open(facial_path, 'r', encoding='utf-8') as f:
@@ -82,6 +90,30 @@ def main():
                     "height": eb["height"],
                     "left": [rename_facial_classes(s) for s in eb["left"]],
                     "right": [rename_facial_classes(s) for s in eb["right"]]
+                })
+
+            # Noses
+            for ns in raw_facial.get("noses", []):
+                facial_db["noses"].append({
+                    "id": ns["id"],
+                    "y_base": ns["y_base"],
+                    "y_center": ns["y_center"],
+                    "x_center": ns.get("x_center", 38.01),
+                    "height": ns["height"],
+                    "left": [rename_facial_classes(s) for s in ns["left"]],
+                    "right": [rename_facial_classes(s) for s in ns["right"]]
+                })
+
+            # Mouths
+            for mt in raw_facial.get("mouths", []):
+                facial_db["mouths"].append({
+                    "id": mt["id"],
+                    "y_base": mt["y_base"],
+                    "y_center": mt["y_center"],
+                    "x_center": mt.get("x_center", 38.01),
+                    "height": mt["height"],
+                    "left": [rename_facial_classes(s) for s in mt["left"]],
+                    "right": [rename_facial_classes(s) for s in mt["right"]]
                 })
 
     # HTML Template
@@ -293,6 +325,20 @@ def main():
             stroke: #1a202c !important;
             stroke-width: 1.17px !important;
             stroke-miterlimit: 10 !important;
+        }
+
+        /* Custom Nose and Mouth styling */
+        #custom-nose .facial-cls-1, .nose-preview .facial-cls-1 {
+            fill: var(--shading-color) !important;
+        }
+        #custom-mouth *, .mouth-preview * {
+            fill: #1a202c !important; /* Default premium slate */
+        }
+        #custom-mouth .facial-cls-1, .mouth-preview .facial-cls-1 {
+            fill: #f44d4d !important; /* Mouth inside / tongue red */
+        }
+        #custom-mouth .facial-cls-2, .mouth-preview .facial-cls-2 {
+            fill: #ffffff !important; /* Teeth white */
         }
 
         /* Canvas HUD Overlay Controls */
@@ -1057,6 +1103,10 @@ def main():
                         <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.58 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
                         Màu da
                     </button>
+                    <button class="tab-btn" data-tab="faces">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                        Dáng mặt
+                    </button>
                     <button class="tab-btn" data-tab="eyes">
                         <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                         Mắt
@@ -1064,6 +1114,14 @@ def main():
                     <button class="tab-btn" data-tab="eyebrows">
                         <svg viewBox="0 0 24 24"><path d="M12 2c-.96 0-1.88.4-2.53 1.1L3.11 9.47c-.72.76-.68 1.98.08 2.7.76.72 1.98.68 2.7-.08l6.11-6.47 6.11 6.47c.72.76 1.94.8 2.7.08.76-.72.8-1.94.08-2.7l-6.36-6.37C13.88 2.4 12.96 2 12 2z"/></svg>
                         Lông mày
+                    </button>
+                    <button class="tab-btn" data-tab="noses">
+                        <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                        Mũi
+                    </button>
+                    <button class="tab-btn" data-tab="mouths">
+                        <svg viewBox="0 0 24 24"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-6c0 2.76 2.24 5 5 5s5-2.24 5-5H7z"/></svg>
+                        Miệng
                     </button>
                 </div>
 
@@ -1145,6 +1203,17 @@ def main():
                     </div>
                 </div>
 
+                <!-- Tab 1.5: Faces Content -->
+                <div class="tab-content" id="tab-faces">
+                    <h3 class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--primary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                        Chọn dáng khuôn mặt (Face Shape)
+                    </h3>
+                    <div class="facial-select-grid" id="facesGrid">
+                        <!-- Face buttons will be generated dynamically -->
+                    </div>
+                </div>
+
                 <!-- Tab 2: Eyes Content -->
                 <div class="tab-content" id="tab-eyes">
                     <h3 class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -1164,6 +1233,28 @@ def main():
                     </h3>
                     <div class="facial-select-grid" id="eyebrowsGrid">
                         <!-- Eyebrow buttons will be generated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab 4: Noses Content -->
+                <div class="tab-content" id="tab-noses">
+                    <h3 class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--primary)"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                        Chọn kiểu mũi (Nose Style)
+                    </h3>
+                    <div class="facial-select-grid" id="nosesGrid">
+                        <!-- Nose buttons will be generated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab 5: Mouths Content -->
+                <div class="tab-content" id="tab-mouths">
+                    <h3 class="card-title" style="font-size: 1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--primary)"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-6c0 2.76 2.24 5 5 5s5-2.24 5-5H7z"/></svg>
+                        Chọn kiểu miệng (Mouth Style)
+                    </h3>
+                    <div class="facial-select-grid" id="mouthsGrid">
+                        <!-- Mouth buttons will be generated dynamically -->
                     </div>
                 </div>
             </div>
@@ -1355,8 +1446,11 @@ def main():
             customMode: false,
             customSkin: "#ffe7e6",
             customShading: "#ffcccc",
+            faceIndex: 1, // 1 to 6
             eyeIndex: 1, // 1 to 11
-            eyebrowIndex: 1 // 1 to 7
+            eyebrowIndex: 1, // 1 to 7
+            noseIndex: 1, // 1 to 7
+            mouthIndex: 1 // 1 to 13
         };
 
         // UI References
@@ -1381,8 +1475,11 @@ def main():
         const autoShadowBtn = document.getElementById("autoShadowBtn");
 
         // Facial grids DOM
+        const facesGrid = document.getElementById("facesGrid");
         const eyesGrid = document.getElementById("eyesGrid");
         const eyebrowsGrid = document.getElementById("eyebrowsGrid");
+        const nosesGrid = document.getElementById("nosesGrid");
+        const mouthsGrid = document.getElementById("mouthsGrid");
 
         // Buttons
         const maleBtn = document.getElementById("genderMaleBtn");
@@ -1410,8 +1507,11 @@ def main():
                     if (typeof parsed.customMode === 'boolean') state.customMode = parsed.customMode;
                     if (parsed.customSkin) state.customSkin = parsed.customSkin;
                     if (parsed.customShading) state.customShading = parsed.customShading;
+                    if (parsed.faceIndex >= 1 && parsed.faceIndex <= 6) state.faceIndex = parsed.faceIndex;
                     if (parsed.eyeIndex >= 1 && parsed.eyeIndex <= 11) state.eyeIndex = parsed.eyeIndex;
                     if (parsed.eyebrowIndex >= 1 && parsed.eyebrowIndex <= 7) state.eyebrowIndex = parsed.eyebrowIndex;
+                    if (parsed.noseIndex >= 1 && parsed.noseIndex <= 7) state.noseIndex = parsed.noseIndex;
+                    if (parsed.mouthIndex >= 1 && parsed.mouthIndex <= 13) state.mouthIndex = parsed.mouthIndex;
                 } catch(e) {}
             }
             buildFacialUI();
@@ -1422,37 +1522,8 @@ def main():
             localStorage.setItem("mee_dressing_facial_state", JSON.stringify(state));
         }
 
-        // Apply custom colors onto base SVG elements dynamically
-        function applyCustomColorsToSVG(svgElement) {
-            const skinColor = state.customSkin;
-            const shadingColor = state.customShading;
-
-            // 1. Update fills for cls-6 (skin) and cls-7 (shadow)
-            svgElement.querySelectorAll(".cls-6").forEach(el => el.style.fill = skinColor);
-            svgElement.querySelectorAll(".cls-7").forEach(el => el.style.fill = shadingColor);
-
-            // 2. Interpolate linear-gradient for legs/body shading transition
-            const linearGrad = svgElement.querySelector("#linear-gradient");
-            if (linearGrad) {
-                const stops = linearGrad.querySelectorAll("stop");
-                if (stops.length >= 5) {
-                    stops[0].setAttribute("stop-color", skinColor);
-                    stops[1].setAttribute("stop-color", lerpColor(skinColor, shadingColor, 0.59));
-                    stops[2].setAttribute("stop-color", lerpColor(skinColor, shadingColor, 0.8));
-                    stops[3].setAttribute("stop-color", lerpColor(skinColor, shadingColor, 0.95));
-                    stops[4].setAttribute("stop-color", shadingColor);
-                }
-            }
-
-            // 3. Update all stop-colors in linear-gradient-3 to shadingColor
-            const linearGrad3 = svgElement.querySelector("#linear-gradient-3");
-            if (linearGrad3) {
-                linearGrad3.querySelectorAll("stop").forEach(stop => {
-                    stop.setAttribute("stop-color", shadingColor);
-                });
-            }
-
-            // 4. Inject component transfer filter for custom ear shading
+        // Inject component transfer filter for ear shading
+        function updateEarFilter(svgElement, skinColor, shadingColor) {
             let defs = svgElement.querySelector("defs");
             if (!defs) {
                 defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
@@ -1515,11 +1586,37 @@ def main():
                 funcB.setAttribute("slope", b_skin - b_shadow);
                 funcB.setAttribute("intercept", b_shadow);
             }
+        }
 
-            // Apply filter to all base64 ear images
-            svgElement.querySelectorAll("image").forEach(img => {
-                img.setAttribute("filter", "url(#custom-ear-filter)");
-            });
+        // Apply custom colors onto base SVG elements dynamically
+        function applyCustomColorsToSVG(svgElement) {
+            const skinColor = state.customSkin;
+            const shadingColor = state.customShading;
+
+            // 1. Update fills for cls-6 (skin) and cls-7 (shadow)
+            svgElement.querySelectorAll(".cls-6").forEach(el => el.style.fill = skinColor);
+            svgElement.querySelectorAll(".cls-7").forEach(el => el.style.fill = shadingColor);
+
+            // 2. Interpolate linear-gradient for legs/body shading transition
+            const linearGrad = svgElement.querySelector("#linear-gradient");
+            if (linearGrad) {
+                const stops = linearGrad.querySelectorAll("stop");
+                if (stops.length >= 5) {
+                    stops[0].setAttribute("stop-color", skinColor);
+                    stops[1].setAttribute("stop-color", lerpColor(skinColor, shadingColor, 0.59));
+                    stops[2].setAttribute("stop-color", lerpColor(skinColor, shadingColor, 0.8));
+                    stops[3].setAttribute("stop-color", lerpColor(skinColor, shadingColor, 0.95));
+                    stops[4].setAttribute("stop-color", shadingColor);
+                }
+            }
+
+            // 3. Update all stop-colors in linear-gradient-3 to shadingColor
+            const linearGrad3 = svgElement.querySelector("#linear-gradient-3");
+            if (linearGrad3) {
+                linearGrad3.querySelectorAll("stop").forEach(stop => {
+                    stop.setAttribute("stop-color", shadingColor);
+                });
+            }
         }
 
         // Update active SVG model display
@@ -1538,52 +1635,197 @@ def main():
                 const doc = parser.parseFromString(svgContent, "image/svg+xml");
                 const svgElement = doc.documentElement;
                 
+                // Determine active skin and shading colors
+                let skinColor = "#ffe7e6";
+                let shadingColor = "#ffcccc";
+                if (state.customMode) {
+                    skinColor = state.customSkin;
+                    shadingColor = state.customShading;
+                } else {
+                    const activeColor = PALETTE_DATA[state.skinToneIndex - 1];
+                    if (activeColor) {
+                        skinColor = activeColor.skin;
+                        shadingColor = activeColor.shading;
+                    }
+                }
+
+                // Set CSS variables on the SVG element so CSS styles can access them
+                svgElement.style.setProperty('--skin-color', skinColor);
+                svgElement.style.setProperty('--shading-color', shadingColor);
+                
+                // Always ensure ear filter is present and configured
+                updateEarFilter(svgElement, skinColor, shadingColor);
+
                 // Colorize vector parts and ears if custom mode is enabled
                 if (state.customMode) {
                     applyCustomColorsToSVG(svgElement);
                 }
 
-                // Inject facial features: eyebrows and eyes immediately after the head ellipse.
-                // The head ellipse always has class="cls-6" and is the only ellipse in Layer 1
-                const head = svgElement.querySelector("ellipse.cls-6");
-                if (head) {
-                    // 1. Inject Eyebrows
-                    if (state.eyebrowIndex > 0) {
-                        const eyebrowItem = FACIAL_DATABASE.eyebrows[state.eyebrowIndex - 1];
-                        const eyebrowsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                        eyebrowsGroup.setAttribute("id", "custom-eyebrows");
+                // 1. Inject Face Shape (which includes ears)
+                if (state.faceIndex > 0) {
+                    const faceSvgStr = SVG_DATABASE.faces[state.faceIndex];
+                    if (faceSvgStr) {
+                        const faceDoc = parser.parseFromString(faceSvgStr, "image/svg+xml");
+                        const faceGroup = faceDoc.getElementById("Layer_2").cloneNode(true);
+                        faceGroup.setAttribute("id", "custom-face");
                         
-                        const cx = parseFloat(head.getAttribute("cx")) || 90.32;
-                        const cy = parseFloat(head.getAttribute("cy")) || 66.73;
+                        // Copy defs patterns/images to main SVG
+                        const faceDefs = faceDoc.querySelector("defs");
+                        if (faceDefs) {
+                            let mainDefs = svgElement.querySelector("defs");
+                            if (!mainDefs) {
+                                mainDefs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                                svgElement.insertBefore(mainDefs, svgElement.firstChild);
+                            }
+                            faceDefs.childNodes.forEach(child => {
+                                if (child.nodeType === 1) {
+                                    const id = child.getAttribute("id");
+                                    if (!id || !mainDefs.querySelector(`#${id}`)) {
+                                        mainDefs.appendChild(child.cloneNode(true));
+                                    }
+                                }
+                            });
+                        }
                         
-                        const dx = cx - eyebrowItem.x_center;
-                        const dy = (cy + 5.705) - eyebrowItem.y_center;
-                        eyebrowsGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
-                        eyebrowsGroup.innerHTML = eyebrowItem.left.join("") + eyebrowItem.right.join("");
+                        // Colorize the face path (Child 4)
+                        let headPath = faceGroup.querySelector("path[fill='#FFE7E6']") || 
+                                       faceGroup.querySelector("path[fill='#ffe7e6']");
+                        if (!headPath) {
+                            const paths = faceGroup.querySelectorAll("path");
+                            for (let p of paths) {
+                                const fillAttr = p.getAttribute("fill");
+                                if (fillAttr && fillAttr.toUpperCase() === "#FFE7E6") {
+                                    headPath = p;
+                                    break;
+                                }
+                            }
+                        }
+                        if (headPath) {
+                            headPath.style.fill = skinColor;
+                        }
                         
-                        head.insertAdjacentElement('afterend', eyebrowsGroup);
+                        // Apply ear filter to images in face group
+                        faceGroup.querySelectorAll("image").forEach(img => {
+                            img.setAttribute("filter", "url(#custom-ear-filter)");
+                        });
+                        
+                        // Insert face group and remove old head/ears
+                        const head = svgElement.querySelector("ellipse.cls-6");
+                        if (head) {
+                            head.parentNode.insertBefore(faceGroup, head);
+                            head.remove();
+                            const rightEar = svgElement.querySelector(".cls-2");
+                            if (rightEar) rightEar.remove();
+                            const leftEar = svgElement.querySelector(".cls-4");
+                            if (leftEar) leftEar.remove();
+                        }
                     }
+                }
+
+                // Head coordinates for features placement (always center on 90.32, 66.73)
+                const cx = 90.32;
+                const cy = 66.73;
+
+                // 2. Inject Eyebrows
+                if (state.eyebrowIndex > 0) {
+                    const eyebrowItem = FACIAL_DATABASE.eyebrows[state.eyebrowIndex - 1];
+                    const eyebrowsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    eyebrowsGroup.setAttribute("id", "custom-eyebrows");
                     
-                    // 2. Inject Eyes
-                    if (state.eyeIndex > 0) {
-                        const eyeItem = FACIAL_DATABASE.eyes[state.eyeIndex - 1];
-                        const eyesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                        eyesGroup.setAttribute("id", "custom-eyes");
-                        
-                        const cx = parseFloat(head.getAttribute("cx")) || 90.32;
-                        const cy = parseFloat(head.getAttribute("cy")) || 66.73;
-                        
-                        const dx = cx - eyeItem.x_center;
-                        const dy = (cy + 20.64) - eyeItem.y_center;
-                        eyesGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
-                        eyesGroup.innerHTML = eyeItem.left.join("") + eyeItem.right.join("");
-                        
-                        // Insert after eyebrows if present, else after head
+                    const dx = cx - eyebrowItem.x_center;
+                    const dy = (cy + 2.48) - eyebrowItem.y_center;
+                    eyebrowsGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
+                    eyebrowsGroup.innerHTML = eyebrowItem.left.join("") + eyebrowItem.right.join("");
+                    
+                    const faceEl = svgElement.querySelector("#custom-face");
+                    if (faceEl) {
+                        faceEl.insertAdjacentElement('afterend', eyebrowsGroup);
+                    } else {
+                        const firstGroup = svgElement.querySelector("g#Layer_1-2") || svgElement;
+                        firstGroup.appendChild(eyebrowsGroup);
+                    }
+                }
+                
+                // 3. Inject Eyes
+                if (state.eyeIndex > 0) {
+                    const eyeItem = FACIAL_DATABASE.eyes[state.eyeIndex - 1];
+                    const eyesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    eyesGroup.setAttribute("id", "custom-eyes");
+                    
+                    const dx = cx - eyeItem.x_center;
+                    const dy = (cy + 20.64) - eyeItem.y_center;
+                    eyesGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
+                    eyesGroup.innerHTML = eyeItem.left.join("") + eyeItem.right.join("");
+                    
+                    const eyebrowsEl = svgElement.querySelector("#custom-eyebrows");
+                    if (eyebrowsEl) {
+                        eyebrowsEl.insertAdjacentElement('afterend', eyesGroup);
+                    } else {
+                        const faceEl = svgElement.querySelector("#custom-face");
+                        if (faceEl) {
+                            faceEl.insertAdjacentElement('afterend', eyesGroup);
+                        } else {
+                            const firstGroup = svgElement.querySelector("g#Layer_1-2") || svgElement;
+                            firstGroup.appendChild(eyesGroup);
+                        }
+                    }
+                }
+
+                // 4. Inject Nose
+                if (state.noseIndex > 0) {
+                    const noseItem = FACIAL_DATABASE.noses[state.noseIndex - 1];
+                    const noseGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    noseGroup.setAttribute("id", "custom-nose");
+                    
+                    const dx = cx - noseItem.x_center;
+                    const dy = (cy + 34.72) - noseItem.y_center;
+                    noseGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
+                    noseGroup.innerHTML = noseItem.left.join("") + noseItem.right.join("");
+                    
+                    const eyesEl = svgElement.querySelector("#custom-eyes");
+                    if (eyesEl) {
+                        eyesEl.insertAdjacentElement('afterend', noseGroup);
+                    } else {
                         const eyebrowsEl = svgElement.querySelector("#custom-eyebrows");
                         if (eyebrowsEl) {
-                            eyebrowsEl.insertAdjacentElement('afterend', eyesGroup);
+                            eyebrowsEl.insertAdjacentElement('afterend', noseGroup);
                         } else {
-                            head.insertAdjacentElement('afterend', eyesGroup);
+                            const faceEl = svgElement.querySelector("#custom-face");
+                            if (faceEl) {
+                                faceEl.insertAdjacentElement('afterend', noseGroup);
+                            }
+                        }
+                    }
+                }
+
+                // 5. Inject Mouth
+                if (state.mouthIndex > 0) {
+                    const mouthItem = FACIAL_DATABASE.mouths[state.mouthIndex - 1];
+                    const mouthGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    mouthGroup.setAttribute("id", "custom-mouth");
+                    
+                    const dx = cx - mouthItem.x_center;
+                    const dy = (cy + 45.43) - mouthItem.y_center;
+                    mouthGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
+                    mouthGroup.innerHTML = mouthItem.left.join("") + mouthItem.right.join("");
+                    
+                    const noseEl = svgElement.querySelector("#custom-nose");
+                    if (noseEl) {
+                        noseEl.insertAdjacentElement('afterend', mouthGroup);
+                    } else {
+                        const eyesEl = svgElement.querySelector("#custom-eyes");
+                        if (eyesEl) {
+                            eyesEl.insertAdjacentElement('afterend', mouthGroup);
+                        } else {
+                            const eyebrowsEl = svgElement.querySelector("#custom-eyebrows");
+                            if (eyebrowsEl) {
+                                eyebrowsEl.insertAdjacentElement('afterend', mouthGroup);
+                            } else {
+                                const faceEl = svgElement.querySelector("#custom-face");
+                                if (faceEl) {
+                                    faceEl.insertAdjacentElement('afterend', mouthGroup);
+                                }
+                            }
                         }
                     }
                 }
@@ -1597,7 +1839,7 @@ def main():
 
             // Update dynamic ambient glow color behind character
             const activeSkinColor = state.customMode ? state.customSkin : PALETTE_DATA[state.skinToneIndex - 1].skin;
-            document.documentElement.style.setProperty('--skin-glow-color', activeSkinColor + "25"); // Add alpha glow
+            document.documentElement.style.setProperty('--skin-glow-color', activeSkinColor + "25");
         }
 
         // Draw and update Palette UI grid
@@ -1726,6 +1968,121 @@ def main():
                 });
                 eyesGrid.appendChild(btn);
             });
+
+            // 3. Faces selection grid
+            facesGrid.innerHTML = "";
+            for (let i = 1; i <= 6; i++) {
+                const faceSvgStr = SVG_DATABASE.faces[i];
+                if (!faceSvgStr) continue;
+                
+                const btn = document.createElement("button");
+                btn.className = "facial-select-btn";
+                if (i === state.faceIndex) {
+                    btn.classList.add("active");
+                }
+                
+                const parser = new DOMParser();
+                const faceDoc = parser.parseFromString(faceSvgStr, "image/svg+xml");
+                const svgEl = faceDoc.documentElement;
+                
+                svgEl.removeAttribute("width");
+                svgEl.removeAttribute("height");
+                svgEl.setAttribute("class", "facial-btn-preview");
+                
+                let headPath = svgEl.querySelector("path[fill='#FFE7E6']") || 
+                               svgEl.querySelector("path[fill='#ffe7e6']");
+                if (!headPath) {
+                    const paths = svgEl.querySelectorAll("path");
+                    for (let p of paths) {
+                        const fillAttr = p.getAttribute("fill");
+                        if (fillAttr && fillAttr.toUpperCase() === "#FFE7E6") {
+                            headPath = p;
+                            break;
+                        }
+                    }
+                }
+                if (headPath) {
+                    headPath.style.fill = "#ffe7e6";
+                }
+                
+                btn.innerHTML = `<span class="facial-btn-label">Dáng #${i}</span>`;
+                btn.appendChild(svgEl);
+                
+                btn.addEventListener("click", () => {
+                    if (state.faceIndex !== i) {
+                        state.faceIndex = i;
+                        playSound('click');
+                        syncFacialActiveState(facesGrid, i);
+                        updateCharacter();
+                        saveState();
+                    }
+                });
+                facesGrid.appendChild(btn);
+            }
+
+            // 4. Noses selection grid
+            nosesGrid.innerHTML = "";
+            FACIAL_DATABASE.noses.forEach(item => {
+                const btn = document.createElement("button");
+                btn.className = "facial-select-btn";
+                if (item.id === state.noseIndex) {
+                    btn.classList.add("active");
+                }
+                
+                const dx = 25 - item.x_center;
+                const dy = 12 - item.y_center;
+                btn.innerHTML = `
+                    <span class="facial-btn-label">Kiểu #${item.id}</span>
+                    <svg viewBox="0 0 50 24" class="facial-btn-preview">
+                        <g class="nose-preview" transform="translate(${dx}, ${dy})">
+                            ${item.left.join("")} ${item.right.join("")}
+                        </g>
+                    </svg>
+                `;
+                
+                btn.addEventListener("click", () => {
+                    if (state.noseIndex !== item.id) {
+                        state.noseIndex = item.id;
+                        playSound('click');
+                        syncFacialActiveState(nosesGrid, item.id);
+                        updateCharacter();
+                        saveState();
+                    }
+                });
+                nosesGrid.appendChild(btn);
+            });
+
+            // 5. Mouths selection grid
+            mouthsGrid.innerHTML = "";
+            FACIAL_DATABASE.mouths.forEach(item => {
+                const btn = document.createElement("button");
+                btn.className = "facial-select-btn";
+                if (item.id === state.mouthIndex) {
+                    btn.classList.add("active");
+                }
+                
+                const dx = 25 - item.x_center;
+                const dy = 12 - item.y_center;
+                btn.innerHTML = `
+                    <span class="facial-btn-label">Kiểu #${item.id}</span>
+                    <svg viewBox="0 0 50 24" class="facial-btn-preview">
+                        <g class="mouth-preview" transform="translate(${dx}, ${dy})">
+                            ${item.left.join("")} ${item.right.join("")}
+                        </g>
+                    </svg>
+                `;
+                
+                btn.addEventListener("click", () => {
+                    if (state.mouthIndex !== item.id) {
+                        state.mouthIndex = item.id;
+                        playSound('click');
+                        syncFacialActiveState(mouthsGrid, item.id);
+                        updateCharacter();
+                        saveState();
+                    }
+                });
+                mouthsGrid.appendChild(btn);
+            });
         }
 
         // Helper to update active classes inside grid
@@ -1768,8 +2125,11 @@ def main():
             buildPaletteUI();
             
             // Sync facial selections
+            syncFacialActiveState(facesGrid, state.faceIndex);
             syncFacialActiveState(eyebrowsGrid, state.eyebrowIndex);
             syncFacialActiveState(eyesGrid, state.eyeIndex);
+            syncFacialActiveState(nosesGrid, state.noseIndex);
+            syncFacialActiveState(mouthsGrid, state.mouthIndex);
         }
 
         function showToast(message) {
@@ -1917,8 +2277,11 @@ def main():
                 customMode: false,
                 customSkin: "#ffe7e6",
                 customShading: "#ffcccc",
+                faceIndex: 1,
                 eyeIndex: 1,
-                eyebrowIndex: 1
+                eyebrowIndex: 1,
+                noseIndex: 1,
+                mouthIndex: 1
             };
             resetCamera();
             updateUI();
@@ -1947,7 +2310,7 @@ def main():
             downloadLink.href = url;
             
             const modeName = state.customMode ? "custom" : `preset_${state.skinToneIndex}`;
-            const filename = `mee_${state.gender}_skin_${modeName}_eye_${state.eyeIndex}_eb_${state.eyebrowIndex}.svg`;
+            const filename = `mee_${state.gender}_skin_${modeName}_face_${state.faceIndex}_eye_${state.eyeIndex}_eb_${state.eyebrowIndex}_nose_${state.noseIndex}_mouth_${state.mouthIndex}.svg`;
             downloadLink.download = filename;
             
             document.body.appendChild(downloadLink);
@@ -1992,7 +2355,7 @@ def main():
                 downloadLink.href = pngURL;
                 
                 const modeName = state.customMode ? "custom" : `preset_${state.skinToneIndex}`;
-                downloadLink.download = `mee_${state.gender}_skin_${modeName}_eye_${state.eyeIndex}_eb_${state.eyebrowIndex}.png`;
+                downloadLink.download = `mee_${state.gender}_skin_${modeName}_face_${state.faceIndex}_eye_${state.eyeIndex}_eb_${state.eyebrowIndex}_nose_${state.noseIndex}_mouth_${state.mouthIndex}.png`;
                 
                 document.body.appendChild(downloadLink);
                 downloadLink.click();

@@ -298,6 +298,8 @@ def parse_single_file(filepath, index):
 
 def main():
     facial_dir = r"d:\StoryMee\SVG\facial"
+    
+    # 1. Eyes
     eyes_data = []
     for i in range(1, 12):
         path = os.path.join(facial_dir, f"eyes_{i}.svg")
@@ -305,21 +307,40 @@ def main():
         if data:
             eyes_data.append(data)
             
+    # 2. Eyebrows
     eyebrow_data = []
     for i in range(1, 8):
         path = os.path.join(facial_dir, f"eyebrow_{i}.svg")
         data = parse_single_file(path, i)
         if data:
             eyebrow_data.append(data)
+
+    # 3. Noses
+    nose_data = []
+    for i in range(1, 8):
+        path = os.path.join(facial_dir, f"nose_{i}.svg")
+        data = parse_single_file(path, i)
+        if data:
+            nose_data.append(data)
+
+    # 4. Mouths
+    mouth_data = []
+    for i in range(1, 14):
+        path = os.path.join(facial_dir, f"mouth_{i}.svg")
+        data = parse_single_file(path, i)
+        if data:
+            mouth_data.append(data)
             
     out_db = {
         "eyes": eyes_data,
-        "eyebrows": eyebrow_data
+        "eyebrows": eyebrow_data,
+        "noses": nose_data,
+        "mouths": mouth_data
     }
     
     with open(r"d:\StoryMee\SVG\facial_features.json", 'w', encoding='utf-8') as f:
         json.dump(out_db, f, indent=2)
-    print("Saved facial_features.json with separate left/right component coordinates!")
+    print("Saved facial_features.json with all facial components!")
 
 if __name__ == '__main__':
     main()
