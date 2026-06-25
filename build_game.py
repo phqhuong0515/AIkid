@@ -1450,7 +1450,7 @@ def main():
             eyeIndex: 1, // 1 to 11
             eyebrowIndex: 1, // 1 to 7
             noseIndex: 1, // 1 to 7
-            mouthIndex: 1 // 1 to 13
+            mouthIndex: 1 // 1 to 14
         };
 
         // UI References
@@ -1511,7 +1511,7 @@ def main():
                     if (parsed.eyeIndex >= 1 && parsed.eyeIndex <= 11) state.eyeIndex = parsed.eyeIndex;
                     if (parsed.eyebrowIndex >= 1 && parsed.eyebrowIndex <= 7) state.eyebrowIndex = parsed.eyebrowIndex;
                     if (parsed.noseIndex >= 1 && parsed.noseIndex <= 7) state.noseIndex = parsed.noseIndex;
-                    if (parsed.mouthIndex >= 1 && parsed.mouthIndex <= 13) state.mouthIndex = parsed.mouthIndex;
+                    if (parsed.mouthIndex >= 1 && parsed.mouthIndex <= 14) state.mouthIndex = parsed.mouthIndex;
                 } catch(e) {}
             }
             buildFacialUI();

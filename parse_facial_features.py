@@ -325,7 +325,7 @@ def main():
 
     # 4. Mouths
     mouth_data = []
-    for i in range(1, 14):
+    for i in range(1, 15):
         path = os.path.join(facial_dir, f"mouth_{i}.svg")
         data = parse_single_file(path, i)
         if data:
