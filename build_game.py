@@ -66,6 +66,7 @@ def main():
                     "id": eye["id"],
                     "y_base": eye["y_base"],
                     "y_center": eye["y_center"],
+                    "x_center": eye.get("x_center", 38.02),
                     "height": eye["height"],
                     "left": [rename_facial_classes(s) for s in eye["left"]],
                     "right": [rename_facial_classes(s) for s in eye["right"]]
@@ -77,6 +78,7 @@ def main():
                     "id": eb["id"],
                     "y_base": eb["y_base"],
                     "y_center": eb["y_center"],
+                    "x_center": eb.get("x_center", 38.01),
                     "height": eb["height"],
                     "left": [rename_facial_classes(s) for s in eb["left"]],
                     "right": [rename_facial_classes(s) for s in eb["right"]]
@@ -1551,9 +1553,11 @@ def main():
                         const eyebrowsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
                         eyebrowsGroup.setAttribute("id", "custom-eyebrows");
                         
-                        // Centered X offset: 90.32 - 38.01 = 52.31. Centered Y target: 72.435
-                        const dx = 52.31;
-                        const dy = 72.435 - eyebrowItem.y_center;
+                        const cx = parseFloat(head.getAttribute("cx")) || 90.32;
+                        const cy = parseFloat(head.getAttribute("cy")) || 66.73;
+                        
+                        const dx = cx - eyebrowItem.x_center;
+                        const dy = (cy + 5.705) - eyebrowItem.y_center;
                         eyebrowsGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
                         eyebrowsGroup.innerHTML = eyebrowItem.left.join("") + eyebrowItem.right.join("");
                         
@@ -1566,9 +1570,11 @@ def main():
                         const eyesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
                         eyesGroup.setAttribute("id", "custom-eyes");
                         
-                        // Centered X offset: 90.32 - 38.02 = 52.3. Centered Y target: 87.37
-                        const dx = 52.30;
-                        const dy = 87.37 - eyeItem.y_center;
+                        const cx = parseFloat(head.getAttribute("cx")) || 90.32;
+                        const cy = parseFloat(head.getAttribute("cy")) || 66.73;
+                        
+                        const dx = cx - eyeItem.x_center;
+                        const dy = (cy + 20.64) - eyeItem.y_center;
                         eyesGroup.setAttribute("transform", `translate(${dx}, ${dy})`);
                         eyesGroup.innerHTML = eyeItem.left.join("") + eyeItem.right.join("");
                         
@@ -2040,6 +2046,32 @@ def main():
         f.write(html_template)
         
     print(f"Self-contained game created successfully at: {dest_path}")
+
+    # Auto sync to GitHub
+    try:
+        import subprocess
+        print("Auto syncing to GitHub...")
+        git_path = os.path.join(base_dir, "git-portable", "cmd", "git.exe")
+        subprocess.run([git_path, "add", "."], check=True)
+        # Check if there are changes before committing
+        status_res = subprocess.run([git_path, "status", "--porcelain"], capture_output=True, text=True)
+        if status_res.stdout.strip():
+            subprocess.run([git_path, "commit", "-m", "Auto sync: Mee Character Customizer update"], check=True)
+        else:
+            print("No changes to commit.")
+        
+        token_path = os.path.join(base_dir, "github_token.txt")
+        if os.path.exists(token_path):
+            with open(token_path, "r", encoding="utf-8") as f:
+                token = f.read().strip()
+        else:
+            raise FileNotFoundError("github_token.txt not found. Please create it with your GitHub Personal Access Token.")
+        
+        remote_url = f"https://{token}@github.com/storymee-dev/mee-character.git"
+        subprocess.run([git_path, "push", remote_url, "main", "--force"], check=True)
+        print("Successfully synced to GitHub!")
+    except Exception as e:
+        print(f"Failed to auto sync: {e}")
 
 if __name__ == "__main__":
     main()

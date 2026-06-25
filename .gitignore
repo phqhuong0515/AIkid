@@ -8,3 +8,4 @@ __pycache__/
 ~*
 *.tmp
 winget_log.txt
+github_token.txt
