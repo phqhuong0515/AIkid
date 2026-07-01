@@ -219,6 +219,11 @@ body {
   box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
 }
 
+.preview-panel, .options-panel {
+  min-height: 0;
+  height: 100%;
+}
+
 /* 2. Preview Panel */
 .preview-panel .preview-card {
   height: 100%;
@@ -606,6 +611,10 @@ body {
   .main-content {
     grid-template-columns: 1fr;
     height: auto; /* Auto height on stacked mobile layouts */
+  }
+
+  .preview-panel, .options-panel {
+    height: auto;
   }
   
   .left-sidebar {
