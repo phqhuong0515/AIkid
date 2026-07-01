@@ -157,35 +157,44 @@ function processFacial() {
   });
 }
 
-// 3. Process Hair SVGs (Bangs & Behind)
+// 3. Process Hair SVGs (Bangs & Behind) recursively
 function processHair() {
   if (!fs.existsSync(HAIR_DIR)) {
     console.warn(`Hair directory not found: ${HAIR_DIR}`);
     return;
   }
-  const files = fs.readdirSync(HAIR_DIR);
-  files.forEach(file => {
-    if (!file.endsWith('.svg')) return;
-    const filePath = path.join(HAIR_DIR, file);
-    const content = readSvg(filePath);
-    const name = path.basename(file, '.svg');
-    
-    // Parse style index (e.g. "Bang 1" -> styleKey = 1)
-    const styleMatch = name.match(/^(Bang|Behind)\s+(\d+)/i);
-    if (!styleMatch) return;
-    
-    const styleType = styleMatch[1].toLowerCase(); // "bang" or "behind"
-    const styleKey = parseInt(styleMatch[2], 10);
-    
-    // Parse color index (e.g. "Bang 1_Color 5" -> colorKey = 5)
-    const colorMatch = name.match(/_Color\s+(\d+)/i);
-    const colorKey = colorMatch ? parseInt(colorMatch[1], 10) : 'default';
-    
-    if (!assets.hair[styleType][styleKey]) {
-      assets.hair[styleType][styleKey] = {};
-    }
-    assets.hair[styleType][styleKey][colorKey] = content;
-  });
+  
+  function scanDir(dir) {
+    const items = fs.readdirSync(dir);
+    items.forEach(item => {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        scanDir(fullPath);
+      } else if (stat.isFile() && item.endsWith('.svg')) {
+        const content = readSvg(fullPath);
+        const name = path.basename(item, '.svg');
+        
+        // Parse style index (e.g. "Bang 1" -> styleKey = 1)
+        const styleMatch = name.match(/^(Bang|Behind)\s+(\d+)/i);
+        if (!styleMatch) return;
+        
+        const styleType = styleMatch[1].toLowerCase(); // "bang" or "behind"
+        const styleKey = parseInt(styleMatch[2], 10);
+        
+        // Parse color index (e.g. "Bang 1_Color 5" -> colorKey = 5)
+        const colorMatch = name.match(/_Color\s+(\d+)/i);
+        const colorKey = colorMatch ? parseInt(colorMatch[1], 10) : 'default';
+        
+        if (!assets.hair[styleType][styleKey]) {
+          assets.hair[styleType][styleKey] = {};
+        }
+        assets.hair[styleType][styleKey][colorKey] = content;
+      }
+    });
+  }
+  
+  scanDir(HAIR_DIR);
 }
 
 // 4. Process Outfit SVGs (Shirts, Pants, Dresses)
