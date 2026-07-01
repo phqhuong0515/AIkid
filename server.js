@@ -30,8 +30,8 @@ const server = http.createServer((req, res) => {
     return;
   }
   
-  fs.access(absolutePath, fs.constants.F_OK, (err) => {
-    if (err) {
+  fs.stat(absolutePath, (err, stats) => {
+    if (err || !stats.isFile()) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('Not Found');
       return;
@@ -41,7 +41,15 @@ const server = http.createServer((req, res) => {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     
     res.writeHead(200, { 'Content-Type': contentType });
-    fs.createReadStream(absolutePath).pipe(res);
+    const stream = fs.createReadStream(absolutePath);
+    stream.on('error', (streamErr) => {
+      console.error(streamErr);
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Internal Server Error');
+      }
+    });
+    stream.pipe(res);
   });
 });
 
