@@ -882,12 +882,96 @@ function composeCharacterSVG() {
     .replace(/#ffcccc/gi, shadowSkinColor)
     .replace(/#fcc\b/gi, shadowSkinColor);
 
+  let outfitGroup = '';
+  // 3. Outfit Layering
   if (state.dress > 0) {
     // Hide default underwear/pants to prevent showing under the dress
     bodySvg = bodySvg
       .replace(/\.cls-10\s*\{\s*fill\s*:\s*url\(#linear-gradient-3\);?\s*\}/i, `.cls-10{display:none;}`)
       .replace(/\.cls-11\s*\{\s*fill\s*:\s*url\(#linear-gradient-4\);?\s*\}/i, `.cls-11{display:none;}`)
       .replace(/\.cls-12\s*\{\s*fill\s*:\s*url\(#linear-gradient-5\);?\s*\}/i, `.cls-12{display:none;}`);
+
+    let dressSvg = '';
+    let dressTransform = '';
+    if (state.dress === 1) {
+      dressSvg = cleanDressChung(meeAssets.outfit.dress.unisex[1]);
+      if (dressSvg) {
+        dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
+        dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
+        
+        const splitResult = splitUnisexDress(dressSvg);
+        dressTransform = 'translate(-7.72, -47.23)';
+        
+        if (splitResult.back) {
+          dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">
+            <circle cx="97" cy="110" r="90" fill="url(#mee-dress-linear-gradient)" />
+            ${splitResult.back}
+          </g>`;
+        }
+        if (splitResult.front) {
+          dressFrontGroup = `<g id="mee-outfit-dress-front" class="mee-outfit-dress" transform="${dressTransform}">${splitResult.front}</g>`;
+        }
+        
+        dressSvg = splitResult.body;
+      }
+    } else if (state.dress === 2) {
+      dressSvg = meeAssets.outfit.dress[state.gender][1];
+      if (dressSvg) {
+        dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
+        dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
+        const dressCenter = getSvgElementCenter(dressSvg) || { x: 69.53, y: 145 };
+        const dressTranslateX = 90.32 - dressCenter.x;
+        const dressTranslateY = state.gender === 'female' ? 136.32 : 136.42;
+        dressTransform = `translate(${dressTranslateX.toFixed(2)}, ${dressTranslateY.toFixed(2)})`;
+      }
+    }
+
+    if (dressSvg) {
+      outfitGroup = `<g id="mee-outfit-dress-body" class="mee-outfit-dress" transform="${dressTransform}">${getSvgInnerContent(dressSvg)}</g>`;
+    }
+  } else {
+    // Render shirt and pants
+    let shirtSvg = '';
+    let pantsSvg = '';
+
+    if (state.shirt > 0) {
+      shirtSvg = meeAssets.outfit.shirt[state.gender][state.shirt];
+    }
+    if (state.pants > 0) {
+      pantsSvg = meeAssets.outfit.pants[state.pants];
+    }
+
+    if (shirtSvg) {
+      shirtSvg = makeSvgIdsUnique(shirtSvg, 'mee-shirt');
+      shirtSvg = extractStylesAndDefs(shirtSvg, stylesArray, defsArray, '#mee-outfit-shirt');
+    }
+    if (pantsSvg) {
+      pantsSvg = makeSvgIdsUnique(pantsSvg, 'mee-pants');
+      pantsSvg = extractStylesAndDefs(pantsSvg, stylesArray, defsArray, '#mee-outfit-pants');
+    }
+
+    let shirtTransform = '';
+    if (shirtSvg) {
+      const shirtCenter = getSvgElementCenter(shirtSvg) || { x: 66.83, y: 48 };
+      const shirtTranslateX = 90.32 - shirtCenter.x;
+      const shirtTranslateY = state.shirt === 3
+        ? (state.gender === 'female' ? 129.93 : 129.91)
+        : (state.gender === 'female' ? 139.93 : 139.91);
+      shirtTransform = `translate(${shirtTranslateX.toFixed(2)}, ${shirtTranslateY.toFixed(2)})`;
+    }
+
+    let pantsTransform = '';
+    if (pantsSvg) {
+      const pantsCenter = getSvgElementCenter(pantsSvg) || { x: 62.0, y: 97 };
+      const pantsTranslateX = 90.32 - pantsCenter.x;
+      const pantsTranslateY = 246.8;
+      pantsTransform = `translate(${pantsTranslateX.toFixed(2)}, ${pantsTranslateY.toFixed(2)})`;
+    }
+
+    let pantsGroup = pantsSvg ? `<g id="mee-outfit-pants" transform="${pantsTransform}">${getSvgInnerContent(pantsSvg)}</g>` : '';
+    let shirtGroup = shirtSvg ? `<g id="mee-outfit-shirt" transform="${shirtTransform}">${getSvgInnerContent(shirtSvg)}</g>` : '';
+
+    outfitGroup = pantsGroup + shirtGroup;
   }
 
   // Extract base body styles and defs, scoped to #mee-character-body to prevent leakage/collisions (such as clip-paths clashing with outfits)
@@ -1102,91 +1186,7 @@ function composeCharacterSVG() {
     </g>
   `;
 
-  // 3. Outfit Layering
-  let outfitGroup = '';
-  if (state.dress > 0) {
-    let dressSvg = '';
-    let dressTransform = '';
-    if (state.dress === 1) {
-      dressSvg = cleanDressChung(meeAssets.outfit.dress.unisex[1]);
-      if (dressSvg) {
-        dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
-        dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
-        
-        const splitResult = splitUnisexDress(dressSvg);
-        dressTransform = 'translate(-7.72, -47.23)';
-        
-        if (splitResult.back) {
-          dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">
-            <circle cx="97" cy="110" r="90" fill="url(#mee-dress-linear-gradient)" />
-            ${splitResult.back}
-          </g>`;
-        }
-        if (splitResult.front) {
-          dressFrontGroup = `<g id="mee-outfit-dress-front" class="mee-outfit-dress" transform="${dressTransform}">${splitResult.front}</g>`;
-        }
-        
-        dressSvg = splitResult.body;
-      }
-    } else if (state.dress === 2) {
-      dressSvg = meeAssets.outfit.dress[state.gender][1];
-      if (dressSvg) {
-        dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
-        dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
-        const dressCenter = getSvgElementCenter(dressSvg) || { x: 69.53, y: 145 };
-        const dressTranslateX = 90.32 - dressCenter.x;
-        const dressTranslateY = state.gender === 'female' ? 136.32 : 136.42;
-        dressTransform = `translate(${dressTranslateX.toFixed(2)}, ${dressTranslateY.toFixed(2)})`;
-      }
-    }
 
-    if (dressSvg) {
-      outfitGroup = `<g id="mee-outfit-dress-body" class="mee-outfit-dress" transform="${dressTransform}">${getSvgInnerContent(dressSvg)}</g>`;
-    }
-  } else {
-  // Render shirt and pants
-  let shirtSvg = '';
-  let pantsSvg = '';
-
-  if (state.shirt > 0) {
-    shirtSvg = meeAssets.outfit.shirt[state.gender][state.shirt];
-  }
-  if (state.pants > 0) {
-    pantsSvg = meeAssets.outfit.pants[state.pants];
-  }
-
-  if (shirtSvg) {
-    shirtSvg = makeSvgIdsUnique(shirtSvg, 'mee-shirt');
-    shirtSvg = extractStylesAndDefs(shirtSvg, stylesArray, defsArray, '#mee-outfit-shirt');
-  }
-  if (pantsSvg) {
-    pantsSvg = makeSvgIdsUnique(pantsSvg, 'mee-pants');
-    pantsSvg = extractStylesAndDefs(pantsSvg, stylesArray, defsArray, '#mee-outfit-pants');
-  }
-
-  let shirtTransform = '';
-  if (shirtSvg) {
-    const shirtCenter = getSvgElementCenter(shirtSvg) || { x: 66.83, y: 48 };
-    const shirtTranslateX = 90.32 - shirtCenter.x;
-    const shirtTranslateY = state.shirt === 3
-      ? (state.gender === 'female' ? 129.93 : 129.91)
-      : (state.gender === 'female' ? 139.93 : 139.91);
-    shirtTransform = `translate(${shirtTranslateX.toFixed(2)}, ${shirtTranslateY.toFixed(2)})`;
-  }
-
-  let pantsTransform = '';
-  if (pantsSvg) {
-    const pantsCenter = getSvgElementCenter(pantsSvg) || { x: 62.0, y: 97 };
-    const pantsTranslateX = 90.32 - pantsCenter.x;
-    const pantsTranslateY = 246.8;
-    pantsTransform = `translate(${pantsTranslateX.toFixed(2)}, ${pantsTranslateY.toFixed(2)})`;
-  }
-
-  let pantsGroup = pantsSvg ? `<g id="mee-outfit-pants" transform="${pantsTransform}">${getSvgInnerContent(pantsSvg)}</g>` : '';
-  let shirtGroup = shirtSvg ? `<g id="mee-outfit-shirt" transform="${shirtTransform}">${getSvgInnerContent(shirtSvg)}</g>` : '';
-
-  outfitGroup = pantsGroup + shirtGroup;
-}
 
   // Inject outfit, facial, and dress front groups right before the closing </svg> tag
   const injectIndex = bodySvg.lastIndexOf('</svg>');
