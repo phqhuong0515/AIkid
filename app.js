@@ -1117,7 +1117,10 @@ function composeCharacterSVG() {
         dressTransform = 'translate(-7.72, -47.23)';
         
         if (splitResult.back) {
-          dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">${splitResult.back}</g>`;
+          dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">
+            <circle cx="97" cy="110" r="90" fill="url(#mee-dress-linear-gradient)" />
+            ${splitResult.back}
+          </g>`;
         }
         if (splitResult.front) {
           dressFrontGroup = `<g id="mee-outfit-dress-front" class="mee-outfit-dress" transform="${dressTransform}">${splitResult.front}</g>`;
