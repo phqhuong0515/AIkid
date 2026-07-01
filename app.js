@@ -958,7 +958,7 @@ function composeCharacterSVG() {
       if (state.shirt === 3) {
         shirtTranslateY = state.gender === 'female' ? 129.93 : 129.91;
       } else if (state.shirt === 4) {
-        shirtTranslateY = state.gender === 'female' ? 136.93 : 136.91;
+        shirtTranslateY = state.gender === 'female' ? 138.93 : 138.91;
       } else if (state.shirt === 5 || state.shirt === 6) {
         shirtTranslateY = state.gender === 'female' ? 134.93 : 134.91;
       } else {
