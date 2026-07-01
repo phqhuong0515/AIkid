@@ -1051,8 +1051,7 @@ function composeCharacterSVG() {
         dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '#mee-outfit-dress');
         dressTransform = 'translate(-7.72, -47.23)';
       }
-    }
-  } else if (state.dress === 2) {
+    } else if (state.dress === 2) {
     dressSvg = meeAssets.outfit.dress[state.gender][1];
     if (dressSvg) {
       dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
