@@ -400,7 +400,7 @@ function initUI() {
 
   // Render new custom grids dynamically based on loaded assets
   renderCustomGrid('bang-picker', 'hair', Object.keys(meeAssets.hair.bang).length, 'bang', false, 'bang');
-  renderCustomGrid('behind-picker', 'hair', Object.keys(meeAssets.hair.behind).length, 'behind', false, 'behind');
+  renderCustomGrid('behind-picker', 'hair', Object.keys(meeAssets.hair.behind).length, 'behind', true, 'behind');
   renderCustomGrid('shirt-picker', 'outfit', Object.keys(meeAssets.outfit.shirt[state.gender]).length, 'shirt', true, 'shirt');
   renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants).length, 'pants', true, 'pants');
   renderCustomGrid('dress-picker', 'outfit', 1 + Object.keys(meeAssets.outfit.dress[state.gender] || {}).length, 'dress', true, 'dress');
