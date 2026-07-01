@@ -398,12 +398,12 @@ function initUI() {
   renderSelectorGrid('nose-picker', 'nose', 7, 'nose', true);
   renderSelectorGrid('mouth-picker', 'mouth', 14, 'mouth', true);
 
-  // Render new custom grids
-  renderCustomGrid('bang-picker', 'hair', 9, 'bang', false, 'bang');
-  renderCustomGrid('behind-picker', 'hair', 17, 'behind', false, 'behind');
-  renderCustomGrid('shirt-picker', 'outfit', 3, 'shirt', true, 'shirt');
-  renderCustomGrid('pants-picker', 'outfit', 3, 'pants', true, 'pants');
-  renderCustomGrid('dress-picker', 'outfit', 2, 'dress', true, 'dress');
+  // Render new custom grids dynamically based on loaded assets
+  renderCustomGrid('bang-picker', 'hair', Object.keys(meeAssets.hair.bang).length, 'bang', false, 'bang');
+  renderCustomGrid('behind-picker', 'hair', Object.keys(meeAssets.hair.behind).length, 'behind', false, 'behind');
+  renderCustomGrid('shirt-picker', 'outfit', Object.keys(meeAssets.outfit.shirt[state.gender]).length, 'shirt', true, 'shirt');
+  renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants).length, 'pants', true, 'pants');
+  renderCustomGrid('dress-picker', 'outfit', 1 + Object.keys(meeAssets.outfit.dress[state.gender] || {}).length, 'dress', true, 'dress');
 
   // 3. Tab switching logic
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
@@ -421,9 +421,9 @@ function initUI() {
   document.querySelectorAll('input[name="gender"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
       state.gender = e.target.value;
-      // Re-render gender-specific grids
-      renderCustomGrid('shirt-picker', 'outfit', 3, 'shirt', true, 'shirt');
-      renderCustomGrid('dress-picker', 'outfit', 2, 'dress', true, 'dress');
+      // Re-render gender-specific grids dynamically
+      renderCustomGrid('shirt-picker', 'outfit', Object.keys(meeAssets.outfit.shirt[state.gender]).length, 'shirt', true, 'shirt');
+      renderCustomGrid('dress-picker', 'outfit', 1 + Object.keys(meeAssets.outfit.dress[state.gender] || {}).length, 'dress', true, 'dress');
       updatePreview();
     });
   });
