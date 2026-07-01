@@ -219,7 +219,7 @@ function processOutfit() {
       assets.outfit.pants[key] = content;
     } else if (lowerName.startsWith('shirt male')) {
       assets.outfit.shirt.male[key] = content;
-    } else if (lowerName.startsWith('shirt female')) {
+    } else if (lowerName.startsWith('shirt female') || lowerName.startsWith('shirt frmale')) {
       assets.outfit.shirt.female[key] = content;
     } else if (lowerName.startsWith('dress chung')) {
       assets.outfit.dress.unisex[key] = content;

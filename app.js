@@ -900,7 +900,7 @@ function composeCharacterSVG() {
         dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
         
         const splitResult = splitUnisexDress(dressSvg);
-        dressTransform = 'translate(-7.72, -47.23)';
+        dressTransform = 'translate(-7.72, -44.23)';
         
         if (splitResult.back) {
           dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">
@@ -1213,10 +1213,10 @@ function composeCharacterSVG() {
     const originalWidth = parseFloat(originalViewBoxMatch[1]);
     const originalHeight = parseFloat(originalViewBoxMatch[2]);
     
-    // Add margin parameters: left/right = 30px, top = 45px (for tall hair), bottom = 35px (for feet)
-    const paddingX = 30;
-    const paddingTop = 45;
-    const paddingBottom = 35;
+    // Add margin parameters: left/right = 33px, top = 48px (for tall hair), bottom = 38px (for feet)
+    const paddingX = 33;
+    const paddingTop = 48;
+    const paddingBottom = 38;
     
     const newMinX = -paddingX;
     const newMinY = -paddingTop;
