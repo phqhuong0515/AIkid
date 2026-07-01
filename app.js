@@ -800,10 +800,63 @@ function cleanDressChung(svgStr) {
   return svgStr.replace(/<path[^>]*?fill=["'](?:#FFF1CC|white|black|#005C00|#090D56|#8FA6B5)["'][^>]*?>/gi, '');
 }
 
+// Split unisex dress SVG elements into back, front, and body layers
+function splitUnisexDress(dressSvg) {
+  const shapes = [];
+  const regex = /<(path|ellipse)\b[^>]*?\/?>/gi;
+  let match;
+  while ((match = regex.exec(dressSvg)) !== null) {
+    shapes.push(match[0]);
+  }
+  
+  const backShapes = [];
+  const frontShapes = [];
+  const bodyShapes = [];
+  
+  shapes.forEach(shape => {
+    // 1. Back Layer: cls-1
+    if (shape.includes('class="cls-1"') || shape.includes("class='cls-1'")) {
+      backShapes.push(shape);
+      return;
+    }
+    
+    // 2. Front Layer:
+    // - class="cls-10" (light green hood)
+    // - class="cls-11" (eyebrows)
+    // - class="cls-9" (eyes and spikes)
+    // - class="cls-2" with d="M96.43 (top horn)
+    // - any shape with cx="51.14" or cx="143.41" (eyes)
+    // - any shape with d="M43.43" or d="M134.79" (eye outlines)
+    const isCls10 = shape.includes('class="cls-10"') || shape.includes("class='cls-10'");
+    const isCls11 = shape.includes('class="cls-11"') || shape.includes("class='cls-11'");
+    const isCls9 = shape.includes('class="cls-9"') || shape.includes("class='cls-9'");
+    const isTopHorn = (shape.includes('class="cls-2"') || shape.includes("class='cls-2'")) && shape.includes('d="M96.43');
+    const isEyeShape = shape.includes('cx="51.14"') || shape.includes('cx="143.41"') || shape.includes('cx=\'51.14\'') || shape.includes('cx=\'143.41\'') ||
+                       shape.includes('d="M43.43"') || shape.includes('d="M134.79"') || shape.includes('d=\'M43.43\'') || shape.includes('d=\'M134.79\'') ||
+                       shape.includes('d="M43.43,') || shape.includes('d="M134.79,');
+                       
+    if (isCls10 || isCls11 || isCls9 || isTopHorn || isEyeShape) {
+      frontShapes.push(shape);
+      return;
+    }
+    
+    // 3. Body Layer: everything else
+    bodyShapes.push(shape);
+  });
+  
+  return {
+    back: backShapes.join('\n'),
+    front: frontShapes.join('\n'),
+    body: bodyShapes.join('\n')
+  };
+}
+
 // Compose final character SVG
 function composeCharacterSVG() {
   const stylesArray = [];
   const defsArray = [];
+  let dressBackGroup = '';
+  let dressFrontGroup = '';
 
   // Always use clothed model body template strictly
   let bodySvg = meeAssets.body['clothes'][state.gender]['default'];
@@ -922,6 +975,16 @@ function composeCharacterSVG() {
     if (bodyOpeningIndex > 0) {
       bodySvg = bodySvg.substring(0, bodyOpeningIndex) +
         `<g id="mee-behind-hair" transform="translate(${behindOffsetX.toFixed(2)}, ${behindOffsetY.toFixed(2)})">${getSvgInnerContent(behindSvg)}</g>` +
+        bodySvg.substring(bodyOpeningIndex);
+    }
+  }
+
+  // Inject dress back group right after the opening <svg> tag (under behind hair)
+  if (dressBackGroup) {
+    const bodyOpeningIndex = bodySvg.indexOf('>') + 1;
+    if (bodyOpeningIndex > 0) {
+      bodySvg = bodySvg.substring(0, bodyOpeningIndex) +
+        dressBackGroup +
         bodySvg.substring(bodyOpeningIndex);
     }
   }
@@ -1048,25 +1111,36 @@ function composeCharacterSVG() {
       dressSvg = cleanDressChung(meeAssets.outfit.dress.unisex[1]);
       if (dressSvg) {
         dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
-        dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '#mee-outfit-dress');
+        dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
+        
+        const splitResult = splitUnisexDress(dressSvg);
         dressTransform = 'translate(-7.72, -47.23)';
+        
+        if (splitResult.back) {
+          dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">${splitResult.back}</g>`;
+        }
+        if (splitResult.front) {
+          dressFrontGroup = `<g id="mee-outfit-dress-front" class="mee-outfit-dress" transform="${dressTransform}">${splitResult.front}</g>`;
+        }
+        
+        dressSvg = splitResult.body;
       }
     } else if (state.dress === 2) {
-    dressSvg = meeAssets.outfit.dress[state.gender][1];
-    if (dressSvg) {
-      dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
-      dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '#mee-outfit-dress');
-      const dressCenter = getSvgElementCenter(dressSvg) || { x: 69.53, y: 145 };
-      const dressTranslateX = 90.32 - dressCenter.x;
-      const dressTranslateY = state.gender === 'female' ? 136.32 : 136.42;
-      dressTransform = `translate(${dressTranslateX.toFixed(2)}, ${dressTranslateY.toFixed(2)})`;
+      dressSvg = meeAssets.outfit.dress[state.gender][1];
+      if (dressSvg) {
+        dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
+        dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
+        const dressCenter = getSvgElementCenter(dressSvg) || { x: 69.53, y: 145 };
+        const dressTranslateX = 90.32 - dressCenter.x;
+        const dressTranslateY = state.gender === 'female' ? 136.32 : 136.42;
+        dressTransform = `translate(${dressTranslateX.toFixed(2)}, ${dressTranslateY.toFixed(2)})`;
+      }
     }
-  }
 
-  if (dressSvg) {
-    outfitGroup = `<g id="mee-outfit-dress" transform="${dressTransform}">${getSvgInnerContent(dressSvg)}</g>`;
-  }
-} else {
+    if (dressSvg) {
+      outfitGroup = `<g id="mee-outfit-dress-body" class="mee-outfit-dress" transform="${dressTransform}">${getSvgInnerContent(dressSvg)}</g>`;
+    }
+  } else {
   // Render shirt and pants
   let shirtSvg = '';
   let pantsSvg = '';
@@ -1111,13 +1185,14 @@ function composeCharacterSVG() {
   outfitGroup = pantsGroup + shirtGroup;
 }
 
-  // Inject outfit and facial groups right before the closing </svg> tag
+  // Inject outfit, facial, and dress front groups right before the closing </svg> tag
   const injectIndex = bodySvg.lastIndexOf('</svg>');
   if (injectIndex === -1) return bodySvg;
 
   let composedSvg = bodySvg.substring(0, injectIndex) +
     outfitGroup +
     faceGroup +
+    dressFrontGroup +
     bodySvg.substring(injectIndex);
 
   // Inject the combined defs and styles right after the opening <svg ...> tag
