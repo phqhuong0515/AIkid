@@ -6,7 +6,8 @@ const state = {
   eyebrows: 1, // 1 to 7
   nose: 1,
   mouth: 1,
-  eyebrowsColor: '#8a2827', // default base hair color (Color 1)
+  eyebrowsColorIndex: 1, // 1 to 20
+  syncEyebrowsColor: true,
   hairColor: 1, // 1 to 20
   customPrimaryColor: null,
   customShadowColor: null,
@@ -463,7 +464,8 @@ function initUI() {
     });
   }
 
-  // Add eyebrow color option in Eyebrow picker
+  // Add hair and eyebrows color pickers
+  addHairColorPicker();
   addEyebrowsColorPicker();
 }
 
@@ -666,34 +668,35 @@ function renderCustomGrid(containerId, category, count, stateKey, hasNone = fals
   }
 }
 
-// Add hair/eyebrows color picker inside eyebrows picker section
-function addEyebrowsColorPicker() {
+// Render hair color swatches
+function addHairColorPicker() {
   const parent = document.getElementById('hair-color-container');
   if (!parent) return;
   parent.innerHTML = '';
 
   const colorPickerWrapper = document.createElement('div');
-  colorPickerWrapper.className = 'eyebrows-color-section';
+  colorPickerWrapper.className = 'hair-color-section';
   colorPickerWrapper.innerHTML = `
     <label class="group-subtitle" style="font-size: 0.9rem; font-weight:600; color: var(--text-muted); margin-top: 10px; display: block;">
-      <i class="fa-solid fa-paintbrush"></i> Hair / Eyebrow Color
+      <i class="fa-solid fa-paintbrush"></i> Màu Tóc (Hair Color)
     </label>
-    <div class="eyebrows-colors-grid"></div>
+    <div class="hair-colors-grid"></div>
   `;
 
-  const grid = colorPickerWrapper.querySelector('.eyebrows-colors-grid');
+  const grid = colorPickerWrapper.querySelector('.hair-colors-grid');
 
   hairColors.forEach(color => {
     const swatch = document.createElement('div');
-    swatch.className = `color-swatch ${state.hairColor === color.index ? 'active' : ''}`;
+    swatch.className = `color-swatch hair-swatch ${state.hairColor === color.index ? 'active' : ''}`;
     swatch.style.backgroundColor = color.base;
     swatch.title = `${color.name} (Base: ${color.base})`;
 
     swatch.addEventListener('click', () => {
-      grid.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-      swatch.classList.add('active');
       state.hairColor = color.index;
-      state.eyebrowsColor = color.base;
+      if (state.syncEyebrowsColor) {
+        state.eyebrowsColorIndex = color.index;
+      }
+      syncHairColorPickersUI();
       updatePreview();
     });
 
@@ -701,6 +704,94 @@ function addEyebrowsColorPicker() {
   });
 
   parent.appendChild(colorPickerWrapper);
+}
+
+// Render eyebrows color swatches and synchronization checkbox
+function addEyebrowsColorPicker() {
+  const parent = document.getElementById('eyebrows-color-container');
+  if (!parent) return;
+  parent.innerHTML = '';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'eyebrows-color-section';
+  wrapper.innerHTML = `
+    <div class="eyebrows-sync-header" style="margin-top: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+      <label class="group-subtitle" style="font-size: 0.9rem; font-weight:600; color: var(--text-muted); margin: 0;">
+        <i class="fa-solid fa-paintbrush"></i> Màu Lông Mày (Eyebrows)
+      </label>
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; color: var(--text-brown);">
+        <input type="checkbox" id="sync-eyebrows-color" ${state.syncEyebrowsColor ? 'checked' : ''} style="cursor: pointer; width: 14px; height: 14px;">
+        <label for="sync-eyebrows-color" style="cursor: pointer; user-select: none;">Đồng bộ với màu tóc</label>
+      </div>
+    </div>
+    <div class="eyebrows-colors-grid"></div>
+  `;
+
+  const grid = wrapper.querySelector('.eyebrows-colors-grid');
+  const checkbox = wrapper.querySelector('#sync-eyebrows-color');
+
+  hairColors.forEach(color => {
+    const swatch = document.createElement('div');
+    const isSelected = state.syncEyebrowsColor ? (state.hairColor === color.index) : (state.eyebrowsColorIndex === color.index);
+    swatch.className = `color-swatch eyebrows-swatch ${isSelected ? 'active' : ''}`;
+    swatch.style.backgroundColor = color.base;
+    swatch.title = `${color.name} (Base: ${color.base})`;
+
+    swatch.addEventListener('click', () => {
+      state.eyebrowsColorIndex = color.index;
+      state.syncEyebrowsColor = false;
+      if (checkbox) checkbox.checked = false;
+      syncHairColorPickersUI();
+      updatePreview();
+    });
+
+    grid.appendChild(swatch);
+  });
+
+  checkbox.addEventListener('change', (e) => {
+    state.syncEyebrowsColor = e.target.checked;
+    if (state.syncEyebrowsColor) {
+      state.eyebrowsColorIndex = state.hairColor;
+    }
+    syncHairColorPickersUI();
+    updatePreview();
+  });
+
+  parent.appendChild(wrapper);
+}
+
+// Keep swatches and checkbox UI in sync with global state
+function syncHairColorPickersUI() {
+  // Update hair swatches active class
+  const hairParent = document.getElementById('hair-color-container');
+  if (hairParent) {
+    hairParent.querySelectorAll('.hair-swatch').forEach((swatch, idx) => {
+      const colorInfo = hairColors[idx];
+      if (colorInfo && colorInfo.index === state.hairColor) {
+        swatch.classList.add('active');
+      } else {
+        swatch.classList.remove('active');
+      }
+    });
+  }
+
+  // Update eyebrows swatches active class
+  const eyebrowsParent = document.getElementById('eyebrows-color-container');
+  if (eyebrowsParent) {
+    const checkbox = eyebrowsParent.querySelector('#sync-eyebrows-color');
+    if (checkbox) {
+      checkbox.checked = state.syncEyebrowsColor;
+    }
+    eyebrowsParent.querySelectorAll('.eyebrows-swatch').forEach((swatch, idx) => {
+      const colorInfo = hairColors[idx];
+      const currentActiveIndex = state.syncEyebrowsColor ? state.hairColor : state.eyebrowsColorIndex;
+      if (colorInfo && colorInfo.index === currentActiveIndex) {
+        swatch.classList.add('active');
+      } else {
+        swatch.classList.remove('active');
+      }
+    });
+  }
 }
 
 // Helper to clean unisex dress
@@ -844,9 +935,13 @@ function composeCharacterSVG() {
 
   let eyebrowSvg = meeAssets.facial.eyebrow[state.eyebrows] || '';
   if (eyebrowSvg) {
+    const currentEyebrowsColorIndex = state.syncEyebrowsColor ? state.hairColor : state.eyebrowsColorIndex;
+    const colorInfo = hairColors.find(c => c.index === currentEyebrowsColorIndex) || hairColors[0];
+    const currentEyebrowsColor = colorInfo.base;
+
     eyebrowSvg = eyebrowSvg
-      .replace(/fill=["']#000000["']/gi, `fill="${state.eyebrowsColor}"`)
-      .replace(/fill=["']#000["']/gi, `fill="${state.eyebrowsColor}"`);
+      .replace(/fill=["']#000000["']/gi, `fill="${currentEyebrowsColor}"`)
+      .replace(/fill=["']#000["']/gi, `fill="${currentEyebrowsColor}"`);
     eyebrowSvg = makeSvgIdsUnique(eyebrowSvg, 'mee-eyebrow');
     eyebrowSvg = extractStylesAndDefs(eyebrowSvg, stylesArray, defsArray, '#composed-eyebrows');
   }
@@ -1083,7 +1178,12 @@ function randomizeCharacter() {
 
   const colorIndex = Math.floor(Math.random() * hairColors.length);
   state.hairColor = hairColors[colorIndex].index;
-  state.eyebrowsColor = hairColors[colorIndex].base;
+  state.syncEyebrowsColor = Math.random() > 0.3; // 70% chance to sync
+  if (state.syncEyebrowsColor) {
+    state.eyebrowsColorIndex = state.hairColor;
+  } else {
+    state.eyebrowsColorIndex = hairColors[Math.floor(Math.random() * hairColors.length)].index;
+  }
 
   // Clear custom overrides on randomize
   state.customPrimaryColor = null;
@@ -1109,7 +1209,8 @@ function resetCharacter() {
   state.nose = 1;
   state.mouth = 1;
   state.hairColor = 1;
-  state.eyebrowsColor = '#8a2827';
+  state.eyebrowsColorIndex = 1;
+  state.syncEyebrowsColor = true;
 
   // Clear custom overrides on reset
   state.customPrimaryColor = null;
@@ -1168,17 +1269,7 @@ function syncUIControls() {
   syncGridSelector('pants-picker', state.pants);
   syncGridSelector('dress-picker', state.dress);
 
-  const colorGrid = document.querySelector('.eyebrows-colors-grid');
-  if (colorGrid) {
-    colorGrid.querySelectorAll('.color-swatch').forEach((swatch, idx) => {
-      const colorInfo = hairColors[idx];
-      if (colorInfo && colorInfo.index === state.hairColor) {
-        swatch.classList.add('active');
-      } else {
-        swatch.classList.remove('active');
-      }
-    });
-  }
+  syncHairColorPickersUI();
 }
 
 function syncGridSelector(containerId, index) {

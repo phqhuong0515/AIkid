@@ -529,13 +529,13 @@ body {
 }
 
 /* Eyebrows and Hair Colors Grid */
-.eyebrows-color-section {
+.hair-color-section, .eyebrows-color-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.eyebrows-colors-grid {
+.hair-colors-grid, .eyebrows-colors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
   gap: 8px;
@@ -558,6 +558,10 @@ body {
 .color-swatch.active {
   transform: scale(1.15);
   box-shadow: 0 0 0 3px var(--accent-pink);
+}
+
+#sync-eyebrows-color {
+  accent-color: var(--accent-pink);
 }
 
 /* Spinner Loader */
