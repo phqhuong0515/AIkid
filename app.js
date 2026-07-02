@@ -23,7 +23,7 @@ const state = {
   pantsColor: 3, // 3 = Yellow (default)
   eyesColor: 1,  // 1 = Black (default)
   backgroundColor: '#ffffff',
-  backgroundType: 'solid'
+  backgroundType: 'light'
 };
 
 const pastelBackgroundColors = [
@@ -37,6 +37,19 @@ const pastelBackgroundColors = [
   { index: 8, base: '#e8f0fe', name: 'Xanh nước biển (Dark Blue)' },
   { index: 9, base: '#f3e8ff', name: 'Tím (Purple)' },
   { index: 10, base: '#fff0f6', name: 'Hồng (Pink)' }
+];
+
+const darkBackgroundColors = [
+  { index: 1, base: '#5a6270', name: 'Xám pastel đậm (Dark Grey)' },
+  { index: 2, base: '#8b1e22', name: 'Đỏ đô (Maroon)' },
+  { index: 3, base: '#c2410c', name: 'Cam đô (Burnt Orange)' },
+  { index: 4, base: '#eab308', name: 'Vàng thư (Golden Yellow)' },
+  { index: 5, base: '#1b4d3e', name: 'Xanh lá đậm (Dark Green)' },
+  { index: 6, base: '#0891b2', name: 'Xanh Cyan (Cyan)' },
+  { index: 7, base: '#1a365d', name: 'Xanh biển đậm (Dark Blue)' },
+  { index: 8, base: '#581c87', name: 'Tím đậm (Dark Purple)' },
+  { index: 9, base: '#d84b65', name: 'Hồng đào đậm (Dark Peach)' },
+  { index: 10, base: '#282c34', name: 'Đen xám pastel (Dark Charcoal)' }
 ];
 
 // Available colors for outfits (10 colors extracted from palette)
@@ -1256,43 +1269,79 @@ function addBackgroundColorPicker() {
     });
     typePicker.appendChild(noneCard);
     
-    // 2. "Nền trơn" (Solid Background) option card
-    const solidCard = document.createElement('div');
-    solidCard.className = `selector-card ${state.backgroundType === 'solid' ? 'active' : ''}`;
-    solidCard.dataset.type = 'solid';
-    solidCard.innerHTML = `
+    // 2. "Nền nhạt" (Light Background) option card
+    const lightCard = document.createElement('div');
+    lightCard.className = `selector-card ${state.backgroundType === 'light' ? 'active' : ''}`;
+    lightCard.dataset.type = 'light';
+    lightCard.innerHTML = `
       <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: block;">
         <rect x="0" y="0" width="100" height="100" rx="12" fill="#a8a8a8" />
       </svg>
-      <span class="card-label">Nền trơn</span>
+      <span class="card-label">Nền nhạt</span>
     `;
-    solidCard.addEventListener('click', () => {
-      state.backgroundType = 'solid';
+    lightCard.addEventListener('click', () => {
+      state.backgroundType = 'light';
+      const isLightColor = pastelBackgroundColors.some(c => c.base === state.backgroundColor);
+      if (!isLightColor) {
+        state.backgroundColor = '#ffffff';
+      }
       syncBackgroundColorPickerUI();
       updatePreview();
     });
-    typePicker.appendChild(solidCard);
+    typePicker.appendChild(lightCard);
+
+    // 3. "Nền đậm" (Dark Background) option card
+    const darkCard = document.createElement('div');
+    darkCard.className = `selector-card ${state.backgroundType === 'dark' ? 'active' : ''}`;
+    darkCard.dataset.type = 'dark';
+    darkCard.innerHTML = `
+      <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: block;">
+        <rect x="0" y="0" width="100" height="100" rx="12" fill="#555555" />
+      </svg>
+      <span class="card-label">Nền đậm</span>
+    `;
+    darkCard.addEventListener('click', () => {
+      state.backgroundType = 'dark';
+      const isDarkColor = darkBackgroundColors.some(c => c.base === state.backgroundColor);
+      if (!isDarkColor) {
+        state.backgroundColor = '#5a6270';
+      }
+      syncBackgroundColorPickerUI();
+      updatePreview();
+    });
+    typePicker.appendChild(darkCard);
   }
 
-  // 3. Render color swatches
+  syncBackgroundColorPickerUI();
+}
+
+function renderBackgroundSwatches() {
   const bgGrid = document.getElementById('background-colors-grid');
-  if (bgGrid) {
-    bgGrid.innerHTML = '';
-    pastelBackgroundColors.forEach(color => {
-      const swatch = document.createElement('div');
-      swatch.className = `color-swatch background-color-swatch ${state.backgroundColor === color.base ? 'active' : ''}`;
-      swatch.style.backgroundColor = color.base;
-      swatch.title = color.name;
-      swatch.addEventListener('click', () => {
-        state.backgroundColor = color.base;
-        syncBackgroundColorPickerUI();
-        updatePreview();
-      });
-      bgGrid.appendChild(swatch);
-    });
+  if (!bgGrid) return;
+  
+  if (bgGrid.dataset.renderedType === state.backgroundType) {
+    return;
   }
   
-  syncBackgroundColorPickerUI();
+  bgGrid.innerHTML = '';
+  bgGrid.dataset.renderedType = state.backgroundType;
+  
+  if (state.backgroundType === 'none') return;
+  
+  const colorList = state.backgroundType === 'dark' ? darkBackgroundColors : pastelBackgroundColors;
+  colorList.forEach(color => {
+    const swatch = document.createElement('div');
+    swatch.className = 'color-swatch background-color-swatch';
+    swatch.style.backgroundColor = color.base;
+    swatch.dataset.color = color.base;
+    swatch.title = color.name;
+    swatch.addEventListener('click', () => {
+      state.backgroundColor = color.base;
+      syncBackgroundColorPickerUI();
+      updatePreview();
+    });
+    bgGrid.appendChild(swatch);
+  });
 }
 
 function syncBackgroundColorPickerUI() {
@@ -1307,11 +1356,12 @@ function syncBackgroundColorPickerUI() {
     });
   }
 
+  renderBackgroundSwatches();
+
   const bgGrid = document.getElementById('background-colors-grid');
   if (bgGrid) {
-    bgGrid.querySelectorAll('.background-color-swatch').forEach((swatch, idx) => {
-      const color = pastelBackgroundColors[idx];
-      if (color && state.backgroundColor === color.base) {
+    bgGrid.querySelectorAll('.background-color-swatch').forEach(swatch => {
+      if (swatch.dataset.color === state.backgroundColor) {
         swatch.classList.add('active');
       } else {
         swatch.classList.remove('active');
@@ -1321,12 +1371,12 @@ function syncBackgroundColorPickerUI() {
 
   const colorContainer = document.getElementById('background-color-container');
   if (colorContainer) {
-    colorContainer.style.display = state.backgroundType === 'solid' ? 'block' : 'none';
+    colorContainer.style.display = (state.backgroundType === 'light' || state.backgroundType === 'dark') ? 'block' : 'none';
   }
 
   const viewport = document.getElementById('svg-preview-container');
   if (viewport) {
-    if (state.backgroundType === 'solid') {
+    if (state.backgroundType === 'light' || state.backgroundType === 'dark') {
       viewport.style.backgroundColor = state.backgroundColor;
     } else {
       viewport.style.backgroundColor = '#ffffff';
