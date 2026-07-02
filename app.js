@@ -1261,7 +1261,9 @@ function addBackgroundColorPicker() {
     solidCard.className = `selector-card ${state.backgroundType === 'solid' ? 'active' : ''}`;
     solidCard.dataset.type = 'solid';
     solidCard.innerHTML = `
-      <div style="font-size: 1.8rem; color: var(--text-muted);"><i class="fa-solid fa-paint-roller"></i></div>
+      <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: block;">
+        <rect x="0" y="0" width="100" height="100" rx="12" fill="#a8a8a8" />
+      </svg>
       <span class="card-label">Nền trơn</span>
     `;
     solidCard.addEventListener('click', () => {
