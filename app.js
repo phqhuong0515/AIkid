@@ -1249,6 +1249,14 @@ function addOutfitColorPickers() {
   }
 }
 
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  return `${r}, ${g}, ${b}`;
+}
+
 function addBackgroundColorPicker() {
   const typePicker = document.getElementById('background-picker');
   if (typePicker) {
@@ -1337,6 +1345,31 @@ function addBackgroundColorPicker() {
       updatePreview();
     });
     typePicker.appendChild(gridCard);
+
+    // 5. "Nền ca-rô" (Gingham Background) option card
+    const ginghamCard = document.createElement('div');
+    ginghamCard.className = `selector-card ${state.backgroundType === 'gingham' ? 'active' : ''}`;
+    ginghamCard.dataset.type = 'gingham';
+    ginghamCard.innerHTML = `
+      <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: block;">
+        <rect x="0" y="0" width="100" height="100" rx="12" fill="#ffffff" />
+        <rect x="0" y="0" width="100" height="25" fill="#a4c2f4" opacity="0.35" />
+        <rect x="0" y="50" width="100" height="25" fill="#a4c2f4" opacity="0.35" />
+        <rect x="0" y="0" width="25" height="100" fill="#a4c2f4" opacity="0.35" />
+        <rect x="50" y="0" width="25" height="100" fill="#a4c2f4" opacity="0.35" />
+      </svg>
+      <span class="card-label">Nền ca-rô</span>
+    `;
+    ginghamCard.addEventListener('click', () => {
+      state.backgroundType = 'gingham';
+      const isLightColor = pastelBackgroundColors.some(c => c.base === state.backgroundColor);
+      if (!isLightColor) {
+        state.backgroundColor = '#ffffff';
+      }
+      syncBackgroundColorPickerUI();
+      updatePreview();
+    });
+    typePicker.appendChild(ginghamCard);
   }
 
   syncBackgroundColorPickerUI();
@@ -1399,7 +1432,12 @@ function syncBackgroundColorPickerUI() {
 
   const colorContainer = document.getElementById('background-color-container');
   if (colorContainer) {
-    colorContainer.style.display = (state.backgroundType === 'light' || state.backgroundType === 'dark' || state.backgroundType === 'grid') ? 'block' : 'none';
+    colorContainer.style.display = (
+      state.backgroundType === 'light' || 
+      state.backgroundType === 'dark' || 
+      state.backgroundType === 'grid' ||
+      state.backgroundType === 'gingham'
+    ) ? 'block' : 'none';
   }
 
   const viewport = document.getElementById('svg-preview-container');
@@ -1414,6 +1452,14 @@ function syncBackgroundColorPickerUI() {
         linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)
       `;
       viewport.style.backgroundSize = '24px 24px';
+    } else if (state.backgroundType === 'gingham') {
+      const rgb = hexToRgb(state.backgroundColor);
+      viewport.style.backgroundColor = '#ffffff';
+      viewport.style.backgroundImage = `
+        linear-gradient(90deg, rgba(${rgb}, 0.35) 50%, transparent 50%),
+        linear-gradient(rgba(${rgb}, 0.35) 50%, transparent 50%)
+      `;
+      viewport.style.backgroundSize = '32px 32px';
     } else {
       viewport.style.backgroundColor = '#ffffff';
       viewport.style.backgroundImage = 'none';
@@ -1964,6 +2010,14 @@ function updatePreview() {
         linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)
       `;
       container.style.backgroundSize = '24px 24px';
+    } else if (state.backgroundType === 'gingham') {
+      const rgb = hexToRgb(state.backgroundColor);
+      container.style.backgroundColor = '#ffffff';
+      container.style.backgroundImage = `
+        linear-gradient(90deg, rgba(${rgb}, 0.35) 50%, transparent 50%),
+        linear-gradient(rgba(${rgb}, 0.35) 50%, transparent 50%)
+      `;
+      container.style.backgroundSize = '32px 32px';
     } else {
       container.style.backgroundColor = '#ffffff';
       container.style.backgroundImage = 'none';
