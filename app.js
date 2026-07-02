@@ -1911,7 +1911,7 @@ function updatePreview() {
   setTimeout(() => {
     const finalSvg = composeCharacterSVG();
     container.innerHTML = finalSvg;
-    if (state.backgroundType === 'solid') {
+    if (state.backgroundType === 'light' || state.backgroundType === 'dark') {
       container.style.backgroundColor = state.backgroundColor;
     } else {
       container.style.backgroundColor = '#ffffff';
@@ -1980,7 +1980,7 @@ function resetCharacter() {
   state.pants = 0;
   state.dress = 0;
   state.backgroundColor = '#ffffff';
-  state.backgroundType = 'solid';
+  state.backgroundType = 'light';
 
   // Clear custom overrides on reset
   state.customPrimaryColor = null;
