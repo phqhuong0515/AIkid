@@ -1541,6 +1541,7 @@ function composeCharacterSVG() {
   const defsArray = [];
   let dressBackGroup = '';
   let dressFrontGroup = '';
+  let faceShapeGroup = '';
 
   // Always use clothed model body template strictly
   let bodySvg = meeAssets.body['clothes'][state.gender]['default'];
@@ -1714,9 +1715,13 @@ function composeCharacterSVG() {
 
     // Replace only the default head shape ellipse with the custom face shape (keeping neck paths intact)
     const headEllipseRegex = /<ellipse class="cls-6" cx="90\.32" cy="66\.73" rx="58\.47" ry="66\.73"\s*\/?>/gi;
-    const faceGroup = `<g id="mee-face-shape">${getSvgInnerContent(faceSvg)}</g>`;
-    
-    bodySvg = bodySvg.replace(headEllipseRegex, faceGroup);
+    if (state.shirt > 0 && state.dress === 0) {
+      bodySvg = bodySvg.replace(headEllipseRegex, '');
+      faceShapeGroup = `<g id="mee-face-shape">${getSvgInnerContent(faceSvg)}</g>`;
+    } else {
+      const tempFaceGroup = `<g id="mee-face-shape">${getSvgInnerContent(faceSvg)}</g>`;
+      bodySvg = bodySvg.replace(headEllipseRegex, tempFaceGroup);
+    }
   }
 
   // Load hair styles and calculate centers/bounds first
@@ -1901,6 +1906,7 @@ function composeCharacterSVG() {
 
   let composedSvg = bodySvg.substring(0, injectIndex) +
     outfitGroup +
+    faceShapeGroup +
     faceGroup +
     dressFrontGroup +
     bodySvg.substring(injectIndex);
