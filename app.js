@@ -18,8 +18,38 @@ const state = {
   behind: 1, // 1 to 8
   shirt: 0, // 0 = None, 1 to 3
   pants: 0, // 0 = None, 1 to 3
-  dress: 0  // 0 = None, 1 to 2
+  dress: 0, // 0 = None, 1 to 2
+  shirtColor: 2, // 2 = Red (default)
+  pantsColor: 3, // 3 = Yellow (default)
+  eyesColor: 1  // 1 = Black (default)
 };
+
+// Available colors for outfits (10 colors extracted from palette)
+const outfitColors = [
+  { index: 1, base: '#000000', name: 'Đen (Black)' },
+  { index: 2, base: '#F70400', name: 'Đỏ (Red)' },
+  { index: 3, base: '#FFC431', name: 'Vàng (Yellow)' },
+  { index: 4, base: '#0FA53A', name: 'Xanh lá (Green)' },
+  { index: 5, base: '#53C69C', name: 'Xanh ngọc (Teal)' },
+  { index: 6, base: '#4EC3F2', name: 'Xanh nhạt (Light Blue)' },
+  { index: 7, base: '#2652BF', name: 'Xanh dương (Blue)' },
+  { index: 8, base: '#642BAF', name: 'Tím (Purple)' },
+  { index: 9, base: '#FF6597', name: 'Hồng (Pink)' },
+  { index: 10, base: '#D8D8D8', name: 'Xám (Grey)' }
+];
+
+const eyeColors = [
+  { index: 1, base: '#000000', name: 'Đen (Black)' },
+  { index: 2, base: '#f70400', name: 'Đỏ (Red)' },
+  { index: 3, base: '#fbc004', name: 'Vàng (Yellow)' },
+  { index: 4, base: '#0fa53a', name: 'Xanh lá (Green)' },
+  { index: 5, base: '#4df4b8', name: 'Xanh ngọc (Teal)' },
+  { index: 6, base: '#4ec3f2', name: 'Xanh nhạt (Light Blue)' },
+  { index: 7, base: '#2652bf', name: 'Xanh dương (Blue)' },
+  { index: 8, base: '#642baf', name: 'Tím (Purple)' },
+  { index: 9, base: '#ff6597', name: 'Hồng (Pink)' },
+  { index: 10, base: '#d8d8d8', name: 'Xám (Grey)' }
+];
 
 // Available colors for hair and eyebrows (20 colors from Palette 1 & Palette 2)
 const hairColors = [
@@ -296,8 +326,9 @@ function recolorAndRefreshEars() {
   });
 }
 
-// State history tracking for undo functionality
+// State history tracking for undo/redo functionality
 let stateHistory = [];
+let redoHistory = [];
 const maxHistory = 50;
 
 function pushStateToHistory() {
@@ -308,18 +339,33 @@ function pushStateToHistory() {
     if (stateHistory.length > maxHistory) {
       stateHistory.shift();
     }
+    // Clear redo history on new action
+    redoHistory = [];
   }
 }
 
 function undoState() {
   if (stateHistory.length > 1) {
-    stateHistory.pop(); // Remove current state
+    const currentState = stateHistory.pop();
+    redoHistory.push(currentState);
     const previousState = JSON.parse(stateHistory[stateHistory.length - 1]);
     Object.assign(state, previousState);
     syncUIControls();
     recolorAndRefreshEars();
   } else {
     alert("Không có thao tác nào để hoàn tác!");
+  }
+}
+
+function redoState() {
+  if (redoHistory.length > 0) {
+    const nextState = redoHistory.pop();
+    stateHistory.push(nextState);
+    Object.assign(state, JSON.parse(nextState));
+    syncUIControls();
+    recolorAndRefreshEars();
+  } else {
+    alert("Không có thao tác nào để làm lại!");
   }
 }
 
@@ -430,11 +476,9 @@ function initUI() {
   });
 
   // 5. Action buttons
-  const btnRotate = document.getElementById('btn-rotate');
-  if (btnRotate) {
-    btnRotate.addEventListener('click', () => {
-      document.getElementById('svg-preview-container').classList.toggle('flipped');
-    });
+  const btnRandom = document.getElementById('btn-random');
+  if (btnRandom) {
+    btnRandom.addEventListener('click', randomizeCharacter);
   }
 
   const btnReset = document.getElementById('btn-reset');
@@ -445,6 +489,11 @@ function initUI() {
   const btnUndo = document.getElementById('btn-undo');
   if (btnUndo) {
     btnUndo.addEventListener('click', undoState);
+  }
+
+  const btnRedo = document.getElementById('btn-redo');
+  if (btnRedo) {
+    btnRedo.addEventListener('click', redoState);
   }
 
   const btnExit = document.getElementById('btn-exit');
@@ -467,6 +516,8 @@ function initUI() {
   // Add hair and eyebrows color pickers
   addHairColorPicker();
   addEyebrowsColorPicker();
+  addOutfitColorPickers();
+  addEyesColorPicker();
 }
 
 // Render selector cards with small vector icons
@@ -496,7 +547,11 @@ function renderSelectorGrid(containerId, assetKey, count, stateKey, hasNone = fa
   for (let i = 1; i <= count; i++) {
     let svgStr = meeAssets.facial[assetKey][i];
     if (svgStr && typeof svgStr === 'object') {
-      svgStr = svgStr['default'] || svgStr[1] || '';
+      if (assetKey === 'eyes') {
+        svgStr = svgStr[state.eyesColor] || svgStr['default'] || svgStr[1] || '';
+      } else {
+        svgStr = svgStr['default'] || svgStr[1] || '';
+      }
     }
     if (!svgStr) continue;
 
@@ -591,9 +646,11 @@ function renderCustomGrid(containerId, category, count, stateKey, hasNone = fals
       svgStr = hairStyle ? (hairStyle['default'] || hairStyle[1]) : '';
     } else if (category === 'outfit') {
       if (subCategory === 'shirt') {
-        svgStr = meeAssets.outfit.shirt[state.gender][i];
+        const shirtStyle = meeAssets.outfit.shirt[state.gender][i];
+        svgStr = shirtStyle ? (shirtStyle[state.shirtColor] || shirtStyle['default'] || '') : '';
       } else if (subCategory === 'pants') {
-        svgStr = meeAssets.outfit.pants[i];
+        const pantsStyle = meeAssets.outfit.pants[i];
+        svgStr = pantsStyle ? (pantsStyle[state.pantsColor] || pantsStyle['default'] || '') : '';
       } else if (subCategory === 'dress') {
         if (i === 1) {
           svgStr = meeAssets.outfit.dress.unisex[1];
@@ -677,10 +734,7 @@ function addHairColorPicker() {
   const colorPickerWrapper = document.createElement('div');
   colorPickerWrapper.className = 'hair-color-section';
   colorPickerWrapper.innerHTML = `
-    <label class="group-subtitle" style="font-size: 0.9rem; font-weight:600; color: var(--text-muted); margin-top: 10px; display: block;">
-      <i class="fa-solid fa-paintbrush"></i> Màu Tóc (Hair Color)
-    </label>
-    <div class="hair-colors-grid"></div>
+    <div class="hair-colors-grid" style="margin-top: 10px;"></div>
   `;
 
   const grid = colorPickerWrapper.querySelector('.hair-colors-grid');
@@ -715,10 +769,7 @@ function addEyebrowsColorPicker() {
   const wrapper = document.createElement('div');
   wrapper.className = 'eyebrows-color-section';
   wrapper.innerHTML = `
-    <div class="eyebrows-sync-header" style="margin-top: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-      <label class="group-subtitle" style="font-size: 0.9rem; font-weight:600; color: var(--text-muted); margin: 0;">
-        <i class="fa-solid fa-paintbrush"></i> Màu Lông Mày (Eyebrows)
-      </label>
+    <div class="eyebrows-sync-header" style="margin-top: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: flex-start;">
       <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; color: var(--text-brown);">
         <input type="checkbox" id="sync-eyebrows-color" ${state.syncEyebrowsColor ? 'checked' : ''} style="cursor: pointer; width: 14px; height: 14px;">
         <label for="sync-eyebrows-color" style="cursor: pointer; user-select: none;">Đồng bộ với màu tóc</label>
@@ -792,6 +843,117 @@ function syncHairColorPickersUI() {
       }
     });
   }
+}
+
+function addOutfitColorPickers() {
+  // Shirt color picker
+  const shirtParent = document.getElementById('shirt-color-container');
+  if (shirtParent) {
+    shirtParent.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'outfit-color-section';
+    wrapper.innerHTML = `
+      <div class="outfit-colors-grid" id="shirt-colors-grid" style="margin-top: 10px;"></div>
+    `;
+    const grid = wrapper.querySelector('#shirt-colors-grid');
+    outfitColors.forEach(color => {
+      const swatch = document.createElement('div');
+      swatch.className = `color-swatch shirt-color-swatch ${state.shirtColor === color.index ? 'active' : ''}`;
+      swatch.style.backgroundColor = color.base;
+      swatch.title = color.name;
+      swatch.addEventListener('click', () => {
+        state.shirtColor = color.index;
+        syncOutfitColorPickersUI();
+        renderCustomGrid('shirt-picker', 'outfit', Object.keys(meeAssets.outfit.shirt[state.gender]).length, 'shirt', true, 'shirt');
+        updatePreview();
+      });
+      grid.appendChild(swatch);
+    });
+    shirtParent.appendChild(wrapper);
+  }
+
+  // Pants color picker
+  const pantsParent = document.getElementById('pants-color-container');
+  if (pantsParent) {
+    pantsParent.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'outfit-color-section';
+    wrapper.innerHTML = `
+      <div class="outfit-colors-grid" id="pants-colors-grid" style="margin-top: 10px;"></div>
+    `;
+    const grid = wrapper.querySelector('#pants-colors-grid');
+    outfitColors.forEach(color => {
+      const swatch = document.createElement('div');
+      swatch.className = `color-swatch pants-color-swatch ${state.pantsColor === color.index ? 'active' : ''}`;
+      swatch.style.backgroundColor = color.base;
+      swatch.title = color.name;
+      swatch.addEventListener('click', () => {
+        state.pantsColor = color.index;
+        syncOutfitColorPickersUI();
+        renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants).length, 'pants', true, 'pants');
+        updatePreview();
+      });
+      grid.appendChild(swatch);
+    });
+    pantsParent.appendChild(wrapper);
+  }
+}
+
+function syncOutfitColorPickersUI() {
+  document.querySelectorAll('.shirt-color-swatch').forEach((swatch, idx) => {
+    const color = outfitColors[idx];
+    if (color && state.shirtColor === color.index) {
+      swatch.classList.add('active');
+    } else {
+      swatch.classList.remove('active');
+    }
+  });
+  document.querySelectorAll('.pants-color-swatch').forEach((swatch, idx) => {
+    const color = outfitColors[idx];
+    if (color && state.pantsColor === color.index) {
+      swatch.classList.add('active');
+    } else {
+      swatch.classList.remove('active');
+    }
+  });
+}
+
+function addEyesColorPicker() {
+  const parent = document.getElementById('eyes-color-container');
+  if (parent) {
+    parent.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'eyes-color-section';
+    wrapper.innerHTML = `
+      <div class="eyes-colors-grid"></div>
+    `;
+    const grid = wrapper.querySelector('.eyes-colors-grid');
+    eyeColors.forEach(color => {
+      const swatch = document.createElement('div');
+      swatch.className = `color-swatch eyes-color-swatch ${state.eyesColor === color.index ? 'active' : ''}`;
+      swatch.style.backgroundColor = color.base;
+      swatch.title = color.name;
+      swatch.addEventListener('click', () => {
+        state.eyesColor = color.index;
+        syncEyesColorPickersUI();
+        renderSelectorGrid('eyes-picker', 'eyes', 11, 'eyes');
+        updatePreview();
+      });
+      grid.appendChild(swatch);
+    });
+    parent.appendChild(wrapper);
+  }
+}
+
+function syncEyesColorPickersUI() {
+  document.querySelectorAll('.eyes-color-swatch').forEach((swatch, idx) => {
+    const color = eyeColors[idx];
+    if (color && state.eyesColor === color.index) {
+      swatch.classList.add('active');
+    } else {
+      swatch.classList.remove('active');
+    }
+  });
 }
 
 // Helper to clean unisex dress
@@ -935,10 +1097,12 @@ function composeCharacterSVG() {
     let pantsSvg = '';
 
     if (state.shirt > 0) {
-      shirtSvg = meeAssets.outfit.shirt[state.gender][state.shirt];
+      const shirtStyle = meeAssets.outfit.shirt[state.gender][state.shirt];
+      shirtSvg = shirtStyle ? (shirtStyle[state.shirtColor] || shirtStyle['default'] || '') : '';
     }
     if (state.pants > 0) {
-      pantsSvg = meeAssets.outfit.pants[state.pants];
+      const pantsStyle = meeAssets.outfit.pants[state.pants];
+      pantsSvg = pantsStyle ? (pantsStyle[state.pantsColor] || pantsStyle['default'] || '') : '';
     }
 
     if (shirtSvg) {
@@ -971,7 +1135,10 @@ function composeCharacterSVG() {
     if (pantsSvg) {
       const pantsCenter = getSvgElementCenter(pantsSvg) || { x: 62.0, y: 97 };
       const pantsTranslateX = 90.32 - pantsCenter.x;
-      const pantsTranslateY = 246.8;
+      let pantsTranslateY = 246.8;
+      if (state.pants === 2 || state.pants === 3) {
+        pantsTranslateY = 252.8; // Shift down by 6px (raised by 4px from 256.8) to hide waistband under the shirt
+      }
       pantsTransform = `translate(${pantsTranslateX.toFixed(2)}, ${pantsTranslateY.toFixed(2)})`;
     }
 
@@ -1081,7 +1248,15 @@ function composeCharacterSVG() {
   }
 
   // Load facial features
-  let eyesSvg = meeAssets.facial.eyes[state.eyes] || '';
+  const eyesStyle = meeAssets.facial.eyes[state.eyes];
+  let eyesSvg = '';
+  if (eyesStyle) {
+    if (typeof eyesStyle === 'object') {
+      eyesSvg = eyesStyle[state.eyesColor] || eyesStyle['default'] || '';
+    } else {
+      eyesSvg = eyesStyle;
+    }
+  }
   if (eyesSvg) {
     eyesSvg = makeSvgIdsUnique(eyesSvg, 'mee-eyes');
     eyesSvg = extractStylesAndDefs(eyesSvg, stylesArray, defsArray, '#composed-eyes');
@@ -1260,6 +1435,13 @@ function randomizeCharacter() {
   state.nose = Math.floor(Math.random() * 7) + 1;
   state.mouth = Math.floor(Math.random() * 14) + 1;
   state.gender = Math.random() > 0.5 ? 'male' : 'female';
+  state.eyesColor = Math.floor(Math.random() * eyeColors.length) + 1;
+
+  const bangCount = Object.keys(meeAssets.hair.bang).length || 6;
+  state.bang = Math.floor(Math.random() * bangCount) + 1;
+
+  const behindCount = Object.keys(meeAssets.hair.behind).length || 6;
+  state.behind = Math.floor(Math.random() * behindCount) + 1;
 
   const colorIndex = Math.floor(Math.random() * hairColors.length);
   state.hairColor = hairColors[colorIndex].index;
@@ -1296,6 +1478,14 @@ function resetCharacter() {
   state.hairColor = 1;
   state.eyebrowsColorIndex = 1;
   state.syncEyebrowsColor = true;
+  state.eyesColor = 1;
+  state.shirtColor = 2;
+  state.pantsColor = 3;
+  state.bang = 1;
+  state.behind = 1;
+  state.shirt = 0;
+  state.pants = 0;
+  state.dress = 0;
 
   // Clear custom overrides on reset
   state.customPrimaryColor = null;
@@ -1355,6 +1545,8 @@ function syncUIControls() {
   syncGridSelector('dress-picker', state.dress);
 
   syncHairColorPickersUI();
+  syncOutfitColorPickersUI();
+  syncEyesColorPickersUI();
 }
 
 function syncGridSelector(containerId, index) {
