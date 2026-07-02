@@ -1133,13 +1133,16 @@ function composeCharacterSVG() {
 
     let pantsTransform = '';
     if (pantsSvg) {
-      const pantsCenter = getSvgElementCenter(pantsSvg) || { x: 62.0, y: 97 };
-      const pantsTranslateX = 90.32 - pantsCenter.x;
+      const pantsCenter = getSvgElementCenter(pantsSvg) || { x: 62.0, y: 97, width: 120 };
       let pantsTranslateY = 246.8;
+      let scaleX = 1;
       if (state.pants === 2 || state.pants === 3) {
-        pantsTranslateY = 252.8; // Shift down by 6px (raised by 4px from 256.8) to hide waistband under the shirt
+        pantsTranslateY = 249.8; // Raised by another 3px (from 252.8) to align under the shirt
+        if (pantsCenter.width > 0) {
+          scaleX = (pantsCenter.width - 4) / pantsCenter.width; // Narrow by 2px on each side (4px total)
+        }
       }
-      pantsTransform = `translate(${pantsTranslateX.toFixed(2)}, ${pantsTranslateY.toFixed(2)})`;
+      pantsTransform = `translate(90.32, ${pantsTranslateY.toFixed(2)}) scale(${scaleX.toFixed(4)}, 1) translate(${-pantsCenter.x.toFixed(2)}, 0)`;
     }
 
     let pantsGroup = pantsSvg ? `<g id="mee-outfit-pants" transform="${pantsTransform}">${getSvgInnerContent(pantsSvg)}</g>` : '';
