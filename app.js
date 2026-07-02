@@ -27,15 +27,15 @@ const state = {
 
 const pastelBackgroundColors = [
   { index: 1, base: '#ffffff', name: 'Trắng (White)' },
-  { index: 2, base: '#e9ecef', name: 'Xám (Grey)' },
-  { index: 3, base: '#ffadad', name: 'Đỏ (Red)' },
-  { index: 4, base: '#ffd6a5', name: 'Cam (Orange)' },
-  { index: 5, base: '#fdffb6', name: 'Vàng (Yellow)' },
-  { index: 6, base: '#caffbf', name: 'Xanh lá (Green)' },
-  { index: 7, base: '#9bf6ff', name: 'Xanh da trời (Light Blue)' },
-  { index: 8, base: '#a0c4ff', name: 'Xanh nước biển (Dark Blue)' },
-  { index: 9, base: '#bdb2ff', name: 'Tím (Purple)' },
-  { index: 10, base: '#ffc6ff', name: 'Hồng (Pink)' }
+  { index: 2, base: '#f1f3f5', name: 'Xám (Grey)' },
+  { index: 3, base: '#ffeef0', name: 'Đỏ (Red)' },
+  { index: 4, base: '#fff3e0', name: 'Cam (Orange)' },
+  { index: 5, base: '#fffde7', name: 'Vàng (Yellow)' },
+  { index: 6, base: '#eafaf1', name: 'Xanh lá (Green)' },
+  { index: 7, base: '#e0f7fa', name: 'Xanh da trời (Light Blue)' },
+  { index: 8, base: '#e8f0fe', name: 'Xanh nước biển (Dark Blue)' },
+  { index: 9, base: '#f3e8ff', name: 'Tím (Purple)' },
+  { index: 10, base: '#fff0f6', name: 'Hồng (Pink)' }
 ];
 
 // Available colors for outfits (10 colors extracted from palette)
