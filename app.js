@@ -21,8 +21,22 @@ const state = {
   dress: 0, // 0 = None, 1 to 2
   shirtColor: 2, // 2 = Red (default)
   pantsColor: 3, // 3 = Yellow (default)
-  eyesColor: 1  // 1 = Black (default)
+  eyesColor: 1,  // 1 = Black (default)
+  backgroundColor: '#ffffff'
 };
+
+const pastelBackgroundColors = [
+  { index: 1, base: '#ffffff', name: 'Trắng (White)' },
+  { index: 2, base: '#e9ecef', name: 'Xám (Grey)' },
+  { index: 3, base: '#ffadad', name: 'Đỏ (Red)' },
+  { index: 4, base: '#ffd6a5', name: 'Cam (Orange)' },
+  { index: 5, base: '#fdffb6', name: 'Vàng (Yellow)' },
+  { index: 6, base: '#caffbf', name: 'Xanh lá (Green)' },
+  { index: 7, base: '#9bf6ff', name: 'Xanh da trời (Light Blue)' },
+  { index: 8, base: '#a0c4ff', name: 'Xanh nước biển (Dark Blue)' },
+  { index: 9, base: '#bdb2ff', name: 'Tím (Purple)' },
+  { index: 10, base: '#ffc6ff', name: 'Hồng (Pink)' }
+];
 
 // Available colors for outfits (10 colors extracted from palette)
 const outfitColors = [
@@ -839,6 +853,7 @@ function initUI() {
   addEyebrowsColorPicker();
   addOutfitColorPickers();
   addEyesColorPicker();
+  addBackgroundColorPicker();
 }
 
 // Render selector cards with small vector icons
@@ -1217,6 +1232,47 @@ function addOutfitColorPickers() {
       grid.appendChild(swatch);
     });
     pantsParent.appendChild(wrapper);
+  }
+}
+
+function addBackgroundColorPicker() {
+  const bgGrid = document.getElementById('background-colors-grid');
+  if (!bgGrid) return;
+  bgGrid.innerHTML = '';
+  pastelBackgroundColors.forEach(color => {
+    const swatch = document.createElement('div');
+    swatch.className = `color-swatch background-color-swatch ${state.backgroundColor === color.base ? 'active' : ''}`;
+    swatch.style.backgroundColor = color.base;
+    swatch.title = color.name;
+    swatch.addEventListener('click', () => {
+      state.backgroundColor = color.base;
+      syncBackgroundColorPickerUI();
+      
+      const viewport = document.getElementById('svg-preview-container');
+      if (viewport) {
+        viewport.style.backgroundColor = state.backgroundColor;
+      }
+      updatePreview();
+    });
+    bgGrid.appendChild(swatch);
+  });
+}
+
+function syncBackgroundColorPickerUI() {
+  const bgGrid = document.getElementById('background-colors-grid');
+  if (bgGrid) {
+    bgGrid.querySelectorAll('.background-color-swatch').forEach((swatch, idx) => {
+      const color = pastelBackgroundColors[idx];
+      if (color && state.backgroundColor === color.base) {
+        swatch.classList.add('active');
+      } else {
+        swatch.classList.remove('active');
+      }
+    });
+  }
+  const viewport = document.getElementById('svg-preview-container');
+  if (viewport) {
+    viewport.style.backgroundColor = state.backgroundColor;
   }
 }
 
@@ -1747,6 +1803,7 @@ function updatePreview() {
   setTimeout(() => {
     const finalSvg = composeCharacterSVG();
     container.innerHTML = finalSvg;
+    container.style.backgroundColor = state.backgroundColor;
   }, 50);
 }
 
@@ -1810,6 +1867,7 @@ function resetCharacter() {
   state.shirt = 0;
   state.pants = 0;
   state.dress = 0;
+  state.backgroundColor = '#ffffff';
 
   // Clear custom overrides on reset
   state.customPrimaryColor = null;
@@ -1871,6 +1929,7 @@ function syncUIControls() {
   syncHairColorPickersUI();
   syncOutfitColorPickersUI();
   syncEyesColorPickersUI();
+  syncBackgroundColorPickerUI();
 }
 
 function syncGridSelector(containerId, index) {
