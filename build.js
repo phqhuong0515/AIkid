@@ -143,7 +143,16 @@ function processFacial() {
       if (name.startsWith(cat)) {
         const indexMatch = name.match(/\d+/);
         const key = indexMatch ? parseInt(indexMatch[0], 10) : 'default';
-        assets.facial[cat][key] = content;
+        
+        if (cat === 'eyes') {
+          const colorMatch = name.match(/_Color\s+(\d+)/i);
+          const colorKey = colorMatch ? parseInt(colorMatch[1], 10) : 'default';
+          if (!assets.facial.eyes[key]) assets.facial.eyes[key] = {};
+          assets.facial.eyes[key][colorKey] = content;
+        } else {
+          assets.facial[cat][key] = content;
+        }
+        
         matched = true;
         break;
       }
@@ -197,38 +206,53 @@ function processHair() {
   scanDir(HAIR_DIR);
 }
 
-// 4. Process Outfit SVGs (Shirts, Pants, Dresses)
+// 4. Process Outfit SVGs (Shirts, Pants, Dresses) recursively
 function processOutfit() {
   if (!fs.existsSync(OUFIT_DIR)) {
     console.warn(`Outfit directory not found: ${OUFIT_DIR}`);
     return;
   }
-  const files = fs.readdirSync(OUFIT_DIR);
-  files.forEach(file => {
-    if (!file.endsWith('.svg')) return;
-    const filePath = path.join(OUFIT_DIR, file);
-    const content = readSvg(filePath);
-    const name = path.basename(file, '.svg');
-    
-    const indexMatch = name.match(/\d+/);
-    if (!indexMatch) return;
-    const key = parseInt(indexMatch[0], 10);
-    
-    const lowerName = name.toLowerCase();
-    if (lowerName.startsWith('pants')) {
-      assets.outfit.pants[key] = content;
-    } else if (lowerName.startsWith('shirt male')) {
-      assets.outfit.shirt.male[key] = content;
-    } else if (lowerName.startsWith('shirt female') || lowerName.startsWith('shirt frmale')) {
-      assets.outfit.shirt.female[key] = content;
-    } else if (lowerName.startsWith('dress chung')) {
-      assets.outfit.dress.unisex[key] = content;
-    } else if (lowerName.startsWith('dress female')) {
-      assets.outfit.dress.female[key] = content;
-    } else if (lowerName.startsWith('dress male')) {
-      assets.outfit.dress.male[key] = content;
-    }
-  });
+  
+  function scanDir(dir) {
+    const items = fs.readdirSync(dir);
+    items.forEach(item => {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        scanDir(fullPath);
+      } else if (stat.isFile() && item.endsWith('.svg')) {
+        const content = readSvg(fullPath);
+        const name = path.basename(item, '.svg');
+        
+        const indexMatch = name.match(/\d+/);
+        if (!indexMatch) return;
+        const key = parseInt(indexMatch[0], 10);
+        
+        const colorMatch = name.match(/_Color\s+(\d+)/i);
+        const colorKey = colorMatch ? parseInt(colorMatch[1], 10) : 'default';
+        
+        const lowerName = name.toLowerCase();
+        if (lowerName.startsWith('pants')) {
+          if (!assets.outfit.pants[key]) assets.outfit.pants[key] = {};
+          assets.outfit.pants[key][colorKey] = content;
+        } else if (lowerName.startsWith('shirt male')) {
+          if (!assets.outfit.shirt.male[key]) assets.outfit.shirt.male[key] = {};
+          assets.outfit.shirt.male[key][colorKey] = content;
+        } else if (lowerName.startsWith('shirt female') || lowerName.startsWith('shirt frmale')) {
+          if (!assets.outfit.shirt.female[key]) assets.outfit.shirt.female[key] = {};
+          assets.outfit.shirt.female[key][colorKey] = content;
+        } else if (lowerName.startsWith('dress chung')) {
+          assets.outfit.dress.unisex[key] = content;
+        } else if (lowerName.startsWith('dress female')) {
+          assets.outfit.dress.female[key] = content;
+        } else if (lowerName.startsWith('dress male')) {
+          assets.outfit.dress.male[key] = content;
+        }
+      }
+    });
+  }
+  
+  scanDir(OUFIT_DIR);
 }
 
 console.log('Bundling assets...');

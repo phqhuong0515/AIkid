@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tạo Người Bạn Đại Diện (Mee)</title>
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Tùy biến nhân vật hoạt hình Mee đáng yêu và tải về dưới dạng SVG/PNG.">
-  <meta name="keywords" content="Mee Character, Tùy biến nhân vật, Avatar, SVG Creator">
-  <meta name="author" content="Antigravity">
-  
-  <!-- Fonts: Fredoka & Outfit -->
+  <title>Tạo Người Bạn Đại Diện (Mee) - Preview Layout</title>
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@300..800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
+    rel="stylesheet">
+
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=29">
+
+  <!-- Custom Stylesheet for Preview -->
+  <link rel="stylesheet" href="styles.css?v=92">
 </head>
+
 <body>
   <div class="app-container">
-    <!-- Header Bar -->
     <header class="app-header">
       <div class="header-left">
-        <button class="btn-world-map" onclick="alert('Quay lại bản đồ thế giới!')">
-          <i class="fa-solid fa-earth-americas"></i> Trở Lại Bản Đồ Thế Giới
-        </button>
+        <a href="#" class="btn-world-map" style="text-decoration: none;">
+          <i class="fa-solid fa-earth-asia"></i> Trở Lại Bản Đồ Thế Giới
+        </a>
       </div>
-      
+
       <div class="header-center">
-        <h1 class="main-title">Tạo Người Bạn Đại Diện (Mee)</h1>
-        <p class="main-subtitle">Tùy biến kiểu tóc, màu da, và nét mặt cho Mee của riêng bạn.</p>
+        <h1>Tạo Người Bạn Đại Diện (Mee)</h1>
+        <p class="subtitle">Tùy biến kiểu tóc, màu da, và nét mặt cho Mee của riêng bạn.</p>
       </div>
-      
+
       <div class="header-right">
         <button id="btn-exit" class="btn btn-exit">
           <i class="fa-solid fa-minus"></i> Exit
@@ -44,202 +43,289 @@
         </button>
       </div>
     </header>
-    
+
     <main class="main-content">
-      <!-- Left Vertical Sidebar -->
-      <nav class="left-sidebar card-panel">
-        <button class="sidebar-btn active" data-tab="identity" title="Chọn Hình Dáng & Màu Da">
-          <i class="fa-solid fa-user"></i>
-        </button>
-        <button class="sidebar-btn" data-tab="facial" title="Chọn Chi Tiết Khuôn Mặt">
-          <i class="fa-solid fa-eye"></i>
-        </button>
-        <button class="sidebar-btn" data-tab="hair" title="Chọn Kiểu Tóc & Màu Tóc">
-          <i class="fa-solid fa-pencil"></i>
-        </button>
-        <button class="sidebar-btn" data-tab="outfit" title="Chọn Trang Phục">
-          <i class="fa-solid fa-shirt"></i>
-        </button>
-      </nav>
-      
-      <!-- Preview Panel (Middle-Left) -->
+      <!-- 1. Preview Panel (Left) -->
       <section class="preview-panel">
         <div class="preview-card card-panel">
           <div class="preview-actions">
-            <button id="btn-rotate" class="preview-action-btn" title="Xoay nhân vật">
-              <i class="fa-solid fa-rotate"></i> Rotate
-            </button>
             <button id="btn-reset" class="preview-action-btn" title="Cài lại ban đầu">
-              <i class="fa-solid fa-house"></i> Reset view
+              <i class="fa-solid fa-rotate-left"></i> Reset
             </button>
             <button id="btn-undo" class="preview-action-btn" title="Hoàn tác">
-              <i class="fa-solid fa-arrow-rotate-left"></i> Undo
+              <i class="fa-solid fa-arrow-left"></i> Undo
+            </button>
+            <button id="btn-redo" class="preview-action-btn" title="Làm lại">
+              <i class="fa-solid fa-arrow-right"></i> Redo
             </button>
           </div>
-          
+
           <div class="preview-viewport" id="svg-preview-container">
             <!-- Composed SVG will be injected here by app.js -->
             <div class="loader-spinner">
               <i class="fa-solid fa-spinner fa-spin"></i>
             </div>
           </div>
-          
-          <div class="preview-footer">
-            <div class="mood-badge">
-              Mood: Bình thường 😊
-            </div>
+
+          <div class="preview-footer" style="margin-top: 16px; display: flex; justify-content: center; width: 100%;">
+            <button id="btn-random" class="btn btn-random"
+              style="width: 100%; max-width: 200px; padding: 12px 24px; justify-content: center;" title="Ngẫu nhiên">
+              <i class="fa-solid fa-dice"></i> Ngẫu Nhiên (Random)
+            </button>
           </div>
         </div>
       </section>
-      
-      <!-- Customizer Options Panel (Right) -->
-      <section class="options-panel">
-        <div class="options-card card-panel">
-          <div class="tab-content-container">
-            
-            <!-- 1. Identity Tab (Gender, Face Shape, Skin Tone) -->
-            <div class="tab-content active" id="tab-identity">
-              <!-- Gender Selection -->
-              <div class="option-group">
-                <label class="group-title">1. Chọn Giới Tính:</label>
-                <div class="gender-toggle-wrapper">
-                  <input type="radio" id="gender-male" name="gender" value="male" checked>
-                  <label for="gender-male" class="gender-card">
-                    <span>Boy (Nam) 👦</span>
-                  </label>
-                  
-                  <input type="radio" id="gender-female" name="gender" value="female">
-                  <label for="gender-female" class="gender-card">
-                    <span>Girl (Nữ) 👧</span>
-                  </label>
+
+      <!-- 2. Integrated Navigation & Options Card Panel (Middle & Right Attached) -->
+      <div class="options-container">
+        <!-- Sidebar Navigation (Middle) -->
+        <nav class="left-sidebar card-panel">
+          <button class="sidebar-btn active" data-tab="identity" title="Chọn Hình Dáng & Màu Da">
+            <i class="fa-solid fa-user"></i>
+          </button>
+          <button class="sidebar-btn" data-tab="facial" title="Chọn Chi Tiết Khuôn Mặt">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+          <button class="sidebar-btn" data-tab="hair" title="Chọn Kiểu Tóc & Màu Tóc">
+            <i class="fa-solid fa-scissors"></i>
+          </button>
+          <button class="sidebar-btn" data-tab="shirt" title="Chọn Áo (Shirt)">
+            <i class="fa-solid fa-shirt"></i>
+          </button>
+          <button class="sidebar-btn" data-tab="pants" title="Chọn Quần (Pants)">
+            <svg viewBox="0 0 512 512" fill="currentColor">
+              <path
+                d="M432 32H80a16 16 0 0 0-16 16v432a16 16 0 0 0 16 16h112a16 16 0 0 0 16-16V304h96v176a16 16 0 0 0 16 16h112a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zm-208 80h-64V64h64zm128 0h-64V64h64z" />
+            </svg>
+          </button>
+          <button class="sidebar-btn" data-tab="dress" title="Chọn Đầm/Bộ liền (Dress)">
+            <svg viewBox="0 0 384 512" fill="currentColor">
+              <path
+                d="M128 32C128 14.3 142.3 0 160 0H224C241.7 0 256 14.3 256 32V64H384V160C384 177.7 369.7 192 352 192H320V448C320 483.3 291.3 512 256 512H128C92.7 512 64 483.3 64 448V192H32C14.3 192 0 177.7 0 160V64H128V32z" />
+            </svg>
+          </button>
+          <button class="sidebar-btn" data-tab="shoes" title="Chọn Giày (Shoes)">
+            <svg viewBox="0 0 512 512" fill="currentColor">
+              <mask id="shoe-mask">
+                <rect x="-100" y="-100" width="712" height="712" fill="white" />
+                <path d="M216 156h64M216 196h64M216 236h64" stroke="black" stroke-width="16" stroke-linecap="round" />
+                <line x1="48" y1="352" x2="464" y2="352" stroke="black" stroke-width="16" />
+                <rect x="336" y="144" width="48" height="96" fill="black" rx="8" />
+                <path d="M256 256Q176 272 144 352" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" />
+              </mask>
+              <g transform="translate(256, 256) scale(1.23) translate(-256, -256)">
+                <g mask="url(#shoe-mask)">
+                  <path d="M400 344H80c-17.7 0-32 14.3-32 32v16c0 17.7 14.3 32 32 32h288c17.7 0 32-14.3 32-32v-48z" />
+                  <path d="M400 112H256v144H144c-44.2 0-80 35.8-80 80v16h336V112z" />
+                </g>
+              </g>
+            </svg>
+          </button>
+          <button class="sidebar-btn" data-tab="accessories" title="Chọn Phụ Kiện (Accessories)">
+            <i class="fa-solid fa-glasses"></i>
+          </button>
+          <button class="sidebar-btn" data-tab="background" title="Chọn Hình Nền (Background)">
+            <i class="fa-solid fa-image"></i>
+          </button>
+        </nav>
+
+        <!-- Customizer Options Panel (Right) -->
+        <section class="options-panel">
+          <div class="options-card card-panel">
+            <div class="tab-content-container">
+
+              <!-- 1. Identity Tab (Gender, Face Shape, Skin Tone) -->
+              <div class="tab-content active" id="tab-identity">
+                <!-- Gender Selection -->
+                <div class="option-group">
+                  <label class="group-title">1. Chọn Giới Tính:</label>
+                  <div class="gender-toggle-wrapper">
+                    <input type="radio" id="gender-male" name="gender" value="male" checked>
+                    <label for="gender-male" class="gender-card">
+                      <span>Boy (Nam) 👦</span>
+                    </label>
+
+                    <input type="radio" id="gender-female" name="gender" value="female">
+                    <label for="gender-female" class="gender-card">
+                      <span>Girl (Nữ) 👧</span>
+                    </label>
+                  </div>
                 </div>
-              </div>
-              
-              <!-- Face Shape Selection -->
-              <div class="option-group">
-                <label class="group-title">Chọn Dạng Khuôn Mặt:</label>
-                <div class="cards-grid" id="face-picker">
-                  <!-- Generated by app.js -->
+
+                <!-- Face Shape Selection -->
+                <div class="option-group">
+                  <label class="group-title">Dáng mặt:</label>
+                  <div class="cards-grid" id="face-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
+
+                <!-- Skin Tone Selection -->
+                <div class="option-group">
+                  <div class="skin-tone-header">
+                    <label class="group-title">Màu da:</label>
+                    <div class="skin-tone-labels">
+                      <span id="active-skin-label" class="skin-label-text">Màu 1</span>
+                      <span id="active-skin-hex" class="skin-hex-text">#FFE7E6</span>
+                    </div>
+                  </div>
+
+                  <div class="skin-tone-grid" id="skin-tone-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+
+                  <!-- Custom Skin Colors Section -->
+                  <div class="custom-skin-section">
+                    <div class="custom-skin-header">
+                      <input type="checkbox" id="enable-custom-skin">
+                      <label for="enable-custom-skin">Tùy chọn màu da riêng</label>
+                    </div>
+
+                    <div class="custom-color-pickers" style="display: none;">
+                      <div class="custom-skin-picker-container">
+                        <!-- Left side: Hue wheel & SV gradient canvas -->
+                        <div class="picker-canvas-wrapper">
+                          <canvas id="skin-color-picker-canvas" width="150" height="150"></canvas>
+                        </div>
+                        
+                        <!-- Right side: RGB sliders -->
+                        <div class="rgb-sliders-container">
+                          <div class="rgb-slider-row">
+                            <span class="rgb-label r-label">R</span>
+                            <input type="range" id="rgb-slider-r" min="0" max="255" value="255" class="rgb-slider">
+                            <span id="rgb-val-r" class="rgb-val-text">255</span>
+                          </div>
+                          <div class="rgb-slider-row">
+                            <span class="rgb-label g-label">G</span>
+                            <input type="range" id="rgb-slider-g" min="0" max="255" value="231" class="rgb-slider">
+                            <span id="rgb-val-g" class="rgb-val-text">231</span>
+                          </div>
+                          <div class="rgb-slider-row">
+                            <span class="rgb-label b-label">B</span>
+                            <input type="range" id="rgb-slider-b" min="0" max="255" value="230" class="rgb-slider">
+                            <span id="rgb-val-b" class="rgb-val-text">230</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Hidden inputs for backward compatibility with JS logic -->
+                      <input type="color" id="custom-skin-base" value="#ffe7e6" style="display: none;">
+                      <input type="color" id="custom-skin-shading" value="#ffcccc" style="display: none;">
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <!-- Skin Tone Selection -->
-              <div class="option-group">
-                <div class="skin-tone-header">
-                  <label class="group-title">2. Chọn Tông Màu Da:</label>
-                  <div class="skin-tone-labels">
-                    <span id="active-skin-label" class="skin-label-text">Màu 1</span>
-                    <span id="active-skin-hex" class="skin-hex-text">#FFE7E6</span>
+              <!-- 2. Facial Features Tab (Eyes, Eyebrows, Nose, Mouth) -->
+              <div class="tab-content" id="tab-facial">
+                <div class="option-group">
+                  <label class="group-title">Mắt:</label>
+                  <div class="cards-grid" id="eyes-picker">
+                    <!-- Generated by app.js -->
                   </div>
                 </div>
-                
-                <div class="skin-tone-grid" id="skin-tone-picker">
-                  <!-- Generated by app.js -->
+                <div class="option-group" id="eyes-color-container">
+                  <!-- Dynamically populated by app.js -->
                 </div>
-                
-                <!-- Custom Skin Colors Section -->
-                <div class="custom-skin-section">
-                  <div class="custom-skin-header">
-                    <input type="checkbox" id="enable-custom-skin">
-                    <label for="enable-custom-skin">Tùy chọn màu da riêng</label>
-                  </div>
-                  
-                  <div class="custom-color-pickers" style="display: none;">
-                    <div class="color-picker-item">
-                      <span>Màu nền:</span>
-                      <input type="color" id="custom-skin-base" value="#ffe7e6">
-                    </div>
-                    <div class="color-picker-item">
-                      <span>Màu bóng:</span>
-                      <input type="color" id="custom-skin-shading" value="#ffcccc">
-                    </div>
+                <div class="option-group">
+                  <label class="group-title">Lông mày:</label>
+                  <div class="cards-grid" id="eyebrows-picker">
+                    <!-- Generated by scss/app.js -->
                   </div>
                 </div>
+                <div class="option-group" id="eyebrows-color-container">
+                  <!-- Dynamically populated by app.js -->
+                </div>
+                <div class="option-group">
+                  <label class="group-title">Mũi:</label>
+                  <div class="cards-grid" id="nose-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
+                <div class="option-group">
+                  <label class="group-title">Miệng:</label>
+                  <div class="cards-grid" id="mouth-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
               </div>
+
+              <!-- 3. Hair Tab -->
+              <div class="tab-content" id="tab-hair">
+                <div class="option-group">
+                  <label class="group-title">Tóc Mái (Bangs):</label>
+                  <div class="cards-grid" id="bang-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
+                <div class="option-group">
+                  <label class="group-title">Tóc Sau (Back Hair):</label>
+                  <div class="cards-grid" id="behind-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
+                <div class="option-group" id="hair-color-container">
+                  <!-- Dynamically populated by app.js -->
+                </div>
+              </div>
+
+              <!-- 4. Shirt Tab -->
+              <div class="tab-content" id="tab-shirt">
+                <div class="option-group">
+                  <div class="cards-grid" id="shirt-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
+                <div class="option-group" id="shirt-color-container">
+                  <!-- Dynamically populated by app.js -->
+                </div>
+              </div>
+
+              <!-- 5. Pants Tab -->
+              <div class="tab-content" id="tab-pants">
+                <div class="option-group">
+                  <div class="cards-grid" id="pants-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
+                <div class="option-group" id="pants-color-container">
+                  <!-- Dynamically populated by app.js -->
+                </div>
+              </div>
+
+              <!-- 6. Dress Tab -->
+              <div class="tab-content" id="tab-dress">
+                <div class="option-group">
+                  <div class="cards-grid" id="dress-picker">
+                    <!-- Generated by app.js -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- 7. Shoes Tab -->
+              <div class="tab-content" id="tab-shoes">
+              </div>
+
+              <!-- 8. Accessories Tab -->
+              <div class="tab-content" id="tab-accessories">
+              </div>
+
+              <!-- 9. Background Tab -->
+              <div class="tab-content" id="tab-background">
+              </div>
+
             </div>
-            
-            <!-- 2. Facial Features Tab (Eyes, Eyebrows, Nose, Mouth) -->
-            <div class="tab-content" id="tab-facial">
-              <div class="option-group">
-                <label class="group-title">Chọn Kiểu Dáng Mắt:</label>
-                <div class="cards-grid" id="eyes-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-              <div class="option-group">
-                <label class="group-title">Chọn Kiểu Dáng Lông Mày:</label>
-                <div class="cards-grid" id="eyebrows-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-              <div class="option-group" id="eyebrows-color-container">
-                <!-- Dynamically populated by app.js -->
-              </div>
-              <div class="option-group">
-                <label class="group-title">Chọn Kiểu Dáng Mũi:</label>
-                <div class="cards-grid" id="nose-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-              <div class="option-group">
-                <label class="group-title">Chọn Kiểu Dáng Miệng:</label>
-                <div class="cards-grid" id="mouth-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-            </div>
-            
-            <!-- 3. Hair Tab -->
-            <div class="tab-content" id="tab-hair">
-              <div class="option-group">
-                <label class="group-title">Tóc Mái (Bangs):</label>
-                <div class="cards-grid" id="bang-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-              <div class="option-group">
-                <label class="group-title">Tóc Sau (Back Hair):</label>
-                <div class="cards-grid" id="behind-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-              <div class="option-group" id="hair-color-container">
-                <!-- Dynamically populated by app.js -->
-              </div>
-            </div>
-            
-            <!-- 6. Outfit Tab -->
-            <div class="tab-content" id="tab-outfit">
-              <div class="option-group">
-                <label class="group-title">Áo (Shirt):</label>
-                <div class="cards-grid" id="shirt-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-              <div class="option-group">
-                <label class="group-title">Quần (Pants):</label>
-                <div class="cards-grid" id="pants-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-              <div class="option-group">
-                <label class="group-title">Đầm/Bộ liền (Dress):</label>
-                <div class="cards-grid" id="dress-picker">
-                  <!-- Generated by app.js -->
-                </div>
-              </div>
-            </div>
-            
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   </div>
-  
+
   <!-- Dynamic Canvas for PNG exports -->
   <canvas id="export-canvas" style="display: none;"></canvas>
-  
-  <script src="assets.js?v=29"></script>
-  <script src="app.js?v=29"></script>
+
+  <script src="assets.js?v=92"></script>
+  <script src="app.js?v=92"></script>
 </body>
+
 </html>

@@ -1,9 +1,9 @@
 /* Cute Child-Friendly UI Styles for Mee Character Customizer */
 :root {
-  --font-main: 'Fredoka', 'Outfit', sans-serif;
-  
+  --font-main: 'Mali', 'Fredoka', 'Outfit', sans-serif;
+
   /* Color Palette */
-  --bg-primary: #a5d7fa;
+  --bg-primary: #FFF7D1;
   --text-brown: #4a3728;
   --text-muted: #8b7565;
   --card-bg-white: #ffffff;
@@ -13,7 +13,7 @@
   --accent-orange: #ff7e5a;
   --accent-orange-hover: #ff6034;
   --border-color: #ebdcd0;
-  
+
   /* Layout */
   --radius-lg: 24px;
   --radius-md: 16px;
@@ -29,7 +29,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
@@ -40,7 +41,7 @@ html, body {
 
 body {
   /* Using the cleaned background image with child toy doodles */
-  background-image: url('bg.jpg');
+  background-image: url('bg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -162,13 +163,26 @@ body {
   box-shadow: 0 6px 16px rgba(255, 126, 90, 0.4);
 }
 
+.btn-random {
+  background: linear-gradient(135deg, #ff9eb5, var(--accent-pink));
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
+}
+
+.btn-random:hover {
+  background: linear-gradient(135deg, #ffcbd6, #ff6585);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 117, 151, 0.4);
+}
+
 /* Dashboard Content Grid */
 .main-content {
   display: grid;
-  grid-template-columns: 80px 360px 1fr;
+  grid-template-columns: 360px 1fr; /* Preview panel on the left, Options container on the right */
   gap: 20px;
   align-items: stretch;
-  height: 580px; /* Fixed uniform height for all panels on desktop viewports */
+  height: 580px;
+  /* Fixed uniform height for all panels on desktop viewports */
 }
 
 /* Card Panels */
@@ -184,25 +198,27 @@ body {
 .left-sidebar {
   display: flex;
   flex-direction: column;
-  padding: 16px 8px;
-  gap: 16px;
+  padding: 12px 8px;
+  gap: 8px;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .sidebar-btn {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   background: #fdfaf4;
   border: 2px solid var(--border-color);
   color: var(--text-muted);
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   cursor: pointer;
   transition: var(--transition-smooth);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .sidebar-btn:hover {
@@ -219,7 +235,13 @@ body {
   box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
 }
 
-.preview-panel, .options-panel {
+.sidebar-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.preview-panel,
+.options-panel {
   min-height: 0;
   height: 100%;
 }
@@ -318,7 +340,10 @@ body {
 
 .tab-content-container {
   flex: 1;
-  min-height: 0; /* Important flex fix for vertical inner scrolling */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* Important flex fix for vertical inner scrolling */
   overflow: hidden;
 }
 
@@ -331,9 +356,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  height: 100%;
-  overflow-y: auto; /* Enable vertical scroll inside the card tab container */
-  padding-right: 8px; /* Extra padding to prevent scrollbar overlapping content */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal overflow and left-side cutoff */
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px 8px 8px; /* Left padding of 8px prevents clipping on hover/active states */
 }
 
 /* Custom premium scrollbar for option content */
@@ -355,8 +384,15 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Option Groups */
@@ -404,7 +440,7 @@ body {
   transform: translateY(-2px);
 }
 
-.gender-toggle-wrapper input[type="radio"]:checked + .gender-card {
+.gender-toggle-wrapper input[type="radio"]:checked+.gender-card {
   background: #ffffff;
   border-color: var(--accent-pink);
   color: var(--accent-pink);
@@ -458,12 +494,7 @@ body {
 }
 
 .card-label {
-  position: absolute;
-  bottom: 4px;
-  right: 6px;
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  font-weight: 600;
+  display: none;
 }
 
 /* Skin Tone Grid */
@@ -474,10 +505,7 @@ body {
 }
 
 .skin-tone-labels {
-  display: flex;
-  gap: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  display: none;
 }
 
 .skin-label-text {
@@ -565,13 +593,15 @@ body {
 }
 
 /* Eyebrows and Hair Colors Grid */
-.hair-color-section, .eyebrows-color-section {
+.hair-color-section,
+.eyebrows-color-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.hair-colors-grid, .eyebrows-colors-grid {
+.hair-colors-grid,
+.eyebrows-colors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
   gap: 8px;
@@ -600,27 +630,215 @@ body {
   accent-color: var(--accent-pink);
 }
 
+/* Outfit Colors Grid */
+.outfit-color-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 5px;
+  margin-bottom: 12px;
+}
+
+.outfit-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 8px;
+}
+
+/* Eyes Colors Grid */
+.eyes-color-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 5px;
+  margin-bottom: 12px;
+}
+
+.eyes-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 8px;
+}
+
 /* Spinner Loader */
 .loader-spinner {
   font-size: 2.5rem;
   color: var(--accent-pink);
 }
 
-/* Responsive Scaling */
+/* Responsive Scaling & Layout Overrides */
+.options-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: var(--card-bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-cute);
+  border: var(--border-thick);
+  overflow: hidden;
+  height: 100%;
+}
+
+.options-container .left-sidebar {
+  border: none;
+  border-right: var(--border-thick);
+  border-radius: 0;
+  box-shadow: none;
+  background: #FAF7F0; /* Soft warm navigation panel background */
+  width: 80px;
+  flex-shrink: 0;
+  height: 100%;
+  padding: 16px 8px;
+  box-sizing: border-box;
+}
+
+.options-container .options-panel {
+  flex: 1;
+  height: 100%;
+}
+
+.options-container .options-card {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  height: 100%;
+  padding: 24px;
+  background: transparent;
+  box-sizing: border-box;
+}
+
 @media (max-width: 1024px) {
   .main-content {
     grid-template-columns: 1fr;
-    height: auto; /* Auto height on stacked mobile layouts */
+    height: auto;
+    /* Auto height on stacked mobile layouts */
   }
 
-  .preview-panel, .options-panel {
+  .preview-panel {
     height: auto;
   }
-  
-  .left-sidebar {
-    flex-direction: row;
+
+  .options-container {
+    flex-direction: column; /* Stack nav and content vertically on mobile */
+    height: auto;
+  }
+
+  .options-container .left-sidebar {
+    flex-direction: row; /* Horizontal bar on mobile */
     justify-content: center;
     width: 100%;
     height: auto;
+    border-right: none;
+    border-bottom: var(--border-thick); /* Middle border between nav and content on mobile */
+    padding: 12px;
   }
+
+  .options-container .options-panel {
+    width: 100%;
+    height: auto;
+  }
+
+  .options-container .options-card {
+    height: auto;
+    padding: 16px;
+  }
+}
+
+/* Custom Skin Tone Picker Styling */
+.custom-skin-picker-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 8px;
+  background: #fdfaf4;
+  border-radius: var(--radius-md);
+  border: 2px dashed #ebdcd0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.picker-canvas-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#skin-color-picker-canvas {
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.rgb-sliders-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rgb-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.rgb-label {
+  font-weight: 700;
+  font-size: 1.1rem;
+  width: 18px;
+  display: inline-block;
+  text-align: center;
+}
+
+.r-label { color: #ff5252; }
+.g-label { color: #4caf50; }
+.b-label { color: #2196f3; }
+
+.rgb-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  background: #ebdcd0;
+  outline: none;
+}
+
+.rgb-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #ebdcd0;
+  border-radius: 4px;
+}
+
+.rgb-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-cute);
+  cursor: pointer;
+  margin-top: -4px; /* Centering the thumb vertically */
+  transition: transform 0.1s ease;
+}
+
+.rgb-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.rgb-val-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  width: 32px;
+  text-align: right;
+  color: var(--text-brown);
 }

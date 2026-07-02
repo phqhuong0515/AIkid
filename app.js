@@ -404,6 +404,340 @@ function initUI() {
     skinPicker.appendChild(swatch);
   });
 
+  // Auto-calculation of shading color from skin base color
+  function calculateShadingColor(hex) {
+    let r = parseInt(hex.substring(1, 3), 16);
+    let g = parseInt(hex.substring(3, 5), 16);
+    let b = parseInt(hex.substring(5, 7), 16);
+    
+    r /= 255; g /= 255; b /= 255;
+    let max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      let d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+
+    let hDeg = h * 360;
+    if (hDeg > 15 && hDeg < 50) {
+      hDeg -= 4; // Shift toward red
+    }
+    h = hDeg / 360;
+
+    s = Math.min(1, s * 1.08); // Slight increase in saturation
+    l = Math.max(0, l * 0.86); // Drop lightness by 14% to darken
+
+    let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    let p = 2 * l - q;
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    }
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+
+    const toHex = val => {
+      let str = Math.round(val * 255).toString(16);
+      return str.length === 1 ? '0' + str : str;
+    };
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  // Custom Canvas Color Picker logic
+  function initCanvasColorPicker() {
+    const canvas = document.getElementById('skin-color-picker-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    const sliderR = document.getElementById('rgb-slider-r');
+    const sliderG = document.getElementById('rgb-slider-g');
+    const sliderB = document.getElementById('rgb-slider-b');
+    const valR = document.getElementById('rgb-val-r');
+    const valG = document.getElementById('rgb-val-g');
+    const valB = document.getElementById('rgb-val-b');
+    const customBaseInput = document.getElementById('custom-skin-base');
+    const customShadingInput = document.getElementById('custom-skin-shading');
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const center = width / 2;
+    const outerRadius = width / 2 - 4;
+    const innerRadius = outerRadius - 18;
+    const sqSize = Math.round(innerRadius * Math.sqrt(2)) - 8;
+    const sqX = center - sqSize / 2;
+    const sqY = center - sqSize / 2;
+
+    let currentHue = 0;
+    let currentSat = 100;
+    let currentVal = 100;
+
+    function hexToRgb(hex) {
+      let r = parseInt(hex.substring(1, 3), 16);
+      let g = parseInt(hex.substring(3, 5), 16);
+      let b = parseInt(hex.substring(5, 7), 16);
+      return { r, g, b };
+    }
+
+    function rgbToHex(r, g, b) {
+      const toHex = val => {
+        let str = Math.round(val).toString(16);
+        return str.length === 1 ? '0' + str : str;
+      };
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    }
+
+    function rgbToHsv(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, v = max;
+      let d = max - min;
+      s = max === 0 ? 0 : d / max;
+
+      if (max === min) {
+        h = 0;
+      } else {
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+    }
+
+    function hsvToRgb(h, s, v) {
+      s /= 100; v /= 100;
+      let c = v * s;
+      let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      let m = v - c;
+      let r = 0, g = 0, b = 0;
+
+      if (h >= 0 && h < 60) { r = c; g = x; }
+      else if (h >= 60 && h < 120) { r = x; g = c; }
+      else if (h >= 120 && h < 180) { g = c; b = x; }
+      else if (h >= 180 && h < 240) { g = x; b = c; }
+      else if (h >= 240 && h < 300) { r = x; b = c; }
+      else if (h >= 300 && h <= 360) { r = c; b = x; }
+
+      return {
+        r: Math.round((r + m) * 255),
+        g: Math.round((g + m) * 255),
+        b: Math.round((b + m) * 255)
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw Hue Ring
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(center, center, outerRadius, 0, Math.PI * 2);
+      ctx.arc(center, center, innerRadius, 0, Math.PI * 2, true);
+      ctx.clip();
+
+      const gradient = ctx.createConicGradient(0, center, center);
+      gradient.addColorStop(0, 'hsl(0, 100%, 50%)');
+      gradient.addColorStop(1/6, 'hsl(60, 100%, 50%)');
+      gradient.addColorStop(2/6, 'hsl(120, 100%, 50%)');
+      gradient.addColorStop(3/6, 'hsl(180, 100%, 50%)');
+      gradient.addColorStop(4/6, 'hsl(240, 100%, 50%)');
+      gradient.addColorStop(5/6, 'hsl(300, 100%, 50%)');
+      gradient.addColorStop(1, 'hsl(360, 100%, 50%)');
+
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.restore();
+
+      // 2. Draw Saturation-Value Square
+      ctx.fillStyle = `hsl(${currentHue}, 100%, 50%)`;
+      ctx.fillRect(sqX, sqY, sqSize, sqSize);
+
+      let whiteGrad = ctx.createLinearGradient(sqX, 0, sqX + sqSize, 0);
+      whiteGrad.addColorStop(0, 'rgba(255,255,255,1)');
+      whiteGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = whiteGrad;
+      ctx.fillRect(sqX, sqY, sqSize, sqSize);
+
+      let blackGrad = ctx.createLinearGradient(0, sqY, 0, sqY + sqSize);
+      blackGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      blackGrad.addColorStop(1, 'rgba(0,0,0,1)');
+      ctx.fillStyle = blackGrad;
+      ctx.fillRect(sqX, sqY, sqSize, sqSize);
+
+      // 3. Draw Hue Ring Target
+      const angle = (currentHue * Math.PI) / 180;
+      const selectorRadius = (outerRadius + innerRadius) / 2;
+      const selX = center + selectorRadius * Math.cos(angle);
+      const selY = center + selectorRadius * Math.sin(angle);
+
+      ctx.beginPath();
+      ctx.arc(selX, selY, 5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+      ctx.shadowColor = 'transparent';
+
+      // 4. Draw SV Square Target
+      const targetX = sqX + (currentSat / 100) * sqSize;
+      const targetY = sqY + ((100 - currentVal) / 100) * sqSize;
+
+      ctx.beginPath();
+      ctx.arc(targetX, targetY, 5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+      ctx.shadowColor = 'transparent';
+    }
+
+    function updateFromHsv() {
+      const rgb = hsvToRgb(currentHue, currentSat, currentVal);
+      sliderR.value = rgb.r;
+      sliderG.value = rgb.g;
+      sliderB.value = rgb.b;
+      valR.textContent = rgb.r;
+      valG.textContent = rgb.g;
+      valB.textContent = rgb.b;
+
+      const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+      const shadingHex = calculateShadingColor(hex);
+
+      customBaseInput.value = hex;
+      customShadingInput.value = shadingHex;
+
+      state.customPrimaryColor = hex;
+      state.customShadowColor = shadingHex;
+      document.querySelectorAll('.skin-swatch').forEach(s => s.classList.remove('active'));
+      document.getElementById('active-skin-hex').textContent = hex.toUpperCase();
+      recolorAndRefreshEars();
+
+      draw();
+    }
+
+    function updateFromRgb() {
+      const r = parseInt(sliderR.value);
+      const g = parseInt(sliderG.value);
+      const b = parseInt(sliderB.value);
+      
+      valR.textContent = r;
+      valG.textContent = g;
+      valB.textContent = b;
+
+      const hsv = rgbToHsv(r, g, b);
+      currentHue = hsv.h;
+      currentSat = hsv.s;
+      currentVal = hsv.v;
+
+      const hex = rgbToHex(r, g, b);
+      const shadingHex = calculateShadingColor(hex);
+
+      customBaseInput.value = hex;
+      customShadingInput.value = shadingHex;
+
+      state.customPrimaryColor = hex;
+      state.customShadowColor = shadingHex;
+      document.querySelectorAll('.skin-swatch').forEach(s => s.classList.remove('active'));
+      document.getElementById('active-skin-hex').textContent = hex.toUpperCase();
+      recolorAndRefreshEars();
+
+      draw();
+    }
+
+    function handleInput(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = clientX - rect.left - center;
+      const y = clientY - rect.top - center;
+      
+      const distance = Math.sqrt(x * x + y * y);
+
+      if (distance >= innerRadius - 2 && distance <= outerRadius + 2) {
+        let angle = Math.atan2(y, x);
+        if (angle < 0) angle += Math.PI * 2;
+        currentHue = Math.round((angle * 180) / Math.PI) % 360;
+        updateFromHsv();
+        return true;
+      }
+      
+      const relativeX = clientX - rect.left - sqX;
+      const relativeY = clientY - rect.top - sqY;
+      if (relativeX >= 0 && relativeX <= sqSize && relativeY >= 0 && relativeY <= sqSize) {
+        currentSat = Math.round((relativeX / sqSize) * 100);
+        currentVal = Math.round((1 - (relativeY / sqSize)) * 100);
+        updateFromHsv();
+        return true;
+      }
+      return false;
+    }
+
+    let isDragging = false;
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = handleInput(e);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        handleInput(e);
+      }
+    });
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      isDragging = handleInput(e);
+      e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        handleInput(e);
+        e.preventDefault();
+      }
+    }, { passive: false });
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    sliderR.addEventListener('input', updateFromRgb);
+    sliderG.addEventListener('input', updateFromRgb);
+    sliderB.addEventListener('input', updateFromRgb);
+
+    const initHex = customBaseInput.value || "#ffe7e6";
+    const initRgb = hexToRgb(initHex);
+    sliderR.value = initRgb.r;
+    sliderG.value = initRgb.g;
+    sliderB.value = initRgb.b;
+    valR.textContent = initRgb.r;
+    valG.textContent = initRgb.g;
+    valB.textContent = initRgb.b;
+
+    const initHsv = rgbToHsv(initRgb.r, initRgb.g, initRgb.b);
+    currentHue = initHsv.h;
+    currentSat = initHsv.s;
+    currentVal = initHsv.v;
+
+    draw();
+  }
+
   // 1.5. Bind Custom Color inputs
   const customBase = document.getElementById('custom-skin-base');
   const customShading = document.getElementById('custom-skin-shading');
@@ -414,26 +748,13 @@ function initUI() {
     enableCustomSkin.addEventListener('change', (e) => {
       if (e.target.checked) {
         customPickersDiv.style.display = 'flex';
-        state.customPrimaryColor = customBase.value;
-        state.customShadowColor = customShading.value;
+        // Initialize/sync canvas color picker
+        initCanvasColorPicker();
       } else {
         customPickersDiv.style.display = 'none';
         state.customPrimaryColor = null;
         state.customShadowColor = null;
       }
-      recolorAndRefreshEars();
-    });
-
-    customBase.addEventListener('input', (e) => {
-      state.customPrimaryColor = e.target.value;
-      document.querySelectorAll('.skin-swatch').forEach(s => s.classList.remove('active'));
-      document.getElementById('active-skin-hex').textContent = e.target.value.toUpperCase();
-      recolorAndRefreshEars();
-    });
-
-    customShading.addEventListener('input', (e) => {
-      state.customShadowColor = e.target.value;
-      document.querySelectorAll('.skin-swatch').forEach(s => s.classList.remove('active'));
       recolorAndRefreshEars();
     });
   }
