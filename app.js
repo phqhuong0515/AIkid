@@ -29,7 +29,7 @@ const state = {
 const pastelBackgroundColors = [
   { index: 1, base: '#ffffff', name: 'Trắng (White)' },
   { index: 2, base: '#f1f3f5', name: 'Xám (Grey)' },
-  { index: 3, base: '#ffeef0', name: 'Đỏ (Red)' },
+  { index: 3, base: '#ffe0e3', name: 'Đỏ (Red)' },
   { index: 4, base: '#fff3e0', name: 'Cam (Orange)' },
   { index: 5, base: '#fffde7', name: 'Vàng (Yellow)' },
   { index: 6, base: '#eafaf1', name: 'Xanh lá (Green)' },
@@ -1310,6 +1310,33 @@ function addBackgroundColorPicker() {
       updatePreview();
     });
     typePicker.appendChild(darkCard);
+
+    // 4. "Nền kẻ ô" (Grid Background) option card
+    const gridCard = document.createElement('div');
+    gridCard.className = `selector-card ${state.backgroundType === 'grid' ? 'active' : ''}`;
+    gridCard.dataset.type = 'grid';
+    gridCard.innerHTML = `
+      <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: block;">
+        <rect x="0" y="0" width="100" height="100" rx="12" fill="#e0e0e0" />
+        <line x1="25" y1="0" x2="25" y2="100" stroke="#ffffff" stroke-width="4" />
+        <line x1="50" y1="0" x2="50" y2="100" stroke="#ffffff" stroke-width="4" />
+        <line x1="75" y1="0" x2="75" y2="100" stroke="#ffffff" stroke-width="4" />
+        <line x1="0" y1="25" x2="100" y2="25" stroke="#ffffff" stroke-width="4" />
+        <line x1="0" y1="50" x2="100" y2="50" stroke="#ffffff" stroke-width="4" />
+        <line x1="0" y1="75" x2="100" y2="75" stroke="#ffffff" stroke-width="4" />
+      </svg>
+      <span class="card-label">Nền kẻ ô</span>
+    `;
+    gridCard.addEventListener('click', () => {
+      state.backgroundType = 'grid';
+      const isLightColor = pastelBackgroundColors.some(c => c.base === state.backgroundColor);
+      if (!isLightColor) {
+        state.backgroundColor = '#ffffff';
+      }
+      syncBackgroundColorPickerUI();
+      updatePreview();
+    });
+    typePicker.appendChild(gridCard);
   }
 
   syncBackgroundColorPickerUI();
@@ -1319,12 +1346,13 @@ function renderBackgroundSwatches() {
   const bgGrid = document.getElementById('background-colors-grid');
   if (!bgGrid) return;
   
-  if (bgGrid.dataset.renderedType === state.backgroundType) {
+  const category = (state.backgroundType === 'dark') ? 'dark' : (state.backgroundType === 'none' ? 'none' : 'light');
+  if (bgGrid.dataset.renderedCategory === category) {
     return;
   }
   
   bgGrid.innerHTML = '';
-  bgGrid.dataset.renderedType = state.backgroundType;
+  bgGrid.dataset.renderedCategory = category;
   
   if (state.backgroundType === 'none') return;
   
@@ -1371,15 +1399,24 @@ function syncBackgroundColorPickerUI() {
 
   const colorContainer = document.getElementById('background-color-container');
   if (colorContainer) {
-    colorContainer.style.display = (state.backgroundType === 'light' || state.backgroundType === 'dark') ? 'block' : 'none';
+    colorContainer.style.display = (state.backgroundType === 'light' || state.backgroundType === 'dark' || state.backgroundType === 'grid') ? 'block' : 'none';
   }
 
   const viewport = document.getElementById('svg-preview-container');
   if (viewport) {
     if (state.backgroundType === 'light' || state.backgroundType === 'dark') {
       viewport.style.backgroundColor = state.backgroundColor;
+      viewport.style.backgroundImage = 'none';
+    } else if (state.backgroundType === 'grid') {
+      viewport.style.backgroundColor = state.backgroundColor;
+      viewport.style.backgroundImage = `
+        linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)
+      `;
+      viewport.style.backgroundSize = '24px 24px';
     } else {
       viewport.style.backgroundColor = '#ffffff';
+      viewport.style.backgroundImage = 'none';
     }
   }
 }
@@ -1913,8 +1950,17 @@ function updatePreview() {
     container.innerHTML = finalSvg;
     if (state.backgroundType === 'light' || state.backgroundType === 'dark') {
       container.style.backgroundColor = state.backgroundColor;
+      container.style.backgroundImage = 'none';
+    } else if (state.backgroundType === 'grid') {
+      container.style.backgroundColor = state.backgroundColor;
+      container.style.backgroundImage = `
+        linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)
+      `;
+      container.style.backgroundSize = '24px 24px';
     } else {
       container.style.backgroundColor = '#ffffff';
+      container.style.backgroundImage = 'none';
     }
   }, 50);
 }
