@@ -23,7 +23,8 @@ const state = {
   pantsColor: 3, // 3 = Yellow (default)
   eyesColor: 1,  // 1 = Black (default)
   backgroundColor: '#ffffff',
-  backgroundType: 'light'
+  backgroundType: 'light',
+  backgroundImageUrl: ''
 };
 
 const pastelBackgroundColors = [
@@ -1262,20 +1263,40 @@ function addBackgroundColorPicker() {
   if (typePicker) {
     typePicker.innerHTML = '';
     
-    // 1. "Không nền" (None) option card
-    const noneCard = document.createElement('div');
-    noneCard.className = `selector-card ${state.backgroundType === 'none' ? 'active' : ''}`;
-    noneCard.dataset.type = 'none';
-    noneCard.innerHTML = `
-      <div style="font-size: 1.8rem; color: var(--text-muted);"><i class="fa-solid fa-ban"></i></div>
-      <span class="card-label">Không nền</span>
+    // 1. "Tải ảnh lên" (Upload) option card
+    const uploadCard = document.createElement('div');
+    uploadCard.className = `selector-card ${state.backgroundType === 'upload' ? 'active' : ''}`;
+    uploadCard.dataset.type = 'upload';
+    uploadCard.innerHTML = `
+      <div style="font-size: 1.8rem; color: var(--text-muted);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <span class="card-label">Tải ảnh lên</span>
+      <input type="file" id="bg-image-upload-input" accept="image/*" style="display: none;" />
     `;
-    noneCard.addEventListener('click', () => {
-      state.backgroundType = 'none';
-      syncBackgroundColorPickerUI();
-      updatePreview();
+    uploadCard.addEventListener('click', (e) => {
+      const fileInput = uploadCard.querySelector('#bg-image-upload-input');
+      if (fileInput) {
+        if (e.target !== fileInput) {
+          fileInput.click();
+        }
+      }
     });
-    typePicker.appendChild(noneCard);
+    const fileInput = uploadCard.querySelector('#bg-image-upload-input');
+    if (fileInput) {
+      fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            state.backgroundType = 'upload';
+            state.backgroundImageUrl = e.target.result;
+            syncBackgroundColorPickerUI();
+            updatePreview();
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    typePicker.appendChild(uploadCard);
     
     // 2. "Nền nhạt" (Light Background) option card
     const lightCard = document.createElement('div');
@@ -1352,11 +1373,18 @@ function addBackgroundColorPicker() {
     ginghamCard.dataset.type = 'gingham';
     ginghamCard.innerHTML = `
       <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: block;">
+        <defs>
+          <clipPath id="gingham-card-clip">
+            <rect x="0" y="0" width="100" height="100" rx="12" />
+          </clipPath>
+        </defs>
         <rect x="0" y="0" width="100" height="100" rx="12" fill="#ffffff" />
-        <rect x="0" y="0" width="100" height="25" fill="#a4c2f4" opacity="0.35" />
-        <rect x="0" y="50" width="100" height="25" fill="#a4c2f4" opacity="0.35" />
-        <rect x="0" y="0" width="25" height="100" fill="#a4c2f4" opacity="0.35" />
-        <rect x="50" y="0" width="25" height="100" fill="#a4c2f4" opacity="0.35" />
+        <g clip-path="url(#gingham-card-clip)">
+          <rect x="0" y="0" width="100" height="25" fill="#888888" opacity="0.35" />
+          <rect x="0" y="50" width="100" height="25" fill="#888888" opacity="0.35" />
+          <rect x="0" y="0" width="25" height="100" fill="#888888" opacity="0.35" />
+          <rect x="50" y="0" width="25" height="100" fill="#888888" opacity="0.35" />
+        </g>
       </svg>
       <span class="card-label">Nền ca-rô</span>
     `;
@@ -1379,7 +1407,7 @@ function renderBackgroundSwatches() {
   const bgGrid = document.getElementById('background-colors-grid');
   if (!bgGrid) return;
   
-  const category = (state.backgroundType === 'dark') ? 'dark' : (state.backgroundType === 'none' ? 'none' : 'light');
+  const category = (state.backgroundType === 'dark') ? 'dark' : (state.backgroundType === 'upload' ? 'upload' : 'light');
   if (bgGrid.dataset.renderedCategory === category) {
     return;
   }
@@ -1387,7 +1415,7 @@ function renderBackgroundSwatches() {
   bgGrid.innerHTML = '';
   bgGrid.dataset.renderedCategory = category;
   
-  if (state.backgroundType === 'none') return;
+  if (state.backgroundType === 'upload') return;
   
   const colorList = state.backgroundType === 'dark' ? darkBackgroundColors : pastelBackgroundColors;
   colorList.forEach(color => {
@@ -1460,6 +1488,12 @@ function syncBackgroundColorPickerUI() {
         linear-gradient(rgba(${rgb}, 0.35) 50%, transparent 50%)
       `;
       viewport.style.backgroundSize = '32px 32px';
+    } else if (state.backgroundType === 'upload') {
+      viewport.style.backgroundColor = '#ffffff';
+      viewport.style.backgroundImage = state.backgroundImageUrl ? `url(${state.backgroundImageUrl})` : 'none';
+      viewport.style.backgroundSize = 'cover';
+      viewport.style.backgroundPosition = 'center';
+      viewport.style.backgroundRepeat = 'no-repeat';
     } else {
       viewport.style.backgroundColor = '#ffffff';
       viewport.style.backgroundImage = 'none';
@@ -2018,6 +2052,12 @@ function updatePreview() {
         linear-gradient(rgba(${rgb}, 0.35) 50%, transparent 50%)
       `;
       container.style.backgroundSize = '32px 32px';
+    } else if (state.backgroundType === 'upload') {
+      container.style.backgroundColor = '#ffffff';
+      container.style.backgroundImage = state.backgroundImageUrl ? `url(${state.backgroundImageUrl})` : 'none';
+      container.style.backgroundSize = 'cover';
+      container.style.backgroundPosition = 'center';
+      container.style.backgroundRepeat = 'no-repeat';
     } else {
       container.style.backgroundColor = '#ffffff';
       container.style.backgroundImage = 'none';
@@ -2087,6 +2127,7 @@ function resetCharacter() {
   state.dress = 0;
   state.backgroundColor = '#ffffff';
   state.backgroundType = 'light';
+  state.backgroundImageUrl = '';
 
   // Clear custom overrides on reset
   state.customPrimaryColor = null;
