@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Custom Stylesheet for Preview -->
-  <link rel="stylesheet" href="styles.css?v=95">
+  <link rel="stylesheet" href="styles.css?v=96">
 </head>
 
 <body>
@@ -313,7 +313,13 @@
               <!-- 9. Background Tab -->
               <div class="tab-content" id="tab-background">
                 <div class="option-group">
-                  <label class="group-title">Chọn màu nền khung nhân vật (Preview Background):</label>
+                  <label class="group-title">Chọn kiểu nền:</label>
+                  <div class="cards-grid" id="background-picker">
+                    <!-- Background type cards rendered by JS -->
+                  </div>
+                </div>
+                <div class="option-group" id="background-color-container" style="display: none;">
+                  <label class="group-title">Chọn màu nền:</label>
                   <div class="outfit-colors-grid" id="background-colors-grid" style="margin-top: 10px;"></div>
                 </div>
               </div>
@@ -328,8 +334,8 @@
   <!-- Dynamic Canvas for PNG exports -->
   <canvas id="export-canvas" style="display: none;"></canvas>
 
-  <script src="assets.js?v=95"></script>
-  <script src="app.js?v=95"></script>
+  <script src="assets.js?v=96"></script>
+  <script src="app.js?v=96"></script>
 </body>
 
 </html>

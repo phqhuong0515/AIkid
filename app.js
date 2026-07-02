@@ -22,7 +22,8 @@ const state = {
   shirtColor: 2, // 2 = Red (default)
   pantsColor: 3, // 3 = Yellow (default)
   eyesColor: 1,  // 1 = Black (default)
-  backgroundColor: '#ffffff'
+  backgroundColor: '#ffffff',
+  backgroundType: 'solid'
 };
 
 const pastelBackgroundColors = [
@@ -1236,29 +1237,74 @@ function addOutfitColorPickers() {
 }
 
 function addBackgroundColorPicker() {
-  const bgGrid = document.getElementById('background-colors-grid');
-  if (!bgGrid) return;
-  bgGrid.innerHTML = '';
-  pastelBackgroundColors.forEach(color => {
-    const swatch = document.createElement('div');
-    swatch.className = `color-swatch background-color-swatch ${state.backgroundColor === color.base ? 'active' : ''}`;
-    swatch.style.backgroundColor = color.base;
-    swatch.title = color.name;
-    swatch.addEventListener('click', () => {
-      state.backgroundColor = color.base;
+  const typePicker = document.getElementById('background-picker');
+  if (typePicker) {
+    typePicker.innerHTML = '';
+    
+    // 1. "Không nền" (None) option card
+    const noneCard = document.createElement('div');
+    noneCard.className = `selector-card ${state.backgroundType === 'none' ? 'active' : ''}`;
+    noneCard.dataset.type = 'none';
+    noneCard.innerHTML = `
+      <div style="font-size: 1.8rem; color: var(--text-muted);"><i class="fa-solid fa-ban"></i></div>
+      <span class="card-label">Không nền</span>
+    `;
+    noneCard.addEventListener('click', () => {
+      state.backgroundType = 'none';
       syncBackgroundColorPickerUI();
-      
-      const viewport = document.getElementById('svg-preview-container');
-      if (viewport) {
-        viewport.style.backgroundColor = state.backgroundColor;
-      }
       updatePreview();
     });
-    bgGrid.appendChild(swatch);
-  });
+    typePicker.appendChild(noneCard);
+    
+    // 2. "Nền trơn" (Solid Background) option card
+    const solidCard = document.createElement('div');
+    solidCard.className = `selector-card ${state.backgroundType === 'solid' ? 'active' : ''}`;
+    solidCard.dataset.type = 'solid';
+    solidCard.innerHTML = `
+      <div style="font-size: 1.8rem; color: var(--text-muted);"><i class="fa-solid fa-paint-roller"></i></div>
+      <span class="card-label">Nền trơn</span>
+    `;
+    solidCard.addEventListener('click', () => {
+      state.backgroundType = 'solid';
+      syncBackgroundColorPickerUI();
+      updatePreview();
+    });
+    typePicker.appendChild(solidCard);
+  }
+
+  // 3. Render color swatches
+  const bgGrid = document.getElementById('background-colors-grid');
+  if (bgGrid) {
+    bgGrid.innerHTML = '';
+    pastelBackgroundColors.forEach(color => {
+      const swatch = document.createElement('div');
+      swatch.className = `color-swatch background-color-swatch ${state.backgroundColor === color.base ? 'active' : ''}`;
+      swatch.style.backgroundColor = color.base;
+      swatch.title = color.name;
+      swatch.addEventListener('click', () => {
+        state.backgroundColor = color.base;
+        syncBackgroundColorPickerUI();
+        updatePreview();
+      });
+      bgGrid.appendChild(swatch);
+    });
+  }
+  
+  syncBackgroundColorPickerUI();
 }
 
 function syncBackgroundColorPickerUI() {
+  const typePicker = document.getElementById('background-picker');
+  if (typePicker) {
+    typePicker.querySelectorAll('.selector-card').forEach(card => {
+      if (card.dataset.type === state.backgroundType) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+  }
+
   const bgGrid = document.getElementById('background-colors-grid');
   if (bgGrid) {
     bgGrid.querySelectorAll('.background-color-swatch').forEach((swatch, idx) => {
@@ -1270,9 +1316,19 @@ function syncBackgroundColorPickerUI() {
       }
     });
   }
+
+  const colorContainer = document.getElementById('background-color-container');
+  if (colorContainer) {
+    colorContainer.style.display = state.backgroundType === 'solid' ? 'block' : 'none';
+  }
+
   const viewport = document.getElementById('svg-preview-container');
   if (viewport) {
-    viewport.style.backgroundColor = state.backgroundColor;
+    if (state.backgroundType === 'solid') {
+      viewport.style.backgroundColor = state.backgroundColor;
+    } else {
+      viewport.style.backgroundColor = '#ffffff';
+    }
   }
 }
 
@@ -1803,7 +1859,11 @@ function updatePreview() {
   setTimeout(() => {
     const finalSvg = composeCharacterSVG();
     container.innerHTML = finalSvg;
-    container.style.backgroundColor = state.backgroundColor;
+    if (state.backgroundType === 'solid') {
+      container.style.backgroundColor = state.backgroundColor;
+    } else {
+      container.style.backgroundColor = '#ffffff';
+    }
   }, 50);
 }
 
@@ -1868,6 +1928,7 @@ function resetCharacter() {
   state.pants = 0;
   state.dress = 0;
   state.backgroundColor = '#ffffff';
+  state.backgroundType = 'solid';
 
   // Clear custom overrides on reset
   state.customPrimaryColor = null;
