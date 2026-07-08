@@ -133,7 +133,7 @@ function extractBase64Images(svgString) {
 function extractStylesAndDefs(svgString, stylesArray, defsArray, scopeSelector) {
   if (!svgString) return '';
   let cleanSvg = svgString;
-  
+
   // Extract styles
   const styleRegex = /<style>([\s\S]*?)<\/style>/gi;
   let styleMatch;
@@ -145,7 +145,7 @@ function extractStylesAndDefs(svgString, stylesArray, defsArray, scopeSelector) 
     stylesArray.push(css);
   }
   cleanSvg = cleanSvg.replace(styleRegex, '');
-  
+
   // Extract defs
   const defsRegex = /<defs>([\s\S]*?)<\/defs>/gi;
   let defsMatch;
@@ -153,7 +153,7 @@ function extractStylesAndDefs(svgString, stylesArray, defsArray, scopeSelector) 
     defsArray.push(defsMatch[1]);
   }
   cleanSvg = cleanSvg.replace(defsRegex, '');
-  
+
   return cleanSvg;
 }
 
@@ -177,12 +177,12 @@ function makeSvgIdsUnique(svgString, prefix) {
   while ((match = idRegex.exec(svgString)) !== null) {
     ids.push(match[1]);
   }
-  
+
   if (ids.length === 0) return svgString;
-  
+
   ids.sort((a, b) => b.length - a.length);
   const uniqueIds = [...new Set(ids)];
-  
+
   uniqueIds.forEach(id => {
     const newId = `${prefix}-${id}`;
     result = result.replace(new RegExp(`\\bid=(["'])${id}\\1`, 'g'), `id=$1${newId}$1`);
@@ -190,7 +190,7 @@ function makeSvgIdsUnique(svgString, prefix) {
     result = result.replace(new RegExp(`xlink:href=(["'])#${id}\\1`, 'g'), `xlink:href=$1#${newId}$1`);
     result = result.replace(new RegExp(`href=(["'])#${id}\\1`, 'g'), `href=$1#${newId}$1`);
   });
-  
+
   return result;
 }
 
@@ -438,7 +438,7 @@ function initUI() {
     let r = parseInt(hex.substring(1, 3), 16);
     let g = parseInt(hex.substring(3, 5), 16);
     let b = parseInt(hex.substring(5, 7), 16);
-    
+
     r /= 255; g /= 255; b /= 255;
     let max = Math.max(r, g, b), min = Math.min(r, g, b);
     let h, s, l = (max + min) / 2;
@@ -470,14 +470,14 @@ function initUI() {
     function hue2rgb(p, q, t) {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;
-      if (t < 1/6) return p + (q - p) * 6 * t;
-      if (t < 1/2) return q;
-      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
       return p;
     }
-    r = hue2rgb(p, q, h + 1/3);
+    r = hue2rgb(p, q, h + 1 / 3);
     g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1/3);
+    b = hue2rgb(p, q, h - 1 / 3);
 
     const toHex = val => {
       let str = Math.round(val * 255).toString(16);
@@ -491,7 +491,7 @@ function initUI() {
     const canvas = document.getElementById('skin-color-picker-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
+
     const sliderR = document.getElementById('rgb-slider-r');
     const sliderG = document.getElementById('rgb-slider-g');
     const sliderB = document.getElementById('rgb-slider-b');
@@ -582,11 +582,11 @@ function initUI() {
 
       const gradient = ctx.createConicGradient(0, center, center);
       gradient.addColorStop(0, 'hsl(0, 100%, 50%)');
-      gradient.addColorStop(1/6, 'hsl(60, 100%, 50%)');
-      gradient.addColorStop(2/6, 'hsl(120, 100%, 50%)');
-      gradient.addColorStop(3/6, 'hsl(180, 100%, 50%)');
-      gradient.addColorStop(4/6, 'hsl(240, 100%, 50%)');
-      gradient.addColorStop(5/6, 'hsl(300, 100%, 50%)');
+      gradient.addColorStop(1 / 6, 'hsl(60, 100%, 50%)');
+      gradient.addColorStop(2 / 6, 'hsl(120, 100%, 50%)');
+      gradient.addColorStop(3 / 6, 'hsl(180, 100%, 50%)');
+      gradient.addColorStop(4 / 6, 'hsl(240, 100%, 50%)');
+      gradient.addColorStop(5 / 6, 'hsl(300, 100%, 50%)');
       gradient.addColorStop(1, 'hsl(360, 100%, 50%)');
 
       ctx.fillStyle = gradient;
@@ -666,7 +666,7 @@ function initUI() {
       const r = parseInt(sliderR.value);
       const g = parseInt(sliderG.value);
       const b = parseInt(sliderB.value);
-      
+
       valR.textContent = r;
       valG.textContent = g;
       valB.textContent = b;
@@ -697,7 +697,7 @@ function initUI() {
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       const x = clientX - rect.left - center;
       const y = clientY - rect.top - center;
-      
+
       const distance = Math.sqrt(x * x + y * y);
 
       if (distance >= innerRadius - 2 && distance <= outerRadius + 2) {
@@ -707,7 +707,7 @@ function initUI() {
         updateFromHsv();
         return true;
       }
-      
+
       const relativeX = clientX - rect.left - sqX;
       const relativeY = clientY - rect.top - sqY;
       if (relativeX >= 0 && relativeX <= sqSize && relativeY >= 0 && relativeY <= sqSize) {
@@ -799,7 +799,7 @@ function initUI() {
   renderCustomGrid('bang-picker', 'hair', Object.keys(meeAssets.hair.bang).length, 'bang', false, 'bang');
   renderCustomGrid('behind-picker', 'hair', Object.keys(meeAssets.hair.behind).length, 'behind', true, 'behind');
   renderCustomGrid('shirt-picker', 'outfit', Object.keys(meeAssets.outfit.shirt[state.gender]).length, 'shirt', true, 'shirt');
-  renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants).length, 'pants', true, 'pants');
+  renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants[state.gender]).length, 'pants', true, 'pants');
   renderCustomGrid('dress-picker', 'outfit', 1 + Object.keys(meeAssets.outfit.dress[state.gender] || {}).length, 'dress', true, 'dress');
 
   // 3. Tab switching logic
@@ -818,8 +818,15 @@ function initUI() {
   document.querySelectorAll('input[name="gender"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
       state.gender = e.target.value;
+
+      // Reset pants to 0 if out of range for the new gender (e.g. skirt selected, switching to male)
+      if (state.pants > Object.keys(meeAssets.outfit.pants[state.gender]).length) {
+        state.pants = 0;
+      }
+
       // Re-render gender-specific grids dynamically
       renderCustomGrid('shirt-picker', 'outfit', Object.keys(meeAssets.outfit.shirt[state.gender]).length, 'shirt', true, 'shirt');
+      renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants[state.gender]).length, 'pants', true, 'pants');
       renderCustomGrid('dress-picker', 'outfit', 1 + Object.keys(meeAssets.outfit.dress[state.gender] || {}).length, 'dress', true, 'dress');
       updatePreview();
     });
@@ -858,8 +865,7 @@ function initUI() {
   const btnDone = document.getElementById('btn-done');
   if (btnDone) {
     btnDone.addEventListener('click', () => {
-      exportAsPNG();
-      setTimeout(exportAsSVG, 500);
+      exportAsJPEG();
     });
   }
 
@@ -912,7 +918,7 @@ function renderSelectorGrid(containerId, assetKey, count, stateKey, hasNone = fa
 
     const cardId = `card-selector-${assetKey}-${i}`;
     card.id = cardId;
-    
+
     // Scope styles and make IDs unique to prevent leakage/collisions
     let scopedSvgStr = makeSvgIdsUnique(svgStr, cardId);
     scopedSvgStr = scopeSvgStyles(scopedSvgStr, `#${cardId}`);
@@ -1000,13 +1006,13 @@ function renderCustomGrid(containerId, category, count, stateKey, hasNone = fals
         const shirtStyle = meeAssets.outfit.shirt[state.gender][i];
         svgStr = shirtStyle ? (shirtStyle[state.shirtColor] || shirtStyle['default'] || '') : '';
       } else if (subCategory === 'pants') {
-        const pantsStyle = meeAssets.outfit.pants[i];
+        const pantsStyle = meeAssets.outfit.pants[state.gender][i];
         svgStr = pantsStyle ? (pantsStyle[state.pantsColor] || pantsStyle['default'] || '') : '';
       } else if (subCategory === 'dress') {
         if (i === 1) {
           svgStr = meeAssets.outfit.dress.unisex[1];
-        } else if (i === 2) {
-          svgStr = meeAssets.outfit.dress[state.gender][1];
+        } else if (i > 1) {
+          svgStr = meeAssets.outfit.dress[state.gender][i - 1];
         }
       }
     }
@@ -1019,7 +1025,7 @@ function renderCustomGrid(containerId, category, count, stateKey, hasNone = fals
 
     const cardId = `card-custom-${category}-${subCategory || ''}-${i}`;
     card.id = cardId;
-    
+
     // Scope styles and make IDs unique to prevent leakage/collisions
     let scopedSvgStr = makeSvgIdsUnique(svgStr, cardId);
     scopedSvgStr = scopeSvgStyles(scopedSvgStr, `#${cardId}`);
@@ -1038,7 +1044,7 @@ function renderCustomGrid(containerId, category, count, stateKey, hasNone = fals
       <svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">
         ${previewContent}
       </svg>
-      <span class="card-label">${subCategory === 'dress' ? (i === 1 ? 'Unisex' : 'Dress') : i}</span>
+      <span class="card-label">${subCategory === 'dress' ? (i === 1 ? 'Unisex' : `Dress ${i - 1}`) : i}</span>
     `;
 
     card.addEventListener('click', () => {
@@ -1241,7 +1247,7 @@ function addOutfitColorPickers() {
       swatch.addEventListener('click', () => {
         state.pantsColor = color.index;
         syncOutfitColorPickersUI();
-        renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants).length, 'pants', true, 'pants');
+        renderCustomGrid('pants-picker', 'outfit', Object.keys(meeAssets.outfit.pants[state.gender]).length, 'pants', true, 'pants');
         updatePreview();
       });
       grid.appendChild(swatch);
@@ -1262,7 +1268,7 @@ function addBackgroundColorPicker() {
   const typePicker = document.getElementById('background-picker');
   if (typePicker) {
     typePicker.innerHTML = '';
-    
+
     // 1. "Tải ảnh lên" (Upload) option card
     const uploadCard = document.createElement('div');
     uploadCard.className = `selector-card ${state.backgroundType === 'upload' ? 'active' : ''}`;
@@ -1297,7 +1303,7 @@ function addBackgroundColorPicker() {
       });
     }
     typePicker.appendChild(uploadCard);
-    
+
     // 2. "Nền nhạt" (Light Background) option card
     const lightCard = document.createElement('div');
     lightCard.className = `selector-card ${state.backgroundType === 'light' ? 'active' : ''}`;
@@ -1406,17 +1412,17 @@ function addBackgroundColorPicker() {
 function renderBackgroundSwatches() {
   const bgGrid = document.getElementById('background-colors-grid');
   if (!bgGrid) return;
-  
+
   const category = (state.backgroundType === 'dark') ? 'dark' : (state.backgroundType === 'upload' ? 'upload' : 'light');
   if (bgGrid.dataset.renderedCategory === category) {
     return;
   }
-  
+
   bgGrid.innerHTML = '';
   bgGrid.dataset.renderedCategory = category;
-  
+
   if (state.backgroundType === 'upload') return;
-  
+
   const colorList = state.backgroundType === 'dark' ? darkBackgroundColors : pastelBackgroundColors;
   colorList.forEach(color => {
     const swatch = document.createElement('div');
@@ -1461,8 +1467,8 @@ function syncBackgroundColorPickerUI() {
   const colorContainer = document.getElementById('background-color-container');
   if (colorContainer) {
     colorContainer.style.display = (
-      state.backgroundType === 'light' || 
-      state.backgroundType === 'dark' || 
+      state.backgroundType === 'light' ||
+      state.backgroundType === 'dark' ||
       state.backgroundType === 'grid' ||
       state.backgroundType === 'gingham'
     ) ? 'block' : 'none';
@@ -1572,18 +1578,18 @@ function splitUnisexDress(dressSvg) {
   while ((match = regex.exec(dressSvg)) !== null) {
     shapes.push(match[0]);
   }
-  
+
   const backShapes = [];
   const frontShapes = [];
   const bodyShapes = [];
-  
+
   shapes.forEach(shape => {
     // 1. Back Layer: cls-1
     if (shape.includes('class="cls-1"') || shape.includes("class='cls-1'")) {
       backShapes.push(shape);
       return;
     }
-    
+
     // 2. Front Layer:
     // - class="cls-10" (light green hood)
     // - class="cls-11" (eyebrows)
@@ -1596,18 +1602,18 @@ function splitUnisexDress(dressSvg) {
     const isCls9 = shape.includes('class="cls-9"') || shape.includes("class='cls-9'");
     const isTopHorn = (shape.includes('class="cls-2"') || shape.includes("class='cls-2'")) && shape.includes('d="M96.43');
     const isEyeShape = shape.includes('cx="51.14"') || shape.includes('cx="143.41"') || shape.includes('cx=\'51.14\'') || shape.includes('cx=\'143.41\'') ||
-                       shape.includes('d="M43.43"') || shape.includes('d="M134.79"') || shape.includes('d=\'M43.43\'') || shape.includes('d=\'M134.79\'') ||
-                       shape.includes('d="M43.43,') || shape.includes('d="M134.79,');
-                       
+      shape.includes('d="M43.43"') || shape.includes('d="M134.79"') || shape.includes('d=\'M43.43\'') || shape.includes('d=\'M134.79\'') ||
+      shape.includes('d="M43.43,') || shape.includes('d="M134.79,');
+
     if (isCls10 || isCls11 || isCls9 || isTopHorn || isEyeShape) {
       frontShapes.push(shape);
       return;
     }
-    
+
     // 3. Body Layer: everything else
     bodyShapes.push(shape);
   });
-  
+
   return {
     back: backShapes.join('\n'),
     front: frontShapes.join('\n'),
@@ -1663,10 +1669,10 @@ function composeCharacterSVG() {
       if (dressSvg) {
         dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
         dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
-        
+
         const splitResult = splitUnisexDress(dressSvg);
         dressTransform = 'translate(-7.72, -44.23)';
-        
+
         if (splitResult.back) {
           dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">
             <ellipse cx="97" cy="110" rx="65" ry="85" fill="url(#mee-dress-linear-gradient)" />
@@ -1676,11 +1682,11 @@ function composeCharacterSVG() {
         if (splitResult.front) {
           dressFrontGroup = `<g id="mee-outfit-dress-front" class="mee-outfit-dress" transform="${dressTransform}">${splitResult.front}</g>`;
         }
-        
+
         dressSvg = splitResult.body;
       }
-    } else if (state.dress === 2) {
-      dressSvg = meeAssets.outfit.dress[state.gender][1];
+    } else if (state.dress > 1) {
+      dressSvg = meeAssets.outfit.dress[state.gender][state.dress - 1];
       if (dressSvg) {
         dressSvg = makeSvgIdsUnique(dressSvg, 'mee-dress');
         dressSvg = extractStylesAndDefs(dressSvg, stylesArray, defsArray, '.mee-outfit-dress');
@@ -1688,6 +1694,19 @@ function composeCharacterSVG() {
         const dressTranslateX = 90.32 - dressCenter.x;
         const dressTranslateY = state.gender === 'female' ? 136.32 : 136.42;
         dressTransform = `translate(${dressTranslateX.toFixed(2)}, ${dressTranslateY.toFixed(2)})`;
+
+        // Split red cape tail for male dress 2 to render behind model
+        if (dressSvg.includes('M119.57 11.7625')) {
+          const pathRegex = /<path\b[^>]*?M119.57 11.7625[^>]*?\/?>/i;
+          const pathMatch = dressSvg.match(pathRegex);
+          if (pathMatch) {
+            const capePath = pathMatch[0];
+            dressSvg = dressSvg.replace(capePath, '');
+            dressBackGroup = `<g id="mee-outfit-dress-back" class="mee-outfit-dress" transform="${dressTransform}">
+              ${capePath}
+            </g>`;
+          }
+        }
       }
     }
 
@@ -1704,7 +1723,7 @@ function composeCharacterSVG() {
       shirtSvg = shirtStyle ? (shirtStyle[state.shirtColor] || shirtStyle['default'] || '') : '';
     }
     if (state.pants > 0) {
-      const pantsStyle = meeAssets.outfit.pants[state.pants];
+      const pantsStyle = meeAssets.outfit.pants[state.gender][state.pants];
       pantsSvg = pantsStyle ? (pantsStyle[state.pantsColor] || pantsStyle['default'] || '') : '';
     }
 
@@ -1777,17 +1796,17 @@ function composeCharacterSVG() {
         faceSvg = faceSvg.replace(faceBase64[1], state.recoloredEars[1]); // Left ear
       }
     }
-    
+
     // Apply custom skin color overrides directly in the face shape path/styles
     if (state.customPrimaryColor || state.customShadowColor) {
       faceSvg = faceSvg
         .replace(new RegExp(colors.primary, 'gi'), primarySkinColor)
         .replace(new RegExp(colors.shadow, 'gi'), shadowSkinColor);
     }
-    
+
     faceSvg = makeSvgIdsUnique(faceSvg, 'mee-face');
     faceSvg = extractStylesAndDefs(faceSvg, stylesArray, defsArray, '#mee-face-shape');
-    
+
     // Remove default ears from body SVG to prevent overlay issues
     bodySvg = bodySvg
       .replace(/<g class="cls-2">[\s\S]*?<\/g>\s*<\/g>/gi, '')
@@ -1824,7 +1843,7 @@ function composeCharacterSVG() {
   // 1. Behind Hair (Tóc sau) - Render behind body template
   if (behindSvg) {
     const behindOffsetX = 90.32 - behindCenter.x;
-    
+
     // Shift behind hair based on the positioning for hair behind.svg relative to the head
     // Top of behind hair is positioned exactly 12.37px higher than the top of the head (Y = 0)
     let behindOffsetY = -12.37 - (behindCenter.top || 0);
@@ -1980,6 +1999,48 @@ function composeCharacterSVG() {
 
 
 
+  // Extract and copy hand paths to render them in front of the dress layers
+  let handsFrontGroup = '';
+  if (state.dress > 1) {
+    const rightHandShadowMatch = bodySvg.match(/<path\b[^>]*?d=["']M11\.(?:32|27)[^"']*?["'][^>]*?\/?>/i);
+    const leftHandShadowMatch = bodySvg.match(/<path\b[^>]*?d=["']M168\.(?:57|52)[^"']*?["'][^>]*?\/?>/i);
+    const rightHandFingersMatch = bodySvg.match(/<path\b[^>]*?d=["']M35\.(?:87|81\d*)[^"']*?["'][^>]*?\/?>/i);
+    const leftHandFingersMatch = bodySvg.match(/<path\b[^>]*?d=["']M14(?:4|3\.97\d*)[^"']*?["'][^>]*?\/?>/i);
+    let handsContent = '';
+
+    // 1. Shadow paths (drawn behind the fingers/palm)
+    if (rightHandShadowMatch) {
+      handsContent += rightHandShadowMatch[0]
+        .replace(/fill=["'].*?["']/gi, '')
+        .replace(/class=["'].*?["']/gi, '')
+        .replace('<path ', `<path fill="${shadowSkinColor}" `) + '\n';
+    }
+    if (leftHandShadowMatch) {
+      handsContent += leftHandShadowMatch[0]
+        .replace(/fill=["'].*?["']/gi, '')
+        .replace(/class=["'].*?["']/gi, '')
+        .replace('<path ', `<path fill="${shadowSkinColor}" `) + '\n';
+    }
+
+    // 2. Fingers/palm paths (should render in front, so shadow is drawn underneath them)
+    if (rightHandFingersMatch) {
+      handsContent += rightHandFingersMatch[0]
+        .replace(/fill=["'].*?["']/gi, '')
+        .replace(/class=["'].*?["']/gi, '')
+        .replace('<path ', `<path fill="${primarySkinColor}" `) + '\n';
+    }
+    if (leftHandFingersMatch) {
+      handsContent += leftHandFingersMatch[0]
+        .replace(/fill=["'].*?["']/gi, '')
+        .replace(/class=["'].*?["']/gi, '')
+        .replace('<path ', `<path fill="${primarySkinColor}" `) + '\n';
+    }
+
+    if (handsContent) {
+      handsFrontGroup = `<g id="mee-hands-front">${handsContent}</g>`;
+    }
+  }
+
   // Inject outfit, facial, and dress front groups right before the closing </svg> tag
   const injectIndex = bodySvg.lastIndexOf('</svg>');
   if (injectIndex === -1) return bodySvg;
@@ -1989,6 +2050,7 @@ function composeCharacterSVG() {
     faceShapeGroup +
     faceGroup +
     dressFrontGroup +
+    handsFrontGroup +
     bodySvg.substring(injectIndex);
 
   // Inject the combined defs and styles right after the opening <svg ...> tag
@@ -2005,17 +2067,17 @@ function composeCharacterSVG() {
   if (originalViewBoxMatch) {
     const originalWidth = parseFloat(originalViewBoxMatch[1]);
     const originalHeight = parseFloat(originalViewBoxMatch[2]);
-    
+
     // Add margin parameters: left/right = 33px, top = 48px (for tall hair), bottom = 38px (for feet)
     const paddingX = 33;
     const paddingTop = 48;
     const paddingBottom = 38;
-    
+
     const newMinX = -paddingX;
     const newMinY = -paddingTop;
     const newWidth = originalWidth + (paddingX * 2);
     const newHeight = originalHeight + paddingTop + paddingBottom;
-    
+
     const newViewBox = `viewBox="${newMinX} ${newMinY} ${newWidth.toFixed(2)} ${newHeight.toFixed(2)}"`;
     composedSvg = composedSvg.replace(originalViewBoxMatch[0], newViewBox);
   }
@@ -2030,6 +2092,13 @@ function updatePreview() {
   container.innerHTML = '<div class="loader-spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>';
 
   pushStateToHistory();
+
+  // Save current state to localStorage to persist options across page navigations
+  try {
+    localStorage.setItem('mee_character_state', JSON.stringify(state));
+  } catch (e) {
+    console.error('Failed to save state to localStorage', e);
+  }
 
   setTimeout(() => {
     const finalSvg = composeCharacterSVG();
@@ -2219,14 +2288,14 @@ function exportAsSVG() {
   URL.revokeObjectURL(url);
 }
 
-// Export Character as PNG file download
-function exportAsPNG() {
+// Export Character as JPEG file download
+function exportAsJPEG() {
   const svgContent = composeCharacterSVG();
   const canvas = document.getElementById('export-canvas');
   const ctx = canvas.getContext('2d');
 
   const isFemale = state.gender === 'female';
-  
+
   // Parse width and height from the newly adjusted viewBox dynamically
   const viewBoxMatch = svgContent.match(/viewBox=["']([^"']+)["']/i);
   let width = isFemale ? 179.89 : 180;
@@ -2243,7 +2312,9 @@ function exportAsPNG() {
   canvas.width = width * scale;
   canvas.height = height * scale;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Fill solid white background (JPEG doesn't support transparency)
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const img = new Image();
   const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
@@ -2252,10 +2323,10 @@ function exportAsPNG() {
   img.onload = function () {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    const pngUrl = canvas.toDataURL('image/png');
+    const jpegUrl = canvas.toDataURL('image/jpeg', 0.95);
     const link = document.createElement('a');
-    link.href = pngUrl;
-    link.download = `mee-character-${state.gender}-clothed.png`;
+    link.href = jpegUrl;
+    link.download = `mee-character-${state.gender}-clothed.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2272,6 +2343,19 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('skin-tone-picker')) {
     return;
   }
+
+  // Load state from localStorage if available to keep previous Mee character options
+  const savedState = localStorage.getItem('mee_character_state');
+  if (savedState) {
+    try {
+      const parsed = JSON.parse(savedState);
+      Object.assign(state, parsed);
+    } catch (e) {
+      console.error('Failed to load state from localStorage', e);
+    }
+  }
+
   initUI();
+  syncUIControls();
   recolorAndRefreshEars();
 });

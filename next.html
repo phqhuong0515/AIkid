@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiếp Tục Hành Trình - StoryMee</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('SVG/3460254.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #f0f4f8; /* Fallback color */
+    }
+
+    /* Common navigation button styles */
+    .nav-btn {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #FF5C8A, #FF8E53);
+      border: 3.5px solid #FCF4DB;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 10px 25px rgba(255, 92, 138, 0.4);
+      cursor: pointer;
+      z-index: 99999;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-decoration: none;
+    }
+    
+    .nav-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      transition: transform 0.2s ease;
+    }
+    
+    /* Left button specific */
+    .btn-left {
+      left: 62px;
+    }
+    
+    .btn-left svg {
+      margin-right: 2px; /* Visual center adjustment for left triangle */
+    }
+    
+    .btn-left:hover {
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 15px 35px rgba(255, 92, 138, 0.6);
+      background: linear-gradient(135deg, #FF7096, #FFA072);
+    }
+    
+    .btn-left:hover svg {
+      transform: translateX(-2px);
+    }
+    
+    .btn-left:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+    
+    /* Right button specific */
+    .btn-right {
+      right: 62px;
+    }
+    
+    .btn-right svg {
+      margin-left: 2px; /* Visual center adjustment for right triangle */
+    }
+    
+    .btn-right:hover {
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 15px 35px rgba(255, 92, 138, 0.6);
+      background: linear-gradient(135deg, #FF7096, #FFA072);
+    }
+    
+    .btn-right:hover svg {
+      transform: translateX(2px);
+    }
+    
+    .btn-right:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <!-- Left back button pointing to customizer -->
+  <a href="index.html" class="nav-btn btn-left" title="Quay lại Tạo Mee">
+    <svg viewBox="0 0 24 24">
+      <path d="M16 5v14l-11-7z" />
+    </svg>
+  </a>
+
+  <!-- Right placeholder button with no function -->
+  <a href="#" class="nav-btn btn-right" title="Tiếp tục (Chưa có tính năng)" onclick="event.preventDefault();">
+    <svg viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  </a>
+</body>
+</html>

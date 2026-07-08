@@ -16,30 +16,44 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   // Parse URL and strip query parameters
-  let filePath = req.url.split('?')[0];
-  if (filePath === '/') {
-    filePath = '/index.html';
+  const urlPathname = req.url.split('?')[0];
+  const decodedUrl = decodeURIComponent(urlPathname);
+
+  // Redirect /me or /mee to include trailing slash
+  if (decodedUrl === '/me' || decodedUrl === '/mee') {
+    res.writeHead(301, { 'Location': decodedUrl + '/' });
+    res.end();
+    return;
   }
-  
-  const absolutePath = path.join(__dirname, filePath);
-  
+
+  let subPath = decodedUrl;
+  if (decodedUrl.startsWith('/me/') || decodedUrl.startsWith('/mee/')) {
+    subPath = decodedUrl.startsWith('/me/') ? decodedUrl.slice(4) : decodedUrl.slice(5);
+  }
+
+  if (subPath === '/' || subPath === '') {
+    subPath = '/index.html';
+  }
+
+  const absolutePath = path.join(__dirname, subPath);
+
   // Security check: ensure the requested file is inside the workspace
   if (!absolutePath.startsWith(__dirname)) {
     res.writeHead(403, { 'Content-Type': 'text/plain' });
     res.end('Forbidden');
     return;
   }
-  
+
   fs.stat(absolutePath, (err, stats) => {
     if (err || !stats.isFile()) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('Not Found');
       return;
     }
-    
+
     const ext = path.extname(absolutePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-    
+
     res.writeHead(200, { 'Content-Type': contentType });
     const stream = fs.createReadStream(absolutePath);
     stream.on('error', (streamErr) => {
@@ -54,5 +68,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}/mee`);
 });

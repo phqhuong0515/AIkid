@@ -28,7 +28,7 @@ const assets = {
   },
   outfit: {
     shirt: { female: {}, male: {} },
-    pants: {},
+    pants: { female: {}, male: {} },
     dress: { female: {}, male: {}, unisex: {} }
   }
 };
@@ -206,6 +206,27 @@ function processHair() {
   scanDir(HAIR_DIR);
 }
 
+// Gradient stops helper for dynamically colorizing skirts
+const colorStops = {
+  1: `<stop stop-color="#262626"/><stop offset="0.21" stop-color="#242424"/><stop offset="0.47" stop-color="#1C1C1C"/><stop offset="0.77" stop-color="#101010"/><stop offset="1" stop-color="#050505"/>`,
+  2: `<stop stop-color="#FF201C"/><stop offset="0.21" stop-color="#FF1A16"/><stop offset="0.47" stop-color="#FF0A06"/><stop offset="0.77" stop-color="#EA0400"/><stop offset="1" stop-color="#D10300"/>`,
+  3: `<stop stop-color="#FFD97B"/><stop offset="0.21" stop-color="#FFD775"/><stop offset="0.47" stop-color="#FFD365"/><stop offset="0.77" stop-color="#FFCB4A"/><stop offset="1" stop-color="#FFC431"/>`,
+  4: `<stop stop-color="#12C646"/><stop offset="0.21" stop-color="#12C144"/><stop offset="0.47" stop-color="#10B23F"/><stop offset="0.77" stop-color="#0E9936"/><stop offset="1" stop-color="#0C822E"/>`,
+  5: `<stop stop-color="#6ECFAC"/><stop offset="0.21" stop-color="#6ACEA9"/><stop offset="0.47" stop-color="#5ECAA2"/><stop offset="0.77" stop-color="#49C397"/><stop offset="1" stop-color="#3DB78A"/>`,
+  6: `<stop stop-color="#70CEF4"/><stop offset="0.21" stop-color="#6ACDF4"/><stop offset="0.47" stop-color="#5BC8F3"/><stop offset="0.77" stop-color="#42BFF1"/><stop offset="1" stop-color="#2BB7EF"/>`,
+  7: `<stop stop-color="#3362D6"/><stop offset="0.21" stop-color="#2E5ED5"/><stop offset="0.47" stop-color="#2857CB"/><stop offset="0.77" stop-color="#244DB4"/><stop offset="1" stop-color="#2045A0"/>`,
+  8: `<stop stop-color="#7532CC"/><stop offset="0.21" stop-color="#7231C7"/><stop offset="0.47" stop-color="#6B2EBA"/><stop offset="0.77" stop-color="#5E28A5"/><stop offset="1" stop-color="#532491"/>`,
+  9: `<stop stop-color="#FF89B0"/><stop offset="0.21" stop-color="#FF83AB"/><stop offset="0.47" stop-color="#FF73A1"/><stop offset="0.77" stop-color="#FF588E"/><stop offset="1" stop-color="#FF3F7E"/>`,
+  10: `<stop stop-color="#E6E6E6"/><stop offset="0.21" stop-color="#E1E1E1"/><stop offset="0.47" stop-color="#D6D6D6"/><stop offset="0.77" stop-color="#C4C4C4"/><stop offset="1" stop-color="#B3B3B3"/>`
+};
+
+function replaceGradientStops(svgContent, colorIndex) {
+  const stopsHtml = colorStops[colorIndex];
+  return svgContent.replace(/(<linearGradient[^>]*>)([\s\S]*?)(<\/linearGradient>)/i, (match, p1, p2, p3) => {
+    return p1 + '\n' + stopsHtml + '\n' + p3;
+  });
+}
+
 // 4. Process Outfit SVGs (Shirts, Pants, Dresses) recursively
 function processOutfit() {
   if (!fs.existsSync(OUFIT_DIR)) {
@@ -233,8 +254,17 @@ function processOutfit() {
         
         const lowerName = name.toLowerCase();
         if (lowerName.startsWith('pants')) {
-          if (!assets.outfit.pants[key]) assets.outfit.pants[key] = {};
-          assets.outfit.pants[key][colorKey] = content;
+          if (!assets.outfit.pants.female[key]) assets.outfit.pants.female[key] = {};
+          if (!assets.outfit.pants.male[key]) assets.outfit.pants.male[key] = {};
+          assets.outfit.pants.female[key][colorKey] = content;
+          assets.outfit.pants.male[key][colorKey] = content;
+        } else if (lowerName.startsWith('skirt')) {
+          const skirtKey = key + 3; // skirt 1 -> index 4, skirt 2 -> index 5, etc.
+          if (!assets.outfit.pants.female[skirtKey]) assets.outfit.pants.female[skirtKey] = {};
+          for (let c = 1; c <= 10; c++) {
+            assets.outfit.pants.female[skirtKey][c] = replaceGradientStops(content, c);
+          }
+          assets.outfit.pants.female[skirtKey]['default'] = content;
         } else if (lowerName.startsWith('shirt male')) {
           if (!assets.outfit.shirt.male[key]) assets.outfit.shirt.male[key] = {};
           assets.outfit.shirt.male[key][colorKey] = content;

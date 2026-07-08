@@ -10,36 +10,52 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
     rel="stylesheet">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Custom Stylesheet for Preview -->
-  <link rel="stylesheet" href="styles.css?v=107">
+  <link rel="stylesheet" href="styles.css?v=118">
 </head>
 
 <body>
+  <!-- Top Navigation Header from StoryMee Universe -->
+  <header class="universe-header">
+    <div class="universe-header-left">
+      <div class="universe-logo" onclick="window.location.href='http://localhost:8000'">
+        <img src="logo.svg" alt="StoryMee Logo" class="logo-image">
+      </div>
+    </div>
+    <div class="universe-header-right">
+      <button class="universe-signup-btn" onclick="window.location.href='http://localhost:8000'">Đăng Ký</button>
+    </div>
+  </header>
+
   <div class="app-container">
     <header class="app-header">
       <div class="header-left">
-        <a href="#" class="btn-world-map" style="text-decoration: none;">
-          <i class="fa-solid fa-earth-asia"></i> Trở Lại Bản Đồ Thế Giới
+        <a href="http://localhost:8000" class="btn btn-done"
+          style="text-decoration: none; display: inline-flex; align-items: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+          </svg>
+          <span>Trở Về</span>
         </a>
       </div>
 
       <div class="header-center">
-        <h1>Tạo Người Bạn Đại Diện (Mee)</h1>
-        <p class="subtitle">Tùy biến kiểu tóc, màu da, và nét mặt cho Mee của riêng bạn.</p>
+        <img src="PNG/Title2.png" alt="Create Your Mee" class="header-logo">
       </div>
 
       <div class="header-right">
-        <button id="btn-exit" class="btn btn-exit">
-          <i class="fa-solid fa-minus"></i> Exit
-        </button>
-        <button id="btn-done" class="btn btn-done">
-          <i class="fa-solid fa-plus"></i> Done
+        <button id="btn-done" class="btn btn-done" style="display: inline-flex; align-items: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          <span>Download</span>
         </button>
       </div>
     </header>
@@ -111,7 +127,8 @@
                 <path d="M216 156h64M216 196h64M216 236h64" stroke="black" stroke-width="16" stroke-linecap="round" />
                 <line x1="48" y1="352" x2="464" y2="352" stroke="black" stroke-width="16" />
                 <rect x="336" y="144" width="48" height="96" fill="black" rx="8" />
-                <path d="M256 256Q176 272 144 352" fill="none" stroke="black" stroke-width="12" stroke-linecap="round" />
+                <path d="M256 256Q176 272 144 352" fill="none" stroke="black" stroke-width="12"
+                  stroke-linecap="round" />
               </mask>
               <g transform="translate(256, 256) scale(1.23) translate(-256, -256)">
                 <g mask="url(#shoe-mask)">
@@ -187,7 +204,7 @@
                         <div class="picker-canvas-wrapper">
                           <canvas id="skin-color-picker-canvas" width="150" height="150"></canvas>
                         </div>
-                        
+
                         <!-- Right side: RGB sliders -->
                         <div class="rgb-sliders-container">
                           <div class="rgb-slider-row">
@@ -207,7 +224,7 @@
                           </div>
                         </div>
                       </div>
-                      
+
                       <!-- Hidden inputs for backward compatibility with JS logic -->
                       <input type="color" id="custom-skin-base" value="#ffe7e6" style="display: none;">
                       <input type="color" id="custom-skin-shading" value="#ffcccc" style="display: none;">
@@ -332,10 +349,17 @@
   </div>
 
   <!-- Dynamic Canvas for PNG exports -->
+  <!-- Next Page Button -->
+  <a href="next.html" class="next-page-btn" title="Tiếp tục chuyển trang">
+    <svg viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  </a>
+
   <canvas id="export-canvas" style="display: none;"></canvas>
 
-  <script src="assets.js?v=107"></script>
-  <script src="app.js?v=107"></script>
+  <script src="assets.js?v=110"></script>
+  <script src="app.js?v=110"></script>
 </body>
 
 </html>
