@@ -28,11 +28,7 @@
 
     /* Clean layout and centering */
     body {
-      background-image: url('/assets/images/bg-character-feature.png?v=7') !important;
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: cover;
-      background-attachment: fixed;
+      background: #FFFFFF !important;
       margin: 0;
       padding: 0;
       height: 100vh;
@@ -44,6 +40,12 @@
 
     /* UI Scaler Wrapper for Header and Back Button */
     .scaler-wrapper {
+      background-image: url('/assets/images/bg-character-feature.png?v=7') !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+      background-size: cover !important;
+      opacity: 0;
+      transition: opacity 0.4s ease;
       box-sizing: border-box;
       position: absolute;
       top: 0;
@@ -1198,6 +1200,10 @@
         const loader = document.getElementById('page-loader-overlay');
         if (loader && loader.style.display !== 'none') {
           loader.style.opacity = '0';
+          const content = document.querySelector('.scaler-wrapper');
+          if (content) {
+            content.style.opacity = '1';
+          }
           setTimeout(() => {
             loader.style.display = 'none';
           }, 400);
