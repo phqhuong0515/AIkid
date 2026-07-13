@@ -1194,15 +1194,20 @@
         }, 350);
       }
 
-      window.addEventListener('load', () => {
+      function hidePageLoader() {
         const loader = document.getElementById('page-loader-overlay');
-        if (loader) {
+        if (loader && loader.style.display !== 'none') {
           loader.style.opacity = '0';
           setTimeout(() => {
             loader.style.display = 'none';
           }, 400);
         }
+      }
+      window.addEventListener('load', hidePageLoader);
+      window.addEventListener('pageshow', (e) => {
+        if (e.persisted) hidePageLoader();
       });
+      setTimeout(hidePageLoader, 1500); // Safety fallback timeout
 
       function triggerImageUpload() {
         playPopSound();
