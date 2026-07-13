@@ -17,6 +17,180 @@
 
 <body>
 
+  <!-- Global Orbit Loading Overlay -->
+  <div id="page-loader-overlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #FFFFFF;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    pointer-events: all;
+  ">
+    <style>
+      @keyframes planetFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+      }
+      @keyframes shadowPulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(0.8); opacity: 0.25; }
+      }
+      @keyframes orbitRotation {
+        0% { transform: rotateX(75deg) rotateY(-10deg) rotateZ(0deg); }
+        100% { transform: rotateX(75deg) rotateY(-10deg) rotateZ(-360deg); }
+      }
+      @keyframes loadingDots {
+        0%, 20% { content: "."; }
+        40% { content: ".."; }
+        60%, 100% { content: "..."; }
+      }
+      .loading-dots::after {
+        content: "";
+        animation: loadingDots 1.5s infinite steps(1);
+        display: inline-block;
+        width: 24px;
+        text-align: left;
+      }
+    </style>
+    <!-- 3D Planet Scene -->
+    <div style="
+      position: relative;
+      width: 320px;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    ">
+      <!-- Floor Shadow -->
+      <div style="
+        position: absolute;
+        bottom: 10px;
+        width: 140px;
+        height: 12px;
+        background: #D4E7F7;
+        border-radius: 50%;
+        filter: blur(2px);
+        animation: shadowPulse 2s ease-in-out infinite;
+      "></div>
+
+      <!-- Floating Group (containing planet & orbit) -->
+      <div style="
+        position: relative;
+        width: 240px;
+        height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform-style: preserve-3d;
+        animation: planetFloat 2s ease-in-out infinite;
+      ">
+        <!-- Yellow Orbit Ring (Tilted) -->
+        <div style="
+          position: absolute;
+          width: 240px;
+          height: 240px;
+          border: 8px solid #FFC300;
+          border-radius: 50%;
+          transform: rotateX(75deg) rotateY(-10deg);
+          transform-style: preserve-3d;
+          box-sizing: border-box;
+        "></div>
+
+        <!-- Orbiting Planet Path (Tilted identically) -->
+        <div style="
+          position: absolute;
+          width: 240px;
+          height: 240px;
+          transform-style: preserve-3d;
+          animation: orbitRotation 2s linear infinite;
+        ">
+          <!-- Orange Planet -->
+          <div style="
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 30% 30%, #FFAE42 0%, #FF6200 80%, #CC4E00 100%);
+            border-radius: 50%;
+            left: 50%;
+            top: 0;
+            margin-left: -15px;
+            margin-top: -15px;
+            transform: rotateX(-75deg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+          "></div>
+        </div>
+
+        <!-- Central Blue Planet (Sitting at Z=1 so front orbit is in front) -->
+        <div style="
+          position: absolute;
+          width: 120px;
+          height: 120px;
+          background: radial-gradient(circle at 35% 35%, #85CEFF 0%, #4BA0EA 65%, #2178C7 100%);
+          border-radius: 50%;
+          transform: translate3d(0, 0, 1px);
+          box-shadow: 0 10px 25px rgba(33, 120, 199, 0.25);
+          overflow: hidden;
+        ">
+          <!-- Dark blue crater 1 -->
+          <div style="
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #2581D7;
+            border-radius: 50%;
+            bottom: 25px;
+            left: 20px;
+            opacity: 0.6;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.15);
+          "></div>
+          <!-- Dark blue crater 2 -->
+          <div style="
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #2581D7;
+            border-radius: 50%;
+            top: 35px;
+            right: 30px;
+            opacity: 0.5;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+          "></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Text -->
+    <div style="margin-top: 30px; text-align: center;">
+      <h2 style="
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #007FFF;
+        font-family: 'Fredoka', 'Mali', sans-serif;
+        margin: 0;
+        letter-spacing: 1px;
+      ">Loading<span class="loading-dots"></span></h2>
+      <p style="
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #FF7E15;
+        font-family: 'Mali', sans-serif;
+        margin: 8px 0 0 0;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      ">IN 2018</p>
+    </div>
+  </div>
+
     <!-- Header Bar -->
     <header class="lobby-header">
         <div class="lobby-logo" onclick="window.location.href='/'">
@@ -183,10 +357,26 @@
 
         function playPopAndNavigate(url) {
             playPopSound();
+            const loader = document.getElementById('page-loader-overlay');
+            if (loader) {
+                loader.style.display = 'flex';
+                loader.offsetHeight; // Force reflow
+                loader.style.opacity = '1';
+            }
             setTimeout(() => {
                 window.location.href = url;
-            }, 180); // 180ms delay gives enough time to hear the bubble pop!
+            }, 350);
         }
+
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader-overlay');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 400);
+            }
+        });
 
     </script>
 </body>
