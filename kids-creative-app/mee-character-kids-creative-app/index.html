@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryMee Universe - Thế Giới Sáng Tạo Cho Bé</title>
+    <!-- Font chữ hoạt hình Fredoka và Outfit sang trọng -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1.0.7">
+</head>
+<body>
+    <!-- 1. POPUP MODAL: ONBOARDING (KHI BẤM VÀO ĐẢO HOME LẦN ĐẦU) -->
+    <div id="onboard-modal" class="modal-overlay">
+        <div class="welcome-container modal-card" style="max-width: 650px; width: 90%; padding: 30px;">
+            <div class="welcome-header animate-bounce-slow">
+                <span class="badge">🚀 Khởi Đầu Hành Trình</span>
+                <h2>Chào Mừng Bé Đến Với StoryMee! 🧸</h2>
+                <p>Hãy chọn chặng tuổi và phân hạng trải nghiệm để bắt đầu khám phá vũ trụ.</p>
+            </div>
+
+            <!-- Chọn nhóm tuổi & Tier -->
+            <div class="selection-row" style="flex-direction: column; gap: 20px; margin-bottom: 25px; text-align: left;">
+                <div class="selection-column age-col" style="width: 100%;">
+                    <h3>1. Chọn độ tuổi của bé:</h3>
+                    <div class="welcome-btn-grid" style="grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px;">
+                        <button class="welcome-select-btn age-select-btn" data-age="6-8">6 - 8 Tuổi<br><small>🌱 Gieo Hạt</small></button>
+                        <button class="welcome-select-btn age-select-btn" data-age="9-10">9 - 10 Tuổi<br><small>🌿 Nảy Mầm</small></button>
+                        <button class="welcome-select-btn age-select-btn" data-age="11-13">11 - 13 Tuổi<br><small>🌳 Vươn Lên</small></button>
+                        <button class="welcome-select-btn age-select-btn" data-age="14-15">14 - 15 Tuổi<br><small>🏆 Master</small></button>
+                    </div>
+                </div>
+                <div class="selection-column tier-col" style="width: 100%;">
+                    <h3>2. Chọn Tier trải nghiệm:</h3>
+                    <div class="welcome-btn-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px;">
+                        <button class="welcome-select-btn tier-select-btn active" data-tier="Guest">Guest<br><small>Chơi nhanh</small></button>
+                        <button class="welcome-select-btn tier-select-btn" data-tier="Free">Free<br><small>Đã đăng ký</small></button>
+                        <button class="welcome-select-btn tier-select-btn" data-tier="Premium">Premium<br><small>Thành viên VIP</small></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút vào ứng dụng -->
+            <button id="enter-app-btn" class="main-btn disabled" disabled>Bắt Đầu Khám Phá! 🎡</button>
+        </div>
+    </div>
+
+    <!-- 2. MÀN HÌNH CHÍNH CỦA ỨNG DỤNG (BẮT ĐẦU HIỂN THỊ MẶC ĐỊNH) -->
+    <div id="app-board" class="screen active" style="display: flex;">
+        <!-- HEADER ỨNG DỤNG -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-logo" id="logo-back-to-home">
+                    <span>🌈 StoryMee <strong class="age-badge-label" id="header-age-badge">-</strong> <span class="tier-badge-label" id="header-tier-badge">GUEST</span></span>
+                </div>
+            </div>
+            
+            <!-- BỘ CHUYỂN ĐỔI NHANH ĐỂ KIỂM THỬ (TEST FLOW) -->
+            <div class="debug-controls-panel hidden" id="header-debug-panel">
+                <div class="debug-group">
+                    <span>Độ Tuổi:</span>
+                    <button class="debug-btn debug-age-btn" data-age="6-8">6-8</button>
+                    <button class="debug-btn debug-age-btn" data-age="9-10">9-10</button>
+                    <button class="debug-btn debug-age-btn" data-age="11-13">11-13</button>
+                    <button class="debug-btn debug-age-btn" data-age="14-15">14-15</button>
+                </div>
+                <div class="debug-group">
+                    <span>Tier:</span>
+                    <button class="debug-btn debug-tier-btn" data-tier="Guest">Guest</button>
+                    <button class="debug-btn debug-tier-btn" data-tier="Free">Free</button>
+                    <button class="debug-btn debug-tier-btn" data-tier="Premium">Premium</button>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="user-stats hidden" id="header-stats-panel">
+                    <div class="stat-item tooltip" title="Streak liên tục - Động lực chăm Pet!">
+                        <span id="streak-count">🔥 3 Ngày</span>
+                    </div>
+                    <div class="stat-item tooltip" title="Credits dùng để mua đồ ăn/đồ chơi cho Pet">
+                        <span id="coin-count">🪙 100 Credits</span>
+                    </div>
+                </div>
+                <button id="header-signup-btn" class="header-action-btn signup-btn">Đăng Ký</button>
+                <button id="header-upgrade-btn" class="header-action-btn premium-btn gold-glow hidden">Nâng Cấp VIP ⭐</button>
+                <button id="header-passport-btn" class="header-action-btn passport-btn hidden">🎫 Passport</button>
+                <button id="header-parent-btn" class="header-action-btn parent-btn hidden">🛡️ Phụ Huynh</button>
+                
+                <div class="user-profile-widget hidden" id="header-profile-widget">
+                    <div class="profile-avatar-circle" id="header-avatar-container"></div>
+                    <span id="header-username">Chọn Bạn</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- BẢN ĐỒ THẾ GIỚI TƯƠNG TÁC (ĐỔI THÀNH HOMEPAGE LANDING PAGE HÌNH 3) -->
+        <div id="world-map-screen" class="world-map-wrapper">
+            <!-- Landing page container -->
+            <div class="homepage-landing-container">
+                <!-- Cột trái: Tiêu đề, CTA & 3 Card -->
+                <div class="homepage-landing-left">
+                    <span class="landing-badge">🚀 StoryMee Universe</span>
+                    <h1 class="landing-title">Let's Play and Learn</h1>
+                    
+                    <!-- Khung trắng giới thiệu dưới Let's Play and Learn -->
+                    <div class="landing-intro-box">
+                        <p>Chào mừng bé đến với vũ trụ sáng tạo diệu kỳ! Hãy tự tay thiết kế nhân vật Mee đáng yêu, sáng tác những cuốn truyện tranh đầy màu sắc và ghi lại hành trình thú vị của riêng mình nhé!</p>
+                    </div>
+                    
+                    <button id="btn-landing-cta" class="landing-cta-btn gold-glow">Let's Create! ✨</button>
+
+                    <!-- 3 Zone Cards được đẩy sang trái nằm trong cột trái -->
+                    <div class="homepage-zones-grid">
+                        <!-- Card 1: Mee Builder -->
+                        <div class="zone-card card-mee" data-zone="mee">
+                            <span class="card-num">1</span>
+                            <div class="zone-card-top-glow"></div>
+                            <img src="assets/images/home_icon.png" alt="Mee House" class="zone-card-image">
+                            <div class="zone-card-content">
+                                <h3>HOME</h3>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 2: Art Kingdom -->
+                        <div class="zone-card card-art" data-zone="art">
+                            <span class="card-num">2</span>
+                            <div class="zone-card-top-glow"></div>
+                            <img src="assets/images/art_icon.png" alt="Art Kingdom" class="zone-card-image">
+                            <div class="zone-card-content">
+                                <h3>ART</h3>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 3: Passport / Diary -->
+                        <div class="zone-card card-passport" data-zone="passport">
+                            <span class="card-num">3</span>
+                            <div class="zone-card-top-glow"></div>
+                            <img src="assets/images/diary_icon.png" alt="Passport / Diary" class="zone-card-image">
+                            <div class="zone-card-content">
+                                <h3>DIARY</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cột phải: Preview Mee khổng lồ -->
+                <div class="homepage-landing-right">
+                    <div class="landing-avatar-platform">
+                        <div id="map-home-avatar" class="landing-avatar-svg-container">
+                            <img src="assets/images/character.png" alt="Mascot Character" style="width: 100%; height: 100%; object-fit: contain;">
+                        </div>
+                        <div class="landing-avatar-shadow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CÁC PANEL CHI TIẾT KHI CLICK VÀO ZONE -->
+        <div id="zone-detail-viewport" class="detail-viewport-wrapper hidden">
+            <button id="btn-back-to-map" class="back-to-map-btn">🗺️ Trở Lại Bản Đồ Thế Giới</button>
+            <div class="detail-panel-container" id="detail-panel-content">
+                
+                <!-- 2.1 PANEL MEE BUILDER (NÂNG CẤP MII-STYLE CHARACTER BUILDER) -->
+                <div id="panel-mee" class="detail-panel hidden" style="padding: 15px 25px;">
+                    <!-- Header Panel có nút Exit và Done ở trên đầu -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #EDF2F7; padding-bottom: 12px;">
+                        <div>
+                            <h2 class="panel-title" style="margin: 0; font-size: 1.6rem;">Tạo Người Bạn Đại Diện (Mee)</h2>
+                            <p class="panel-subtitle" style="margin: 0; font-size: 0.85rem; color: var(--color-text-muted);">Tùy biến kiểu tóc, màu da, và nét mặt cho Mee của riêng bé.</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="btn-mee-exit" class="opt-btn" style="background: #FFF; border: 2px solid #CBD5E0; color: #4A5568; padding: 8px 20px; font-size: 0.9rem;">➖ Exit</button>
+                            <button id="btn-mee-done" class="opt-btn active" style="background: var(--gradient-primary); color: white; border: none; padding: 8px 22px; font-size: 0.95rem; box-shadow: 0 4px 15px var(--theme-6-8-shadow);">➕ Done</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mii-editor-container" style="display: flex; gap: 20px; height: 500px;">
+                        <!-- CỘT 1: THANH SIDEBAR ICON DỌC -->
+                        <div class="mii-sidebar" style="width: 60px; display: flex; flex-direction: column; gap: 12px; background: #F7FAFC; border-radius: 16px; padding: 10px 0; border: 2px solid #E2E8F0; align-items: center; box-sizing: border-box;">
+                            <button class="mii-tab-btn mii-tab-main active" data-tab="skin" title="Giới tính & Màu da">👤</button>
+                            <button class="mii-tab-btn mii-tab-main" data-tab="eyes" title="Đôi mắt">👁️</button>
+                            <button class="mii-tab-btn mii-tab-main" data-tab="eyebrows" title="Lông mày">✏️</button>
+                            <button class="mii-tab-btn mii-tab-main" data-tab="nose" title="Chiếc mũi">👃</button>
+                            <button class="mii-tab-btn mii-tab-main" data-tab="mouth" title="Khuôn miệng">👄</button>
+                        </div>
+                        
+                        <!-- CỘT 2: KHUNG PREVIEW NHÂN VẬT (BÊN TRÁI) -->
+                        <div class="mii-preview-box" style="width: 320px; background: #FFFEEA; border: 3px solid #FFF; border-radius: 24px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px; position: relative; box-sizing: border-box;">
+                            <!-- Phụ trợ trên đỉnh -->
+                            <div style="display: flex; gap: 15px; width: 100%; justify-content: center; font-size: 0.8rem; font-weight: bold; color: var(--color-text-muted);">
+                                <span style="cursor:pointer;" class="btn-preview-helper" id="btn-preview-rotate">🔄 Rotate</span>
+                                <span style="cursor:pointer;" class="btn-preview-helper" id="btn-preview-reset">🏠 Reset view</span>
+                                <span style="cursor:pointer;" class="btn-preview-helper" id="btn-preview-undo">↩️ Undo</span>
+                            </div>
+                            
+                            <!-- SVG container -->
+                            <div class="mii-avatar-svg-wrap" id="human-avatar-preview" style="width: 220px; height: 240px; display: flex; justify-content: center; align-items: center; transition: transform 0.5s ease;">
+                                <!-- Sẽ render SVG động qua JS -->
+                            </div>
+                            
+                            <div class="mee-mood-label" id="mee-builder-mood-text" style="font-size: 0.8rem; padding: 4px 12px; background: var(--color-primary); color: white; border-radius: 50px;">Mood: Vui vẻ 😊</div>
+                        </div>
+                        
+                        <!-- CỘT 3: KHU VỰC TÙY CHỈNH CHỌN KIỂU DÁNG & MÀU SẮC (BÊN PHẢI) -->
+                        <div class="mii-options-panel" style="flex: 1; background: white; border: 2px solid #E2E8F0; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; box-sizing: border-box;">
+                            
+                            <!-- Tab 1: Giới tính & Màu da -->
+                            <div id="mee-builder-skin-content" class="mee-builder-tab-content">
+                                <h4 style="margin-bottom: 8px; color: var(--color-text-main);">1. Chọn Giới Tính:</h4>
+                                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                    <button class="opt-btn active" id="meeBuilderGenderMaleBtn" style="flex: 1; padding: 10px; font-weight: bold; border-radius: 10px; cursor: pointer;">Boy (Nam) 👦</button>
+                                    <button class="opt-btn" id="meeBuilderGenderFemaleBtn" style="flex: 1; padding: 10px; font-weight: bold; border-radius: 10px; cursor: pointer;">Girl (Nữ) 👧</button>
+                                </div>
+                                
+                                <h4 style="margin-bottom: 4px; color: var(--color-text-main);">2. Chọn Tông Màu Da:</h4>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">
+                                    <span id="meeBuilderActiveSkinLabel">Mẫu #1</span>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <span id="meeBuilderHexSkinLabel" style="display: flex; align-items: center; gap: 4px;"><div id="meeBuilderSkinBadgeDot" style="width: 8px; height: 8px; border-radius: 50%; background-color: #ffe7e6;"></div><span>#FFE7E6</span></span>
+                                    </div>
+                                </div>
+                                <!-- Grid 10 màu da mặc định -->
+                                <div class="palette-grid" id="meeBuilderPaletteGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 15px;"></div>
+                                
+                                <!-- Custom Skin Switch -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #E2E8F0;">
+                                    <span style="font-weight: bold; font-size: 0.9rem; color: var(--color-text-main);">Tùy chọn màu da riêng:</span>
+                                    <label class="switch-glow">
+                                        <input type="checkbox" id="meeBuilderCustomModeToggle">
+                                        <span class="slider-glow"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Bảng Color Pickers cho Custom Mode -->
+                                <div id="meeBuilderCustomPickers" class="hidden" style="margin-top: 12px; display: flex; flex-direction: column; gap: 10px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; padding: 12px 16px; border-radius: 14px; border: 1.5px solid #E2E8F0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
+                                        <span style="font-size: 0.9rem; font-weight: bold; color: var(--color-text-muted);">Màu da (Skin):</span>
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <input type="color" id="meeBuilderCustomSkinPicker" value="#ffe7e6" style="width: 44px; height: 44px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: none; box-shadow: 0 3px 8px rgba(0,0,0,0.12);">
+                                            <span id="meeBuilderCustomSkinHex" style="font-family: monospace; font-size: 1rem; font-weight: bold; color: var(--color-text-main);">#FFE7E6</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; padding: 12px 16px; border-radius: 14px; border: 1.5px solid #E2E8F0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
+                                        <span style="font-size: 0.9rem; font-weight: bold; color: var(--color-text-muted);">Màu bóng (Shadow):</span>
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <input type="color" id="meeBuilderCustomShadingPicker" value="#ffcccc" style="width: 44px; height: 44px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: none; box-shadow: 0 3px 8px rgba(0,0,0,0.12);">
+                                            <span id="meeBuilderCustomShadingHex" style="font-family: monospace; font-size: 1rem; font-weight: bold; color: var(--color-text-main);">#FFCCCC</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Tab 2: Đôi mắt -->
+                            <div id="mee-builder-eyes-content" class="mee-builder-tab-content hidden">
+                                <h4 style="margin-bottom: 8px; color: var(--color-text-main);">Chọn Kiểu Mắt:</h4>
+                                <div class="facial-grid" id="meeBuilderEyesGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;"></div>
+                            </div>
+                            
+                            <!-- Tab 3: Lông mày -->
+                            <div id="mee-builder-eyebrows-content" class="mee-builder-tab-content hidden">
+                                <h4 style="margin-bottom: 8px; color: var(--color-text-main);">Chọn Kiểu Lông Mày:</h4>
+                                <div class="facial-grid" id="meeBuilderEyebrowsGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;"></div>
+                            </div>
+                            
+                            <!-- Tab 4: Chiếc mũi -->
+                            <div id="mee-builder-nose-content" class="mee-builder-tab-content hidden">
+                                <h4 style="margin-bottom: 8px; color: var(--color-text-main);">Chọn Kiểu Mũi:</h4>
+                                <div class="facial-grid" id="meeBuilderNoseGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;"></div>
+                            </div>
+
+                            <!-- Tab 5: Khuôn miệng -->
+                            <div id="mee-builder-mouth-content" class="mee-builder-tab-content hidden">
+                                <h4 style="margin-bottom: 8px; color: var(--color-text-main);">Chọn Kiểu Miệng:</h4>
+                                <div class="facial-grid" id="meeBuilderMouthGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;"></div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.2 PANEL PET HOME -->
+                <div id="panel-pet" class="detail-panel hidden">
+                    <h2 class="panel-title">Ngôi Nhà Thú Cưng Đáng Yêu</h2>
+                    <p class="panel-subtitle">Chăm sóc pet cưng bằng Credits kiếm được để duy trì Streak và mở khóa vật phẩm độc quyền.</p>
+                    
+                    <div class="pet-workspace">
+                        <div class="pet-showcase-box">
+                            <div class="pet-status-indicators">
+                                <div class="indicator-item">🍖 No Bụng: <strong id="pet-val-hunger">100</strong>%</div>
+                                <div class="indicator-item">🧸 Vui Vẻ: <strong id="pet-val-happiness">100</strong>%</div>
+                                <div class="indicator-item">🧼 Sạch Sẽ: <strong id="pet-val-clean">100</strong>%</div>
+                                <div class="indicator-item hidden" id="pet-ind-energy">⚡ Năng Lượng: <strong id="pet-val-energy">100</strong>%</div>
+                                <div class="indicator-item hidden" id="pet-ind-affection">❤️ Tình Cảm: <strong id="pet-val-affection">100</strong>%</div>
+                            </div>
+                            <div class="pet-visual-cage">
+                                <div class="pet-speech-bubble" id="pet-main-bubble">Bé ơi chơi với tớ đi! 🐾</div>
+                                <div class="pet-main-sprite" id="pet-main-sprite-container">🐶</div>
+                                <div class="pet-accessory-layer" id="pet-acc-layer"></div>
+                            </div>
+                            <div class="pet-care-actions">
+                                <button id="btn-care-feed" class="care-btn">🍕 Cho Ăn (-10 Credits)</button>
+                                <button id="btn-care-bath" class="care-btn">🛁 Tắm Rửa (-5 Credits)</button>
+                                <button id="btn-care-play" class="care-btn">🧸 Chơi Đùa (-10 Credits)</button>
+                            </div>
+                        </div>
+
+                        <div class="pet-config-box">
+                            <!-- Chọn loại thú cưng -->
+                            <div class="editor-section">
+                                <h4>Chọn Pet muốn nuôi:</h4>
+                                <div class="options-row" id="pet-type-selector"></div>
+                            </div>
+
+                            <!-- Shop phụ kiện cho Pet -->
+                            <div class="editor-section">
+                                <h4>Cửa hàng phụ kiện cho Pet:</h4>
+                                <div class="pet-shop-grid" id="pet-shop-container"></div>
+                            </div>
+
+                            <!-- Lợi ích streak -->
+                            <div class="editor-section streak-benefit-info">
+                                <h4>🎁 Quà Tặng Streak Hôm Nay:</h4>
+                                <p id="streak-gift-desc">Duy trì streak 7 ngày để mở khóa bờm tuần lộc cho Pet!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.3 PANEL ART KINGDOM -->
+                <div id="panel-art" class="detail-panel hidden">
+                    <div class="art-cloud-header-wrapper">
+                        <div class="art-cloud-header">
+                            <h2 class="panel-title">XƯỞNG SÁNG TẠO</h2>
+                        </div>
+                    </div>
+                    
+                    <!-- LOBBY VIEW: Sẽ hiển thị 3 xưởng dạng card dọc dài giống hình Sếp gửi -->
+                    <div id="art-lobby-view" class="art-lobby-container" style="margin-top: 20px;">
+                        <div class="art-lobby-grid">
+                            <!-- Card 1: Xưởng Vẽ -->
+                            <div class="art-card" data-sub="coloring">
+                                <div class="art-card-img">
+                                    <img src="assets/images/drawing.jpeg" alt="DRAWING" class="art-card-banner">
+                                </div>
+                                <div class="art-card-content">
+                                    <span class="art-card-tag tag-blue">Season 1 • Drawing</span>
+                                    <h3 class="art-card-title">DRAWING</h3>
+                                    <p class="art-card-desc">Tô màu số hóa thông minh hoặc tự do sáng tạo nét vẽ tay cùng cọ vẽ ma thuật và nhãn dán sticker dễ thương.</p>
+                                    <button class="art-card-btn">PLAY NOW</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Card 2: Truyện Tranh -->
+                            <div class="art-card" id="card-art-comic" data-sub="comic">
+                                <div class="art-card-img">
+                                    <img src="assets/images/comic.jpeg" alt="COMIC" class="art-card-banner">
+                                </div>
+                                <div class="art-card-content">
+                                    <span class="art-card-tag tag-green">Season 1 • Comic</span>
+                                    <h3 class="art-card-title">COMIC</h3>
+                                    <p class="art-card-desc">Tự thiết kế ảnh nền AI độc đáo và viết kịch bản hội thoại sinh động cho các nhân vật đại diện Mee trên từng khung hình.</p>
+                                    <button class="art-card-btn">PLAY NOW</button>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Sáng Tác Truyện Chữ -->
+                            <div class="art-card" data-sub="library">
+                                <div class="art-card-img">
+                                    <img src="assets/images/stories.jpeg" alt="STORIES" class="art-card-banner">
+                                </div>
+                                <div class="art-card-content">
+                                    <span class="art-card-tag tag-purple">Season 1 • Audio</span>
+                                    <h3 class="art-card-title">STORIES</h3>
+                                    <p class="art-card-desc">Lắng nghe kể chuyện cổ tích audio AI truyền cảm, hoặc tự biên soạn các câu chuyện phiêu lưu diệu kỳ cho riêng bé.</p>
+                                    <button class="art-card-btn">PLAY NOW</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ZONE VIEW: Sẽ hiển thị khi click vào từng xưởng -->
+                    <div id="art-zone-view" class="hidden" style="margin-top: 15px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px dashed #E2E8F0; padding-bottom: 15px;">
+                            <button id="btn-back-to-art-lobby" class="opt-btn" style="background: white; border: 2px solid var(--color-primary); color: var(--color-primary); padding: 8px 18px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                                ⬅️ Trở Lại Các Xưởng Nghệ Thuật
+                            </button>
+                            <h3 id="art-zone-title-label" style="margin: 0; font-family: var(--font-primary); font-size: 1.3rem; color: var(--color-text-main);">Xưởng Vẽ Thần Kỳ 🎨</h3>
+                        </div>
+                        
+                        <div class="art-workspace-container">
+                            
+                            <!-- Sub-tab 1: Xưởng Vẽ (Coloring / Free Draw - AI Style Transfer) -->
+                            <div id="art-sub-panel-coloring" class="art-sub-panel hidden" style="width: 100%;">
+                                
+                                <!-- PAGE 1: CHỌN STYLE -->
+                                <div id="drawing-step-1" class="drawing-step-panel">
+                                    <div class="step-header-title">
+                                        <h3>✨ Bước 1: Chọn Phong Cách Vẽ Phép Thuật ✨</h3>
+                                        <p>Bé hãy chọn một phong cách nghệ thuật yêu thích dưới đây nhé!</p>
+                                    </div>
+                                    
+                                    <div class="ai-style-selector-row">
+                                        <div class="ai-style-options" id="ai-style-list">
+                                            <button class="style-btn active" data-style="chibi">
+                                                <img src="assets/images/style_chibi.png" alt="Chibi">
+                                                <span>Chibi</span>
+                                            </button>
+                                            <button class="style-btn" data-style="anime">
+                                                <img src="assets/images/style_anime.png" alt="Anime">
+                                                <span>Anime</span>
+                                            </button>
+                                            <button class="style-btn" data-style="pixar">
+                                                <img src="assets/images/style_pixar.png" alt="Pixar 3D">
+                                                <span>Pixar 3D</span>
+                                            </button>
+                                            <button class="style-btn" data-style="comic">
+                                                <img src="assets/images/style_comic.png" alt="Comic">
+                                                <span>Comic</span>
+                                            </button>
+                                            <button class="style-btn" data-style="watercolor">
+                                                <img src="assets/images/style_watercolor.png" alt="Màu Nước">
+                                                <span>Màu Nước</span>
+                                            </button>
+                                            <button class="style-btn" data-style="neon">
+                                                <img src="assets/images/style_neon.png" alt="Neon Glow">
+                                                <span>Neon Glow</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="step-footer-actions">
+                                        <button class="action-btn-main gold-glow" id="btn-goto-step2" style="font-size: 1.1rem; padding: 14px 45px;">Tiếp Tục Vẽ ➡️</button>
+                                    </div>
+                                </div>
+
+                                <!-- PAGE 2: VẼ / UPLOAD & GEN -->
+                                <div id="drawing-step-2" class="drawing-step-panel hidden">
+                                    <div class="step2-header-nav">
+                                        <button id="btn-back-to-step1" class="opt-btn" style="background: white; border: 2px solid var(--color-primary); color: var(--color-primary); padding: 8px 18px; font-size: 0.9rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                                            ⬅️ Chọn Lại Style
+                                        </button>
+                                        <span class="active-style-badge" id="active-style-label">Phong cách: CHIBI 🧸</span>
+                                    </div>
+
+                                    <div class="drawing-ai-workspace">
+                                        <!-- Khung 1: Bé Vẽ & Tải Lên -->
+                                        <div class="workspace-box left-box">
+                                            <div class="box-header">
+                                                <h4>🎨 Tranh Của Bé Vẽ</h4>
+                                                <div class="box-actions">
+                                                    <label for="drawing-upload-input" class="upload-btn-label">📤 Tải Ảnh Lên</label>
+                                                    <input type="file" id="drawing-upload-input" accept="image/*" style="display: none;">
+                                                    <button class="btn-micro" id="btn-ai-drawing-clear">Xóa Sạch</button>
+                                                </div>
+                                            </div>
+                                            <!-- Toolbar vẽ tranh -->
+                                            <div class="drawing-canvas-toolbar">
+                                                <!-- Chọn màu -->
+                                                <input type="color" id="ai-brush-color" value="#4F46E5" title="Chọn màu cọ">
+                                                
+                                                <!-- Thanh kéo kích thước kèm chấm tròn minh họa nét vẽ -->
+                                                <div class="brush-size-control-group">
+                                                    <span class="size-dot small-dot" data-size="4" title="Nét mảnh"></span>
+                                                    <input type="range" id="ai-brush-size" min="2" max="35" value="8" title="Độ dày cọ">
+                                                    <span class="size-dot large-dot" data-size="24" title="Nét dày"></span>
+                                                </div>
+
+                                                <!-- Các nút chọn công cụ vẽ -->
+                                                <button class="tool-btn active" id="tool-brush">🎨 Bút Vẽ</button>
+                                                <button class="tool-btn" id="tool-pencil">✏️ Bút Chì</button>
+                                                <button class="tool-btn" id="tool-eraser">🧽 Tẩy</button>
+                                                
+                                                <div class="sticker-shelf" id="ai-sticker-shelf">
+                                                    <span class="sticker-item" data-sticker="⭐">⭐</span>
+                                                    <span class="sticker-item" data-sticker="🎈">🎈</span>
+                                                    <span class="sticker-item" data-sticker="🌈">🌈</span>
+                                                    <span class="sticker-item" data-sticker="🐱">🐱</span>
+                                                    <span class="sticker-item" data-sticker="👑">👑</span>
+                                                </div>
+                                            </div>
+                                            <div class="canvas-wrapper">
+                                                <canvas id="ai-user-canvas" width="800" height="450" style="background: #ffffff; cursor: crosshair; display: block;"></canvas>
+                                            </div>
+                                        </div>
+
+                                        <!-- Khung 2: AI Biến Hóa -->
+                                        <div class="workspace-box right-box">
+                                            <div class="box-header">
+                                                <h4>🪄 AI Biến Hóa Thần Kỳ</h4>
+                                            </div>
+                                            <div class="ai-output-container">
+                                                <div id="ai-image-placeholder" class="ai-image-placeholder">
+                                                    <span class="magic-wand-icon">🪄</span>
+                                                    <p>Hãy vẽ tranh hoặc tải ảnh lên, sau đó bấm **AI Vẽ Lại** để xem phép thuật nhé!</p>
+                                                </div>
+                                                <img id="ai-generated-img" class="hidden" alt="AI Generated Artwork" style="width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 16px;">
+                                                <div id="ai-loading-overlay" class="ai-loading-overlay hidden">
+                                                    <div class="magic-spinner"></div>
+                                                    <p>AI đang múa cọ vẽ tranh cho bé...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Thanh dưới: Các nút hành động chính -->
+                                    <div class="drawing-action-footer">
+                                        <button class="action-btn-main gold-glow" id="btn-ai-generate">🪄 AI Vẽ Lại! (Gen lại)</button>
+                                        <button class="action-btn-main" id="btn-push-to-diary" style="background: #10B981; box-shadow: 0 6px 0 #059669;">📖 Đẩy Vào Nhật Ký (Diary)</button>
+                                    </div>
+                                </div>
+                            </div> <!-- Đóng art-sub-panel-coloring -->
+
+                            <!-- Sub-tab 2: Thư Viện Cổ -->
+                            <div id="art-sub-panel-library" class="art-sub-panel hidden">
+                                <div id="art-story-6-8" class="fairytale-player-interface">
+                                    <h3 class="fairytale-title-heading">📖 Thư Viện Cổ Tích Bé Nghe</h3>
+                                    
+                                    <div class="fairytale-bluey-layout">
+                                        <!-- CỘT 1 (BÊN TRÁI): Sân khấu chính diện to ra kết hợp bóng bay -->
+                                        <div class="fairytale-main-stage-container">
+                                            <!-- Quả bóng bay đỏ lơ lửng nằm bên trái sân khấu -->
+                                            <div class="fairytale-balloon-container">
+                                                <div class="fairytale-balloon">
+                                                    <h4 id="fairytale-balloon-title">BẢN ĐỒ CỔ TÍCH</h4>
+                                                    <p id="fairytale-balloon-desc">Mee tìm thấy chiếc bản đồ cổ tích rực rỡ ẩn giấu bên trong cuốn sách phép thuật tại thư viện cổ của lâu đài.</p>
+                                                </div>
+                                                <div class="fairytale-balloon-string"></div>
+                                            </div>
+
+                                            <!-- Sân khấu ảnh chính -->
+                                            <div class="fairytale-main-stage">
+                                                <img id="fairytale-main-img" src="assets/fairytale_scene_1.png" alt="Fairytale Scene" class="fairytale-stage-img">
+                                                <div class="fairytale-stage-title" id="fairytale-stage-title">BẢN ĐỒ CỔ TÍCH</div>
+                                                
+                                                <!-- Trình phát Audio mini -->
+                                                <div class="fairytale-audio-player-mini">
+                                                    <button class="fairytale-audio-btn" id="btn-story-play-68">▶ Play Audio</button>
+                                                    <div class="fairytale-audio-progress-container">
+                                                        <div class="audio-progress-bar" id="story-progress-68" style="width:0%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- CỘT 2 (BÊN PHẢI): Thế Giới Truyện (Lưới 3 cột x 3 hàng, kéo cuộn) -->
+                                        <div class="fairytale-library-shelf">
+                                            <div class="shelf-header">THẾ GIỚI TRUYỆN 📚</div>
+                                            <div class="fairytale-grid-shelf" id="fairytale-story-grid">
+                                                <!-- Sẽ sinh các card truyện nhỏ tự động qua JS -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Phụ đề chạy chữ bên dưới -->
+                                    <div class="fairytale-karaoke-lyrics-wrap">
+                                        <div class="karaoke-text-container" id="story-karaoke-lyrics">
+                                            <p class="lyrics-line active">Ngày xửa ngày xưa, ở ngôi làng nọ...</p>
+                                            <p class="lyrics-line">Có một chàng trai nghèo hiền lành, khỏe mạnh...</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="art-story-9-up" class="ai-story-generator-interface hidden">
+                                    <h3>🪄 Sáng Tác Truyện Ngắn AI Với Mee</h3>
+                                    <div class="ai-story-form">
+                                        <div class="form-field">
+                                            <label>Bối cảnh câu chuyện:</label>
+                                            <select id="ai-story-context" class="app-input">
+                                                <option value="khu rừng kẹo ngọt">🍭 Khu rừng kẹo ngọt đầy màu sắc</option>
+                                                <option value="thành phố trên mây">☁️ Thành phố trên mây lung linh</option>
+                                                <option value="đại dương xanh thẳm">🐳 Cung điện Atlantis dưới biển</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-field">
+                                            <label>Nhiệm vụ của nhân vật:</label>
+                                            <select id="ai-story-mission" class="app-input">
+                                                <option value="giải cứu hành tinh khỏi quái vật Slime">🤖 Giải cứu hành tinh khỏi quái vật Slime</option>
+                                                <option value="tìm kiếm chiếc bánh gato bị mất tích">🍰 Tìm kiếm chiếc bánh gato khổng lồ bị mất tích</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-field">
+                                            <label>Nhập thêm ý tưởng của bé:</label>
+                                            <textarea id="ai-story-custom-idea" class="app-input" placeholder="Ví dụ: Gặp chú gấu biết bay..."></textarea>
+                                        </div>
+                                        <button class="action-btn-main gold-glow" id="btn-generate-ai-story">Sinh Câu Chuyện Phép Thuật AI ✨</button>
+                                    </div>
+
+                                    <div class="ai-story-result-box">
+                                        <h4>📖 Bản thảo câu chuyện AI:</h4>
+                                        <div class="story-output-text" id="ai-story-result-text">Truyện của bé sẽ xuất hiện tại đây...</div>
+                                        <div class="storyboard-addon-section hidden" id="ai-storyboard-addon">
+                                            <h4>🎨 AI Phân Cảnh & Sinh Ảnh Storyboard:</h4>
+                                            <div class="storyboard-grid" id="storyboard-scenes-container"></div>
+                                        </div>
+                                        <div class="story-action-buttons hidden" id="ai-story-save-row">
+                                            <button class="btn-micro" id="btn-save-story-work">Lưu Truyện Lên Passport</button>
+                                            <button class="btn-micro premium-gate" id="btn-publish-story-feed">Đăng Lên Cộng Đồng (Cần duyệt)</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sub-tab 3: Truyện Tranh -->
+                            <div id="art-sub-panel-comic" class="art-sub-panel hidden">
+                                <h3>💬 Sáng Tác Truyện Tranh Của Mee</h3>
+                                <div class="comic-creator-layout" style="display: flex; flex-direction: column; gap: 15px;">
+                                    <div class="comic-panel-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                        <!-- Panel 1 -->
+                                        <div class="comic-panel-item" data-panel="1" style="border: 2px solid #E2E8F0; border-radius: 16px; padding: 10px; cursor: pointer; transition: all 0.3s; background: #F8FAFC;">
+                                            <span class="panel-num" style="font-weight: bold; font-size: 0.9rem; color: var(--color-primary); display: block; margin-bottom: 5px;">Khung Hình 1</span>
+                                            <div class="panel-canvas-preview" id="comic-p1-view" style="height: 180px; display: flex; align-items: center; justify-content: center; background: #EDF2F7; overflow: hidden; border-radius: 12px; position: relative; border: 1.5px dashed #CBD5E0; transition: all 0.3s;">
+                                                <div class="speech-bubble" id="comic-p1-bubble"></div>
+                                                <div class="mee-character-svg" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; transform: scale(1.1); transform-origin: bottom center;"></div>
+                                            </div>
+                                            <input type="text" class="panel-bubble-input" id="comic-p1-text" placeholder="Nhập lời thoại panel 1..." style="width: 100%; margin-top: 8px; padding: 8px; border: 1.5px solid #CBD5E0; border-radius: 8px; box-sizing: border-box;">
+                                        </div>
+                                        
+                                        <!-- Panel 2 -->
+                                        <div class="comic-panel-item" data-panel="2" style="border: 2px solid #E2E8F0; border-radius: 16px; padding: 10px; cursor: pointer; transition: all 0.3s; background: #F8FAFC;">
+                                            <span class="panel-num" style="font-weight: bold; font-size: 0.9rem; color: var(--color-primary); display: block; margin-bottom: 5px;">Khung Hình 2</span>
+                                            <div class="panel-canvas-preview" id="comic-p2-view" style="height: 180px; display: flex; align-items: center; justify-content: center; background: #EDF2F7; overflow: hidden; border-radius: 12px; position: relative; border: 1.5px dashed #CBD5E0; transition: all 0.3s;">
+                                                <div class="speech-bubble" id="comic-p2-bubble"></div>
+                                                <div class="mee-character-svg" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; transform: scale(1.1); transform-origin: bottom center;"></div>
+                                            </div>
+                                            <input type="text" class="panel-bubble-input" id="comic-p2-text" placeholder="Nhập lời thoại panel 2..." style="width: 100%; margin-top: 8px; padding: 8px; border: 1.5px solid #CBD5E0; border-radius: 8px; box-sizing: border-box;">
+                                        </div>
+                                        
+                                        <!-- Panel 3 -->
+                                        <div class="comic-panel-item" data-panel="3" style="border: 2px solid #E2E8F0; border-radius: 16px; padding: 10px; cursor: pointer; transition: all 0.3s; background: #F8FAFC;">
+                                            <span class="panel-num" style="font-weight: bold; font-size: 0.9rem; color: var(--color-primary); display: block; margin-bottom: 5px;">Khung Hình 3</span>
+                                            <div class="panel-canvas-preview" id="comic-p3-view" style="height: 180px; display: flex; align-items: center; justify-content: center; background: #EDF2F7; overflow: hidden; border-radius: 12px; position: relative; border: 1.5px dashed #CBD5E0; transition: all 0.3s;">
+                                                <div class="speech-bubble" id="comic-p3-bubble"></div>
+                                                <div class="mee-character-svg" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; transform: scale(1.1); transform-origin: bottom center;"></div>
+                                            </div>
+                                            <input type="text" class="panel-bubble-input" id="comic-p3-text" placeholder="Nhập lời thoại panel 3..." style="width: 100%; margin-top: 8px; padding: 8px; border: 1.5px solid #CBD5E0; border-radius: 8px; box-sizing: border-box;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="comic-tools" style="display: flex; gap: 15px; background: #F7FAFC; padding: 15px; border-radius: 16px; border: 1.5px solid #E2E8F0;">
+                                        <!-- Chọn background preset màu sắc nghệ thuật -->
+                                        <div style="flex: 1;">
+                                            <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; color: var(--color-text-main);">🌈 Chọn Nền Nghệ Thuật:</h4>
+                                            <div style="display: flex; gap: 8px;" id="comic-bg-presets-row">
+                                                <button class="btn-micro" data-bg="linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #1a202c; border: 1.5px solid #cbd5e0; text-shadow: 0 1px 2px #fff;">Hửng Đông</button>
+                                                <button class="btn-micro" data-bg="linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: #1a202c; border: 1.5px solid #cbd5e0; text-shadow: 0 1px 2px #fff;">Kẹo Ngọt</button>
+                                                <button class="btn-micro" data-bg="linear-gradient(135deg, #30cfd0 0%, #330867 100%)" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; border: 1.5px solid #cbd5e0;">Vũ Trụ</button>
+                                                <button class="btn-micro" data-bg="linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #1a202c; border: 1.5px solid #cbd5e0; text-shadow: 0 1px 2px #fff;">Lâu Đài</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- AI Background Generator -->
+                                        <div class="editor-section hidden" id="comic-ai-bg-section" style="flex: 1.2;">
+                                            <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; color: var(--color-text-main);">🏞️ AI Sinh Ảnh Nền Panel (VIP):</h4>
+                                            <div style="display: flex; gap: 8px;">
+                                                <input type="text" id="comic-ai-bg-prompt" class="app-input" placeholder="Ví dụ: Rừng kẹo ngọt..." style="flex: 1; padding: 6px 10px; font-size: 0.85rem; border: 1.5px solid #CBD5E0; border-radius: 8px;">
+                                                <button class="btn-micro gold-glow" id="btn-comic-ai-bg-gen">Gen Nền AI</button>
+                                            </div>
+                                        </div>
+
+                                        <div style="display: flex; align-items: flex-end;">
+                                            <button class="action-btn-main gold-glow" id="btn-save-comic-work" style="padding: 10px 20px; font-size: 0.95rem; margin: 0; box-shadow: 0 4px 12px var(--theme-6-8-shadow);">💾 Lưu Truyện Tranh</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sub-tab 4: Photobooth -->
+                            <div id="art-sub-panel-photobooth" class="art-sub-panel hidden">
+                                <h3>📸 Thiết Kế Nhân Vật & Photobooth Studio Của Mee</h3>
+                                <div class="photobooth-workspace-new">
+                                    
+                                    <!-- CỘT 1 BÊN TRÁI: Viewport nhân vật + Khung ảnh + Camera controls -->
+                                    <div class="photobooth-viewport-side">
+                                        <!-- Khung hiển thị ảnh kết xuất -->
+                                        <div class="photo-preview-card-new" id="photo-frame-preview">
+                                            <div class="photo-bg-layer" id="photo-bg-layer">🏖️</div>
+                                            <!-- Container chứa SVG động của Mee -->
+                                            <div class="photo-mee-layer-new" id="photo-mee-layer" style="cursor: grab;">
+                                                <div id="characterWrapper"></div>
+                                            </div>
+                                            <!-- Canvas ảo để kéo thả, pan, zoom chuột trên viewport -->
+                                            <div id="viewportCanvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 5;"></div>
+                                            <div id="ambientGlow" class="ambient-glow"></div>
+                                        </div>
+                                        
+                                        <!-- Thanh camera tools phía dưới viewport -->
+                                        <div class="photo-camera-tools" style="display: flex; gap: 8px; justify-content: center; margin-top: 10px; width: 100%;">
+                                            <button class="btn-micro" id="btn-camera-zoom-in" title="Phóng to">➕ Zoom In</button>
+                                            <button class="btn-micro" id="btn-camera-zoom-out" title="Thu nhỏ">➖ Zoom Out</button>
+                                            <button class="btn-micro" id="btn-camera-reset" title="Đặt lại camera">🔄 Reset Cam</button>
+                                        </div>
+                                        <div class="photo-export-tools" style="display: flex; gap: 8px; justify-content: center; margin-top: 5px; width: 100%;">
+                                            <button class="btn-micro" id="btn-export-svg" style="background: rgba(99, 102, 241, 0.1); border: 1px solid #6366f1; color: #818cf8;">Tải SVG</button>
+                                            <button class="btn-micro" id="btn-export-png" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #34d399;">Tải PNG</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- CỘT 2 BÊN PHẢI: Bảng điều khiển Photobooth (Khung & Nền AI) -->
+                                    <div class="photobooth-controls-side" style="display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; width: 100%; height: 100%;">
+                                        <h3 style="margin: 0; font-size: 1.2rem; color: #FFF;">🎨 Trang Trí Ảnh Chụp MEE</h3>
+                                        
+                                        <div class="editor-section">
+                                            <h4 style="margin-bottom: 8px; color: #E2E8F0; font-size: 0.9rem;">Chọn khung ảnh nghệ thuật:</h4>
+                                            <div class="options-row" id="photo-frame-selector" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                                <button class="opt-btn active" data-frame="star">Khung Sao ✨</button>
+                                                <button class="opt-btn" data-frame="heart">Khung Trái Tim ❤️</button>
+                                                <button class="opt-btn" data-frame="retro">Khung Retro 🎞️</button>
+                                                <button class="opt-btn premium-opt" data-frame="neon">Khung Neon ⚡ (VIP)</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="editor-section" id="photo-ai-bg-section" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 12px;">
+                                            <h4 style="margin-bottom: 6px; color: #E2E8F0; font-size: 0.9rem;">🏞️ AI Ghép Nền Thông Minh (VIP):</h4>
+                                            <input type="text" id="photo-ai-bg-prompt" class="app-input" placeholder="Ví dụ: Lâu đài băng tuyết..." style="width: 100%; margin-bottom: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #FFF; padding: 10px; border-radius: 8px; box-sizing: border-box;">
+                                            <button class="btn-micro gold-glow" id="btn-photo-ai-bg" style="width: 100%; padding: 10px; cursor: pointer;">Đổi Nền Bằng AI 🪄</button>
+                                        </div>
+                                        
+                                        <!-- Toast Notification inside panel -->
+                                        <div id="toast" class="toast-message">
+                                            <span id="toastContent">Lưu thành công!</span>
+                                        </div>
+                                        
+                                        <!-- Nút Chụp & Lưu ảnh ở dưới cùng -->
+                                        <button class="action-btn-main" id="btn-save-photo-work" style="margin-top: auto; padding: 12px; font-weight: bold; background: var(--gradient-primary); border: none; border-radius: 12px; color: #FFF; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">📸 Chụp & Lưu Vào Passport</button>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+                            <!-- Sub-tab 5: Phòng Thu -->
+                            <div id="art-sub-panel-studio" class="art-sub-panel hidden">
+                                <h3>🎵 Phòng Thu Âm & Mix Nhạc Loop</h3>
+                                <div class="studio-workspace">
+                                    <div id="studio-music-6-8" class="music-player-68">
+                                        <h4>Thư viện nhạc nền êm ái:</h4>
+                                        <div class="music-list">
+                                            <button class="music-play-btn active" data-track="sleep">💤 Nhạc Ru Ngủ Cực Ngoan</button>
+                                            <button class="music-play-btn" data-track="fun">🎉 Nhạc Vui Nhộn Buổi Sáng</button>
+                                        </div>
+                                    </div>
+                                    <div id="studio-mix-9-up" class="music-mixer-interface hidden">
+                                        <h4>🎧 Bàn Mix Nhạc Sáng Tạo:</h4>
+                                        <div class="mixer-channels">
+                                            <div class="mixer-channel"> Beat: <button class="loop-toggle-btn" data-type="beat">🥁 Loop Trống</button></div>
+                                            <div class="mixer-channel"> Melody: <button class="loop-toggle-btn" data-type="melody">🎸 Loop Guitar</button></div>
+                                            <div class="mixer-channel"> Effect: <button class="loop-toggle-btn" data-type="effect">✨ Effect Sao</button></div>
+                                        </div>
+                                        <button class="btn-micro" id="btn-mixer-play">▶ Chạy Bản Phối</button>
+                                    </div>
+                                    <div id="studio-ai-11-up" class="ai-music-interface hidden">
+                                        <h4>🤖 Sinh Nhạc AI 15 giây (VIP):</h4>
+                                        <input type="text" id="ai-music-prompt" class="app-input" placeholder="Nhạc hoạt hình phiêu lưu...">
+                                        <button class="btn-micro gold-glow" id="btn-ai-music-gen">Gen Nhạc AI 🪄</button>
+                                        <div class="music-wave-mock hidden" id="music-wave-animation">
+                                            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                                        </div>
+                                    </div>
+                                    <div class="art-save-row">
+                                        <button class="action-btn-main" id="btn-save-music-work">💾 Lưu Âm Thanh</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sub-tab 6: Phim Trường -->
+                            <div id="art-sub-panel-movie" class="art-sub-panel hidden">
+                                <h3>🎬 Phim Trường & Sân Khấu StoryMee</h3>
+                                <div class="movie-workspace">
+                                    <div class="movie-theater-stage" id="movie-stage">
+                                        <div class="stage-prop prop-tree">🌳</div>
+                                        <div class="stage-character-puppet" id="stage-puppet">🐰</div>
+                                    </div>
+                                    <div class="movie-controls">
+                                        <div id="movie-puppet-6-8" class="puppet-68-controls">
+                                            <p class="draw-tip">Kéo chú Mee di chuyển trên sân khấu để diễn kịch rối nhé!</p>
+                                        </div>
+                                        <div id="movie-storyboard-9-up" class="storyboard-controls hidden">
+                                            <h4>🎤 Thu Âm Lồng Tiếng Cho Mee:</h4>
+                                            <button class="btn-micro" id="btn-movie-record">🎙️ Bắt Đầu Thu Giọng</button>
+                                            <span id="movie-record-status">Chưa thu âm</span>
+                                        </div>
+                                        <div id="movie-ai-11-up" class="voice-ai-controls hidden">
+                                            <h4>🗣️ Bộ Biến Đổi Giọng Nói AI (Voice AI):</h4>
+                                            <div class="options-row" id="voice-ai-type-selector">
+                                                <button class="opt-btn active" data-voice="kid">Giọng Cute</button>
+                                                <button class="opt-btn" data-voice="robot">Giọng Rô Bốt</button>
+                                            </div>
+                                        </div>
+                                        <button class="action-btn-main" id="btn-save-movie-work">💾 Lưu Video Phim</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- 2.4 PANEL BRAIN ARENA -->
+                <div id="panel-brain" class="detail-panel hidden">
+                    <h2 class="panel-title">Đấu Trường Trí Tuệ</h2>
+                    <p class="panel-subtitle">Chơi vui học hay với hàng loạt thử thách Quiz, Puzzle và Game Logic kịch tính.</p>
+                    
+                    <div class="brain-activities-tabs" id="brain-sub-tabs">
+                        <button class="brain-tab-btn active" data-sub="quiz">❓ Quiz Trí Tuệ</button>
+                        <button class="brain-tab-btn" data-sub="puzzle">🧩 Puzzle & Khác Biệt</button>
+                        <button class="brain-tab-btn hidden" id="brain-tab-myquiz" data-sub="myquiz">📝 Tạo Quiz Riêng</button>
+                        <button class="brain-tab-btn" data-sub="arena">⚔️ Đấu Trường Cạnh Tranh</button>
+                    </div>
+
+                    <div class="brain-workspace-container">
+                        
+                        <!-- Sub-tab 1: Quiz Trí Tuệ -->
+                        <div id="brain-sub-panel-quiz" class="brain-sub-panel">
+                            <div class="quiz-card-container">
+                                <div class="quiz-header-info">
+                                    <span>Câu hỏi: <strong id="brain-quiz-curr-q">1</strong>/3</span>
+                                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="brain-quiz-progress" style="width: 33.3%;"></div></div>
+                                </div>
+                                <div class="quiz-question-box">
+                                    <h3 id="brain-quiz-question-text">Câu hỏi đang tải...</h3>
+                                </div>
+                                <div class="quiz-options-grid" id="brain-quiz-options-list"></div>
+                                <div id="brain-quiz-feedback" class="quiz-feedback-box hidden"></div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 2: Puzzle & Khác Biệt -->
+                        <div id="brain-sub-panel-puzzle" class="brain-sub-panel hidden">
+                            <div id="puzzle-6-8" class="puzzle-68-interface">
+                                <h3>🔍 Tìm 3 Điểm Khác Biệt Trên Ảnh</h3>
+                                <div class="spot-diff-header">
+                                    <span class="game-score">Còn lại: <strong id="puz-diff-rem">3</strong> điểm</span>
+                                    <button class="btn-micro" id="btn-puz-diff-reset">Chơi Lại</button>
+                                </div>
+                                <div class="spot-diff-playground">
+                                    <div class="image-wrapper">
+                                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200'><rect width='100%25' height='100%25' fill='%23E0F7FA'/><circle cx='60' cy='50' r='20' fill='%23FFEB3B'/><rect x='120' y='110' width='60' height='60' fill='%2381C784' rx='5'/><polygon points='150,30 190,80 110,80' fill='%23E57373'/><circle cx='240' cy='150' r='15' fill='%23BA68C8'/></svg>" alt="Hình gốc">
+                                    </div>
+                                    <div class="image-wrapper" id="puz-img-right">
+                                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200'><rect width='100%25' height='100%25' fill='%23E0F7FA'/><circle cx='60' cy='50' r='20' fill='%23FFA726'/><rect x='120' y='110' width='60' height='60' fill='%2381C784' rx='5'/><circle cx='240' cy='150' r='15' fill='%23BA68C8'/></svg>" alt="Hình thay đổi">
+                                        <div class="diff-spot" data-id="1" style="top: 15%; left: 13%; width: 20%; height: 25%;"></div>
+                                        <div class="diff-spot" data-id="2" style="top: 15%; left: 36%; width: 28%; height: 28%;"></div>
+                                        <div class="diff-spot" data-id="3" style="top: 55%; left: 40%; width: 20%; height: 30%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="puzzle-9-10" class="puzzle-910-interface hidden">
+                                <h3>🤖 AI Tự Động Thiết Kế Ảnh Khác Biệt</h3>
+                                <button class="action-btn-main gold-glow" id="btn-puz-ai-gen">Yêu Cầu AI Gen Cặp Ảnh Mới 🪄</button>
+                            </div>
+
+                            <div id="puzzle-11-up" class="puzzle-11-interface hidden">
+                                <h3>🎮 Thiết Kế Mini-Game Kéo Thả Logic Blocks</h3>
+                                <div class="logic-blocks-layout">
+                                    <div class="blocks-toolbox">
+                                        <div class="logic-block" data-code="move">Đi Thẳng ➡️</div>
+                                        <div class="logic-block" data-code="turn">Rẽ Trái ↩️</div>
+                                    </div>
+                                    <div class="blocks-workspace" id="blocks-logic-workspace">Kéo logic blocks vào đây...</div>
+                                </div>
+                                <button class="btn-micro" id="btn-run-logic-game">▶ Chạy Thử Game</button>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 3: Tạo Quiz Riêng -->
+                        <div id="brain-sub-panel-myquiz" class="brain-sub-panel hidden">
+                            <h3>📝 Tự Biên Soạn Quiz Cá Nhân Bằng AI</h3>
+                            <div class="myquiz-creation-box">
+                                <div class="form-field">
+                                    <label>Chủ đề của bộ Quiz:</label>
+                                    <input type="text" id="myquiz-theme-input" class="app-input" placeholder="Ví dụ: Vũ trụ bí ẩn...">
+                                </div>
+                                <button class="action-btn-main gold-glow" id="btn-myquiz-ai-gen">Tạo Bộ Quiz Bằng AI 🪄</button>
+                                <div class="myquiz-preview-editor hidden" id="myquiz-editor-area">
+                                    <h4>Danh sách câu hỏi AI sinh:</h4>
+                                    <div class="myquiz-questions-list" id="myquiz-questions-list-container"></div>
+                                    <button class="action-btn-main" id="btn-save-myquiz-work">💾 Lưu Và Xuất Bản</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tab 4: Đấu Trường -->
+                        <div id="brain-sub-panel-arena" class="brain-sub-panel hidden">
+                            <h3>⚔️ Đấu Trường Trạng Nguyên Tuần</h3>
+                            <div id="arena-normal-challenges" class="arena-challenges-list">
+                                <h4>🏆 Thử Thách Tuần:</h4>
+                                <div class="challenge-item-card">
+                                    <strong>Chủ đề: Vẽ Cây Cọ Phép Thuật 🎨</strong>
+                                    <button class="btn-micro" id="btn-join-normal-challenge">Tham Gia Ngay</button>
+                                </div>
+                            </div>
+                            <div id="arena-11-up-video" class="arena-video-challenges hidden">
+                                <h4>🎞️ Thử Thách Video 5s:</h4>
+                                <div class="challenge-item-card">
+                                    <strong>Mee Nhảy Múa 💃</strong>
+                                    <button class="btn-micro" id="btn-submit-video-challenge">Nộp Bài Dự Thi</button>
+                                </div>
+                            </div>
+                            <div id="arena-14-15-rank" class="arena-pro-rank hidden">
+                                <h4>👑 Đấu Trường Leo Rank Toàn Cầu:</h4>
+                                <button class="action-btn-main gold-glow" id="btn-join-tournament">⚔️ Bắt Đầu Trận Đấu Hạng VIP</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 2.5 PANEL ACADEMY CENTER -->
+                <div id="panel-academy" class="detail-panel hidden">
+                    <h2 class="panel-title">Học Viện Tài Năng StoryMee</h2>
+                    <p class="panel-subtitle">Học các khóa học sáng tạo có cấu trúc do đội ngũ chuyên gia biên soạn.</p>
+                    <div class="academy-workspace">
+                        <div class="academy-courses-grid" id="academy-courses-container"></div>
+                        <div class="academy-course-detail-view hidden" id="academy-course-detail">
+                            <button class="btn-micro" id="btn-back-to-courses">⬅️ Quay lại danh sách</button>
+                            <h3 id="academy-course-title">Học vẽ cơ bản</h3>
+                            <div class="course-lesson-player">
+                                <div class="video-placeholder-mock" id="academy-video-frame">▶ Bấm Play để xem Video (1:30)</div>
+                                <div class="lesson-meta-info">
+                                    <h4 id="academy-lesson-name">Bài 1: Nét vẽ hình tròn</h4>
+                                    <button class="action-btn-main" id="btn-academy-do-homework">✏️ Làm Bài Tập Thực Hành Ngay</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.6 PANEL EXPLORE COMMUNITY -->
+                <div id="panel-explore" class="detail-panel hidden">
+                    <h2 class="panel-title">Khám Phá Vũ Trụ Tác Phẩm Cộng Đồng</h2>
+                    <p class="panel-subtitle">Nơi trưng bày các tác phẩm nghệ thuật đã kiểm duyệt của các bạn nhỏ.</p>
+                    <div class="explore-workspace">
+                        <div class="explore-filter-bar">
+                            <button class="filter-btn active" data-filter="all">Tất cả</button>
+                            <button class="filter-btn" data-filter="drawing">🎨 Tranh Vẽ</button>
+                            <button class="filter-btn" data-filter="story">📖 Truyện</button>
+                            <button class="filter-btn" data-filter="quiz">❓ Quiz</button>
+                        </div>
+                        <div class="explore-feed-container" id="explore-feed-grid"></div>
+                        <div class="explore-pagination">
+                            <button class="action-btn-main" id="btn-explore-load-more">Xem Thêm Tác Phẩm 🔭</button>
+                        </div>
+                        <div class="marketplace-section-box hidden" id="explore-marketplace-box">
+                            <hr style="margin:40px 0; border:1px dashed var(--color-primary); opacity:0.3;">
+                            <h3>🏪 Marketplace Cửa Hàng Item Tự Thiết Kế</h3>
+                            <div class="marketplace-grid" id="market-items-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.7 PANEL PASSPORT -->
+                <div id="panel-passport" class="detail-panel hidden">
+                    <h2 class="panel-title">🎫 Passport Hành Trình Sáng Tạo</h2>
+                    <p class="panel-subtitle">Hồ sơ năng lực ghi nhận toàn bộ tranh, truyện, quiz và bài tập học viện của bé.</p>
+                    <div class="passport-workspace">
+                        <div class="passport-header-card">
+                            <div class="passport-kid-profile">
+                                <div class="passport-avatar" id="passport-avatar-view"></div>
+                                <div class="passport-meta">
+                                    <h3 id="passport-username-view">Gấu Ú</h3>
+                                    <p>Độ tuổi: <strong id="passport-age-view">6-8 Tuổi</strong> | Phân hạng: <strong id="passport-tier-view">Guest</strong></p>
+                                </div>
+                            </div>
+                            <div class="passport-stats-box">
+                                <div class="p-stat">🚀 Tác Phẩm: <strong id="passport-works-count">0</strong></div>
+                                <div class="p-stat">🏆 Bài tập: <strong id="passport-homework-count">0</strong></div>
+                            </div>
+                        </div>
+                        <div class="passport-timeline-section">
+                            <h4>Dòng thời gian sáng tác của bé (Timeline):</h4>
+                            <div class="passport-filter-bar">
+                                <button class="p-filter-btn active" data-pfilter="all">Tất Cả</button>
+                                <button class="p-filter-btn" data-pfilter="drawing">🎨 Tranh</button>
+                                <button class="p-filter-btn" data-pfilter="story">📖 Truyện</button>
+                            </div>
+                            <div class="passport-timeline" id="passport-timeline-list"></div>
+                        </div>
+                        <div class="passport-actions-row">
+                            <button class="action-btn-main gold-glow" id="btn-passport-export-pdf">📧 Xuất File PDF Gửi Email (Chỉ VIP ⭐)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.8 PANEL PARENT DASHBOARD -->
+                <div id="panel-parent" class="detail-panel hidden">
+                    <h2 class="panel-title">🛡️ Cổng Quản Lý Cho Phụ Huynh</h2>
+                    <p class="panel-subtitle">Theo dõi thời gian sử dụng, kiểm soát an toàn và duyệt tác phẩm của bé lên feed.</p>
+                    <div class="parent-workspace">
+                        <div class="parent-left-col">
+                            <div class="parent-control-card">
+                                <h3>⏱️ Quản Lý Thời Gian Sử Dụng (Screen Time)</h3>
+                                <select id="parent-time-limit" class="app-input">
+                                    <option value="30">30 Phút</option>
+                                    <option value="60" selected>60 Phút</option>
+                                    <option value="120">120 Phút</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="parent-right-col">
+                            <div class="parent-control-card">
+                                <h3>📥 Hàng Đợi Kiểm Duyệt Tác Phẩm Của Bé</h3>
+                                <div class="moderation-queue" id="parent-moderation-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+    <!-- 3. POPUP MODAL: SIGNUP -->
+    <div id="signup-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 550px; width: 90%; transition: all 0.3s ease;">
+            <button class="modal-close-btn" id="btn-close-signup">&times;</button>
+            
+            <!-- BƯỚC 1: NHẬP THÔNG TIN -->
+            <div id="signup-step-1" class="signup-step active">
+                <div class="modal-header">
+                    <h2>Tạo Tài Khoản Bé Ngoan! 🌟</h2>
+                </div>
+                <form class="modal-form" id="signup-form">
+                    <div class="form-field">
+                        <label for="signup-kid-name">Tên của bé:</label>
+                        <input type="text" id="signup-kid-name" required placeholder="Gấu Ú...">
+                    </div>
+                    <div class="form-field">
+                        <label for="signup-parent-email">Email của bố mẹ:</label>
+                        <input type="email" id="signup-parent-email" required placeholder="bome@gmail.com">
+                    </div>
+                    <div class="form-field">
+                        <label for="signup-password">Mật khẩu:</label>
+                        <input type="password" id="signup-password" required placeholder="Nhập mật khẩu">
+                    </div>
+                    <button type="submit" class="action-btn-main">Đăng Ký Tài Khoản Miễn Phí 🚀</button>
+                </form>
+            </div>
+
+            <!-- BƯỚC 2: XÁC MINH OTP EMAIL BỐ MẸ -->
+            <div id="signup-step-2" class="signup-step hidden">
+                <div class="modal-header">
+                    <h2>Xác Minh Email Bố Mẹ 🛡️</h2>
+                </div>
+                <div class="otp-instruction" style="margin-bottom: 20px; font-size: 0.95rem; line-height: 1.4; color: var(--color-text-muted);">
+                    Hệ thống đã gửi mã xác minh OTP gồm 6 chữ số đến email <strong id="otp-target-email" style="color: var(--color-primary);">bome@gmail.com</strong>. Bé hãy nhờ bố mẹ đọc mã để nhập nhé!
+                </div>
+                <form class="modal-form" id="otp-form">
+                    <div class="form-field">
+                        <label for="signup-otp-code">Nhập mã xác minh (OTP):</label>
+                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 8px;">
+                            <input type="text" id="signup-otp-code" required placeholder="123456" style="text-align: center; font-size: 1.3rem; font-weight: 800; padding: 10px; width: 140px; border-radius: 12px; border: 2px solid #E2E8F0;">
+                            <span style="font-size: 0.8rem; background: #EDF2F7; padding: 6px 12px; border-radius: 8px; font-weight: bold;">Gợi ý: 123456</span>
+                        </div>
+                        <div id="otp-error-msg" class="hidden" style="color: #E53E3E; font-size: 0.85rem; margin-top: 8px; font-weight: bold;">❌ Mã xác minh chưa chính xác!</div>
+                    </div>
+                    <button type="submit" class="action-btn-main" style="background: var(--gradient-premium); margin-top: 15px;">Xác Minh Ngay & Kích Hoạt ⭐</button>
+                    <button type="button" class="btn-micro" id="btn-back-to-step1" style="margin-top: 15px; border: none; background: transparent; color: var(--color-text-muted); cursor: pointer; text-decoration: underline; display: block; font-family: var(--font-primary); font-size: 0.85rem;">Quay lại chỉnh sửa email</button>
+                </form>
+            </div>
+
+            <!-- BƯỚC 3: THƯ CHÚC MỪNG GỬI VỀ EMAIL BỐ MẸ -->
+            <div id="signup-step-3" class="signup-step hidden">
+                <div class="modal-header" style="margin-bottom: 15px;">
+                    <h2>Đăng Ký Thành Công! 🎉</h2>
+                </div>
+                <div style="text-align: center; margin-bottom: 15px; font-size: 0.95rem; font-weight: bold; color: #48BB78;">
+                    ✉️ Thư chào mừng đã gửi về hòm thư của Bố Mẹ!
+                </div>
+                
+                <!-- Giao diện Email Client giả lập -->
+                <div class="email-mockup" style="background: #F7FAFC; border: 2px solid #E2E8F0; border-radius: 16px; padding: 15px; text-align: left; font-family: var(--font-secondary); box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
+                    <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 8px; margin-bottom: 10px; font-size: 0.8rem; color: #718096; line-height: 1.4;">
+                        <strong>Hộp thư bố mẹ:</strong> <span id="email-mock-to">bome@gmail.com</span><br>
+                        <strong>Người gửi:</strong> welcome@storymee.com (StoryMee Universe)
+                    </div>
+                    <div style="font-weight: 800; font-size: 0.95rem; color: #2D3748; margin-bottom: 12px;">
+                        [StoryMee] Chúc mừng bé <span id="email-mock-kidname">Gấu Ú</span> đã đăng ký tài khoản thành công! 🥳
+                    </div>
+                    <div style="font-size: 0.85rem; color: #4A5568; line-height: 1.5; white-space: pre-line; background: white; padding: 12px; border-radius: 8px; border: 1px solid #EDF2F7;">
+                        Kính gửi Quý phụ huynh,
+
+                        Chúc mừng bé đã chính thức kích hoạt thành công tài khoản tại **StoryMee Universe**!
+
+                        Bố mẹ có thể truy cập cổng quản lý **🛡️ Phụ Huynh** ngay trên Header của ứng dụng để:
+                        • Thiết lập giới hạn thời gian sử dụng thiết bị cho bé.
+                        • Duyệt các tác phẩm sáng tạo của bé trước khi hiển thị lên cộng đồng.
+
+                        Chúc bé có những giây phút khám phá vui vẻ!
+                        
+                        Trân trọng,
+                        **Ban điều hành StoryMee**
+                    </div>
+                </div>
+                
+                <button type="button" class="action-btn-main" id="btn-finish-signup" style="margin-top: 20px;">Bắt Đầu Trải Nghiệm Ngay! 🎡</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 4. POPUP MODAL: PAYWALL -->
+    <div id="paywall-modal" class="modal-overlay">
+        <div class="modal-card paywall-card">
+            <button class="modal-close-btn" id="btn-close-paywall">&times;</button>
+            <div class="paywall-header text-center">
+                <span class="vip-badge">STAR CREATOR VIP</span>
+                <h2>Mở Khóa Siêu Năng Lực Sáng Tạo! ⭐</h2>
+            </div>
+            <div class="pricing-plans">
+                <div class="price-plan">
+                    <h3>Gói Tháng</h3>
+                    <div class="price">$4.99</div>
+                    <button class="plan-btn btn-buy-now">Đăng Ký</button>
+                </div>
+                <div class="price-plan popular-plan">
+                    <span class="popular-ribbon">TIẾT KIỆM 50% 🔥</span>
+                    <h3>Gói Năm</h3>
+                    <div class="price">$29.99</div>
+                    <button class="plan-btn btn-buy-now gold-glow">Đăng Ký Năm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. POPUP THÔNG BÁO TÙY CHỈNH -->
+    <div id="custom-alert-modal" class="modal-overlay">
+        <div class="modal-card alert-card">
+            <div class="alert-emoji" id="alert-emoji">🎉</div>
+            <h2 id="alert-title">Thành công!</h2>
+            <p id="alert-message">Bạn đã hoàn thành nhiệm vụ.</p>
+            <button id="btn-alert-close" class="action-btn-main">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Script điều khiển chính -->
+    <script src="assets/mee_database.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

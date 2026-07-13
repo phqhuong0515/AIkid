@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryMee Universe</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Bowlby+One+SC&family=Fredoka:wght@300..700&family=Inter:wght@800;900&family=Mali:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=2.4.2">
+</head>
+
+<body>
+
+    <!-- Header Bar -->
+    <header class="lobby-header">
+        <div class="lobby-logo" onclick="window.location.href='/'">
+            <img src="assets/images/logo.svg" alt="StoryMee Logo" class="logo-image">
+        </div>
+        <button class="auth-btn">Đăng Ký</button>
+    </header>
+
+    <div class="lobby-wrapper">
+        <!-- Main Landing Content -->
+        <div class="lobby-title-container">
+            <img src="assets/images/title-home-vn.png?v=2.0" alt="LET'S PLAY AND LEARN!" class="lobby-title-img">
+            <div class="sparkle sparkle-1"></div>
+            <div class="sparkle sparkle-2"></div>
+            <div class="sparkle sparkle-3"></div>
+            <div class="sparkle sparkle-4"></div>
+            <div class="sparkle sparkle-5"></div>
+            <div class="sparkle sparkle-6"></div>
+        </div>
+        <div class="lobby-description">
+            <p>Chào mừng bé đến với vũ trụ sáng tạo diệu kỳ! Hãy tự tay thiết kế nhân vật Mee đáng yêu, sáng tác những
+                cuốn truyện tranh đầy màu sắc và ghi lại hành trình thú vị của riêng mình nhé!</p>
+        </div>
+
+        <button class="start-btn" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="btn-icon">
+                <path d="M8 5v14l11-7z" />
+            </svg>
+            <span>Bắt đầu</span>
+        </button>
+
+        <div class="lobby-mascot">
+            <img src="assets/images/mascot.png" alt="StoryMee Kids" class="mascot-img">
+        </div>
+
+        <!-- Cards Navigation Grid -->
+        <div class="lobby-card card-mee" onclick="playPopAndNavigate('/mee')">
+            <img src="assets/images/card_mee.jpeg" alt="Mee Studio" class="card-img">
+            <div class="card-label">
+                <h2>mee</h2>
+            </div>
+        </div>
+
+        <div class="lobby-card card-character" onclick="playPopAndNavigate('/character')">
+            <img src="assets/images/home-character.jpeg" alt="Character Studio" class="card-img">
+            <div class="card-label">
+                <h2>Nhân<br>Vật</h2>
+            </div>
+        </div>
+
+        <div class="lobby-card card-art" onclick="playPopAndNavigate('/art')">
+            <img src="assets/images/card_art.jpeg" alt="Art Playground" class="card-img">
+            <div class="card-label">
+                <h2>Xưởng<br>Vẽ</h2>
+            </div>
+        </div>
+
+        <div class="lobby-card card-diary" onclick="playPopAndNavigate('/diary')">
+            <img src="assets/images/home-explore.jpeg" alt="Explore" class="card-img">
+            <div class="card-label">
+                <h2>Khám<br>Phá</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top-btn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Back to top">
+        <svg viewBox="0 0 24 24">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
+        </svg>
+    </button>
+
+    <!-- Responsive Auto-Scaling Script -->
+    <script>
+        function adjustScale() {
+            const wrapper = document.querySelector('.lobby-wrapper');
+            const header = document.querySelector('.lobby-header');
+            const targetWidth = 2122.57;
+            const targetHeight = 2200;
+            const winWidth = window.innerWidth;
+
+            const scale = winWidth / targetWidth;
+
+            wrapper.style.transform = `scale(${scale})`;
+
+            if (header) {
+                header.style.transform = `scale(${scale})`;
+                header.style.transformOrigin = 'top left';
+                header.style.left = `${40 * scale}px`;
+                header.style.top = `${38.04 * scale}px`;
+            }
+
+            document.body.style.minHeight = `${wrapper.getBoundingClientRect().bottom}px`;
+        }
+
+        window.addEventListener('resize', adjustScale);
+        window.addEventListener('load', adjustScale);
+        adjustScale();
+
+
+        // Show/hide back-to-top button on scroll
+        window.addEventListener('scroll', () => {
+            const btn = document.querySelector('.back-to-top-btn');
+            if (btn) {
+                const isBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 20);
+                if (isBottom) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            }
+        });
+
+        // High-fidelity synthesized Bubble SFX (Dual-Oscillator)
+        function playPopSound() {
+            try {
+                var ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+                // 1. Warm resonance body
+                var osc1 = ctx.createOscillator();
+                var gain1 = ctx.createGain();
+
+                // 2. High-frequency release click
+                var osc2 = ctx.createOscillator();
+                var gain2 = ctx.createGain();
+
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+
+                var now = ctx.currentTime;
+
+                // --- Warm Resonant Body (Triangle Wave) ---
+                osc1.type = 'triangle';
+                osc1.frequency.setValueAtTime(200, now);
+                osc1.frequency.exponentialRampToValueAtTime(350, now + 0.03);
+                osc1.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(0.35, now + 0.01);
+                gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+                // --- High-frequency Release Click (Sine Wave) ---
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(850, now);
+                osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.02);
+                osc2.frequency.exponentialRampToValueAtTime(450, now + 0.08);
+
+                gain2.gain.setValueAtTime(0, now);
+                gain2.gain.linearRampToValueAtTime(0.18, now + 0.005);
+                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+                osc1.start(now);
+                osc1.stop(now + 0.16);
+
+                osc2.start(now);
+                osc2.stop(now + 0.09);
+            } catch (e) {
+                console.error("Web Audio API failed", e);
+            }
+        }
+
+        function playPopAndNavigate(url) {
+            playPopSound();
+            setTimeout(() => {
+                window.location.href = url;
+            }, 180); // 180ms delay gives enough time to hear the bubble pop!
+        }
+
+    </script>
+</body>
+
+</html>

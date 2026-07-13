@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xưởng Sáng Tạo - StoryMee</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Bowlby+One+SC&family=Chiron+GoRound+TC:wght@200..900&family=Fredoka:wght@300..700&family=Huninn:wght@700&family=Inter:wght@800;900&family=Mali:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=5.7">
+    <style>
+        .card-title {
+            font-family: 'Chiron GoRound TC', sans-serif !important;
+            font-weight: 950 !important;
+            text-transform: uppercase !important;
+        }
+
+        .card-desc {
+            margin-top: 7px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sound Effects -->
+    <audio id="pop-sound" src="../assets/audio/pop.mp3" preload="auto"></audio>
+
+    <div class="scaler-wrapper">
+        <div class="art-container">
+        <!-- Header Bar -->
+        <header class="art-header">
+            <div class="art-logo" onclick="window.location.href='/'">
+                <img src="../assets/images/logo.svg" alt="StoryMee Logo" class="logo-image">
+            </div>
+            <button class="auth-btn" onclick="window.location.href='/'">Đăng Ký</button>
+        </header>
+        
+        <!-- Back Button & Page Title -->
+        <div class="art-content">
+            <div class="back-btn-container">
+                <button class="back-btn" onclick="playPopAndNavigate('/')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                    </svg>
+                    <span>Trở Về</span>
+                </button>
+            </div>
+
+            <div class="page-title-img-container">
+                <img src="../assets/images/title-art-vn.png?v=2" alt="Xưởng Sáng Tạo" class="page-title-img">
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="cards-grid">
+                <!-- Card 1: Drawing -->
+                <div class="card" onclick="playPopAndNavigate('/art/style')">
+                    <div class="card-image-wrapper">
+                        <img src="../assets/images/art-comic.jpeg" alt="Drawing" class="card-img">
+                    </div>
+                    <div class="card-body">
+                        <h2 class="card-title">Vẽ Tranh</h2>
+                        <p class="card-desc">Bắt đầu từ những nét vẽ nhỏ, AI sẽ mở ra cả một thế giới đầy màu sắc để trí
+                            tưởng tượng được bay xa.</p>
+                        <button class="play-btn">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"
+                                style="margin-left: 0px;">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Comic -->
+                <div class="card" onclick="showComingSoon('Sáng Tác Truyện')">
+                    <div class="card-image-wrapper">
+                        <img src="../assets/images/art-image.jpeg" alt="Comic" class="card-img">
+                    </div>
+                    <div class="card-body">
+                        <h2 class="card-title">Sáng Tác Truyện</h2>
+                        <p class="card-desc">Mỗi ý tưởng đều có thể trở thành một cuốn truyện sống động với sự
+                            đồng hành <br>của AI.</p>
+                        <button class="play-btn">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"
+                                style="margin-left: 0px;">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3: Stories -->
+                <div class="card" onclick="showComingSoon('Làm Video')">
+                    <div class="card-image-wrapper">
+                        <img src="../assets/images/art-video.jpeg" alt="Stories" class="card-img">
+                    </div>
+                    <div class="card-body">
+                        <h2 class="card-title">Làm Video</h2>
+                        <p class="card-desc">Biến những câu chuyện yêu thích thành video rực rỡ với AI, đầy âm thanh,
+                            chuyển động và niềm vui khám phá.</p>
+                        <button class="play-btn">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"
+                                style="margin-left: 0px;">
+                                <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- .scaler-wrapper -->
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-message"></div>
+
+    <script>
+        // High-fidelity synthesized Bubble SFX (Dual-Oscillator)
+        function playPopSound() {
+            try {
+                var ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+                // 1. Warm resonance body
+                var osc1 = ctx.createOscillator();
+                var gain1 = ctx.createGain();
+
+                // 2. High-frequency release click
+                var osc2 = ctx.createOscillator();
+                var gain2 = ctx.createGain();
+
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+
+                var now = ctx.currentTime;
+
+                // --- Warm Resonant Body (Triangle Wave) ---
+                osc1.type = 'triangle';
+                osc1.frequency.setValueAtTime(200, now);
+                osc1.frequency.exponentialRampToValueAtTime(350, now + 0.03);
+                osc1.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(0.35, now + 0.01);
+                gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+                // --- High-frequency Release Click (Sine Wave) ---
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(850, now);
+                osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.02);
+                osc2.frequency.exponentialRampToValueAtTime(450, now + 0.08);
+
+                gain2.gain.setValueAtTime(0, now);
+                gain2.gain.linearRampToValueAtTime(0.18, now + 0.005);
+                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+                osc1.start(now);
+                osc1.stop(now + 0.16);
+
+                osc2.start(now);
+                osc2.stop(now + 0.09);
+            } catch (e) {
+                console.error("Web Audio API failed", e);
+            }
+        }
+
+        function playPopAndNavigate(url) {
+            playPopSound();
+            setTimeout(() => {
+                window.location.href = url;
+            }, 180); // 180ms delay gives enough time to hear the bubble pop!
+        }
+
+        function showComingSoon(featureName) {
+            playPopSound();
+            const toast = document.getElementById('toast');
+            toast.innerText = `${featureName} - Tính năng đang được phát triển!`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // --- Dynamic Scale Logic to match Mee page ---
+        function adjustScale() {
+            const wrapper = document.querySelector('.scaler-wrapper');
+            if (!wrapper) return;
+            
+            const isDesktop = window.innerWidth > 1024;
+            
+            if (isDesktop) {
+                const targetWidth = 1927.63;
+                const winWidth = window.innerWidth;
+                
+                // Scale by width to maintain proportions
+                const scale = winWidth / targetWidth;
+                
+                wrapper.style.transform = `translateX(-50%) scale(${scale})`;
+                
+                // Allow scrolling only if the scaled content exceeds the window height
+                document.body.style.minHeight = `${wrapper.getBoundingClientRect().height}px`;
+            } else {
+                wrapper.style.transform = '';
+                document.body.style.minHeight = '';
+            }
+        }
+        
+        window.addEventListener('resize', adjustScale);
+        window.addEventListener('load', adjustScale);
+        // Call immediately to adjust layout
+        adjustScale();
+    </script>
+</body>
+
+</html>

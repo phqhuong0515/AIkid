@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lựa Chọn Phong Cách Vẽ - StoryMee</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Chiron+GoRound+TC:wght@900&family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
+    rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom Stylesheet for Preview -->
+  <link rel="stylesheet" href="/mee/styles.css?v=202607101658">
+
+  <style>
+    /* Clean layout and centering */
+    body {
+      background-image: url('/mee/PNG/bg-art.png') !important;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Mali', 'Chiron GoRound TC', sans-serif;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Outer Wrapper for responsive scaling */
+    .style-selection-wrapper {
+      width: 100%;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      margin-top: 240px;
+    }
+
+    /* Absolute Positioned Style Grid */
+    .style-grid {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      box-sizing: border-box;
+      margin: 40px 0;
+    }
+
+    /* Base Card Styling - Absolute Center and transformed by JS */
+    .style-card {
+      position: absolute;
+      left: 50%;
+      top: 50px;
+      margin-left: -160px;
+      /* Center card horizontally by default */
+      width: 320px;
+      height: 380px;
+      cursor: pointer;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+        opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      overflow: visible;
+      /* To allow tags to overlap */
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Inner Wrapper containing frame background, border, and shadow to lift all together */
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      background: #FFFFFF;
+      border: 10px solid #FFFFFF;
+      border-radius: 48px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+      outline: 6px solid rgba(255, 92, 138, 0);
+      /* Default inactive outline: transparent pink */
+      overflow: visible;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+        border-color 0.3s,
+        box-shadow 0.3s,
+        outline 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .style-card:hover .card-inner {
+      transform: translateY(-16px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Card Image Wrapper with skeleton color */
+    .card-image-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 36px;
+      overflow: hidden;
+      box-sizing: border-box;
+      background: #f1f5f9;
+    }
+
+    .style-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+
+    .style-card:hover .style-img {
+      transform: scale(1.06);
+    }
+
+    /* Tags at the top of the cards */
+    .card-tag {
+      position: absolute;
+      top: -26px;
+      left: 30px;
+      color: #FFFFFF;
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 950;
+      font-size: 1.5rem;
+      padding: 8px 30px;
+      border-radius: 20px;
+      border: 4px solid #FFFFFF;
+      text-transform: uppercase;
+      z-index: 10;
+      transition: all 0.3s ease;
+      line-height: 1.1;
+      letter-spacing: 0.5px;
+    }
+
+    /* Shift text down by 1px for cards with accented Vietnamese characters */
+    .card-tag.has-diacritics {
+      padding-top: 9px;
+      padding-bottom: 7px;
+    }
+
+    /* Specific Tag gradients (repeats for 9 styles) */
+    .style-card:nth-child(9n+1) .card-tag {
+      background: linear-gradient(135deg, #FF8E53, #FF2E93);
+      box-shadow: 0 8px 20px rgba(255, 46, 147, 0.4);
+    }
+
+    .style-card:nth-child(9n+2) .card-tag {
+      background: linear-gradient(135deg, #00C6FF, #0072FF);
+      box-shadow: 0 8px 25px rgba(0, 114, 255, 0.5);
+    }
+
+    .style-card:nth-child(9n+3) .card-tag {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      box-shadow: 0 8px 20px rgba(56, 239, 125, 0.4);
+    }
+
+    .style-card:nth-child(9n+4) .card-tag {
+      background: linear-gradient(135deg, #FF9966, #FF5E62);
+      box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4);
+    }
+
+    .style-card:nth-child(9n+5) .card-tag {
+      background: linear-gradient(135deg, #7F00FF, #E100FF);
+      box-shadow: 0 8px 20px rgba(225, 0, 255, 0.4);
+    }
+
+    .style-card:nth-child(9n+6) .card-tag {
+      background: linear-gradient(135deg, #F857A6, #FF5858);
+      box-shadow: 0 8px 20px rgba(248, 87, 166, 0.4);
+    }
+
+    .style-card:nth-child(9n+7) .card-tag {
+      background: linear-gradient(135deg, #4da0b0, #d39d38);
+      box-shadow: 0 8px 20px rgba(77, 160, 176, 0.4);
+    }
+
+    .style-card:nth-child(9n+8) .card-tag {
+      background: linear-gradient(135deg, #1A2980, #26D0CE);
+      box-shadow: 0 8px 20px rgba(38, 208, 206, 0.4);
+    }
+
+    .style-card:nth-child(9n+9) .card-tag {
+      background: linear-gradient(135deg, #f12711, #f5af19);
+      box-shadow: 0 8px 20px rgba(245, 175, 25, 0.4);
+    }
+
+    /* Active Highlighted State applied to card-inner */
+    .style-card.active {
+      z-index: 5;
+    }
+
+    .style-card.active .card-inner {
+      border: 12px solid #FFFFFF;
+      outline: 6px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 0 35px rgba(255, 255, 255, 0.5), 0 25px 55px rgba(0, 0, 0, 0.28);
+    }
+
+    .style-card.active .card-tag {
+      left: 20px;
+    }
+
+    /* Back Button styling */
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(255, 117, 151, 0.45);
+      background: linear-gradient(135deg, #ff5780, #ff7597) !important;
+    }
+
+    /* Toast Notification for Selections (Moved to the Top) */
+    .selection-toast {
+      position: fixed;
+      top: 190px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      width: 420px;
+      white-space: nowrap;
+      box-sizing: border-box;
+      background: #FF5C8A;
+      border: 4px solid #FFFFFF;
+      color: #FFFFFF;
+      font-family: 'Mali', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      padding: 16px 24px;
+      border-radius: 35px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10000;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .selection-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Centered Continue Button styling at the bottom */
+    .continue-btn-container {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) scale(1.1);
+      transform-origin: bottom center;
+      bottom: 20px;
+      z-index: 1000;
+    }
+
+    .continue-btn {
+      background: linear-gradient(135deg, #ff7597, #ff9eb5);
+      /* Match reversed gradient of image-generate back button */
+      border: none;
+      border-radius: 35px;
+      color: white;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 220px;
+      height: 70px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 12px 35px rgba(255, 117, 151, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .continue-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(255, 117, 151, 0.5);
+      background: linear-gradient(135deg, #ff5780, #ff7597);
+    }
+
+    .continue-btn:active {
+      transform: translateY(-2px);
+    }
+
+    /* UI Scaler Wrapper for Header and Back Button */
+    .scaler-wrapper {
+      box-sizing: border-box;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1927.63px;
+      height: 930px;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(1);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .scaler-wrapper > * {
+      pointer-events: auto;
+    }
+
+    /* Art Page exact Header styles */
+    .art-header {
+      position: absolute;
+      left: 38px;
+      top: 35px;
+      width: 1844.3px;
+      height: 76.17px;
+      background: rgba(253, 250, 244, 0.8);
+      border-radius: 24px;
+      padding: 0 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+      opacity: 1;
+    }
+
+    .art-logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-left: -10px;
+    }
+
+    .art-logo img {
+      height: 58px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .auth-btn {
+      font-family: 'Mali', sans-serif;
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: #1E293B;
+      background: #FFFFFF;
+      border: 3px solid #CBD5E0;
+      padding: 10px 40px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .auth-btn:hover {
+      transform: translateY(-2px);
+      border-color: #CBD5E1;
+      background: #F8FAFC;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Main Scaler Wrapper (Contains all interactive UI elements scaled together) -->
+  <div class="scaler-wrapper">
+    <!-- Header Bar -->
+    <header class="art-header">
+      <div class="art-logo" onclick="window.location.href='/'">
+        <img src="../assets/images/logo.svg" alt="StoryMee Logo" class="logo-image">
+      </div>
+      <button class="auth-btn" onclick="window.location.href='/'">Đăng Ký</button>
+    </header>
+
+    <div class="back-btn-container"
+      style="position: absolute; left: 38px; top: 131px; z-index: 1000; transform: scale(1.1); transform-origin: left top;">
+      <button class="back-btn" onclick="playPopAndNavigate('/art/')" style="
+        background: linear-gradient(135deg, #ff9eb5, #ff7597);
+        border: none;
+        border-radius: 9999px;
+        color: white;
+        font-family: 'Mali', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 10px 25px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      ">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Trở Về</span>
+      </button>
+    </div>
+
+    <!-- Style Selection Content (All 9 Art Styles) -->
+    <div class="style-selection-wrapper">
+      <div class="style-grid">
+        <!-- Card 1: Màu Nước -->
+        <div class="style-card card-watercolor active" onclick="selectStyle(this, 'Màu Nước', 0)">
+          <div class="card-inner">
+            <div class="card-tag has-diacritics">Màu Nước</div>
+            <div class="card-image-container">
+              <img src="/mee/PNG/art-style-watercolor.jpeg" alt="Màu Nước" class="style-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Hoạt Hình -->
+        <div class="style-card card-cartoon" onclick="selectStyle(this, 'Hoạt Hình', 1)">
+          <div class="card-inner">
+            <div class="card-tag has-diacritics">Hoạt Hình</div>
+            <div class="card-image-container">
+              <img src="/mee/PNG/art-style-cartoon.jpeg" alt="Hoạt Hình" class="style-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Bút Sáp -->
+        <div class="style-card card-crayon" onclick="selectStyle(this, 'Bút Sáp', 2)">
+          <div class="card-inner">
+            <div class="card-tag has-diacritics">Bút Sáp</div>
+            <div class="card-image-container">
+              <img src="/mee/PNG/art-style-crayon.jpeg" alt="Bút Sáp" class="style-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Anime -->
+        <div class="style-card card-anime" onclick="selectStyle(this, 'Anime', 3)">
+          <div class="card-inner">
+            <div class="card-tag">Anime</div>
+            <div class="card-image-container">
+              <img src="/mee/PNG/art-style-anime.jpeg" alt="Anime" class="style-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Manga -->
+        <div class="style-card card-manga" onclick="selectStyle(this, 'Manga', 4)">
+          <div class="card-inner">
+            <div class="card-tag">Manga</div>
+            <div class="card-image-container">
+              <img src="/mee/PNG/art-style-manga.jpeg" alt="Manga" class="style-img">
+            </div>
+          </div>
+        </div>
+
+      <!-- Card 6: Truyện Tranh -->
+      <div class="style-card card-comic" onclick="selectStyle(this, 'Truyện Tranh', 5)">
+        <div class="card-inner">
+          <div class="card-tag has-diacritics">Truyện Tranh</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-comic.jpeg" alt="Truyện Tranh" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7: Tranh Chì -->
+      <div class="style-card card-sketch" onclick="selectStyle(this, 'Tranh Chì', 6)">
+        <div class="card-inner">
+          <div class="card-tag has-diacritics">Tranh Chì</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-sketch.jpeg" alt="Tranh Chì" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8: 3D -->
+      <div class="style-card card-3d" onclick="selectStyle(this, '3D', 7)">
+        <div class="card-inner">
+          <div class="card-tag">3D</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-3D.jpeg" alt="3D" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9: Pixel -->
+      <div class="style-card card-pixel" onclick="selectStyle(this, 'Pixel', 8)">
+        <div class="card-inner">
+          <div class="card-tag">Pixel</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-pixel.jpeg" alt="Pixel" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 10: Chibi -->
+      <div class="style-card card-chibi" onclick="selectStyle(this, 'Chibi', 9)">
+        <div class="card-inner">
+          <div class="card-tag">Chibi</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-chibi.jpeg" alt="Chibi" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 11: Đất Sét -->
+      <div class="style-card card-clay" onclick="selectStyle(this, 'Đất Sét', 10)">
+        <div class="card-inner">
+          <div class="card-tag has-diacritics">Đất Sét</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-clay.jpeg" alt="Đất Sét" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 12: Vải Nỉ -->
+      <div class="style-card card-fabric" onclick="selectStyle(this, 'Vải Nỉ', 11)">
+        <div class="card-inner">
+          <div class="card-tag has-diacritics">Vải Nỉ</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-farbic.jpeg" alt="Vải Nỉ" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 13: Manhwa -->
+      <div class="style-card card-manhwa" onclick="selectStyle(this, 'Manhwa', 12)">
+        <div class="card-inner">
+          <div class="card-tag">Manhwa</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-manhwa.jpeg" alt="Manhwa" class="style-img">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 14: Bán Tả Thực -->
+      <div class="style-card card-semirealistic" onclick="selectStyle(this, 'Bán Tả Thực', 13)">
+        <div class="card-inner">
+          <div class="card-tag has-diacritics">Bán Tả Thực</div>
+          <div class="card-image-container">
+            <img src="/mee/PNG/art-style-semirealistic.jpeg" alt="Bán Tả Thực" class="style-img">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast for User Interaction (Top-centered) -->
+  <div id="toast" class="selection-toast">Đã chọn phong cách Màu Nước!</div>
+
+  <!-- Centered Action Button (Width matches Toast) -->
+  <div class="continue-btn-container">
+    <button class="continue-btn" onclick="playPopAndNavigate('/art/image-generate')">
+      <span>Chọn</span>
+    </button>
+  </div>
+  </div>
+
+  <script>
+    // --- UI Scaler Logic ---
+    function adjustScale() {
+      const wrapper = document.querySelector('.scaler-wrapper');
+      if (!wrapper) return;
+
+      const targetWidth = 1927.63;
+      const targetHeight = 930;
+      const winWidth = window.innerWidth;
+      const winHeight = window.innerHeight;
+
+      // Fit both width and height to prevent scrolling
+      const scale = Math.min(winWidth / targetWidth, winHeight / targetHeight);
+      wrapper.style.transform = `translateX(-50%) scale(${scale})`;
+    }
+
+    window.addEventListener('resize', adjustScale);
+    window.addEventListener('load', adjustScale);
+    adjustScale();
+
+    // Audio synthesis for bubble pop
+    function playPopSound() {
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc1 = ctx.createOscillator();
+        var gain1 = ctx.createGain();
+        var osc2 = ctx.createOscillator();
+        var gain2 = ctx.createGain();
+
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+
+        var now = ctx.currentTime;
+
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(200, now);
+        osc1.frequency.exponentialRampToValueAtTime(350, now + 0.03);
+        osc1.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.35, now + 0.01);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(850, now);
+        osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.02);
+        osc2.frequency.exponentialRampToValueAtTime(450, now + 0.08);
+
+        gain2.gain.setValueAtTime(0, now);
+        gain2.gain.linearRampToValueAtTime(0.18, now + 0.005);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+        osc1.start(now);
+        osc1.stop(now + 0.16);
+        osc2.start(now);
+        osc2.stop(now + 0.09);
+      } catch (e) {
+        console.error("Audio Context error:", e);
+      }
+    }
+
+    function playPopAndNavigate(url) {
+      playPopSound();
+      setTimeout(function () {
+        window.location.href = url;
+      }, 180);
+    }
+
+    // Dynamic Visual Settings
+    const baseWidth = 320;
+    const activeScale = 1.10;
+    const d1Scale = 0.9;
+    const d2Scale = 0.8;
+    const g1 = 48; // Gap between active card and adjacent inactive card
+    const g2 = 30; // Gap between the two inactive cards (set to exactly 30px)
+
+    function getScaleForDistance(distance) {
+      if (distance === 0) return activeScale;
+      if (distance === 1) return d1Scale;
+      if (distance === 2) return d2Scale;
+      return Math.max(0.5, d2Scale - (distance - 2) * 0.05);
+    }
+
+    function getOpacityForDistance(distance) {
+      if (distance === 0) return 1.0;
+      if (distance === 1) return 0.75;
+      if (distance === 2) return 0.65;
+      if (distance === 3) return 0.2; // Fade out quickly
+      return 0.0; // Completely hidden
+    }
+
+    function getCardOffset(d) {
+      if (d === 0) return 0;
+      let x = 0;
+      x += (baseWidth * activeScale) / 2 + g1;
+      x += (baseWidth * d1Scale) / 2;
+      for (let i = 2; i <= d; i++) {
+        x += (baseWidth * getScaleForDistance(i - 1)) / 2;
+        x += g2;
+        x += (baseWidth * getScaleForDistance(i)) / 2;
+      }
+      return x;
+    }
+
+    function updateCardPositions(activeIndex) {
+      console.log("updateCardPositions called for active index:", activeIndex);
+      const cards = document.querySelectorAll('.style-card');
+
+      cards.forEach((card, j) => {
+        const d = Math.abs(j - activeIndex);
+        const scale = getScaleForDistance(d);
+        const opacity = getOpacityForDistance(d);
+        const direction = j > activeIndex ? 1 : -1;
+        const x = direction * getCardOffset(d);
+
+        card.style.transform = `translateX(${x}px) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.zIndex = 10 - d;
+
+        // Hide card completely from screen readers and cursor interactions when opacity is 0
+        if (opacity === 0) {
+          card.style.visibility = 'hidden';
+          card.style.pointerEvents = 'none';
+        } else {
+          card.style.visibility = 'visible';
+          card.style.pointerEvents = 'auto';
+        }
+      });
+    }
+
+    let toastTimeout = null;
+
+    function selectStyle(element, styleName, index) {
+      playPopSound();
+
+      // Toggle active states
+      document.querySelectorAll('.style-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      element.classList.add('active');
+
+      // Center the active card dynamically
+      updateCardPositions(index);
+
+      // Show toast
+      const toast = document.getElementById('toast');
+      toast.innerText = `Đã chọn phong cách ${styleName}!`;
+      toast.classList.add('show');
+
+      if (toastTimeout) {
+        clearTimeout(toastTimeout);
+      }
+
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Centering and positioning on DOM load
+    function init() {
+      console.log("Initializing style selection positions...");
+      updateCardPositions(0);
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+
+</html>
