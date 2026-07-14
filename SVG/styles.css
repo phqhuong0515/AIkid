@@ -987,3 +987,21 @@ body {
 .next-page-btn:active {
   transform: translateY(-50%) scale(1.045);
 }
+
+/* Custom high-fidelity rounded Vietnamese letter đ */
+.custom-đ {
+  position: relative;
+  display: inline-block;
+  font-family: 'Chiron GoRound TC', sans-serif !important;
+}
+
+.custom-đ::after {
+  content: "";
+  position: absolute;
+  width: 0.46em;
+  height: 0.12em;
+  background: currentColor;
+  border-radius: 9999px; /* Make the crossbar perfectly rounded */
+  top: 0.23em;
+  left: 0.27em;
+}
