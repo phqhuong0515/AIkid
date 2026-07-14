@@ -23,12 +23,12 @@
     body, html {
       width: 100%;
       height: 100%;
-      background-color: #4ba3e3; /* Sky blue background matching the reference */
+      background-color: #4ba3e3; /* Sky blue background */
       font-family: 'Mali', sans-serif;
       overflow: hidden;
       display: flex;
       justify-content: center;
-      align-items: flex-end; /* Align the monster to the bottom */
+      align-items: flex-end; /* Align the cat to the bottom */
     }
 
     /* Back Button */
@@ -58,121 +58,204 @@
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
 
-    /* Container for the monster */
+    /* Container for the cat */
     .login-container {
       width: 100%;
-      max-width: 900px;
+      max-width: 700px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
-      bottom: -60px; /* Slight offset to crop the monster body at the bottom */
+      bottom: -60px; /* Slight offset to crop the cat body at the bottom */
     }
 
-    /* Monster Layout */
-    .monster {
+    /* Cat Body */
+    .cat {
       position: relative;
-      width: 800px;
-      height: 580px;
-      background: #ffa114; /* Warm orange body */
-      border-radius: 400px 400px 0 0; /* Dome shape for head and body */
+      width: 580px;
+      height: 600px;
+      background: #FFFFFF; /* White body */
+      border-radius: 290px 290px 0 0; /* Dome shape for head/body */
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -10px 45px rgba(0, 0, 0, 0.06);
     }
 
-    /* Monster Horns */
-    .horn {
+    /* Cat Ears */
+    .ear {
       position: absolute;
-      top: -15px;
-      width: 95px;
-      height: 95px;
-      background: #f06100; /* Darker orange sừng */
+      top: -35px;
+      width: 115px;
+      height: 115px;
       z-index: -1;
-      transition: transform 0.3s ease;
     }
 
-    .horn.left {
-      left: 170px;
-      border-radius: 100% 0 0 0;
-      transform: rotate(-30deg) skewX(-10deg);
+    .ear.left {
+      left: 35px;
+      background: #FFFFFF;
+      border-radius: 20px 90px 0 0;
+      transform: rotate(-12deg);
     }
 
-    .horn.right {
-      right: 170px;
-      border-radius: 0 100% 0 0;
-      transform: rotate(30deg) skewX(10deg);
-    }
-
-    /* Hair tuft on top of head */
-    .hair-tuft {
+    .ear.left .ear-inner {
       position: absolute;
-      top: -16px;
-      display: flex;
-      gap: -4px;
-      z-index: 2;
+      top: 18px;
+      left: 18px;
+      width: 75px;
+      height: 75px;
+      background: #f06100; /* Orange inner ear */
+      border-radius: 10px 65px 0 0;
     }
 
-    .hair-tuft span {
-      width: 32px;
-      height: 32px;
+    .ear.right {
+      right: 35px;
+      background: #f08b18; /* Orange outer ear */
+      border-radius: 90px 20px 0 0;
+      transform: rotate(12deg);
+    }
+
+    .ear.right .ear-inner {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 75px;
+      height: 75px;
       background: #f06100;
-      border-radius: 50%;
-      display: inline-block;
-      margin: 0 -4px;
+      border-radius: 65px 10px 0 0;
     }
 
-    /* Eyes Container */
+    /* Cat spots (Orange patch over the right eye/ear) */
+    .cat-spot {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 250px;
+      height: 250px;
+      background: #f08b18; /* Vàng cam */
+      border-radius: 0 290px 0 100%;
+      z-index: 1;
+    }
+
+    /* Happy Happy Curved Eyes (^) */
     .eyes-container {
       display: flex;
-      gap: 2px;
-      margin-top: 100px;
-      z-index: 5;
-    }
-
-    /* Eye */
-    .eye {
-      width: 68px;
-      height: 68px;
-      background: #FFFFFF;
-      border: 3.5px solid #e07f00; /* Thin orange border */
-      border-radius: 50%;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Pupil */
-    .pupil {
-      width: 13px;
-      height: 13px;
-      background: #000000;
-      border-radius: 50%;
+      justify-content: space-between;
+      width: 320px;
       position: absolute;
-      transition: transform 0.05s linear;
+      top: 135px;
+      z-index: 3;
     }
 
-    /* Orange login wrapper container */
+    .eye-happy {
+      width: 48px;
+      height: 24px;
+      border: 5px solid #d64900; /* Dark orange eye line */
+      border-bottom: none;
+      border-left: none;
+      border-right: none;
+      border-radius: 40px 40px 0 0 / 40px 40px 0 0; /* Curve up */
+    }
+
+    /* Nose */
+    .cat-nose {
+      position: absolute;
+      top: 182px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 26px;
+      height: 16px;
+      background: #d64900;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      z-index: 3;
+    }
+
+    .cat-nose::after {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 11px;
+      width: 4px;
+      height: 18px;
+      background: #d64900;
+    }
+
+    /* Big Mouth eating the card */
+    .cat-mouth {
+      position: absolute;
+      top: 215px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 380px;
+      height: 220px;
+      background: #e64a19; /* Big dark orange/red mouth */
+      border-radius: 50% 50% 46% 46%;
+      overflow: hidden;
+      z-index: 2;
+      box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    /* Fangs */
+    .fang {
+      position: absolute;
+      top: -2px;
+      width: 22px;
+      height: 25px;
+      background: #FFFFFF;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    .fang.left {
+      left: 80px;
+    }
+
+    .fang.right {
+      right: 80px;
+    }
+
+    /* Tongue */
+    .cat-tongue {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 170px;
+      height: 85px;
+      background: #b71c1c; /* Tongue red */
+      border-radius: 85px 85px 0 0;
+    }
+
+    .cat-throat {
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 40px;
+      background: #880e4f;
+      border-radius: 50%;
+      opacity: 0.45;
+    }
+
+    /* Login Form Wrapper overlapping the mouth */
     .login-form-wrapper {
       position: relative;
-      margin-top: 55px;
-      width: 440px;
+      margin-top: 255px; /* Overlap mouth precisely */
+      width: 326px;
       z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* White card with thick orange border */
+    /* White login card with thin border */
     .login-card {
       width: 100%;
       background: #FFFFFF;
-      border: 15px solid #f06100; /* Extra thick border matching the reference */
-      border-radius: 30px;
+      border: 2px solid #E2E8F0;
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     }
 
     .input-group {
@@ -182,12 +265,12 @@
 
     .input-group input {
       width: 100%;
-      height: 68px;
+      height: 60px;
       border: none;
       outline: none;
-      padding: 0 28px;
+      padding: 0 24px;
       font-family: 'Mali', sans-serif;
-      font-size: 1.48rem;
+      font-size: 1.25rem;
       font-weight: 500;
       color: #2D3748;
       background: #FFFFFF;
@@ -199,68 +282,69 @@
       opacity: 1;
     }
 
-    /* Grey divider between inputs */
+    /* Grey divider */
     .input-divider {
       width: 100%;
-      height: 4px;
-      background: #E2E8F0;
+      height: 2px;
+      background: #EDF2F7;
     }
 
     /* Submit Button Area */
     .submit-area {
       position: relative;
-      margin-top: -12px; /* Pulls the button up to overlap with the card bottom border */
+      margin-top: -15px; /* Overlap card bottom */
       display: flex;
       align-items: center;
       justify-content: center;
       width: 100%;
     }
 
-    /* Monster Hands holding the button */
+    /* Cat Arms holding the button */
     .hand {
       position: absolute;
-      width: 58px;
+      width: 110px;
       height: 52px;
-      background: #ffa114; /* Matches body color */
-      border-radius: 50%;
+      background: #f08b18; /* Orange arms */
       z-index: 15;
       top: 50%;
       transform: translateY(-50%);
     }
 
     .hand.left {
-      left: 65px;
+      left: -50px;
+      border-radius: 0 26px 26px 0;
     }
 
     .hand.right {
-      right: 65px;
+      right: -50px;
+      border-radius: 26px 0 0 26px;
     }
 
     /* Custom go/Đăng Nhập button */
     .login-btn {
-      min-width: 250px;
-      height: 66px;
-      background: #f06100; /* Solid dark orange matching reference */
+      min-width: 200px;
+      height: 58px;
+      background: #e64a19; /* Solid red orange button */
       border: none;
-      border-radius: 20px;
+      border-radius: 18px;
       color: #FFFFFF;
       font-family: 'Mali', sans-serif;
       font-weight: 700;
-      font-size: 1.6rem;
+      font-size: 1.45rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 45px;
-      box-shadow: 0 6px 18px rgba(240, 97, 0, 0.3);
+      padding: 0 35px;
+      box-shadow: 0 6px 15px rgba(230, 74, 25, 0.25);
       transition: all 0.2s ease;
       z-index: 12;
     }
 
     .login-btn:hover {
-      background: #d65600;
+      background: #d84315;
       transform: scale(1.02);
-      box-shadow: 0 8px 22px rgba(240, 97, 0, 0.4);
+      box-shadow: 0 8px 20px rgba(230, 74, 25, 0.35);
     }
 
     .login-btn:active {
@@ -305,30 +389,39 @@
   </div>
 
   <div class="login-container">
-    <form class="monster" onsubmit="handleLogin(event)">
-      <!-- Left & Right Horns behind body -->
-      <div class="horn left"></div>
-      <div class="horn right"></div>
+    <form class="cat" onsubmit="handleLogin(event)">
+      <!-- Left & Right Ears -->
+      <div class="ear left">
+        <div class="ear-inner"></div>
+      </div>
+      <div class="ear right">
+        <div class="ear-inner"></div>
+      </div>
       
-      <!-- Top hair tuft -->
-      <div class="hair-tuft">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+      <!-- Right eye/ear orange patch -->
+      <div class="cat-spot"></div>
 
-      <!-- Eyes following mouse cursor -->
+      <!-- Happy Happy Curved Eyes (^) -->
       <div class="eyes-container">
-        <div class="eye">
-          <div class="pupil" id="pupil-left"></div>
-        </div>
-        <div class="eye">
-          <div class="pupil" id="pupil-right"></div>
-        </div>
+        <div class="eye-happy left"></div>
+        <div class="eye-happy right"></div>
       </div>
 
-      <!-- White Login Card -->
+      <!-- Nose & Mouth attachment -->
+      <div class="cat-nose"></div>
+
+      <!-- Big mouth behind card -->
+      <div class="cat-mouth">
+        <!-- Throat depth -->
+        <div class="cat-throat"></div>
+        <!-- Fangs -->
+        <div class="fang left"></div>
+        <div class="fang right"></div>
+        <!-- Tongue -->
+        <div class="cat-tongue"></div>
+      </div>
+
+      <!-- Login Card -->
       <div class="login-form-wrapper">
         <div class="login-card">
           <div class="input-group">
@@ -340,7 +433,7 @@
           </div>
         </div>
 
-        <!-- Overlapping button held by hands -->
+        <!-- Submit Button held by cat arms -->
         <div class="submit-area">
           <div class="hand left"></div>
           <button type="submit" class="login-btn">đăng nhập</button>
@@ -351,32 +444,6 @@
   </div>
 
   <script>
-    // Eye tracking logic
-    const pupils = document.querySelectorAll('.pupil');
-    const eyes = document.querySelectorAll('.eye');
-
-    document.addEventListener('mousemove', (e) => {
-      eyes.forEach((eye, index) => {
-        const pupil = pupils[index];
-        const rect = eye.getBoundingClientRect();
-        
-        // Center coordinates of the eye
-        const eyeX = rect.left + rect.width / 2;
-        const eyeY = rect.top + rect.height / 2;
-        
-        // Distance to the mouse cursor
-        const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
-        
-        // Maximum offset for pupil movement (within the eye boundary)
-        const maxOffset = 14; 
-        
-        const offsetX = Math.cos(angle) * maxOffset;
-        const offsetY = Math.sin(angle) * maxOffset;
-        
-        pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-      });
-    });
-
     // Handle form submit
     function handleLogin(event) {
       event.preventDefault();
@@ -389,7 +456,7 @@
         const toast = document.getElementById('success-toast');
         toast.classList.add('show');
         
-        // Play pop sound if audio library exists
+        // Play pop sound
         try {
           const audio = new Audio('/assets/audio/pop.mp3');
           audio.volume = 0.5;
@@ -403,7 +470,7 @@
       }
     }
 
-    // Go back with support for history or default back path
+    // Go back
     function goBack() {
       if (document.referrer) {
         window.history.back();
