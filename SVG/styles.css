@@ -121,20 +121,26 @@ body {
 .universe-signup-btn {
   font-family: 'Mali', sans-serif;
   font-weight: 800;
-  font-size: 1.8rem;
-  color: #1E293B;
-  background: #FFFFFF;
-  border: 3px solid #CBD5E0;
-  padding: 10px 40px;
+  font-size: 1.38rem;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #FF5C8A, #FF8E53);
+  border: none;
+  padding: 10px 36px;
+  height: 50px;
   border-radius: 9999px;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 92, 138, 0.2);
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .universe-signup-btn:hover {
   transform: translateY(-2px);
-  background: #F8FAFC;
-  color: #1E293B;
+  box-shadow: 0 6px 18px rgba(255, 92, 138, 0.35);
+  background: linear-gradient(135deg, #FF7096, #FFA072);
+  color: #FFFFFF;
 }
 
 /* App Container */

@@ -12,12 +12,13 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
     rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Custom Stylesheet for Preview -->
-  <link rel="stylesheet" href="styles.css?v=202607100916">
+  <link rel="stylesheet" href="styles.css?v=202607141142">
   <style>
     .preview-action-btn span {
       white-space: nowrap !important;
@@ -38,24 +39,206 @@
 </head>
 
 <body>
+  <!-- Global Meteor Loading Overlay (Visible by default on initial load to cover asset parsing) -->
+  <div id="page-loader-overlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+    /* Starry background effect for sunset */
+    background-image: 
+      radial-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.1) 2px, transparent 40px),
+      radial-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.05) 1px, transparent 30px),
+      linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+    background-size: 550px 550px, 350px 350px, 100% 100%;
+    background-position: 0 0, 40px 60px, 0 0;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    pointer-events: all;
+    overflow: hidden;
+  ">
+    <style>
+      @keyframes meteorFlight {
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
+      }
+      @keyframes miniFlight {
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+        15% { opacity: 0.6; }
+        85% { opacity: 0.6; }
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
+      }
+      @keyframes loadingDots {
+        0%, 20% { content: "."; }
+        40% { content: ".."; }
+        60%, 100% { content: "..."; }
+      }
+      .loading-dots::after {
+        content: "";
+        animation: loadingDots 1.5s infinite steps(1);
+        display: inline-block;
+        width: 24px;
+        text-align: left;
+      }
+      .meteor-container {
+        position: relative;
+        width: 320px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+        z-index: 10;
+      }
+      .meteor-head {
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle at 35% 35%, #FFF0F5 0%, #FFB6C1 25%, #FF5E97 60%, #9D1C7F 100%);
+        border-radius: 50%;
+        box-shadow: 
+          0 0 25px rgba(255, 94, 151, 0.9),
+          0 0 60px rgba(157, 28, 127, 0.6),
+          0 0 120px rgba(157, 28, 127, 0.4);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .meteor-crater {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 50%;
+        box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+      }
+      .meteor-crater-1 { width: 14px; height: 14px; top: 22px; left: 18px; }
+      .meteor-crater-2 { width: 20px; height: 20px; top: 32px; left: 32px; }
+      .meteor-crater-3 { width: 12px; height: 12px; top: 18px; left: 45px; }
+      .meteor-crater-4 { width: 10px; height: 10px; top: 48px; left: 20px; }
+      
+      .meteor-trail {
+        width: 600px;
+        height: 70px;
+        background: linear-gradient(to right, rgba(157, 28, 127, 0) 0%, rgba(157, 28, 127, 0.25) 35%, rgba(255, 94, 151, 0.75) 75%, rgba(255, 240, 245, 0.95) 100%);
+        border-radius: 40px 0 0 40px;
+        margin-right: -40px;
+        filter: blur(2px);
+      }
+      .mini-meteor {
+        position: absolute;
+        width: 160px;
+        height: 5px;
+        background: linear-gradient(to right, rgba(255, 182, 193, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
+        border-radius: 9999px;
+        opacity: 0.4;
+        filter: blur(1.5px);
+      }
+      .mini-1 {
+        top: 15%;
+        left: 10%;
+        animation: miniFlight 1.6s linear infinite;
+        animation-delay: 0.4s;
+      }
+      .mini-2 {
+        top: 75%;
+        left: 5%;
+        animation: miniFlight 1.9s linear infinite;
+        animation-delay: 0.9s;
+      }
+      .mini-3 {
+        top: 85%;
+        left: 50%;
+        animation: miniFlight 1.4s linear infinite;
+        animation-delay: 0.1s;
+      }
+    </style>
+
+    <!-- Space Background Mini Meteors -->
+    <div class="mini-meteor mini-1"></div>
+    <div class="mini-meteor mini-2"></div>
+    <div class="mini-meteor mini-3"></div>
+
+    <!-- Main Meteor Container -->
+    <div class="meteor-container">
+      <div class="meteor-trail"></div>
+      <div class="meteor-head">
+        <div class="meteor-crater meteor-crater-1"></div>
+        <div class="meteor-crater meteor-crater-2"></div>
+        <div class="meteor-crater meteor-crater-3"></div>
+        <div class="meteor-crater meteor-crater-4"></div>
+      </div>
+    </div>
+
+    <!-- Glowing Loading Text -->
+    <div style="margin-top: 50px; text-align: center; z-index: 20;">
+      <h2 style="
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #FFFFFF;
+        font-family: 'Chiron GoRound TC', sans-serif;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
+      ">Bé đợi chút nhé<span class="loading-dots"></span></h2>
+    </div>
+  </div>
+
   <div class="scaler-wrapper">
+    <script>
+      // Apply correct transform scale immediately before rendering any DOM nodes to prevent jumps
+      (function() {
+        const targetWidth = 1927.63;
+        const targetHeight = 930;
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+        const scale = Math.min(winWidth / targetWidth, winHeight / targetHeight);
+        const wrapper = document.currentScript.parentNode;
+        wrapper.style.transform = `translateX(-50%) scale(${scale})`;
+      })();
+    </script>
     <!-- Top Navigation Header from StoryMee Universe -->
     <header class="universe-header">
     <div class="universe-header-left">
-      <div class="universe-logo" onclick="window.location.href='http://localhost:8000'">
+      <div class="universe-logo" onclick="playPopAndNavigate('http://localhost:8000'); return false;">
         <img src="logo.svg" alt="StoryMee Logo" class="logo-image">
       </div>
     </div>
     <div class="universe-header-right">
-      <button class="universe-signup-btn" onclick="window.location.href='http://localhost:8000'">Đăng Ký</button>
+      <button class="universe-signup-btn" onclick="playPopAndNavigate('http://localhost:8000'); return false;">Đăng Ký</button>
     </div>
   </header>
+
+  <!-- Sound Effects -->
+  <audio id="pop-audio" src="/assets/audio/pop.mp3" preload="auto"></audio>
 
   <div class="app-container">
     <header class="app-header">
       <div class="header-left">
         <a href="http://localhost:8000" class="btn btn-done"
-          style="text-decoration: none; display: inline-flex; align-items: center;">
+          style="text-decoration: none; display: inline-flex; align-items: center;"
+          onclick="playPopAndNavigate('http://localhost:8000'); return false;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
           </svg>
@@ -362,7 +545,7 @@
       </div>
 
       <!-- Next Page Button -->
-      <a href="next.html" class="next-page-btn" title="Tiếp tục chuyển trang">
+      <a href="next.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="playPopAndNavigate('next.html'); return false;">
         <svg viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z" />
         </svg>
@@ -391,9 +574,86 @@
       wrapper.style.transform = `translateX(-50%) scale(${scale})`;
     }
     
+    function playPopSound() {
+      const audio = document.getElementById('pop-audio');
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(err => console.log('Audio play blocked:', err));
+      }
+    }
+
+    function playPopAndNavigate(url) {
+      playPopSound();
+      const loader = document.getElementById('page-loader-overlay');
+      if (loader) {
+        loader.style.display = 'flex';
+        loader.offsetHeight; // Force reflow
+        loader.style.opacity = '1';
+      }
+      setTimeout(function () {
+        window.location.href = url;
+      }, 350);
+    }
+
+    let loaderFaded = false;
+    let pageLoaded = false;
+
+    function hidePageLoader() {
+      pageLoaded = true;
+      const loader = document.getElementById('page-loader-overlay');
+      if (!loader || loader.style.display === 'none') {
+        adjustScale();
+        return;
+      }
+
+      adjustScale();
+
+      const meteorContainer = document.querySelector('.meteor-container');
+      if (meteorContainer) {
+        const iterationHandler = () => {
+          if (!loaderFaded) {
+            loaderFaded = true;
+            performLoaderFadeOut(loader);
+            meteorContainer.removeEventListener('animationiteration', iterationHandler);
+          }
+        };
+        meteorContainer.addEventListener('animationiteration', iterationHandler);
+
+        setTimeout(() => {
+          if (!loaderFaded) {
+            loaderFaded = true;
+            performLoaderFadeOut(loader);
+            meteorContainer.removeEventListener('animationiteration', iterationHandler);
+          }
+        }, 2500);
+      } else {
+        setTimeout(() => {
+          performLoaderFadeOut(loader);
+        }, 150);
+      }
+    }
+
+    function performLoaderFadeOut(loader) {
+      adjustScale();
+      loader.style.opacity = '0';
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 400);
+    }
+
     window.addEventListener('resize', adjustScale);
-    window.addEventListener('load', adjustScale);
+    window.addEventListener('load', () => {
+      hidePageLoader();
+    });
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        loaderFaded = false;
+        pageLoaded = false;
+        hidePageLoader();
+      }
+    });
     adjustScale();
+
   </script>
 </body>
 

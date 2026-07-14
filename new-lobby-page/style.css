@@ -5,21 +5,26 @@
     padding: 0;
 }
 
-body,
 html {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+body {
     width: 100%;
     margin: 0;
     padding: 0;
     background: url('assets/images/bg-home.png') no-repeat center center;
     background-size: cover;
-    background-attachment: fixed;
-    overflow-x: hidden;
-    overflow-y: auto;
+    background-attachment: scroll;
     position: relative;
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
 }
 
 body::-webkit-scrollbar,
@@ -75,19 +80,26 @@ html::-webkit-scrollbar {
 .auth-btn {
     font-family: 'Mali', sans-serif;
     font-weight: 800;
-    font-size: 1.8rem;
-    color: #1E293B;
-    background: #FFFFFF;
-    border: 3px solid #CBD5E0;
-    padding: 10px 40px;
+    font-size: 1.38rem;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #FF5C8A, #FF8E53);
+    border: none;
+    padding: 10px 36px;
+    height: 55px;
     border-radius: 9999px;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 92, 138, 0.2);
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .auth-btn:hover {
     transform: translateY(-2px);
-    background: #F8FAFC;
+    box-shadow: 0 6px 18px rgba(255, 92, 138, 0.35);
+    background: linear-gradient(135deg, #FF7096, #FFA072);
+    color: #FFFFFF;
 }
 
 /* Big custom stroke title */

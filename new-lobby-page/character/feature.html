@@ -11,6 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
     rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -23,15 +24,16 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-image: none !important;
-      background-color: #FFFFFF !important;
+      background-image: url('/assets/images/bg-character-feature.png?v=7') !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+      background-size: cover !important;
+      background-attachment: fixed !important;
+      background-color: #fad698 !important;
     }
 
     .scaler-wrapper {
-      background-image: url('/assets/images/bg-character-feature.png?v=7') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
+      background: transparent !important;
       opacity: 0;
       transition: opacity 0.4s ease;
     }
@@ -308,18 +310,25 @@
       transform: scale(1.15) !important;
     }
   </style>
-  <link rel="stylesheet" href="/mee/styles.css?v=202607101658">
+  <link rel="stylesheet" href="/mee/styles.css?v=202607141142">
 </head>
 
 <body>
-  <!-- Global Orbit Loading Overlay -->
+  <!-- Global Meteor Loading Overlay -->
   <div id="page-loader-overlay" style="
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #FFFFFF;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+    /* Starry background effect for sunset */
+    background-image: 
+      radial-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.1) 2px, transparent 40px),
+      radial-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.05) 1px, transparent 30px),
+      linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+    background-size: 550px 550px, 350px 350px, 100% 100%;
+    background-position: 0 0, 40px 60px, 0 0;
     z-index: 999999;
     display: flex;
     flex-direction: column;
@@ -328,19 +337,36 @@
     opacity: 1;
     transition: opacity 0.4s ease;
     pointer-events: all;
+    overflow: hidden;
   ">
     <style>
-      @keyframes planetFloat {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-12px); }
+      @keyframes meteorFlight {
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
       }
-      @keyframes shadowPulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(0.8); opacity: 0.25; }
-      }
-      @keyframes orbitRotation {
-        0% { transform: rotateX(75deg) rotateY(-10deg) rotateZ(0deg); }
-        100% { transform: rotateX(75deg) rotateY(-10deg) rotateZ(-360deg); }
+      @keyframes miniFlight {
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+        15% { opacity: 0.6; }
+        85% { opacity: 0.6; }
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
       }
       @keyframes loadingDots {
         0%, 20% { content: "."; }
@@ -354,126 +380,103 @@
         width: 24px;
         text-align: left;
       }
-    </style>
-    <!-- 3D Planet Scene -->
-    <div style="
-      position: relative;
-      width: 320px;
-      height: 240px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      perspective: 1000px;
-      transform-style: preserve-3d;
-    ">
-      <!-- Floor Shadow -->
-      <div style="
-        position: absolute;
-        bottom: 10px;
-        width: 140px;
-        height: 12px;
-        background: #D4E7F7;
-        border-radius: 50%;
-        filter: blur(2px);
-        animation: shadowPulse 2s ease-in-out infinite;
-      "></div>
-
-      <!-- Floating Group (containing planet & orbit) -->
-      <div style="
+      .meteor-container {
         position: relative;
-        width: 240px;
-        height: 240px;
+        width: 320px;
+        height: 120px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        transform-style: preserve-3d;
-        animation: planetFloat 2s ease-in-out infinite;
-      ">
-        <!-- Yellow Orbit Ring (Tilted) -->
-        <div style="
-          position: absolute;
-          width: 240px;
-          height: 240px;
-          border: 8px solid #FFC300;
-          border-radius: 50%;
-          transform: rotateX(75deg) rotateY(-10deg);
-          transform-style: preserve-3d;
-          box-sizing: border-box;
-        "></div>
+        justify-content: flex-end;
+        animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+        z-index: 10;
+      }
+      .meteor-head {
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle at 35% 35%, #FFF0F5 0%, #FFB6C1 25%, #FF5E97 60%, #9D1C7F 100%);
+        border-radius: 50%;
+        box-shadow: 
+          0 0 25px rgba(255, 94, 151, 0.9),
+          0 0 60px rgba(157, 28, 127, 0.6),
+          0 0 120px rgba(157, 28, 127, 0.4);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .meteor-crater {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 50%;
+        box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+      }
+      .meteor-crater-1 { width: 14px; height: 14px; top: 22px; left: 18px; }
+      .meteor-crater-2 { width: 20px; height: 20px; top: 32px; left: 32px; }
+      .meteor-crater-3 { width: 12px; height: 12px; top: 18px; left: 45px; }
+      .meteor-crater-4 { width: 10px; height: 10px; top: 48px; left: 20px; }
+      
+      .meteor-trail {
+        width: 600px;
+        height: 70px;
+        background: linear-gradient(to right, rgba(157, 28, 127, 0) 0%, rgba(157, 28, 127, 0.25) 35%, rgba(255, 94, 151, 0.75) 75%, rgba(255, 240, 245, 0.95) 100%);
+        border-radius: 40px 0 0 40px;
+        margin-right: -40px;
+        filter: blur(2px);
+      }
+      .mini-meteor {
+        position: absolute;
+        width: 160px;
+        height: 5px;
+        background: linear-gradient(to right, rgba(255, 182, 193, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
+        border-radius: 9999px;
+        opacity: 0.4;
+        filter: blur(1.5px);
+      }
+      .mini-1 {
+        top: 15%;
+        left: 10%;
+        animation: miniFlight 1.6s linear infinite;
+        animation-delay: 0.4s;
+      }
+      .mini-2 {
+        top: 75%;
+        left: 5%;
+        animation: miniFlight 1.9s linear infinite;
+        animation-delay: 0.9s;
+      }
+      .mini-3 {
+        top: 85%;
+        left: 50%;
+        animation: miniFlight 1.4s linear infinite;
+        animation-delay: 0.1s;
+      }
+    </style>
 
-        <!-- Orbiting Planet Path (Tilted identically) -->
-        <div style="
-          position: absolute;
-          width: 240px;
-          height: 240px;
-          transform-style: preserve-3d;
-          animation: orbitRotation 2s linear infinite;
-        ">
-          <!-- Orange Planet -->
-          <div style="
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle at 30% 30%, #FFAE42 0%, #FF6200 80%, #CC4E00 100%);
-            border-radius: 50%;
-            left: 50%;
-            top: 0;
-            margin-left: -15px;
-            margin-top: -15px;
-            transform: rotateX(-75deg);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-          "></div>
-        </div>
+    <!-- Space Background Mini Meteors -->
+    <div class="mini-meteor mini-1"></div>
+    <div class="mini-meteor mini-2"></div>
+    <div class="mini-meteor mini-3"></div>
 
-        <!-- Central Blue Planet (Sitting at Z=1 so front orbit is in front) -->
-        <div style="
-          position: absolute;
-          width: 120px;
-          height: 120px;
-          background: radial-gradient(circle at 35% 35%, #85CEFF 0%, #4BA0EA 65%, #2178C7 100%);
-          border-radius: 50%;
-          transform: translate3d(0, 0, 1px);
-          box-shadow: 0 10px 25px rgba(33, 120, 199, 0.25);
-          overflow: hidden;
-        ">
-          <!-- Dark blue crater 1 -->
-          <div style="
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #2581D7;
-            border-radius: 50%;
-            bottom: 25px;
-            left: 20px;
-            opacity: 0.6;
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.15);
-          "></div>
-          <!-- Dark blue crater 2 -->
-          <div style="
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #2581D7;
-            border-radius: 50%;
-            top: 35px;
-            right: 30px;
-            opacity: 0.5;
-            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
-          "></div>
-        </div>
+    <!-- Main Meteor Container -->
+    <div class="meteor-container">
+      <div class="meteor-trail"></div>
+      <div class="meteor-head">
+        <div class="meteor-crater meteor-crater-1"></div>
+        <div class="meteor-crater meteor-crater-2"></div>
+        <div class="meteor-crater meteor-crater-3"></div>
+        <div class="meteor-crater meteor-crater-4"></div>
       </div>
     </div>
 
-    <!-- Loading Text -->
-    <div style="margin-top: 30px; text-align: center;">
+    <!-- Glowing Loading Text -->
+    <div style="margin-top: 50px; text-align: center; z-index: 20;">
       <h2 style="
         font-size: 2.2rem;
-        font-weight: 600;
-        color: #007FFF;
-        font-family: 'Fredoka', sans-serif;
+        font-weight: 900;
+        color: #FFFFFF;
+        font-family: 'Chiron GoRound TC', sans-serif;
         margin: 0;
         letter-spacing: 1px;
-      ">Loading<span class="loading-dots"></span></h2>
+        text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
+      ">Bé đợi chút nhé<span class="loading-dots"></span></h2>
     </div>
   </div>
 
@@ -835,14 +838,14 @@
     </div>
 
     <!-- Left back button pointing to customizer -->
-    <a href="/character" class="nav-btn btn-left" title="Quay lại Tạo Nhân Vật" onclick="playPopAndNavigate('/character'); return false;">
+    <a href="/character.html" class="nav-btn btn-left" title="Quay lại Tạo Nhân Vật" onclick="playPopAndNavigate('/character.html'); return false;">
       <svg viewBox="0 0 24 24">
         <path d="M16 5v14l-11-7z" />
       </svg>
     </a>
 
-    <!-- Right placeholder button pointing to home -->
-    <a href="/" class="nav-btn btn-right" title="Quay lại Trang Chủ" onclick="playPopAndNavigate('/'); return false;">
+    <!-- Right next button pointing to feature-next -->
+    <a href="/character/feature-next" class="nav-btn btn-right" title="Tiếp tục" onclick="playPopAndNavigate('/character/feature-next'); return false;">
       <svg viewBox="0 0 24 24">
         <path d="M8 5v14l11-7z" />
       </svg>
