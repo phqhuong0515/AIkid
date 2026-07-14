@@ -32,31 +32,34 @@
       align-items: flex-end; /* Align the cat to the bottom */
     }
 
-    /* Back Button */
+    /* Back/Close Button */
     .back-btn {
       position: absolute;
-      left: 30px;
+      right: 30px;
       top: 30px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 3px solid #FFFFFF;
-      color: #1E293B;
-      padding: 10px 24px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      border-radius: 9999px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+      border: none;
+      color: #FFFFFF;
+      font-size: 1.5rem;
+      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s ease;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(255, 117, 151, 0.35);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       z-index: 100;
     }
 
     .back-btn:hover {
-      transform: translateY(-2px);
-      background: #FFFFFF;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 10px 25px rgba(255, 117, 151, 0.5);
+    }
+
+    .back-btn:active {
+      transform: scale(0.95);
     }
 
     /* Container for the cat */
@@ -410,8 +413,8 @@
 <body>
 
   <!-- Back to Lobby Button -->
-  <button class="back-btn" onclick="goBack()">
-    <i class="fa-solid fa-arrow-left"></i> Quay Lại
+  <button class="back-btn" onclick="goBack()" aria-label="Đóng">
+    <i class="fa-solid fa-xmark"></i>
   </button>
 
   <!-- Success Toast -->
