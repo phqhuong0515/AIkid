@@ -80,12 +80,12 @@ html {
 .auth-btn {
     font-family: 'Mali', sans-serif;
     font-weight: 800;
-    font-size: 1.38rem;
+    font-size: 1.52rem;
     color: #FFFFFF;
     background: linear-gradient(135deg, #FF5C8A, #FF8E53);
     border: none;
-    padding: 10px 36px;
-    height: 55px;
+    padding: 11px 40px;
+    height: 60px;
     border-radius: 9999px;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(255, 92, 138, 0.2);
