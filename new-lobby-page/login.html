@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Nhập - StoryMee</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: #4ba3e3; /* Sky blue background matching the reference */
+      font-family: 'Mali', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end; /* Align the monster to the bottom */
+    }
+
+    /* Back Button */
+    .back-btn {
+      position: absolute;
+      left: 30px;
+      top: 30px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 3px solid #FFFFFF;
+      color: #1E293B;
+      padding: 10px 24px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+      z-index: 100;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      background: #FFFFFF;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Container for the monster */
+    .login-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      bottom: -60px; /* Slight offset to crop the monster body at the bottom */
+    }
+
+    /* Monster Layout */
+    .monster {
+      position: relative;
+      width: 800px;
+      height: 580px;
+      background: #ffa114; /* Warm orange body */
+      border-radius: 400px 400px 0 0; /* Dome shape for head and body */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Monster Horns */
+    .horn {
+      position: absolute;
+      top: -15px;
+      width: 95px;
+      height: 95px;
+      background: #f06100; /* Darker orange sừng */
+      z-index: -1;
+      transition: transform 0.3s ease;
+    }
+
+    .horn.left {
+      left: 170px;
+      border-radius: 100% 0 0 0;
+      transform: rotate(-30deg) skewX(-10deg);
+    }
+
+    .horn.right {
+      right: 170px;
+      border-radius: 0 100% 0 0;
+      transform: rotate(30deg) skewX(10deg);
+    }
+
+    /* Hair tuft on top of head */
+    .hair-tuft {
+      position: absolute;
+      top: -16px;
+      display: flex;
+      gap: -4px;
+      z-index: 2;
+    }
+
+    .hair-tuft span {
+      width: 32px;
+      height: 32px;
+      background: #f06100;
+      border-radius: 50%;
+      display: inline-block;
+      margin: 0 -4px;
+    }
+
+    /* Eyes Container */
+    .eyes-container {
+      display: flex;
+      gap: 2px;
+      margin-top: 100px;
+      z-index: 5;
+    }
+
+    /* Eye */
+    .eye {
+      width: 68px;
+      height: 68px;
+      background: #FFFFFF;
+      border: 3.5px solid #e07f00; /* Thin orange border */
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Pupil */
+    .pupil {
+      width: 13px;
+      height: 13px;
+      background: #000000;
+      border-radius: 50%;
+      position: absolute;
+      transition: transform 0.05s linear;
+    }
+
+    /* Orange login wrapper container */
+    .login-form-wrapper {
+      position: relative;
+      margin-top: 55px;
+      width: 440px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* White card with thick orange border */
+    .login-card {
+      width: 100%;
+      background: #FFFFFF;
+      border: 15px solid #f06100; /* Extra thick border matching the reference */
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .input-group {
+      width: 100%;
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      height: 68px;
+      border: none;
+      outline: none;
+      padding: 0 28px;
+      font-family: 'Mali', sans-serif;
+      font-size: 1.48rem;
+      font-weight: 500;
+      color: #2D3748;
+      background: #FFFFFF;
+    }
+
+    /* Input placeholders */
+    .input-group input::placeholder {
+      color: #A0AEC0;
+      opacity: 1;
+    }
+
+    /* Grey divider between inputs */
+    .input-divider {
+      width: 100%;
+      height: 4px;
+      background: #E2E8F0;
+    }
+
+    /* Submit Button Area */
+    .submit-area {
+      position: relative;
+      margin-top: -12px; /* Pulls the button up to overlap with the card bottom border */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    /* Monster Hands holding the button */
+    .hand {
+      position: absolute;
+      width: 58px;
+      height: 52px;
+      background: #ffa114; /* Matches body color */
+      border-radius: 50%;
+      z-index: 15;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .hand.left {
+      left: 65px;
+    }
+
+    .hand.right {
+      right: 65px;
+    }
+
+    /* Custom go/Đăng Nhập button */
+    .login-btn {
+      min-width: 250px;
+      height: 66px;
+      background: #f06100; /* Solid dark orange matching reference */
+      border: none;
+      border-radius: 20px;
+      color: #FFFFFF;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 45px;
+      box-shadow: 0 6px 18px rgba(240, 97, 0, 0.3);
+      transition: all 0.2s ease;
+      z-index: 12;
+    }
+
+    .login-btn:hover {
+      background: #d65600;
+      transform: scale(1.02);
+      box-shadow: 0 8px 22px rgba(240, 97, 0, 0.4);
+    }
+
+    .login-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Success toast styling */
+    .success-toast {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #38A169;
+      color: #FFFFFF;
+      padding: 16px 36px;
+      border-radius: 20px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(56, 161, 105, 0.35);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .success-toast.show {
+      top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Back to Lobby Button -->
+  <button class="back-btn" onclick="goBack()">
+    <i class="fa-solid fa-arrow-left"></i> Quay Lại
+  </button>
+
+  <!-- Success Toast -->
+  <div id="success-toast" class="success-toast">
+    <i class="fa-solid fa-circle-check"></i> Đăng nhập thành công! Đang vào đảo...
+  </div>
+
+  <div class="login-container">
+    <form class="monster" onsubmit="handleLogin(event)">
+      <!-- Left & Right Horns behind body -->
+      <div class="horn left"></div>
+      <div class="horn right"></div>
+      
+      <!-- Top hair tuft -->
+      <div class="hair-tuft">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <!-- Eyes following mouse cursor -->
+      <div class="eyes-container">
+        <div class="eye">
+          <div class="pupil" id="pupil-left"></div>
+        </div>
+        <div class="eye">
+          <div class="pupil" id="pupil-right"></div>
+        </div>
+      </div>
+
+      <!-- White Login Card -->
+      <div class="login-form-wrapper">
+        <div class="login-card">
+          <div class="input-group">
+            <input type="email" id="email" placeholder="Email" required autocomplete="email">
+          </div>
+          <div class="input-divider"></div>
+          <div class="input-group">
+            <input type="password" id="password" placeholder="Mật khẩu" required autocomplete="current-password">
+          </div>
+        </div>
+
+        <!-- Overlapping button held by hands -->
+        <div class="submit-area">
+          <div class="hand left"></div>
+          <button type="submit" class="login-btn">đăng nhập</button>
+          <div class="hand right"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Eye tracking logic
+    const pupils = document.querySelectorAll('.pupil');
+    const eyes = document.querySelectorAll('.eye');
+
+    document.addEventListener('mousemove', (e) => {
+      eyes.forEach((eye, index) => {
+        const pupil = pupils[index];
+        const rect = eye.getBoundingClientRect();
+        
+        // Center coordinates of the eye
+        const eyeX = rect.left + rect.width / 2;
+        const eyeY = rect.top + rect.height / 2;
+        
+        // Distance to the mouse cursor
+        const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
+        
+        // Maximum offset for pupil movement (within the eye boundary)
+        const maxOffset = 14; 
+        
+        const offsetX = Math.cos(angle) * maxOffset;
+        const offsetY = Math.sin(angle) * maxOffset;
+        
+        pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      });
+    });
+
+    // Handle form submit
+    function handleLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (email && password) {
+        // Show success alert
+        const toast = document.getElementById('success-toast');
+        toast.classList.add('show');
+        
+        // Play pop sound if audio library exists
+        try {
+          const audio = new Audio('/assets/audio/pop.mp3');
+          audio.volume = 0.5;
+          audio.play();
+        } catch(e) {}
+
+        // Redirect back to lobby after 1.5s
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      }
+    }
+
+    // Go back with support for history or default back path
+    function goBack() {
+      if (document.referrer) {
+        window.history.back();
+      } else {
+        window.location.href = '/';
+      }
+    }
+  </script>
+</body>
+</html>
