@@ -21,9 +21,9 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    background: url('assets/images/bg-home.png') no-repeat center center;
-    background-size: cover;
-    background-attachment: fixed;
+    background: url('assets/images/bg-home.png') no-repeat center top;
+    background-size: 100% 100%;
+    background-attachment: scroll;
     position: relative;
 }
 
