@@ -275,7 +275,8 @@
                 header.style.top = `${38.04 * scale}px`;
             }
 
-            document.body.style.minHeight = `${wrapper.getBoundingClientRect().bottom}px`;
+            const wrapperHeight = targetHeight * scale;
+            document.body.style.minHeight = `${wrapperHeight}px`;
         }
 
         window.addEventListener('resize', adjustScale);
