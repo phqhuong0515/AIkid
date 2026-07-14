@@ -61,21 +61,21 @@
     /* Container for the cat */
     .login-container {
       width: 100%;
-      max-width: 700px;
+      max-width: 800px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
-      bottom: -60px; /* Slight offset to crop the cat body at the bottom */
+      bottom: -60px; /* Offset to crop the cat body at the bottom */
     }
 
-    /* Cat Body */
+    /* Giant Cat Body */
     .cat {
       position: relative;
-      width: 580px;
-      height: 600px;
+      width: 720px; /* Expanded width to match reference */
+      height: 680px; /* Tall and big */
       background: #FFFFFF; /* White body */
-      border-radius: 290px 290px 0 0; /* Dome shape for head/body */
+      border-radius: 360px 360px 0 0; /* Huge dome shape for head/body */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -85,86 +85,86 @@
     /* Cat Ears */
     .ear {
       position: absolute;
-      top: -35px;
-      width: 115px;
-      height: 115px;
+      top: -45px;
+      width: 140px;
+      height: 140px;
       z-index: -1;
     }
 
     .ear.left {
-      left: 35px;
+      left: 50px;
       background: #FFFFFF;
-      border-radius: 20px 90px 0 0;
+      border-radius: 25px 110px 0 0;
       transform: rotate(-12deg);
     }
 
     .ear.left .ear-inner {
       position: absolute;
-      top: 18px;
-      left: 18px;
-      width: 75px;
-      height: 75px;
-      background: #f06100; /* Orange inner ear */
-      border-radius: 10px 65px 0 0;
+      top: 22px;
+      left: 22px;
+      width: 90px;
+      height: 90px;
+      background: #f06100; /* Dark orange inner ear */
+      border-radius: 12px 80px 0 0;
     }
 
     .ear.right {
-      right: 35px;
-      background: #f08b18; /* Orange outer ear */
-      border-radius: 90px 20px 0 0;
+      right: 50px;
+      background: #f08b18; /* Yellow orange outer ear */
+      border-radius: 110px 25px 0 0;
       transform: rotate(12deg);
     }
 
     .ear.right .ear-inner {
       position: absolute;
-      top: 18px;
-      right: 18px;
-      width: 75px;
-      height: 75px;
+      top: 22px;
+      right: 22px;
+      width: 90px;
+      height: 90px;
       background: #f06100;
-      border-radius: 65px 10px 0 0;
+      border-radius: 80px 12px 0 0;
     }
 
-    /* Cat spots (Orange patch over the right eye/ear) */
+    /* Orange patch over right eye and ear */
     .cat-spot {
       position: absolute;
       top: 0;
       right: 0;
-      width: 250px;
-      height: 250px;
-      background: #f08b18; /* Vàng cam */
-      border-radius: 0 290px 0 100%;
+      width: 320px;
+      height: 320px;
+      background: #f08b18;
+      border-radius: 0 360px 0 100%;
       z-index: 1;
     }
 
-    /* Happy Happy Curved Eyes (^) */
+    /* Curved Happy Eyes (^) */
     .eyes-container {
       display: flex;
       justify-content: space-between;
-      width: 320px;
+      width: 400px;
       position: absolute;
-      top: 135px;
+      top: 155px;
       z-index: 3;
     }
 
     .eye-happy {
-      width: 48px;
-      height: 24px;
-      border: 5px solid #d64900; /* Dark orange eye line */
+      width: 60px;
+      height: 30px;
+      border: 6.5px solid #d64900; /* Thick dark orange eye stroke */
       border-bottom: none;
       border-left: none;
       border-right: none;
-      border-radius: 40px 40px 0 0 / 40px 40px 0 0; /* Curve up */
+      border-radius: 50px 50px 0 0 / 50px 50px 0 0; /* Arc shape */
     }
 
     /* Nose */
     .cat-nose {
       position: absolute;
-      top: 182px;
+      top: 212px;
       left: 50%;
       transform: translateX(-50%);
-      width: 26px;
-      height: 16px;
+      width: 32px;
+      height: 20px;
       background: #d64900;
       clip-path: polygon(0 0, 100% 0, 50% 100%);
       z-index: 3;
@@ -173,89 +173,99 @@
     .cat-nose::after {
       content: "";
       position: absolute;
-      top: 15px;
-      left: 11px;
-      width: 4px;
-      height: 18px;
+      top: 19px;
+      left: 14px;
+      width: 4.5px;
+      height: 24px;
       background: #d64900;
     }
 
-    /* Big Mouth eating the card */
+    /* Giant Mouth eating card */
     .cat-mouth {
       position: absolute;
-      top: 215px;
+      top: 252px;
       left: 50%;
       transform: translateX(-50%);
-      width: 380px;
-      height: 220px;
-      background: #e64a19; /* Big dark orange/red mouth */
+      width: 480px; /* Extra large mouth */
+      height: 270px;
+      background: #e64a19; /* Red-orange inner mouth */
       border-radius: 50% 50% 46% 46%;
       overflow: hidden;
       z-index: 2;
-      box-shadow: inset 0 10px 20px rgba(0,0,0,0.15);
+      box-shadow: inset 0 12px 24px rgba(0,0,0,0.18);
     }
 
-    /* Fangs */
+    /* Double fangs */
     .fang {
       position: absolute;
       top: -2px;
-      width: 22px;
-      height: 25px;
+      width: 26px;
+      height: 32px;
       background: #FFFFFF;
       clip-path: polygon(0 0, 100% 0, 50% 100%);
     }
 
     .fang.left {
-      left: 80px;
+      left: 105px;
     }
 
     .fang.right {
-      right: 80px;
+      right: 105px;
     }
 
-    /* Tongue */
+    /* Custom Double-Lobe Tongue shape */
     .cat-tongue {
       position: absolute;
       bottom: -15px;
       left: 50%;
       transform: translateX(-50%);
-      width: 170px;
-      height: 85px;
-      background: #b71c1c; /* Tongue red */
-      border-radius: 85px 85px 0 0;
+      width: 220px;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .tongue-lobe {
+      width: 125px;
+      height: 125px;
+      background: #f06100; /* Brighter orange tongue */
+      border-radius: 50%;
+      margin: 0 -12px;
+      box-shadow: inset 0 5px 10px rgba(0,0,0,0.05);
     }
 
     .cat-throat {
       position: absolute;
-      top: 25px;
+      top: 30px;
       left: 50%;
       transform: translateX(-50%);
-      width: 70px;
-      height: 40px;
+      width: 90px;
+      height: 50px;
       background: #880e4f;
       border-radius: 50%;
-      opacity: 0.45;
+      opacity: 0.4;
     }
 
-    /* Login Form Wrapper overlapping the mouth */
+    /* Login Form Wrapper overlapping mouth */
     .login-form-wrapper {
       position: relative;
-      margin-top: 255px; /* Overlap mouth precisely */
-      width: 326px;
+      margin-top: 310px; /* Shifted down to overlap mouth precisely */
+      width: 390px;
       z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* White login card with thin border */
+    /* White card with thin border */
     .login-card {
       width: 100%;
       background: #FFFFFF;
       border: 2px solid #E2E8F0;
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
     .input-group {
@@ -265,24 +275,22 @@
 
     .input-group input {
       width: 100%;
-      height: 60px;
+      height: 68px;
       border: none;
       outline: none;
-      padding: 0 24px;
+      padding: 0 26px;
       font-family: 'Mali', sans-serif;
-      font-size: 1.25rem;
+      font-size: 1.45rem;
       font-weight: 500;
       color: #2D3748;
       background: #FFFFFF;
     }
 
-    /* Input placeholders */
     .input-group input::placeholder {
       color: #A0AEC0;
       opacity: 1;
     }
 
-    /* Grey divider */
     .input-divider {
       width: 100%;
       height: 2px;
@@ -292,51 +300,73 @@
     /* Submit Button Area */
     .submit-area {
       position: relative;
-      margin-top: -15px; /* Overlap card bottom */
+      margin-top: -15px;
       display: flex;
       align-items: center;
       justify-content: center;
       width: 100%;
     }
 
-    /* Cat Arms holding the button */
+    /* Cat Arms with detailed rounded fingers holding button */
     .hand {
       position: absolute;
-      width: 110px;
-      height: 52px;
-      background: #f08b18; /* Orange arms */
+      background: #f08b18; /* Yellow orange arms */
       z-index: 15;
-      top: 50%;
-      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
     }
 
     .hand.left {
-      left: -50px;
-      border-radius: 0 26px 26px 0;
+      left: -60px;
+      width: 200px;
+      height: 75px;
+      border-radius: 0 35px 35px 0;
+      top: 50%;
+      transform: translateY(-50%) rotate(12deg);
+      transform-origin: left center;
+      justify-content: flex-end;
+      padding-right: 15px;
     }
 
     .hand.right {
-      right: -50px;
-      border-radius: 26px 0 0 26px;
+      right: -60px;
+      width: 200px;
+      height: 75px;
+      border-radius: 35px 0 0 35px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-12deg);
+      transform-origin: right center;
+      justify-content: flex-start;
+      padding-left: 15px;
+    }
+
+    /* Detailed rounded fingers */
+    .finger {
+      width: 26px;
+      height: 26px;
+      background: #f08b18;
+      border-radius: 50%;
+      margin: 0 -2.5px;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
     }
 
     /* Custom go/Đăng Nhập button */
     .login-btn {
-      min-width: 200px;
-      height: 58px;
+      min-width: 250px;
+      height: 68px;
       background: #e64a19; /* Solid red orange button */
       border: none;
       border-radius: 18px;
       color: #FFFFFF;
       font-family: 'Mali', sans-serif;
       font-weight: 700;
-      font-size: 1.45rem;
+      font-size: 1.6rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 35px;
-      box-shadow: 0 6px 15px rgba(230, 74, 25, 0.25);
+      padding: 0 45px;
+      box-shadow: 0 6px 18px rgba(230, 74, 25, 0.25);
       transition: all 0.2s ease;
       z-index: 12;
     }
@@ -344,7 +374,7 @@
     .login-btn:hover {
       background: #d84315;
       transform: scale(1.02);
-      box-shadow: 0 8px 20px rgba(230, 74, 25, 0.35);
+      box-shadow: 0 8px 22px rgba(230, 74, 25, 0.35);
     }
 
     .login-btn:active {
@@ -417,8 +447,11 @@
         <!-- Fangs -->
         <div class="fang left"></div>
         <div class="fang right"></div>
-        <!-- Tongue -->
-        <div class="cat-tongue"></div>
+        <!-- Tongue with double-lobe -->
+        <div class="cat-tongue">
+          <div class="tongue-lobe"></div>
+          <div class="tongue-lobe"></div>
+        </div>
       </div>
 
       <!-- Login Card -->
@@ -433,11 +466,21 @@
           </div>
         </div>
 
-        <!-- Submit Button held by cat arms -->
+        <!-- Submit Button held by cat arms with fingers -->
         <div class="submit-area">
-          <div class="hand left"></div>
+          <!-- Left hand with 3 fingers -->
+          <div class="hand left">
+            <div class="finger"></div>
+            <div class="finger"></div>
+            <div class="finger"></div>
+          </div>
           <button type="submit" class="login-btn">đăng nhập</button>
-          <div class="hand right"></div>
+          <!-- Right hand with 3 fingers -->
+          <div class="hand right">
+            <div class="finger"></div>
+            <div class="finger"></div>
+            <div class="finger"></div>
+          </div>
         </div>
       </div>
     </form>
