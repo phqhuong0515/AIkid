@@ -954,6 +954,7 @@
             const val = option.getAttribute('data-value');
             selectedValueSpan.textContent = val;
             selectedValueSpan.style.color = '#BCA695';
+            localStorage.setItem('storymee_char_gender', val);
 
             // Toggle selected class
             options.forEach(opt => opt.classList.remove('selected'));
@@ -962,6 +963,20 @@
             dropdownOptions.style.display = 'none';
           });
         });
+
+        // Load initial gender
+        const savedGender = localStorage.getItem('storymee_char_gender');
+        if (savedGender) {
+          selectedValueSpan.textContent = savedGender;
+          selectedValueSpan.style.color = '#BCA695';
+          options.forEach(opt => {
+            if (opt.getAttribute('data-value') === savedGender) {
+              opt.classList.add('selected');
+            } else {
+              opt.classList.remove('selected');
+            }
+          });
+        }
 
         // Close dropdown when clicking outside
         document.addEventListener('click', () => {
@@ -1183,8 +1198,9 @@
         });
       }
 
-      // Auto-save name and species to localStorage to sync with character creator prompt
+      // Auto-save name, age, gender, species to localStorage to sync with character creator prompt
       const speciesInput = document.getElementById('species-input');
+      const ageInput = document.getElementById('age-input');
       
       // Load existing values from localStorage if available
       if (nameInput) {
@@ -1193,6 +1209,14 @@
         
         nameInput.addEventListener('input', () => {
           localStorage.setItem('storymee_char_name', nameInput.value.trim());
+        });
+      }
+      if (ageInput) {
+        const savedAge = localStorage.getItem('storymee_char_age');
+        if (savedAge) ageInput.value = savedAge;
+        
+        ageInput.addEventListener('input', () => {
+          localStorage.setItem('storymee_char_age', ageInput.value.trim());
         });
       }
       if (speciesInput) {
