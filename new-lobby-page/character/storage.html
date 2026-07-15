@@ -137,6 +137,7 @@
       line-height: 1;
       height: 64px; /* Lock height to match .panel-header for identical vertical alignment */
       box-sizing: border-box;
+      transform: translateY(-4px); /* Shift panel titles up by 4px */
     }
 
     .panel-title span {
@@ -301,6 +302,7 @@
       align-items: center;
       margin-bottom: 0;
       gap: 12px;
+      transform: translateY(-4px); /* Shift the entire filter bar block up by 4px */
     }
 
     .search-box {
@@ -309,8 +311,14 @@
       background: #FFFFFF;
       border: 2px solid #EBDCD0;
       border-radius: 9999px;
-      padding: 6px 16px;
-      width: 250px;
+      padding: 0 20px;
+      width: 280px;
+      height: 46px;
+      box-sizing: border-box;
+    }
+
+    .search-box i {
+      font-size: 1.1rem;
     }
 
     .search-box input {
@@ -318,37 +326,65 @@
       background: transparent;
       outline: none;
       font-family: 'Mali', sans-serif;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       width: 100%;
-      margin-left: 8px;
+      margin-left: 10px;
       color: #4A5568;
     }
 
-    .tabs {
+    .filter-select-wrapper {
+      position: relative;
       display: flex;
-      gap: 8px;
+      align-items: center;
       background: #F0E6DF;
-      padding: 6px;
       border-radius: 9999px;
+      padding: 0 20px;
+      height: 46px;
+      cursor: pointer;
+      box-sizing: border-box;
+      min-width: 185px;
     }
 
-    .tab-item {
+    .filter-select-wrapper span.label {
       font-family: 'Mali', sans-serif;
       font-weight: 700;
-      font-size: 0.9rem;
-      padding: 6px 16px;
-      border-radius: 9999px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: #718096;
-      transition: all 0.2s ease;
+      font-size: 1.1rem;
+      color: #FF5E97;
+      margin-right: 8px;
+      white-space: nowrap;
     }
 
-    .tab-item.active {
-      background: #FFFFFF;
-      color: #FF5E97;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    .filter-select-wrapper select {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #718096;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: 100%;
+      padding-right: 25px;
+      height: 100%;
+    }
+
+    .filter-select-wrapper select option {
+      background: #FDFAF4;
+      color: #4A5568;
+      font-family: 'Mali', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .filter-select-wrapper .dropdown-icon {
+      position: absolute;
+      right: 20px;
+      font-size: 1.0rem;
+      color: #718096;
+      pointer-events: none;
     }
 
     .grid-container {
@@ -414,7 +450,7 @@
 
     /* Dash Add New Card */
     .add-new-card {
-      border: 4px dashed #CBD5E0;
+      border: 4px dashed #C8B5A7;
       background: transparent;
       justify-content: center;
       box-shadow: none;
@@ -425,7 +461,7 @@
     }
     .add-new-card i {
       font-size: 3rem;
-      color: #A0AEC0;
+      color: #C8B5A7;
       transition: color 0.2s ease;
     }
     .add-new-card:hover i {
@@ -874,10 +910,14 @@
             
             <!-- Filters -->
             <div class="filter-bar">
-              <div class="tabs">
-                <button class="tab-item active" onclick="filterType('all', this)">Tất cả</button>
-                <button class="tab-item" onclick="filterType('user', this)">Bé tạo</button>
-                <button class="tab-item" onclick="filterType('demo', this)">Mẫu</button>
+              <div class="filter-select-wrapper">
+                <span class="label">Bộ lọc:</span>
+                <select id="sort-select" onchange="handleSortChange(this.value)">
+                  <option value="newest">Mới nhất</option>
+                  <option value="oldest">Cũ nhất</option>
+                  <option value="az">A-Z</option>
+                </select>
+                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
               </div>
 
               <div class="search-box">
@@ -1045,28 +1085,64 @@
     // --- CHARACTER DATABASE & RENDERING ---
     let characters = [];
     let selectedId = null;
-    let currentFilterType = 'all';
+    let currentSortType = 'newest';
     let currentSearchQuery = '';
     let tempUploadImageBase64 = '';
 
+    function getCharacterTimestamp(c) {
+      if (c.createdAt) return c.createdAt;
+      if (c.id && c.id.startsWith('user-')) {
+        const ts = parseInt(c.id.split('-')[1]);
+        if (!isNaN(ts)) return ts;
+      }
+      return 0;
+    }
+
     // Initialize list with seed characters or localStorage
     function initDatabase() {
-      // Clear data once to remove default seeded characters
-      const cleared = localStorage.getItem('storymee_storage_cleared_v2');
+      const defaultSeeds = [
+        {
+          id: 'seed-yuu',
+          name: 'Yuu',
+          species: 'Bé tự tạo',
+          avatar: '/mee/PNG/storage-test-yuu.jpeg',
+          type: 'demo',
+          createdAt: 1784100000000,
+          date: '15/07/2026'
+        },
+        {
+          id: 'seed-nori',
+          name: 'Nori',
+          species: 'Bé tự tạo',
+          avatar: '/mee/PNG/storage-test-nori.jpeg',
+          type: 'demo',
+          createdAt: 1784100000001,
+          date: '15/07/2026'
+        }
+      ];
+
+      // Clear data once to populate the new examples
+      const cleared = localStorage.getItem('storymee_storage_cleared_v6');
       if (!cleared) {
-        localStorage.setItem('storymee_saved_characters', JSON.stringify([]));
-        localStorage.setItem('storymee_storage_cleared_v2', 'true');
+        localStorage.setItem('storymee_saved_characters', JSON.stringify(defaultSeeds));
+        localStorage.setItem('storymee_storage_cleared_v6', 'true');
       }
 
       const saved = localStorage.getItem('storymee_saved_characters');
       if (saved) {
         characters = JSON.parse(saved);
+        if (characters.length === 0) {
+          characters = [...defaultSeeds];
+          localStorage.setItem('storymee_saved_characters', JSON.stringify(characters));
+        }
       } else {
-        characters = [];
+        characters = [...defaultSeeds];
+        localStorage.setItem('storymee_saved_characters', JSON.stringify(characters));
       }
 
       // Set initial selected character
       if (characters.length > 0) {
+        characters.sort((a, b) => getCharacterTimestamp(b) - getCharacterTimestamp(a));
         selectedId = characters[0].id;
       } else {
         selectedId = null;
@@ -1086,8 +1162,7 @@
       const addCard = document.createElement('div');
       addCard.className = 'char-card add-new-card';
       addCard.onclick = () => {
-        playPopSound();
-        openAddModal();
+        playPopAndNavigate('/character-generate');
       };
       addCard.innerHTML = `
         <i class="fa-solid fa-circle-plus"></i>
@@ -1096,11 +1171,17 @@
 
       // Filter and render list
       const filtered = characters.filter(c => {
-        const matchesType = (currentFilterType === 'all') || (c.type === currentFilterType);
-        const matchesSearch = c.name.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
-                              c.species.toLowerCase().includes(currentSearchQuery.toLowerCase());
-        return matchesType && matchesSearch;
+        return c.name.toLowerCase().includes(currentSearchQuery.toLowerCase());
       });
+
+      // Sort characters
+      if (currentSortType === 'newest') {
+        filtered.sort((a, b) => getCharacterTimestamp(b) - getCharacterTimestamp(a));
+      } else if (currentSortType === 'oldest') {
+        filtered.sort((a, b) => getCharacterTimestamp(a) - getCharacterTimestamp(b));
+      } else if (currentSortType === 'az') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name, 'vi', { sensitivity: 'base' }));
+      }
 
       filtered.forEach(c => {
         const card = document.createElement('div');
@@ -1139,25 +1220,7 @@
     function selectCharacter(id) {
       playPopSound();
       selectedId = id;
-      
-      // Update active state in grid cards
-      const cards = document.querySelectorAll('.char-card:not(.add-new-card)');
-      const filtered = characters.filter(c => {
-        const matchesType = (currentFilterType === 'all') || (c.type === currentFilterType);
-        const matchesSearch = c.name.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
-                              c.species.toLowerCase().includes(currentSearchQuery.toLowerCase());
-        return matchesType && matchesSearch;
-      });
-
-      let selectedIndexInFiltered = filtered.findIndex(c => c.id === id);
-      cards.forEach((card, idx) => {
-        if (idx === selectedIndexInFiltered) {
-          card.classList.add('active');
-        } else {
-          card.classList.remove('active');
-        }
-      });
-
+      renderGrid();
       renderDetail();
     }
 
@@ -1239,15 +1302,9 @@
     }
 
     // Filters and search logic
-    function filterType(type, element) {
+    function handleSortChange(value) {
       playPopSound();
-      currentFilterType = type;
-      
-      // Update tab active states
-      const tabItems = document.querySelectorAll('.tab-item');
-      tabItems.forEach(item => item.classList.remove('active'));
-      element.classList.add('active');
-
+      currentSortType = value;
       renderGrid();
     }
 
@@ -1333,6 +1390,7 @@
         species: 'Bé tự tạo',
         avatar: tempUploadImageBase64,
         type: 'user',
+        createdAt: Date.now(),
         date: new Date().toLocaleDateString('vi-VN')
       };
 
