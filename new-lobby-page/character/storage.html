@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kho Nhân Vật - AIkid</title>
-  
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@400;500;600;700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@400;500;600;700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;600;800&display=swap"
+    rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
-  
+
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <!-- Link to common universe styles -->
   <link rel="stylesheet" href="/mee/styles.css">
 
   <style>
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       width: 100%;
@@ -51,7 +55,7 @@
       align-items: center;
     }
 
-    .scaler-wrapper > * {
+    .scaler-wrapper>* {
       pointer-events: auto;
     }
 
@@ -71,19 +75,18 @@
     .workspace-wrapper {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      width: 1851.63px;
-      max-width: 1851.63px;
-      margin-top: 220px; /* Space for navbar, pushed down by 70px total */
+      align-items: center;
+      width: 94%;
+      max-width: 1512px;
+      margin-top: 220px;
+      /* Space for navbar, pushed down by 70px total */
       gap: 16px;
       box-sizing: border-box;
-      align-self: flex-start;
-      margin-left: 38px;
     }
 
     .workspace-container {
       display: flex;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: stretch;
       gap: 40px;
       width: 100%;
@@ -96,7 +99,8 @@
       height: 680px;
       background: #FDFAF4;
       border-radius: 36px;
-      padding: 12px 28px 28px 28px; /* Top padding 12px to match reference vertical centering */
+      padding: 12px 28px 28px 28px;
+      /* Top padding 12px to match reference vertical centering */
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -123,7 +127,8 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      height: 64px; /* Shift dashed cut line down by an additional 10px total relative to 54px */
+      height: 64px;
+      /* Shift dashed cut line down by an additional 10px total relative to 54px */
       border-bottom: 2px dashed #EBDCD0;
       box-sizing: border-box;
     }
@@ -137,13 +142,16 @@
       font-weight: 900;
       color: #475569;
       line-height: 1;
-      height: 64px; /* Lock height to match .panel-header for identical vertical alignment */
+      height: 64px;
+      /* Lock height to match .panel-header for identical vertical alignment */
       box-sizing: border-box;
-      transform: translateY(-4px); /* Shift panel titles up by 4px */
+      transform: translateY(-4px);
+      /* Shift panel titles up by 4px */
     }
 
     .panel-title span {
-      transform: translateY(1.5px); /* Fine-tune baseline alignment for round font */
+      transform: translateY(1.5px);
+      /* Fine-tune baseline alignment for round font */
     }
 
     .panel-title i {
@@ -155,7 +163,7 @@
     .detail-container {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
       height: 100%;
       gap: 20px;
@@ -179,7 +187,8 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 12%; /* Portrait chest-up focus */
+      object-position: center 12%;
+      /* Portrait chest-up focus */
     }
 
     #detail-char-name {
@@ -187,7 +196,7 @@
       font-weight: 900;
       font-size: 1.8rem;
       color: #4A5568;
-      text-align: center;
+      text-align: left;
       text-transform: uppercase;
       margin-top: 10px;
       width: 100%;
@@ -276,6 +285,7 @@
     .btn-download {
       background: linear-gradient(135deg, #ff9eb5, #ff7597);
     }
+
     .btn-download:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 15px rgba(255, 117, 151, 0.3);
@@ -284,6 +294,7 @@
     .btn-edit {
       background: linear-gradient(135deg, #68D391, #48BB78);
     }
+
     .btn-edit:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 15px rgba(72, 187, 120, 0.3);
@@ -292,6 +303,7 @@
     .btn-delete {
       background: linear-gradient(135deg, #FC8181, #E53E3E);
     }
+
     .btn-delete:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 15px rgba(229, 62, 62, 0.3);
@@ -304,7 +316,8 @@
       align-items: center;
       margin-bottom: 0;
       gap: 12px;
-      transform: translateY(-4px); /* Shift the entire filter bar block up by 4px */
+      transform: translateY(-4px);
+      /* Shift the entire filter bar block up by 4px */
     }
 
     .search-box {
@@ -400,9 +413,11 @@
     .grid-container::-webkit-scrollbar {
       width: 8px;
     }
+
     .grid-container::-webkit-scrollbar-track {
       background: transparent;
     }
+
     .grid-container::-webkit-scrollbar-thumb {
       background: #E2E8F0;
       border-radius: 9999px;
@@ -446,7 +461,8 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 12%; /* Portrait chest-up focus */
+      object-position: center 12%;
+      /* Portrait chest-up focus */
       display: block;
     }
 
@@ -457,15 +473,18 @@
       justify-content: center;
       box-shadow: none;
     }
+
     .add-new-card:hover {
       border-color: #FF5E97;
       background: rgba(255, 94, 151, 0.03);
     }
+
     .add-new-card i {
       font-size: 3rem;
       color: #C8B5A7;
       transition: color 0.2s ease;
     }
+
     .add-new-card:hover i {
       color: #FF5E97;
     }
@@ -540,6 +559,7 @@
       color: #A0AEC0;
       transition: color 0.2s ease;
     }
+
     .modal-close-btn:hover {
       color: #E53E3E;
     }
@@ -569,6 +589,7 @@
       color: #A0AEC0;
       margin-bottom: 6px;
     }
+
     .upload-area:hover i {
       color: #FF5E97;
     }
@@ -678,12 +699,14 @@
       pointer-events: none;
       z-index: 100;
     }
+
     .save-toast.show {
       opacity: 1;
       transform: translateY(0);
     }
   </style>
 </head>
+
 <body>
 
   <!-- Global Meteor Loading Overlay -->
@@ -696,9 +719,9 @@
         width: 100vw;
         height: 100vh;
         background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
-        background-image: 
-          radial-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.1) 2px, transparent 40px),
-          radial-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.05) 1px, transparent 30px),
+        background-image:
+          radial-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1) 2px, transparent 40px),
+          radial-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05) 1px, transparent 30px),
           linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
         background-size: 550px 550px, 350px 350px, 100% 100%;
         background-position: 0 0, 40px 60px, 0 0;
@@ -712,23 +735,64 @@
         pointer-events: all;
         overflow: hidden;
       }
+
       @keyframes meteorFlight {
-        0% { transform: translate(60vw, -60vh) rotate(150deg); opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { transform: translate(-60vw, 60vh) rotate(150deg); opacity: 0; }
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        90% {
+          opacity: 1;
+        }
+
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
       }
+
       @keyframes miniFlight {
-        0% { transform: translate(60vw, -60vh) rotate(150deg); opacity: 0; }
-        15% { opacity: 0.6; }
-        85% { opacity: 0.6; }
-        100% { transform: translate(-60vw, 60vh) rotate(150deg); opacity: 0; }
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+
+        15% {
+          opacity: 0.6;
+        }
+
+        85% {
+          opacity: 0.6;
+        }
+
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
       }
+
       @keyframes loadingDots {
-        0%, 20% { content: "."; }
-        40% { content: ".."; }
-        60%, 100% { content: "..."; }
+
+        0%,
+        20% {
+          content: ".";
+        }
+
+        40% {
+          content: "..";
+        }
+
+        60%,
+        100% {
+          content: "...";
+        }
       }
+
       .loading-dots::after {
         content: "";
         animation: loadingDots 1.5s infinite steps(1);
@@ -736,6 +800,7 @@
         width: 24px;
         text-align: left;
       }
+
       .meteor-container {
         position: relative;
         width: 320px;
@@ -746,6 +811,7 @@
         animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
         z-index: 10;
       }
+
       .meteor-head {
         width: 80px;
         height: 80px;
@@ -755,16 +821,42 @@
         position: relative;
         flex-shrink: 0;
       }
+
       .meteor-crater {
         position: absolute;
         background: rgba(0, 0, 0, 0.08);
         border-radius: 50%;
-        box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+        box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.15);
       }
-      .meteor-crater-1 { width: 14px; height: 14px; top: 22px; left: 18px; }
-      .meteor-crater-2 { width: 20px; height: 20px; top: 32px; left: 32px; }
-      .meteor-crater-3 { width: 12px; height: 12px; top: 18px; left: 45px; }
-      .meteor-crater-4 { width: 10px; height: 10px; top: 48px; left: 20px; }
+
+      .meteor-crater-1 {
+        width: 14px;
+        height: 14px;
+        top: 22px;
+        left: 18px;
+      }
+
+      .meteor-crater-2 {
+        width: 20px;
+        height: 20px;
+        top: 32px;
+        left: 32px;
+      }
+
+      .meteor-crater-3 {
+        width: 12px;
+        height: 12px;
+        top: 18px;
+        left: 45px;
+      }
+
+      .meteor-crater-4 {
+        width: 10px;
+        height: 10px;
+        top: 48px;
+        left: 20px;
+      }
+
       .meteor-trail {
         width: 600px;
         height: 70px;
@@ -773,6 +865,7 @@
         margin-right: -40px;
         filter: blur(2px);
       }
+
       .mini-meteor {
         position: absolute;
         width: 160px;
@@ -783,9 +876,27 @@
         filter: blur(1.5px);
         transform: rotate(150deg);
       }
-      .mini-1 { top: 25%; left: 15%; animation: miniFlight 1.6s linear infinite; animation-delay: 0.4s; }
-      .mini-2 { top: 75%; left: 5%; animation: miniFlight 1.9s linear infinite; animation-delay: 0.9s; }
-      .mini-3 { top: 85%; left: 50%; animation: miniFlight 1.4s linear infinite; animation-delay: 0.1s; }
+
+      .mini-1 {
+        top: 25%;
+        left: 15%;
+        animation: miniFlight 1.6s linear infinite;
+        animation-delay: 0.4s;
+      }
+
+      .mini-2 {
+        top: 75%;
+        left: 5%;
+        animation: miniFlight 1.9s linear infinite;
+        animation-delay: 0.9s;
+      }
+
+      .mini-3 {
+        top: 85%;
+        left: 50%;
+        animation: miniFlight 1.4s linear infinite;
+        animation-delay: 0.1s;
+      }
     </style>
     <div class="mini-meteor mini-1"></div>
     <div class="mini-meteor mini-2"></div>
@@ -808,7 +919,9 @@
         margin: 0;
         letter-spacing: 1px;
         text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
-      ">Bé <span style="position: relative; display: inline-block;">d<span style="position: absolute; width: 0.46em; height: 0.12em; background: currentColor; border-radius: 9999px; top: 0.32em; left: 0.27em;"></span></span>ợi chút nhé<span class="loading-dots"></span></h2>
+      ">Bé <span style="position: relative; display: inline-block;">d<span
+            style="position: absolute; width: 0.46em; height: 0.12em; background: currentColor; border-radius: 9999px; top: 0.32em; left: 0.27em;"></span></span>ợi
+        chút nhé<span class="loading-dots"></span></h2>
     </div>
   </div>
 
@@ -854,7 +967,7 @@
     <!-- Main Workspace -->
     <div class="workspace-wrapper">
       <div class="workspace-container">
-        
+
         <!-- Left Panel: Detail -->
         <div class="workspace-panel panel-detail" style="position: relative;">
           <!-- Save Toast Alert -->
@@ -869,8 +982,10 @@
             <h3>Xóa Nhân Vật</h3>
             <p>Bé có chắc chắn muốn chia tay bạn nhân vật này không? Hành động này không thể hoàn tác nhé!</p>
             <div class="detail-actions" style="margin-top: 15px;">
-              <button class="btn-action btn-delete" onclick="confirmDeleteCharacter()" style="flex: 1;">Chắc chắn xóa</button>
-              <button class="btn-action" onclick="closeDeleteConfirm()" style="background: #A0AEC0; flex: 1;">Giữ lại</button>
+              <button class="btn-action btn-delete" onclick="confirmDeleteCharacter()" style="flex: 1;">Chắc chắn
+                xóa</button>
+              <button class="btn-action" onclick="closeDeleteConfirm()" style="background: #A0AEC0; flex: 1;">Giữ
+                lại</button>
             </div>
           </div>
 
@@ -907,9 +1022,9 @@
           <div class="panel-header">
             <div class="panel-title">
               <i class="fa-solid fa-images"></i>
-              <span>ALBUM NHÂN VẬT</span>
+              <span>Album Nhân Vật Của Bé</span>
             </div>
-            
+
             <!-- Filters -->
             <div class="filter-bar">
               <div class="filter-select-wrapper">
@@ -968,7 +1083,8 @@
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
-          <input type="file" id="modal-file-input" style="display: none;" accept="image/*" onchange="handleModalFileChange(event)">
+          <input type="file" id="modal-file-input" style="display: none;" accept="image/*"
+            onchange="handleModalFileChange(event)">
         </div>
       </div>
 
@@ -1048,12 +1164,12 @@
     function adjustScale() {
       const wrapper = document.querySelector('.scaler-wrapper');
       if (!wrapper) return;
-      
+
       const targetWidth = 1927.63;
       const targetHeight = 930;
       const winWidth = window.innerWidth;
       const winHeight = window.innerHeight;
-      
+
       const scale = Math.min(winWidth / targetWidth, winHeight / targetHeight);
       wrapper.style.transform = `translateX(-50%) scale(${scale})`;
     }
@@ -1189,7 +1305,7 @@
         const card = document.createElement('div');
         card.className = `char-card ${c.id === selectedId ? 'active' : ''}`;
         card.onclick = () => selectCharacter(c.id);
-        
+
         card.innerHTML = `
           <img src="${c.avatar}" alt="${c.name}">
         `;
@@ -1201,7 +1317,7 @@
       const char = characters.find(c => c.id === selectedId);
       const detailContainer = document.querySelector('.detail-container');
       const emptyPlaceholder = document.getElementById('detail-empty-placeholder');
-      
+
       if (!char) {
         // Fallback if no characters exist
         if (detailContainer) detailContainer.style.display = 'none';
@@ -1227,7 +1343,7 @@
     }
 
     // --- INTERACTIVE ACTIONS ---
-    
+
     // Save details modifications
     function saveCurrentCharacterDetails() {
       playPopSound();
@@ -1245,7 +1361,7 @@
 
       saveToLocalStorage();
       renderGrid();
-      
+
       // Show check toast
       const toast = document.getElementById('save-toast');
       if (toast) {
@@ -1289,14 +1405,14 @@
       if (index !== -1) {
         characters.splice(index, 1);
         saveToLocalStorage();
-        
+
         // Select next character if possible
         if (characters.length > 0) {
           selectedId = characters[0].id;
         } else {
           selectedId = null;
         }
-        
+
         closeDeleteConfirm();
         renderGrid();
         renderDetail();
@@ -1348,11 +1464,11 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         tempUploadImageBase64 = e.target.result;
-        
+
         document.getElementById('upload-placeholder').style.display = 'none';
-        
+
         const previewBox = document.getElementById('upload-preview-box');
         const previewImg = document.getElementById('upload-preview-img');
         previewBox.style.display = 'flex';
@@ -1375,7 +1491,7 @@
     function saveNewCharacter() {
       playPopSound();
       const newName = document.getElementById('new-name-input').value.trim();
-      
+
       if (!tempUploadImageBase64) {
         alert('Bé ơi hãy chọn hình ảnh cho bạn nhân vật mới nhé!');
         return;
@@ -1399,7 +1515,7 @@
       characters.unshift(newChar);
       selectedId = newChar.id;
       saveToLocalStorage();
-      
+
       closeAddModal(null);
       renderGrid();
       renderDetail();
@@ -1411,4 +1527,5 @@
     renderDetail();
   </script>
 </body>
+
 </html>
