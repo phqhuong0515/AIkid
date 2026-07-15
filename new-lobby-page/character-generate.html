@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo Nhân Vật - AIkid</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@400;500;600;700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;600;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom Stylesheet for Preview -->
+  <link rel="stylesheet" href="/mee/styles.css?v=202607141142">
+
+  <style>
+    /* Placeholder color set to light grey (#A3A3A3) */
+    textarea::placeholder {
+      color: #A3A3A3 !important;
+      opacity: 1 !important;
+    }
+
+    /* Clean layout and centering */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('/assets/images/bg-character-feature.png?v=7') !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+      background-size: cover !important;
+      background-attachment: fixed !important;
+      background-color: #fad698 !important;
+      font-family: 'Mali', sans-serif;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* UI Scaler Wrapper for Header and Back Button */
+    .scaler-wrapper {
+      background: transparent !important;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      box-sizing: border-box;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1927.63px;
+      height: 930px;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(1);
+      pointer-events: none;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .scaler-wrapper>* {
+      pointer-events: auto;
+    }
+
+    /* Wrapper holding back button and container */
+    .workspace-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 94%;
+      max-width: 1512px;
+      margin-top: 235px;
+      /* Space for navbar */
+      margin-bottom: 20px;
+      gap: 16px;
+      box-sizing: border-box;
+    }
+
+    /* Main Workspace flex layout */
+    .workspace-container {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 40px;
+      width: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Next Page Floating Button */
+    .next-page-btn {
+      position: absolute;
+      right: -115px;
+      top: calc(50% - 25px);
+      transform: translateY(-50%) scale(1.1);
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #FF5C8A, #FF8E53);
+      border: 3.5px solid #FCF4DB;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 10px 25px rgba(255, 92, 138, 0.4);
+      cursor: pointer;
+      z-index: 99999;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-decoration: none;
+    }
+
+    .next-page-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      transition: transform 0.2s ease;
+    }
+
+    .next-page-btn:hover {
+      transform: translateY(-50%) scale(1.265);
+      box-shadow: 0 15px 35px rgba(255, 92, 138, 0.6);
+      background: linear-gradient(135deg, #FF7096, #FFA072);
+    }
+
+    .next-page-btn:hover svg {
+      transform: translateX(2px);
+    }
+
+    .next-page-btn:active {
+      transform: translateY(-50%) scale(1.045);
+    }
+
+    /* Panel Base (Fixed Height to fit viewport) */
+    .workspace-panel {
+      flex: 1;
+      height: 637px;
+      background: #FDFAF4;
+      border-radius: 36px;
+      padding: 24px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      min-width: 450px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Left panel: white border */
+    .panel-draw {
+      border: 6px solid #FFFFFF;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Right panel: white border */
+    .panel-ai {
+      border: 6px solid #FFFFFF;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.06);
+      flex: none !important;
+      width: 567px;
+    }
+
+    /* Panel Header */
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px dashed #EBDCD0;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2D3748;
+    }
+
+    .panel-title i {
+      font-size: 1.6rem;
+    }
+
+    .panel-draw .panel-title i {
+      color: #3182CE;
+    }
+
+    .panel-ai .panel-title i {
+      color: #E53E3E;
+    }
+
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      border: 2px solid #EBDCD0;
+      background: #FFFFFF;
+      color: #4A3D3C;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      white-space: nowrap;
+    }
+
+    .action-btn:hover {
+      background: #FDFAF4;
+      border-color: #D8C7BA;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .action-btn:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    /* Workspace body layout holding toolbar and canvas */
+    .draw-workspace-body {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 20px;
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+      position: relative;
+      /* relative parent for absolute child sub-toolbar */
+    }
+
+    /* Toolbar for drawing tools (Compact Vertical Layout) */
+    .draw-toolbar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 15px;
+      background: #F5EDE6;
+      /* Original warm beige background */
+      border-radius: 24px;
+      padding: 24px 8px;
+      border: 1px solid #E5D9CE;
+      /* Original border */
+      width: 76px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .tool-buttons-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      /* Increased from 7px to 10px (+3px) */
+      width: 100%;
+    }
+
+    /* Color picker & size slider container */
+    .color-size-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .color-indicator {
+      width: 42px;
+      /* Reduced by another 5% (from 44px to 42px) */
+      height: 42px;
+      /* Reduced by another 5% */
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #EBDCD0;
+      /* Match warm beige border color of 'Tải lên' button */
+      cursor: pointer;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .hidden-color-picker {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    .size-slider-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: #FFFFFF;
+      padding: 12px 9px;
+      /* Equal top and bottom padding */
+      border-radius: 12px;
+      border: 1px solid #EBDCD0;
+      /* Match warm beige border color */
+      box-sizing: border-box;
+    }
+
+    .size-dot {
+      width: 6px;
+      height: 6px;
+      background: #718096;
+      border-radius: 50%;
+      display: block;
+      flex-shrink: 0;
+      margin-bottom: -1px;
+      /* Shift small dot down by 1px */
+    }
+
+    .size-dot.large {
+      width: 12px;
+      height: 12px;
+      display: block;
+      flex-shrink: 0;
+      margin-top: -1px;
+      /* Shift large dot up by 1px */
+    }
+
+    .size-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      width: 6px;
+      /* Match the track width to center it perfectly */
+      height: 72px;
+      /* Shortened track for symmetrical spacing */
+      background: transparent;
+      outline: none;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    /* Webkit (Chrome, Safari, Edge) Track */
+    .size-slider::-webkit-slider-runnable-track {
+      width: 6px;
+      height: 100%;
+      background: #E2E8F0;
+      /* Elegant light gray track */
+      border-radius: 9999px;
+      border: none;
+    }
+
+    /* Webkit (Chrome, Safari, Edge) Thumb */
+    .size-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff7597, #ff9eb5);
+      /* Reversed gradient direction */
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      margin-left: -6px;
+      /* Centered on the track */
+      margin-top: 0;
+      cursor: pointer;
+    }
+
+    /* Firefox Track */
+    .size-slider::-moz-range-track {
+      width: 6px;
+      height: 100%;
+      background: #E2E8F0;
+      border-radius: 9999px;
+      border: none;
+    }
+
+    /* Firefox Thumb */
+    .size-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff7597, #ff9eb5);
+      /* Reversed gradient direction */
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+    }
+
+    /* Tool button styling (Icon Only for Compactness) */
+    .tool-btn {
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      padding: 8px;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      border: 2px solid #EBDCD0;
+      /* Match warm beige border color of 'Tải lên' button */
+      background: #FFFFFF;
+      color: #4A3D3C;
+      /* Match color of 'Tải lên' and other header buttons */
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .tool-btn:hover {
+      border-color: #CBD5E0;
+      background: #F7FAFC;
+    }
+
+    .tool-btn.active {
+      background: linear-gradient(135deg, #ff7597, #ff9eb5);
+      /* Reversed gradient direction */
+      color: #FFFFFF;
+      border: none;
+      /* Remove border entirely when selected */
+      box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
+    }
+
+    .toolbar-divider {
+      width: 40px;
+      height: 2px;
+      background: #E2E8F0;
+      margin: 2px 0;
+    }
+
+    /* Stamp stickers (2-Column Grid) */
+    .stamps-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .stamp-btn {
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      padding: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stamp-btn:hover {
+      transform: scale(1.3) rotate(8deg);
+    }
+
+    .stamp-btn.active {
+      transform: scale(1.3) rotate(-8deg);
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+    }
+
+    /* Canvas / Placeholder container */
+    .viewport-box {
+      flex: 1;
+      border: 2px dashed #EBDCD0;
+      border-radius: 24px;
+      background: #FFFFFF;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #upload-box-container:hover {
+      border-color: #FF5C8A !important;
+      background: #FFF5F7 !important;
+    }
+    #upload-box-container:hover i {
+      color: #FF5C8A !important;
+    }
+    #upload-box-container:hover span {
+      color: #FF5C8A !important;
+    }
+
+    .panel-ai .viewport-box {
+      background: #FFFFFF;
+      border: 2px dashed #EBDCD0;
+      width: 507px;
+      height: 507px;
+      flex: none !important;
+      margin: 0 auto;
+    }
+
+    /* Canvas sizing */
+    #drawing-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      background: #FFFFFF;
+    }
+
+    /* AI Magic wand and placeholder */
+    .ai-placeholder {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    .magic-wand-icon {
+      font-size: 4.5rem;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #FF5C8A 0%, #FF6584 65%, #FF9B62 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: magicFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 16px rgba(255, 92, 138, 0.3));
+    }
+
+    @keyframes magicFloat {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-12px) rotate(5deg);
+      }
+    }
+
+    .ai-placeholder-text {
+      font-family: 'Mali', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #718096;
+      line-height: 1.6;
+      max-width: 400px;
+      margin-bottom: 30px;
+    }
+
+    .ai-placeholder-text strong {
+      color: #FF5C8A;
+      font-weight: 700;
+    }
+
+    #character-prompt::placeholder {
+      color: #b0b0b0;
+      /* Light gray */
+    }
+
+    /* Action button inside AI panel */
+    .magic-btn {
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+      border: none;
+      border-radius: 30px;
+      padding: 14px 48px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255, 117, 151, 0.35);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .magic-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(255, 117, 151, 0.5);
+      background: linear-gradient(135deg, #ff7597, #ff5780);
+    }
+
+    .magic-btn:active {
+      transform: translateY(-2px);
+    }
+
+    /* Floating Back Button */
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(255, 117, 151, 0.45);
+      background: linear-gradient(135deg, #ff5780, #ff7597) !important;
+      /* Reversed gradient direction */
+    }
+
+    /* Shape Sub-Toolbar Panel */
+    .shape-sub-toolbar {
+      position: absolute;
+      left: 70px;
+      /* Aligned next to the drawing toolbar */
+      top: -80px;
+      /* Perfectly centered vertically with the shape tool button */
+      z-index: 1000;
+      /* floats over the canvas box */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background: #F5EDE6;
+      border-radius: 20px;
+      padding: 8px;
+      /* height only fits the 4 buttons combined */
+      border: 1px solid #EBDCD0;
+      width: 56px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      animation: slideInRight 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(-15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .shape-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 2px solid #EBDCD0;
+      background: #FFFFFF;
+      color: #4A3D3C;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .shape-btn:hover {
+      border-color: #CBD5E0;
+      background: #F7FAFC;
+    }
+
+    .shape-btn.active {
+      background: linear-gradient(135deg, #ff7597, #ff9eb5);
+      /* Match reversed gradient */
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 10px rgba(255, 117, 151, 0.2);
+    }
+
+    .shape-btn svg {
+      flex-shrink: 0;
+    }
+
+    /* Brush Sub-Toolbar Panel */
+    .brush-sub-toolbar {
+      position: absolute;
+      left: 70px;
+      /* Aligned next to the drawing toolbar */
+      top: -55px;
+      /* Centered vertically with the brush tool button */
+      z-index: 1000;
+      /* floats over the canvas box */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background: #F5EDE6;
+      border-radius: 20px;
+      padding: 8px;
+      border: 1px solid #EBDCD0;
+      width: 56px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      animation: slideInRight 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .brush-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 2px solid #EBDCD0;
+      background: #FFFFFF;
+      color: #4A3D3C;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .brush-btn:hover {
+      border-color: #CBD5E0;
+      background: #F7FAFC;
+    }
+
+    .brush-btn.active {
+      background: linear-gradient(135deg, #ff7597, #ff9eb5);
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 10px rgba(255, 117, 151, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Global Meteor Loading Overlay -->
+  <div id="page-loader-overlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+    /* Starry background effect for sunset */
+    background-image: 
+      radial-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.1) 2px, transparent 40px),
+      radial-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.05) 1px, transparent 30px),
+      linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+    background-size: 550px 550px, 350px 350px, 100% 100%;
+    background-position: 0 0, 40px 60px, 0 0;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    pointer-events: all;
+    overflow: hidden;
+  ">
+    <style>
+      @keyframes meteorFlight {
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
+      }
+      @keyframes miniFlight {
+        0% {
+          transform: translate(60vw, -60vh) rotate(150deg);
+          opacity: 0;
+        }
+        15% { opacity: 0.6; }
+        85% { opacity: 0.6; }
+        100% {
+          transform: translate(-60vw, 60vh) rotate(150deg);
+          opacity: 0;
+        }
+      }
+      @keyframes loadingDots {
+        0%, 20% { content: "."; }
+        40% { content: ".."; }
+        60%, 100% { content: "..."; }
+      }
+      .loading-dots::after {
+        content: "";
+        animation: loadingDots 1.5s infinite steps(1);
+        display: inline-block;
+        width: 24px;
+        text-align: left;
+      }
+      .meteor-container {
+        position: relative;
+        width: 320px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+        z-index: 10;
+      }
+      .meteor-head {
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle at 35% 35%, #FFF0F5 0%, #FFB6C1 25%, #FF5E97 60%, #9D1C7F 100%);
+        border-radius: 50%;
+        box-shadow: 
+          0 0 25px rgba(255, 94, 151, 0.9),
+          0 0 60px rgba(157, 28, 127, 0.6),
+          0 0 120px rgba(157, 28, 127, 0.4);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .meteor-crater {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 50%;
+        box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+      }
+      .meteor-crater-1 { width: 14px; height: 14px; top: 22px; left: 18px; }
+      .meteor-crater-2 { width: 20px; height: 20px; top: 32px; left: 32px; }
+      .meteor-crater-3 { width: 12px; height: 12px; top: 18px; left: 45px; }
+      .meteor-crater-4 { width: 10px; height: 10px; top: 48px; left: 20px; }
+      
+      .meteor-trail {
+        width: 600px;
+        height: 70px;
+        background: linear-gradient(to right, rgba(157, 28, 127, 0) 0%, rgba(157, 28, 127, 0.25) 35%, rgba(255, 94, 151, 0.75) 75%, rgba(255, 240, 245, 0.95) 100%);
+        border-radius: 40px 0 0 40px;
+        margin-right: -40px;
+        filter: blur(2px);
+      }
+      .mini-meteor {
+        position: absolute;
+        width: 160px;
+        height: 5px;
+        background: linear-gradient(to right, rgba(255, 182, 193, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
+        border-radius: 9999px;
+        opacity: 0;
+        filter: blur(1.5px);
+        transform: rotate(150deg);
+      }
+      .mini-1 {
+        top: 15%;
+        left: 10%;
+        animation: miniFlight 1.6s linear infinite;
+        animation-delay: 0.4s;
+      }
+      .mini-2 {
+        top: 75%;
+        left: 5%;
+        animation: miniFlight 1.9s linear infinite;
+        animation-delay: 0.9s;
+      }
+      .mini-3 {
+        top: 85%;
+        left: 50%;
+        animation: miniFlight 1.4s linear infinite;
+        animation-delay: 0.1s;
+      }
+    </style>
+
+    <!-- Space Background Mini Meteors -->
+    <div class="mini-meteor mini-1"></div>
+    <div class="mini-meteor mini-2"></div>
+    <div class="mini-meteor mini-3"></div>
+
+    <!-- Main Meteor Container -->
+    <div class="meteor-container">
+      <div class="meteor-trail"></div>
+      <div class="meteor-head">
+        <div class="meteor-crater meteor-crater-1"></div>
+        <div class="meteor-crater meteor-crater-2"></div>
+        <div class="meteor-crater meteor-crater-3"></div>
+        <div class="meteor-crater meteor-crater-4"></div>
+      </div>
+    </div>
+
+    <!-- Glowing Loading Text -->
+    <div style="margin-top: 50px; text-align: center; z-index: 20;">
+      <h2 style="
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #FFFFFF;
+        font-family: 'Chiron GoRound TC', sans-serif;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
+      ">Bé <span class="custom-đ">d</span>ợi chút nhé<span class="loading-dots"></span></h2>
+    </div>
+  </div>
+
+  <div class="scaler-wrapper">
+    <!-- Top Navigation Header from StoryMee Universe -->
+    <header class="universe-header">
+      <div class="universe-header-left">
+        <div class="universe-logo" onclick="playPopAndNavigate('/')">
+          <img src="/mee/logo.svg" alt="StoryMee Logo" class="logo-image">
+        </div>
+      </div>
+      <div class="universe-header-right">
+        <button class="universe-signup-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+      </div>
+    </header>
+
+    <!-- Floating Back Button -->
+    <div class="back-btn-container"
+      style="position: absolute; left: 38px; top: 131px; z-index: 1000; transform: scale(1.1); transform-origin: left top;">
+      <!-- Floating back button matching style.html design in customizer style -->
+      <button onclick="playPopAndNavigate('/')" style="
+        background: linear-gradient(135deg, #ff9eb5, #ff7597);
+        border: none;
+        border-radius: 9999px;
+        color: white;
+        font-family: 'Mali', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 10px 25px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      ">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Trở Về</span>
+      </button>
+    </div>
+
+    <!-- Workspace Wrapper (Holds Container) -->
+    <div class="workspace-wrapper">
+      <!-- Toggle Mode Button -->
+      <div style="width: 100%; display: flex; justify-content: flex-start; margin-bottom: -6px; box-sizing: border-box;">
+        <button id="btn-toggle-option" onclick="toggleOption()" style="
+          background: linear-gradient(135deg, #ff7597, #ff9eb5);
+          border: 2px solid #FFFFFF;
+          border-radius: 9999px;
+          color: white;
+          font-family: 'Mali', sans-serif;
+          font-weight: 700;
+          font-size: 1rem;
+          padding: 8px 20px;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        ">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Hình ảnh</span>
+        </button>
+      </div>
+
+      <!-- Workspace Container for Two Panels -->
+      <div class="workspace-container">
+        <!-- Panel 1: Drawing Canvas -->
+        <div class="workspace-panel panel-draw">
+          <!-- Upload & Description Body (Vertical Flow) -->
+          <div class="draw-workspace-body" style="flex: 1; display: flex; flex-direction: column; gap: 15px; height: auto; width: 100%; border-radius: 24px; background: transparent; border: none; padding: 0;">
+            
+            <!-- Top Section Option 1: Ideas (Left) & Upload (Right) -->
+            <div id="option-1-container" style="display: none; flex-direction: row; gap: 20px; width: 100%; flex: none; align-items: stretch;">
+              <!-- Left Column: Ideas Panel -->
+              <div style="flex: 1.0; min-width: 260px; background: #F5EDE6; border: 3px solid #E5D9CE; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+                <!-- Title -->
+                <div style="font-family: 'Mali', sans-serif; font-size: 1.3rem; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none;">
+                  <i class="fa-solid fa-lightbulb" style="color: #FF7597; font-size: 1.3rem;"></i>
+                  <span style="position: relative; top: -1px;">Ý TƯỞNG CỦA EM</span>
+                </div>
+                
+                <!-- Idea fields container -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <!-- Field 1 -->
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">1. MÔ TẢ HÌNH DÁNG CỦA NHÂN VẬT</span>
+                    <textarea id="idea-shape" placeholder="Ví dụ: con mèo màu cam tròn xoe..." style="
+                        background: #FFFFFF;
+                        border: 2px solid #FFFFFF;
+                        border-radius: 16px;
+                        padding: 10px 16px;
+                        font-family: 'Mali', sans-serif;
+                        font-size: 0.95rem;
+                        color: #4A3D3C;
+                        outline: none;
+                        box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                        transition: all 0.2s;
+                        height: 66px;
+                        resize: none;
+                        line-height: 1.4;
+                        box-sizing: border-box;
+                      "></textarea>
+                  </div>
+
+                  <!-- Field 2 -->
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">2. TRANG PHỤC & PHỤ KIỆN</span>
+                    <textarea id="idea-clothes" placeholder="Ví dụ: đeo nơ màu hồng, mặc đồ siêu nhân..." style="
+                        background: #FFFFFF;
+                        border: 2px solid #FFFFFF;
+                        border-radius: 16px;
+                        padding: 10px 16px;
+                        font-family: 'Mali', sans-serif;
+                        font-size: 0.95rem;
+                        color: #4A3D3C;
+                        outline: none;
+                        box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                        transition: all 0.2s;
+                        height: 66px;
+                        resize: none;
+                        line-height: 1.4;
+                        box-sizing: border-box;
+                      "></textarea>
+                  </div>
+
+                  <!-- Field 3 -->
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">3. NHÂN VẬT ĐANG LÀM GÌ?</span>
+                    <textarea id="idea-action" placeholder="Ví dụ: đang chơi lắp ráp mô hình..." style="
+                        background: #FFFFFF;
+                        border: 2px solid #FFFFFF;
+                        border-radius: 16px;
+                        padding: 10px 16px;
+                        font-family: 'Mali', sans-serif;
+                        font-size: 0.95rem;
+                        color: #4A3D3C;
+                        outline: none;
+                        box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                        transition: all 0.2s;
+                        height: 66px;
+                        resize: none;
+                        line-height: 1.4;
+                        box-sizing: border-box;
+                      "></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Upload Area -->
+              <div style="flex: 1.0; display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box;">
+                <!-- Upload Box (1:1 Aspect Ratio) -->
+                <div class="viewport-box" id="upload-box-container" style="width: 100%; aspect-ratio: 1 / 1; flex: none !important; position: relative; border: 2px dashed #EBDCD0; border-radius: 24px; background: #FFFFFF; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: all 0.25s ease;" onclick="triggerImageUpload()">
+                  <!-- Hidden file inputs -->
+                  <input type="file" id="file-uploader" style="display: none;" accept="image/*" onchange="handleImageUpload(event)">
+                  
+                  <!-- Upload Placeholder state -->
+                  <div id="upload-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; gap: 12px; pointer-events: none;">
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 4rem; color: #EBDCD0; transition: color 0.2s;"></i>
+                    <span style="font-family: 'Mali', sans-serif; font-size: 1.25rem; font-weight: 700; color: #475569;">Tải ảnh phác họa nhân vật lên</span>
+                    <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; color: #C8B5A7; max-width: 320px; line-height: 1.5;">Click hoặc kéo thả ảnh của em vào đây</span>
+                  </div>
+
+                  <!-- Preview state (hidden by default) -->
+                  <div id="upload-preview-container" style="display: none; width: 100%; height: 100%; justify-content: center; align-items: center; position: relative;">
+                    <img id="uploaded-image-preview" src="" style="max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 12px;">
+                    <!-- Delete / Remove button -->
+                    <button id="btn-remove-uploaded-image" onclick="removeUploadedImage(event)" style="
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        background: rgba(255, 92, 138, 0.9);
+                        border: 2px solid #FFFFFF;
+                        color: #FFFFFF;
+                        font-size: 1.1rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                        transition: all 0.2s;
+                        z-index: 10;
+                      " title="Xóa ảnh này">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Section Option 2: 6 Questions (Replacer for Image Upload) -->
+            <div id="option-2-container" style="display: block; width: 100%; flex: none; box-sizing: border-box;">
+              <!-- Unified Frame for 6 Questions -->
+              <div style="width: 100%; background: #F5EDE6; border: 3px solid #E5D9CE; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+                <!-- Title -->
+                <div style="font-family: 'Mali', sans-serif; font-size: 1.3rem; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none;">
+                  <i class="fa-solid fa-clipboard-question" style="color: #FF7597; font-size: 1.3rem;"></i>
+                  <span style="position: relative; top: -1px;">BỘ CÂU HỎI CHI TIẾT</span>
+                </div>
+                
+                <!-- 2-Column Grid Layout for 6 textareas -->
+                <div style="display: flex; flex-direction: row; gap: 20px; width: 100%;">
+                  <!-- Left Column: Questions 1-3 -->
+                  <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Question 1 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">1. CÂU HỎI 1</span>
+                      <textarea id="question-1" placeholder="Ví dụ: câu trả lời câu hỏi 1..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">2. CÂU HỎI 2</span>
+                      <textarea id="question-2" placeholder="Ví dụ: câu trả lời câu hỏi 2..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">3. CÂU HỎI 3</span>
+                      <textarea id="question-3" placeholder="Ví dụ: câu trả lời câu hỏi 3..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+                  </div>
+
+                  <!-- Right Column: Questions 4-6 -->
+                  <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Question 4 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">4. CÂU HỎI 4</span>
+                      <textarea id="question-4" placeholder="Ví dụ: câu trả lời câu hỏi 4..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">5. CÂU HỎI 5</span>
+                      <textarea id="question-5" placeholder="Ví dụ: câu trả lời câu hỏi 5..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">6. CÂU HỎI 6</span>
+                      <textarea id="question-6" placeholder="Ví dụ: câu trả lời câu hỏi 6..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Section: Prompt Box (Full Width & Shortened Height) -->
+            <div class="prompt-box" style="flex: 1; width: 100%; background: #FFFFFF; border: 2px dashed #EBDCD0; border-radius: 24px; padding: 16px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; justify-content: flex-start;">
+              <!-- Formula Banner -->
+              <div style="background: #FFF0F3; border: 1.5px solid #FFCCD5; border-radius: 14px; padding: 8px 16px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #FF5C8A; display: flex; align-items: center; gap: 8px; user-select: none; flex-shrink: 0;">
+                <i class="fa-solid fa-star" style="color: #FF5C8A; font-size: 0.95rem;"></i> Công thức: [Nhân vật] + [Hình dáng] + [Trang phục] + [Hành động]
+              </div>
+              <!-- Rich Prompt Display Area -->
+              <div id="prompt-display" style="flex: 1; font-family: 'Mali', sans-serif; font-size: 1.15rem; color: #4A3D3C; line-height: 1.8; word-break: break-word; outline: none; overflow-y: auto; text-align: left; max-height: 120px;">
+                <!-- Dynamically populated in JavaScript -->
+              </div>
+              <textarea id="character-prompt" style="display: none;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: AI Result -->
+        <div class="workspace-panel panel-ai">
+          <!-- AI Panel Header containing 'Chọn lại phong cách vẽ' and 'Làm lại' buttons -->
+          <div class="panel-header"
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: none; width: 100%;">
+            <div class="left-actions" style="display: flex; gap: 8px;">
+            </div>
+
+            <div class="right-actions" style="display: flex; gap: 8px;">
+              <button class="action-btn" onclick="regenerateAI()" title="Làm lại ảnh AI">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                <span>Làm lại</span>
+              </button>
+              <button class="action-btn" onclick="downloadAIImage()" title="Tải về ảnh AI">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"
+                  style="margin-right: 6px; display: inline-block; vertical-align: middle;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg>
+                <span>Tải về</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Placeholder Box -->
+          <div class="viewport-box">
+            <div class="ai-placeholder">
+              <div class="magic-wand-icon">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <div class="ai-placeholder-text">
+                Hãy sáng tạo nhân vật hoặc tải ảnh lên, sau đó bấm <strong>AI Vẽ Lại</strong> để xem phép thuật nhé!
+              </div>
+              <button class="magic-btn" onclick="triggerAIGeneration()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>AI Vẽ Lại</span>
+              </button>
+            </div>
+          </div>
+          <!-- Next Page Button pointing to /character-generate/feature.html -->
+          <a href="/character-generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="playPopAndNavigate('/character-generate/feature.html'); return false;">
+            <svg viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </a>
+        </div>
+      </div> <!-- Closes .workspace-wrapper -->
+    </div> <!-- Closes .scaler-wrapper -->
+
+    <script>
+      // Audio synthesis for bubble pop
+      function playPopSound() {
+        try {
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          var osc1 = ctx.createOscillator();
+          var gain1 = ctx.createGain();
+          var osc2 = ctx.createOscillator();
+          var gain2 = ctx.createGain();
+
+          osc1.connect(gain1);
+          gain1.connect(ctx.destination);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+
+          var now = ctx.currentTime;
+
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(200, now);
+          osc1.frequency.exponentialRampToValueAtTime(1400, now + 0.15);
+
+          gain1.gain.setValueAtTime(0, now);
+          gain1.gain.linearRampToValueAtTime(0.25, now + 0.015);
+          gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(850, now);
+          osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.02);
+          osc2.frequency.exponentialRampToValueAtTime(450, now + 0.08);
+
+          gain2.gain.setValueAtTime(0, now);
+          gain2.gain.linearRampToValueAtTime(0.18, now + 0.005);
+          gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+          osc1.start(now);
+          osc1.stop(now + 0.16);
+          osc2.start(now);
+          osc2.stop(now + 0.09);
+        } catch (e) {
+          console.error("Audio Context error:", e);
+        }
+      }
+
+      function playPopAndNavigate(url) {
+        playPopSound();
+        const loader = document.getElementById('page-loader-overlay');
+        if (loader) {
+          loader.style.display = 'flex';
+          loader.offsetHeight; // Force reflow
+          loader.style.opacity = '1';
+        }
+        setTimeout(function () {
+          window.location.href = url;
+        }, 350);
+      }
+
+      function hidePageLoader() {
+        const loader = document.getElementById('page-loader-overlay');
+        if (loader && loader.style.display !== 'none') {
+          loader.style.opacity = '0';
+          const content = document.querySelector('.scaler-wrapper');
+          if (content) {
+            content.style.opacity = '1';
+          }
+          setTimeout(() => {
+            loader.style.display = 'none';
+          }, 400);
+        }
+      }
+      window.addEventListener('load', hidePageLoader);
+      window.addEventListener('pageshow', (e) => {
+        if (e.persisted) hidePageLoader();
+      });
+      setTimeout(hidePageLoader, 1500); // Safety fallback timeout
+
+      function triggerImageUpload() {
+        playPopSound();
+        document.getElementById('file-uploader').click();
+      }
+
+      function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const previewImg = document.getElementById('uploaded-image-preview');
+          const previewContainer = document.getElementById('upload-preview-container');
+          const placeholder = document.getElementById('upload-placeholder');
+          
+          if (previewImg && previewContainer && placeholder) {
+            previewImg.src = e.target.result;
+            previewContainer.style.display = 'flex';
+            placeholder.style.display = 'none';
+            // Save upload to localStorage
+            try {
+              localStorage.setItem('storymee_uploaded_image', e.target.result);
+            } catch (err) {
+              console.error(err);
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function removeUploadedImage(event) {
+        if (event) {
+          event.stopPropagation(); // Avoid triggering file upload picker again
+        }
+        playPopSound();
+        
+        const previewImg = document.getElementById('uploaded-image-preview');
+        const previewContainer = document.getElementById('upload-preview-container');
+        const placeholder = document.getElementById('upload-placeholder');
+        const fileUploader = document.getElementById('file-uploader');
+
+        if (previewImg && previewContainer && placeholder) {
+          previewImg.src = '';
+          previewContainer.style.display = 'none';
+          placeholder.style.display = 'flex';
+        }
+        if (fileUploader) {
+          fileUploader.value = '';
+        }
+        try {
+          localStorage.removeItem('storymee_uploaded_image');
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function loadUploadedImageFromLocalStorage() {
+        try {
+          const savedData = localStorage.getItem('storymee_uploaded_image');
+          if (savedData) {
+            const previewImg = document.getElementById('uploaded-image-preview');
+            const previewContainer = document.getElementById('upload-preview-container');
+            const placeholder = document.getElementById('upload-placeholder');
+            if (previewImg && previewContainer && placeholder) {
+              previewImg.src = savedData;
+              previewContainer.style.display = 'flex';
+              placeholder.style.display = 'none';
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load uploaded image from localStorage", e);
+        }
+      }
+
+      function adjustScale() {
+        const wrapper = document.querySelector('.scaler-wrapper');
+        if (!wrapper) return;
+
+        const targetWidth = 1927.63;
+        const targetHeight = 930;
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+
+        const scale = Math.min(winWidth / targetWidth, winHeight / targetHeight);
+        wrapper.style.transform = `translateX(-50%) scale(${scale})`;
+      }
+
+      function updatePromptFromIdeas() {
+        const shapeVal = document.getElementById('idea-shape').value.trim();
+        const clothesVal = document.getElementById('idea-clothes').value.trim();
+        const actionVal = document.getElementById('idea-action').value.trim();
+
+        let tagsAdded = 0;
+        let tagsHtml = '';
+        
+        // Field 1: Shape Tag
+        if (shapeVal) {
+          tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${shapeVal}</span>`;
+          tagsAdded++;
+        }
+        
+        // Field 2: Clothes Tag
+        if (clothesVal) {
+          let prefixComma = tagsAdded > 0 ? ', ' : '';
+          tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${prefixComma}${clothesVal}</span>`;
+          tagsAdded++;
+        }
+        
+        // Field 3: Action Tag
+        if (actionVal) {
+          let prefixComma = tagsAdded > 0 ? ', ' : '';
+          tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${prefixComma}${actionVal}</span>`;
+          tagsAdded++;
+        }
+
+        // 1. Build the visible rich display HTML with cute tags
+        let suffix = tagsAdded > 0 ? '' : '...';
+        let htmlContent = `<span style="color: #4A3D3C; font-weight: 500;">Bản vẽ thiết kế${suffix} </span>` + tagsHtml;
+
+        // Render to display area
+        const displayDiv = document.getElementById('prompt-display');
+        if (displayDiv) {
+          displayDiv.innerHTML = htmlContent;
+        }
+
+        // 2. Build plain text prompt for the background textarea
+        let plainText = `Bản vẽ thiết kế`;
+        let plainParts = [];
+        if (shapeVal) plainParts.push(shapeVal);
+        if (clothesVal) plainParts.push(clothesVal);
+        if (actionVal) plainParts.push(actionVal);
+        
+        if (plainParts.length > 0) {
+          plainText += ` ` + plainParts.join(`, `);
+        }
+        plainText += '.';
+
+        const promptTextarea = document.getElementById('character-prompt');
+        if (promptTextarea) {
+          promptTextarea.value = plainText;
+        }
+      }
+
+      function triggerAIGeneration() {
+        playPopSound();
+        alert('Chức năng AI đang chuẩn bị biến hóa phép thuật của bé! Cùng chờ đón nhé ✨');
+      }
+
+      function regenerateAI() {
+        playPopSound();
+        alert('Chức năng làm lại ảnh AI đang được chuẩn bị! Cùng chờ đón nhé ✨');
+      }
+
+      function downloadAIImage() {
+        playPopSound();
+        const aiPanel = document.querySelector('.panel-ai');
+        const aiImg = aiPanel ? aiPanel.querySelector('.ai-result-img, img:not(.magic-wand-icon img)') : null;
+
+        const link = document.createElement('a');
+        if (aiImg && aiImg.src) {
+          link.href = aiImg.src;
+          link.download = 'storymee_ai_artwork.png';
+        } else {
+          const previewImg = document.getElementById('uploaded-image-preview');
+          if (previewImg && previewImg.src) {
+            link.href = previewImg.src;
+            link.download = 'storymee_upload.png';
+          } else {
+            alert('Chưa có ảnh nào để tải về!');
+            return;
+          }
+        }
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      let currentOption = 2;
+
+      function toggleOption() {
+        playPopSound();
+        const opt1Container = document.getElementById('option-1-container');
+        const opt2Container = document.getElementById('option-2-container');
+        const btnToggle = document.getElementById('btn-toggle-option');
+        const btnText = btnToggle.querySelector('span');
+
+        if (currentOption === 1) {
+          currentOption = 2;
+          opt1Container.style.display = 'none';
+          opt2Container.style.display = 'flex';
+          btnText.textContent = 'Hình ảnh';
+          updatePromptFromQuestions();
+        } else {
+          currentOption = 1;
+          opt1Container.style.display = 'flex';
+          opt2Container.style.display = 'none';
+          btnText.textContent = 'Câu trả lời';
+          updatePromptFromIdeas();
+        }
+      }
+
+      function updatePromptFromQuestions() {
+        const q1 = document.getElementById('question-1').value.trim();
+        const q2 = document.getElementById('question-2').value.trim();
+        const q3 = document.getElementById('question-3').value.trim();
+        const q4 = document.getElementById('question-4').value.trim();
+        const q5 = document.getElementById('question-5').value.trim();
+        const q6 = document.getElementById('question-6').value.trim();
+
+        let tagsHtml = '';
+        let tagsAdded = 0;
+        const vals = [q1, q2, q3, q4, q5, q6];
+
+        vals.forEach(val => {
+          if (val) {
+            let prefixComma = tagsAdded > 0 ? ', ' : '';
+            tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${prefixComma}${val}</span>`;
+            tagsAdded++;
+          }
+        });
+
+        let suffix = tagsAdded > 0 ? '' : '...';
+        let htmlContent = `<span style="color: #4A3D3C; font-weight: 500;">Bản vẽ thiết kế${suffix} </span>` + tagsHtml;
+
+        const displayDiv = document.getElementById('prompt-display');
+        if (displayDiv) {
+          displayDiv.innerHTML = htmlContent;
+        }
+
+        let plainText = `Bản vẽ thiết kế`;
+        let plainParts = vals.filter(v => v);
+        if (plainParts.length > 0) {
+          plainText += ` ` + plainParts.join(`, `);
+        }
+        plainText += '.';
+
+        const promptTextarea = document.getElementById('character-prompt');
+        if (promptTextarea) {
+          promptTextarea.value = plainText;
+        }
+      }
+
+      // Initial loading and drag/drop binding
+      adjustScale();
+      window.addEventListener('load', () => {
+        adjustScale();
+        loadUploadedImageFromLocalStorage();
+
+        // Bind drag and drop events
+        const uploadBox = document.getElementById('upload-box-container');
+        if (uploadBox) {
+          uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadBox.style.borderColor = '#FF7597';
+            uploadBox.style.background = '#FFF0F3';
+          });
+          uploadBox.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadBox.style.borderColor = '#EBDCD0';
+            uploadBox.style.background = '#FFFFFF';
+          });
+          uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.style.borderColor = '#EBDCD0';
+            uploadBox.style.background = '#FFFFFF';
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+              const file = e.dataTransfer.files[0];
+              if (file.type.startsWith('image/')) {
+                const fileUploader = document.getElementById('file-uploader');
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileUploader.files = dt.files;
+                handleImageUpload({ target: fileUploader });
+              }
+            }
+          });
+        }
+
+        // Bind idea inputs change events
+        ['idea-shape', 'idea-clothes', 'idea-action'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', updatePromptFromIdeas);
+          }
+        });
+
+        // Bind option 2 inputs change events
+        ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', updatePromptFromQuestions);
+          }
+        });
+
+        // Run initially to populate with name/species from feature page
+        updatePromptFromQuestions();
+      });
+
+      window.addEventListener('resize', adjustScale);
+    </script>
+</body>
+</html>

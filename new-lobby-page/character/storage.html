@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Nhân Vật - AIkid</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@400;500;600;700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Link to common universe styles -->
+  <link rel="stylesheet" href="/mee/styles.css">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('/assets/images/bg-character-feature.png') !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+      background-size: cover !important;
+      background-attachment: fixed !important;
+      background-color: #fad698 !important;
+      font-family: 'Mali', sans-serif;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .scaler-wrapper {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1927.63px;
+      height: 930px;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(1);
+      background: transparent !important;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .scaler-wrapper > * {
+      pointer-events: auto;
+    }
+
+    /* Page title in header */
+    .storage-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #FF5E97 0%, #FF9EB5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    /* Workspace container */
+    .workspace-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 94%;
+      max-width: 1512px;
+      margin-top: 220px; /* Space for navbar, pushed down by 70px total */
+      gap: 16px;
+      box-sizing: border-box;
+    }
+
+    .workspace-container {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 40px;
+      width: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Panel layout */
+    .workspace-panel {
+      height: 680px;
+      background: #FDFAF4;
+      border-radius: 36px;
+      padding: 12px 28px 28px 28px; /* Top padding 12px to match reference vertical centering */
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      border: 6px solid #FFFFFF;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    /* Left panel: Character Detail */
+    .panel-detail {
+      width: 520px;
+      flex: none;
+      align-items: center;
+    }
+
+    /* Right panel: Character List Grid */
+    .panel-list {
+      flex: 1;
+    }
+
+    .panel-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      height: 64px; /* Shift dashed cut line down by an additional 10px total relative to 54px */
+      border-bottom: 2px dashed #EBDCD0;
+      box-sizing: border-box;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #475569;
+      line-height: 1;
+      height: 64px; /* Lock height to match .panel-header for identical vertical alignment */
+      box-sizing: border-box;
+    }
+
+    .panel-title span {
+      transform: translateY(1.5px); /* Fine-tune baseline alignment for round font */
+    }
+
+    .panel-title i {
+      font-size: 1.8rem;
+      color: #FF5E97;
+    }
+
+    /* Left side layout */
+    .detail-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      gap: 20px;
+    }
+
+    .detail-avatar-box {
+      width: 250px;
+      height: 250px;
+      border-radius: 32px;
+      border: 6px solid #FFFFFF;
+      background: linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 100%);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .detail-avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 12%; /* Portrait chest-up focus */
+    }
+
+    #detail-char-name {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: #4A5568;
+      text-align: center;
+      text-transform: uppercase;
+      margin-top: 10px;
+      width: 100%;
+      letter-spacing: 0.5px;
+      word-wrap: break-word;
+    }
+
+    #detail-empty-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: 'Mali', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #C8B5A7;
+      height: 100%;
+      width: 100%;
+      padding: 40px;
+      line-height: 1.6;
+      box-sizing: border-box;
+      min-height: 350px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #718096;
+    }
+
+    .form-group input {
+      font-family: 'Mali', sans-serif;
+      font-size: 1.1rem;
+      padding: 10px 16px;
+      border-radius: 16px;
+      border: 2px solid #E2E8F0;
+      background: #FFFFFF;
+      color: #2D3748;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #FF5E97;
+    }
+
+    .form-group input:disabled {
+      background: #F7FAFC;
+      border-color: #EDF2F7;
+      color: #718096;
+      cursor: not-allowed;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn-action {
+      flex: 1;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 12px 16px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      color: white;
+    }
+
+    .btn-download {
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+    }
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(255, 117, 151, 0.3);
+    }
+
+    .btn-edit {
+      background: linear-gradient(135deg, #68D391, #48BB78);
+    }
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(72, 187, 120, 0.3);
+    }
+
+    .btn-delete {
+      background: linear-gradient(135deg, #FC8181, #E53E3E);
+    }
+    .btn-delete:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(229, 62, 62, 0.3);
+    }
+
+    /* Right side Layout */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0;
+      gap: 12px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #FFFFFF;
+      border: 2px solid #EBDCD0;
+      border-radius: 9999px;
+      padding: 6px 16px;
+      width: 250px;
+    }
+
+    .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Mali', sans-serif;
+      font-size: 0.95rem;
+      width: 100%;
+      margin-left: 8px;
+      color: #4A5568;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: #F0E6DF;
+      padding: 6px;
+      border-radius: 9999px;
+    }
+
+    .tab-item {
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #718096;
+      transition: all 0.2s ease;
+    }
+
+    .tab-item.active {
+      background: #FFFFFF;
+      color: #FF5E97;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .grid-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 6px;
+      margin-top: 5px;
+    }
+
+    /* Scrollbar Style */
+    .grid-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .grid-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .grid-container::-webkit-scrollbar-thumb {
+      background: #E2E8F0;
+      border-radius: 9999px;
+    }
+
+    .character-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    /* Character Item Card */
+    .char-card {
+      background: #FFFFFF;
+      border: 4px solid #FFFFFF;
+      border-radius: 24px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      position: relative;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+    }
+
+    .char-card:hover {
+      border-color: #FF5E97;
+    }
+
+    .char-card.active {
+      border-color: #FF5E97;
+      background: #FFF5F7;
+      box-shadow: 0 10px 20px rgba(255, 94, 151, 0.2);
+    }
+
+    .char-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 12%; /* Portrait chest-up focus */
+      display: block;
+    }
+
+    /* Dash Add New Card */
+    .add-new-card {
+      border: 4px dashed #CBD5E0;
+      background: transparent;
+      justify-content: center;
+      box-shadow: none;
+    }
+    .add-new-card:hover {
+      border-color: #FF5E97;
+      background: rgba(255, 94, 151, 0.03);
+    }
+    .add-new-card i {
+      font-size: 3rem;
+      color: #A0AEC0;
+      transition: color 0.2s ease;
+    }
+    .add-new-card:hover i {
+      color: #FF5E97;
+    }
+
+    /* Modal for Adding New Character */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 200000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: #FDFAF4;
+      border: 6px solid #FFFFFF;
+      border-radius: 36px;
+      width: 480px;
+      padding: 28px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #EBDCD0;
+      padding-bottom: 12px;
+    }
+
+    .modal-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #2D3748;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-title i {
+      color: #FF5E97;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: #A0AEC0;
+      transition: color 0.2s ease;
+    }
+    .modal-close-btn:hover {
+      color: #E53E3E;
+    }
+
+    .upload-area {
+      border: 3px dashed #CBD5E0;
+      border-radius: 20px;
+      height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: #FFFFFF;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .upload-area:hover {
+      border-color: #FF5E97;
+      background: #FFF5F7;
+    }
+
+    .upload-area i {
+      font-size: 2.2rem;
+      color: #A0AEC0;
+      margin-bottom: 6px;
+    }
+    .upload-area:hover i {
+      color: #FF5E97;
+    }
+
+    .upload-area span {
+      font-size: 0.9rem;
+      color: #718096;
+    }
+
+    .upload-preview {
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .upload-preview img {
+      max-height: 90%;
+      max-width: 90%;
+      object-fit: contain;
+    }
+
+    .remove-preview-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      background: rgba(229, 62, 62, 0.9);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    /* Custom Confirm Popup Container in Details Panel */
+    .delete-confirm-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(253, 250, 244, 0.96);
+      border-radius: 30px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      box-sizing: border-box;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .delete-confirm-overlay.active {
+      display: flex;
+    }
+
+    .delete-confirm-overlay i {
+      font-size: 3rem;
+      color: #E53E3E;
+      margin-bottom: 12px;
+    }
+
+    .delete-confirm-overlay h3 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.3rem;
+      color: #2D3748;
+      margin-bottom: 6px;
+    }
+
+    .delete-confirm-overlay p {
+      font-size: 0.95rem;
+      color: #718096;
+      margin-bottom: 20px;
+    }
+
+    /* Custom Alert Overlay */
+    .save-toast {
+      position: absolute;
+      bottom: 20px;
+      background: #48BB78;
+      color: white;
+      font-weight: 700;
+      padding: 8px 20px;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .save-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Global Meteor Loading Overlay -->
+  <div id="page-loader-overlay">
+    <style>
+      #page-loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+        background-image: 
+          radial-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.1) 2px, transparent 40px),
+          radial-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.05) 1px, transparent 30px),
+          linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+        background-size: 550px 550px, 350px 350px, 100% 100%;
+        background-position: 0 0, 40px 60px, 0 0;
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        transition: opacity 0.4s ease;
+        pointer-events: all;
+        overflow: hidden;
+      }
+      @keyframes meteorFlight {
+        0% { transform: translate(60vw, -60vh) rotate(150deg); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translate(-60vw, 60vh) rotate(150deg); opacity: 0; }
+      }
+      @keyframes miniFlight {
+        0% { transform: translate(60vw, -60vh) rotate(150deg); opacity: 0; }
+        15% { opacity: 0.6; }
+        85% { opacity: 0.6; }
+        100% { transform: translate(-60vw, 60vh) rotate(150deg); opacity: 0; }
+      }
+      @keyframes loadingDots {
+        0%, 20% { content: "."; }
+        40% { content: ".."; }
+        60%, 100% { content: "..."; }
+      }
+      .loading-dots::after {
+        content: "";
+        animation: loadingDots 1.5s infinite steps(1);
+        display: inline-block;
+        width: 24px;
+        text-align: left;
+      }
+      .meteor-container {
+        position: relative;
+        width: 320px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+        z-index: 10;
+      }
+      .meteor-head {
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle at 35% 35%, #FFF0F5 0%, #FFB6C1 25%, #FF5E97 60%, #9D1C7F 100%);
+        border-radius: 50%;
+        box-shadow: 0 0 25px rgba(255, 94, 151, 0.9), 0 0 60px rgba(157, 28, 127, 0.6), 0 0 120px rgba(157, 28, 127, 0.4);
+        position: relative;
+        flex-shrink: 0;
+      }
+      .meteor-crater {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 50%;
+        box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+      }
+      .meteor-crater-1 { width: 14px; height: 14px; top: 22px; left: 18px; }
+      .meteor-crater-2 { width: 20px; height: 20px; top: 32px; left: 32px; }
+      .meteor-crater-3 { width: 12px; height: 12px; top: 18px; left: 45px; }
+      .meteor-crater-4 { width: 10px; height: 10px; top: 48px; left: 20px; }
+      .meteor-trail {
+        width: 600px;
+        height: 70px;
+        background: linear-gradient(to right, rgba(157, 28, 127, 0) 0%, rgba(157, 28, 127, 0.25) 35%, rgba(255, 94, 151, 0.75) 75%, rgba(255, 240, 245, 0.95) 100%);
+        border-radius: 40px 0 0 40px;
+        margin-right: -40px;
+        filter: blur(2px);
+      }
+      .mini-meteor {
+        position: absolute;
+        width: 160px;
+        height: 5px;
+        background: linear-gradient(to right, rgba(255, 182, 193, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
+        border-radius: 9999px;
+        opacity: 0;
+        filter: blur(1.5px);
+        transform: rotate(150deg);
+      }
+      .mini-1 { top: 25%; left: 15%; animation: miniFlight 1.6s linear infinite; animation-delay: 0.4s; }
+      .mini-2 { top: 75%; left: 5%; animation: miniFlight 1.9s linear infinite; animation-delay: 0.9s; }
+      .mini-3 { top: 85%; left: 50%; animation: miniFlight 1.4s linear infinite; animation-delay: 0.1s; }
+    </style>
+    <div class="mini-meteor mini-1"></div>
+    <div class="mini-meteor mini-2"></div>
+    <div class="mini-meteor mini-3"></div>
+    <div class="meteor-container">
+      <div class="meteor-trail"></div>
+      <div class="meteor-head">
+        <div class="meteor-crater meteor-crater-1"></div>
+        <div class="meteor-crater meteor-crater-2"></div>
+        <div class="meteor-crater meteor-crater-3"></div>
+        <div class="meteor-crater meteor-crater-4"></div>
+      </div>
+    </div>
+    <div style="margin-top: 50px; text-align: center; z-index: 20;">
+      <h2 style="
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #FFFFFF;
+        font-family: 'Chiron GoRound TC', sans-serif;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
+      ">Bé <span style="position: relative; display: inline-block;">d<span style="position: absolute; width: 0.46em; height: 0.12em; background: currentColor; border-radius: 9999px; top: 0.32em; left: 0.27em;"></span></span>ợi chút nhé<span class="loading-dots"></span></h2>
+    </div>
+  </div>
+
+  <div class="scaler-wrapper">
+    <!-- Universe Header -->
+    <header class="universe-header">
+      <div class="universe-header-left">
+        <div class="universe-logo" onclick="playPopAndNavigate('/')">
+          <img src="/mee/logo.svg" alt="StoryMee Logo" class="logo-image">
+        </div>
+      </div>
+      <div class="universe-header-right">
+        <button class="universe-signup-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+      </div>
+    </header>
+
+    <!-- Floating Back Button -->
+    <div class="back-btn-container"
+      style="position: absolute; left: 38px; top: 131px; z-index: 1000; transform: scale(1.1); transform-origin: left top;">
+      <button onclick="playPopAndNavigate('/character')" style="
+        background: linear-gradient(135deg, #ff9eb5, #ff7597);
+        border: none;
+        border-radius: 9999px;
+        color: white;
+        font-family: 'Mali', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 10px 25px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      ">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Trở Về</span>
+      </button>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="workspace-wrapper">
+      <div class="workspace-container">
+        
+        <!-- Left Panel: Detail -->
+        <div class="workspace-panel panel-detail" style="position: relative;">
+          <!-- Save Toast Alert -->
+          <div class="save-toast" id="save-toast">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Đã lưu thông tin mới!</span>
+          </div>
+
+          <!-- Custom Delete Confirm Overlay -->
+          <div class="delete-confirm-overlay" id="delete-confirm-overlay">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h3>Xóa Nhân Vật</h3>
+            <p>Bé có chắc chắn muốn chia tay bạn nhân vật này không? Hành động này không thể hoàn tác nhé!</p>
+            <div class="detail-actions" style="margin-top: 15px;">
+              <button class="btn-action btn-delete" onclick="confirmDeleteCharacter()" style="flex: 1;">Chắc chắn xóa</button>
+              <button class="btn-action" onclick="closeDeleteConfirm()" style="background: #A0AEC0; flex: 1;">Giữ lại</button>
+            </div>
+          </div>
+
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-id-card"></i>
+              <span>Chi Tiết Nhân Vật</span>
+            </div>
+          </div>
+
+          <div class="detail-container">
+            <div class="detail-avatar-box">
+              <img id="detail-avatar" src="/assets/images/girl-character.png" alt="Avatar">
+            </div>
+
+            <div id="detail-char-name"></div>
+
+            <div class="detail-actions">
+              <button class="btn-action btn-download" onclick="downloadCurrentCharacter()">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+                <span>Tải Ảnh Về</span>
+              </button>
+              <button class="btn-action btn-delete" onclick="openDeleteConfirm()">
+                <i class="fa-solid fa-trash-can"></i>
+                <span>Xóa</span>
+              </button>
+            </div>
+          </div>
+          <div id="detail-empty-placeholder" style="display: none;"></div>
+        </div>
+
+        <!-- Right Panel: Grid Album -->
+        <div class="workspace-panel panel-list">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-images"></i>
+              <span>Album Nhân Vật Của Bé</span>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filter-bar">
+              <div class="tabs">
+                <button class="tab-item active" onclick="filterType('all', this)">Tất cả</button>
+                <button class="tab-item" onclick="filterType('user', this)">Bé tạo</button>
+                <button class="tab-item" onclick="filterType('demo', this)">Mẫu</button>
+              </div>
+
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color: #A0AEC0;"></i>
+                <input type="text" id="search-input" placeholder="Tìm kiếm tên..." oninput="handleSearch()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Characters Scrollable Grid -->
+          <div class="grid-container">
+            <div class="character-grid" id="character-grid">
+              <!-- Grid Items injected dynamically by JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Create New Character Modal -->
+  <div class="modal-overlay" id="add-modal" onclick="closeAddModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>Thêm Nhân Vật Mới</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeAddModal(null)">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>Hình ảnh nhân vật</label>
+        <div class="upload-area" onclick="triggerFilePicker()">
+          <div id="upload-placeholder" style="text-align: center;">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <div><span>Bấm để tải ảnh lên (PNG/JPG)</span></div>
+          </div>
+          <div class="upload-preview" id="upload-preview-box">
+            <img id="upload-preview-img" src="" alt="Preview">
+            <button class="remove-preview-btn" onclick="removeUploadedFile(event)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <input type="file" id="modal-file-input" style="display: none;" accept="image/*" onchange="handleModalFileChange(event)">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="new-name-input">Tên nhân vật</label>
+        <input type="text" id="new-name-input" placeholder="Nhập tên dễ thương...">
+      </div>
+
+
+
+      <div class="modal-actions">
+        <button class="btn-action btn-edit" onclick="saveNewCharacter()" style="width: 100%;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Thêm Vào Bộ Sưu Tập</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio Synthesis for Bubble Pop Sound
+    function playPopSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(200, now);
+        osc1.frequency.exponentialRampToValueAtTime(1400, now + 0.15);
+
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.25, now + 0.015);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(850, now);
+        osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.02);
+        osc2.frequency.exponentialRampToValueAtTime(450, now + 0.08);
+
+        gain2.gain.setValueAtTime(0, now);
+        gain2.gain.linearRampToValueAtTime(0.18, now + 0.005);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+        osc1.start(now);
+        osc1.stop(now + 0.16);
+        osc2.start(now);
+        osc2.stop(now + 0.09);
+      } catch (e) {
+        console.warn("Audio Context blocked: ", e);
+      }
+    }
+
+    function playPopAndNavigate(url) {
+      playPopSound();
+      const loader = document.getElementById('page-loader-overlay');
+      if (loader) {
+        loader.style.display = 'flex';
+        loader.offsetHeight;
+        loader.style.opacity = '1';
+      }
+      setTimeout(() => {
+        window.location.href = url;
+      }, 350);
+    }
+
+    // Auto Scaler
+    function adjustScale() {
+      const wrapper = document.querySelector('.scaler-wrapper');
+      if (!wrapper) return;
+      
+      const targetWidth = 1927.63;
+      const targetHeight = 930;
+      const winWidth = window.innerWidth;
+      const winHeight = window.innerHeight;
+      
+      const scale = Math.min(winWidth / targetWidth, winHeight / targetHeight);
+      wrapper.style.transform = `translateX(-50%) scale(${scale})`;
+    }
+
+    window.addEventListener('resize', adjustScale);
+    adjustScale();
+
+    let pageLoaded = false;
+    function hidePageLoader() {
+      if (pageLoaded) return;
+      pageLoaded = true;
+      adjustScale();
+      const loader = document.getElementById('page-loader-overlay');
+      if (!loader) return;
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 400);
+      }, 150);
+    }
+
+    window.addEventListener('load', hidePageLoader);
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        pageLoaded = false;
+        hidePageLoader();
+      }
+    });
+
+    // --- CHARACTER DATABASE & RENDERING ---
+    let characters = [];
+    let selectedId = null;
+    let currentFilterType = 'all';
+    let currentSearchQuery = '';
+    let tempUploadImageBase64 = '';
+
+    // Initialize list with seed characters or localStorage
+    function initDatabase() {
+      // Clear data once to remove default seeded characters
+      const cleared = localStorage.getItem('storymee_storage_cleared_v2');
+      if (!cleared) {
+        localStorage.setItem('storymee_saved_characters', JSON.stringify([]));
+        localStorage.setItem('storymee_storage_cleared_v2', 'true');
+      }
+
+      const saved = localStorage.getItem('storymee_saved_characters');
+      if (saved) {
+        characters = JSON.parse(saved);
+      } else {
+        characters = [];
+      }
+
+      // Set initial selected character
+      if (characters.length > 0) {
+        selectedId = characters[0].id;
+      } else {
+        selectedId = null;
+      }
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('storymee_saved_characters', JSON.stringify(characters));
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('character-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      // Create Add New Card
+      const addCard = document.createElement('div');
+      addCard.className = 'char-card add-new-card';
+      addCard.onclick = () => {
+        playPopSound();
+        openAddModal();
+      };
+      addCard.innerHTML = `
+        <i class="fa-solid fa-circle-plus"></i>
+      `;
+      grid.appendChild(addCard);
+
+      // Filter and render list
+      const filtered = characters.filter(c => {
+        const matchesType = (currentFilterType === 'all') || (c.type === currentFilterType);
+        const matchesSearch = c.name.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
+                              c.species.toLowerCase().includes(currentSearchQuery.toLowerCase());
+        return matchesType && matchesSearch;
+      });
+
+      filtered.forEach(c => {
+        const card = document.createElement('div');
+        card.className = `char-card ${c.id === selectedId ? 'active' : ''}`;
+        card.onclick = () => selectCharacter(c.id);
+        
+        card.innerHTML = `
+          <img src="${c.avatar}" alt="${c.name}">
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderDetail() {
+      const char = characters.find(c => c.id === selectedId);
+      const detailContainer = document.querySelector('.detail-container');
+      const emptyPlaceholder = document.getElementById('detail-empty-placeholder');
+      
+      if (!char) {
+        // Fallback if no characters exist
+        if (detailContainer) detailContainer.style.display = 'none';
+        if (emptyPlaceholder) {
+          emptyPlaceholder.style.display = 'flex';
+          emptyPlaceholder.innerHTML = 'Chưa có nhân vật.<br>Hãy tạo nhân vật mới nhé!';
+        }
+        return;
+      }
+
+      if (detailContainer) detailContainer.style.display = 'flex';
+      if (emptyPlaceholder) emptyPlaceholder.style.display = 'none';
+
+      document.getElementById('detail-avatar').src = char.avatar;
+      document.getElementById('detail-char-name').textContent = char.name;
+    }
+
+    function selectCharacter(id) {
+      playPopSound();
+      selectedId = id;
+      
+      // Update active state in grid cards
+      const cards = document.querySelectorAll('.char-card:not(.add-new-card)');
+      const filtered = characters.filter(c => {
+        const matchesType = (currentFilterType === 'all') || (c.type === currentFilterType);
+        const matchesSearch = c.name.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
+                              c.species.toLowerCase().includes(currentSearchQuery.toLowerCase());
+        return matchesType && matchesSearch;
+      });
+
+      let selectedIndexInFiltered = filtered.findIndex(c => c.id === id);
+      cards.forEach((card, idx) => {
+        if (idx === selectedIndexInFiltered) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+
+      renderDetail();
+    }
+
+    // --- INTERACTIVE ACTIONS ---
+    
+    // Save details modifications
+    function saveCurrentCharacterDetails() {
+      playPopSound();
+      const charIndex = characters.findIndex(c => c.id === selectedId);
+      if (charIndex === -1) return;
+
+      const newName = document.getElementById('char-name-input').value.trim();
+
+      if (!newName) {
+        alert('Tên nhân vật không được để trống nha bé!');
+        return;
+      }
+
+      characters[charIndex].name = newName;
+
+      saveToLocalStorage();
+      renderGrid();
+      
+      // Show check toast
+      const toast = document.getElementById('save-toast');
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2200);
+      }
+    }
+
+    // Download Character Avatar
+    function downloadCurrentCharacter() {
+      playPopSound();
+      const char = characters.find(c => c.id === selectedId);
+      if (!char) return;
+
+      const link = document.createElement('a');
+      link.href = char.avatar;
+      link.download = `${char.name}_${char.species}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Custom confirm dialog overlays
+    function openDeleteConfirm() {
+      playPopSound();
+      const overlay = document.getElementById('delete-confirm-overlay');
+      if (overlay) overlay.classList.add('active');
+    }
+
+    function closeDeleteConfirm() {
+      playPopSound();
+      const overlay = document.getElementById('delete-confirm-overlay');
+      if (overlay) overlay.classList.remove('active');
+    }
+
+    function confirmDeleteCharacter() {
+      playPopSound();
+      const index = characters.findIndex(c => c.id === selectedId);
+      if (index !== -1) {
+        characters.splice(index, 1);
+        saveToLocalStorage();
+        
+        // Select next character if possible
+        if (characters.length > 0) {
+          selectedId = characters[0].id;
+        } else {
+          selectedId = null;
+        }
+        
+        closeDeleteConfirm();
+        renderGrid();
+        renderDetail();
+      }
+    }
+
+    // Filters and search logic
+    function filterType(type, element) {
+      playPopSound();
+      currentFilterType = type;
+      
+      // Update tab active states
+      const tabItems = document.querySelectorAll('.tab-item');
+      tabItems.forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+
+      renderGrid();
+    }
+
+    function handleSearch() {
+      const searchInput = document.getElementById('search-input');
+      currentSearchQuery = searchInput.value.trim();
+      renderGrid();
+    }
+
+    // --- ADD NEW CHARACTER MODAL LOGIC ---
+    function openAddModal() {
+      const modal = document.getElementById('add-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('new-name-input').value = '';
+        document.getElementById('new-species-input').value = '';
+        removeUploadedFile(null);
+      }
+    }
+
+    function closeAddModal(event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      playPopSound();
+      const modal = document.getElementById('add-modal');
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    }
+
+    function triggerFilePicker() {
+      playPopSound();
+      document.getElementById('modal-file-input').click();
+    }
+
+    function handleModalFileChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        tempUploadImageBase64 = e.target.result;
+        
+        document.getElementById('upload-placeholder').style.display = 'none';
+        
+        const previewBox = document.getElementById('upload-preview-box');
+        const previewImg = document.getElementById('upload-preview-img');
+        previewBox.style.display = 'flex';
+        previewImg.src = tempUploadImageBase64;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeUploadedFile(event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      tempUploadImageBase64 = '';
+      document.getElementById('upload-placeholder').style.display = 'block';
+      document.getElementById('upload-preview-box').style.display = 'none';
+      document.getElementById('upload-preview-img').src = '';
+      document.getElementById('modal-file-input').value = '';
+    }
+
+    function saveNewCharacter() {
+      playPopSound();
+      const newName = document.getElementById('new-name-input').value.trim();
+      
+      if (!tempUploadImageBase64) {
+        alert('Bé ơi hãy chọn hình ảnh cho bạn nhân vật mới nhé!');
+        return;
+      }
+
+      if (!newName) {
+        alert('Hãy đặt một cái tên dễ thương cho nhân vật nha bé!');
+        return;
+      }
+
+      const newChar = {
+        id: 'user-' + Date.now(),
+        name: newName,
+        species: 'Bé tự tạo',
+        avatar: tempUploadImageBase64,
+        type: 'user',
+        date: new Date().toLocaleDateString('vi-VN')
+      };
+
+      characters.unshift(newChar);
+      selectedId = newChar.id;
+      saveToLocalStorage();
+      
+      closeAddModal(null);
+      renderGrid();
+      renderDetail();
+    }
+
+    // --- APP STARTUP ---
+    initDatabase();
+    renderGrid();
+    renderDetail();
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StoryMee Universe</title>
+    <title>AIkid Universe</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,12 @@
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=202607141151">
+    <script>
+        // Skip meteor loading overlay when coming from the login page
+        if (document.referrer.indexOf('/login') !== -1 || window.location.search.indexOf('from=login') !== -1) {
+            document.write('<style>#page-loader-overlay { display: none !important; opacity: 0 !important; }</style>');
+        }
+    </script>
 </head>
 
 <body>
@@ -189,7 +195,7 @@
         <div class="lobby-logo" onclick="window.location.href='/'">
             <img src="assets/images/logo.svg" alt="StoryMee Logo" class="logo-image">
         </div>
-        <button class="auth-btn" onclick="window.location.href='/login'">Đăng Nhập</button>
+        <button class="auth-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
     </header>
 
     <div class="lobby-wrapper">
