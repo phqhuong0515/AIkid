@@ -32,390 +32,116 @@
       align-items: flex-end; /* Align the cat to the bottom */
     }
 
-    /* Back/Close Button */
-    .back-btn {
-      position: absolute;
-      right: 30px;
-      top: 30px;
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, #ff9eb5, #ff7597);
-      border: none;
-      color: #FFFFFF;
-      font-size: 1.5rem;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 20px rgba(255, 117, 151, 0.35);
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 100;
-    }
-
-    .back-btn:hover {
-      transform: scale(1.1) rotate(90deg);
-      box-shadow: 0 10px 25px rgba(255, 117, 151, 0.5);
-    }
-
-    .back-btn:active {
-      transform: scale(0.95);
-    }
-
     /* Container for the cat */
     .login-container {
       width: 100%;
-      max-width: 800px;
+      max-width: 1260px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
-      bottom: -60px; /* Offset to crop the cat body at the bottom */
+      bottom: 0px; /* Align white body bottom with screen bottom to show paws fully */
     }
 
-    /* Giant Cat Body */
-    .cat {
-      position: relative;
-      width: 720px; /* Expanded width to match reference */
-      height: 680px; /* Tall and big */
-      background: #FFFFFF; /* White body */
-      border-radius: 360px 360px 0 0; /* Huge dome shape for head/body */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 -10px 45px rgba(0, 0, 0, 0.06);
+    /* Hide the orange tongue shape drawn in the SVG */
+    #svg-tongue {
+      display: none !important;
     }
 
-    /* Cat Ears */
-    .ear {
-      position: absolute;
-      top: -45px;
-      width: 140px;
-      height: 140px;
-      z-index: -1;
-    }
-
-    .ear.left {
-      left: 50px;
-      background: #FFFFFF;
-      border-radius: 25px 110px 0 0;
-      transform: rotate(-12deg);
-    }
-
-    .ear.left .ear-inner {
-      position: absolute;
-      top: 22px;
-      left: 22px;
-      width: 90px;
-      height: 90px;
-      background: #f06100; /* Dark orange inner ear */
-      border-radius: 12px 80px 0 0;
-    }
-
-    .ear.right {
-      right: 50px;
-      background: #f08b18; /* Yellow orange outer ear */
-      border-radius: 110px 25px 0 0;
-      transform: rotate(12deg);
-    }
-
-    .ear.right .ear-inner {
-      position: absolute;
-      top: 22px;
-      right: 22px;
-      width: 90px;
-      height: 90px;
-      background: #f06100;
-      border-radius: 80px 12px 0 0;
-    }
-
-    /* Orange patch over right eye and ear */
-    .cat-spot {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 320px;
-      height: 320px;
-      background: #f08b18;
-      border-radius: 0 360px 0 100%;
-      z-index: 1;
-    }
-
-    /* Curved Happy Eyes (^) */
-    .eyes-container {
-      display: flex;
-      justify-content: space-between;
-      width: 400px;
-      position: absolute;
-      top: 155px;
-      z-index: 3;
-    }
-
-    .eye-happy {
-      width: 60px;
-      height: 30px;
-      border: 6.5px solid #d64900; /* Thick dark orange eye stroke */
-      border-bottom: none;
-      border-left: none;
-      border-right: none;
-      border-radius: 50px 50px 0 0 / 50px 50px 0 0; /* Arc shape */
-    }
-
-    /* Nose */
-    .cat-nose {
-      position: absolute;
-      top: 212px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 32px;
-      height: 20px;
-      background: #d64900;
-      clip-path: polygon(0 0, 100% 0, 50% 100%);
-      z-index: 3;
-    }
-
-    .cat-nose::after {
-      content: "";
-      position: absolute;
-      top: 19px;
-      left: 14px;
-      width: 4.5px;
-      height: 24px;
-      background: #d64900;
-    }
-
-    /* Giant Mouth eating card */
-    .cat-mouth {
-      position: absolute;
-      top: 252px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 480px; /* Extra large mouth */
-      height: 270px;
-      background: #e64a19; /* Red-orange inner mouth */
-      border-radius: 50% 50% 46% 46%;
-      overflow: hidden;
-      z-index: 2;
-      box-shadow: inset 0 12px 24px rgba(0,0,0,0.18);
-    }
-
-    /* Double fangs */
-    .fang {
-      position: absolute;
-      top: -2px;
-      width: 26px;
-      height: 32px;
-      background: #FFFFFF;
-      clip-path: polygon(0 0, 100% 0, 50% 100%);
-    }
-
-    .fang.left {
-      left: 105px;
-    }
-
-    .fang.right {
-      right: 105px;
-    }
-
-    /* Custom Double-Lobe Tongue shape */
-    .cat-tongue {
-      position: absolute;
-      bottom: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 220px;
-      height: 90px;
-      display: flex;
-      justify-content: center;
-      z-index: 1;
-    }
-
-    .tongue-lobe {
-      width: 125px;
-      height: 125px;
-      background: #f06100; /* Brighter orange tongue */
-      border-radius: 50%;
-      margin: 0 -12px;
-      box-shadow: inset 0 5px 10px rgba(0,0,0,0.05);
-    }
-
-    .cat-throat {
-      position: absolute;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90px;
-      height: 50px;
-      background: #880e4f;
-      border-radius: 50%;
-      opacity: 0.4;
-    }
-
-    /* Login Form Wrapper overlapping mouth */
-    .login-form-wrapper {
-      position: relative;
-      margin-top: 310px; /* Shifted down to overlap mouth precisely */
-      width: 390px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* White card with thin border */
-    .login-card {
-      width: 100%;
-      background: #FFFFFF;
-      border: 2px solid #E2E8F0;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    }
-
-    .input-group {
-      width: 100%;
-      position: relative;
-    }
-
-    .input-group input {
-      width: 100%;
-      height: 68px;
-      border: none;
-      outline: none;
-      padding: 0 26px;
-      font-family: 'Mali', sans-serif;
-      font-size: 1.45rem;
-      font-weight: 500;
-      color: #2D3748;
-      background: #FFFFFF;
-    }
-
-    .input-group input::placeholder {
-      color: #A0AEC0;
-      opacity: 1;
-    }
-
-    .input-divider {
-      width: 100%;
-      height: 2px;
-      background: #EDF2F7;
-    }
-
-    /* Submit Button Area */
-    .submit-area {
-      position: relative;
-      margin-top: -15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-    }
-
-    /* Cat Arms with detailed rounded fingers holding button */
-    .hand {
-      position: absolute;
-      background: #f08b18; /* Yellow orange arms */
-      z-index: 15;
-      display: flex;
-      align-items: center;
-    }
-
-    .hand.left {
-      left: -60px;
-      width: 200px;
-      height: 75px;
-      border-radius: 0 35px 35px 0;
-      top: 50%;
-      transform: translateY(-50%) rotate(12deg);
-      transform-origin: left center;
-      justify-content: flex-end;
-      padding-right: 15px;
-    }
-
-    .hand.right {
-      right: -60px;
-      width: 200px;
-      height: 75px;
-      border-radius: 35px 0 0 35px;
-      top: 50%;
-      transform: translateY(-50%) rotate(-12deg);
-      transform-origin: right center;
-      justify-content: flex-start;
-      padding-left: 15px;
-    }
-
-    /* Detailed rounded fingers */
-    .finger {
-      width: 26px;
-      height: 26px;
-      background: #f08b18;
-      border-radius: 50%;
-      margin: 0 -2.5px;
-      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Custom go/Đăng Nhập button */
-    .login-btn {
-      min-width: 250px;
-      height: 68px;
-      background: #e64a19; /* Solid red orange button */
-      border: none;
-      border-radius: 18px;
-      color: #FFFFFF;
-      font-family: 'Mali', sans-serif;
-      font-weight: 700;
-      font-size: 1.6rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 45px;
-      box-shadow: 0 6px 18px rgba(230, 74, 25, 0.25);
-      transition: all 0.2s ease;
-      z-index: 12;
-    }
-
+    /* Styling for the new login button overlay */
     .login-btn:hover {
-      background: #d84315;
-      transform: scale(1.02);
-      box-shadow: 0 8px 22px rgba(230, 74, 25, 0.35);
+      transform: scale(1.05);
+      box-shadow: 0 12px 30px rgba(255, 117, 151, 0.5) !important;
+      background: linear-gradient(135deg, #ff5780, #ff7597) !important;
     }
 
-    .login-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* Success toast styling */
+    /* Success Toast */
     .success-toast {
       position: fixed;
       top: -100px;
       left: 50%;
       transform: translateX(-50%);
-      background: #38A169;
+      background: #4ADE80;
       color: #FFFFFF;
-      padding: 16px 36px;
-      border-radius: 20px;
-      font-size: 1.25rem;
+      padding: 16px 32px;
+      border-radius: 9999px;
       font-weight: 700;
-      box-shadow: 0 10px 25px rgba(56, 161, 105, 0.35);
-      z-index: 1000;
+      font-size: 1.15rem;
+      box-shadow: 0 10px 25px rgba(74, 222, 128, 0.35);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      z-index: 99999;
       transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .success-toast.show {
       top: 40px;
     }
+
+    /* Placeholder customization */
+    input::placeholder {
+      color: #A99586;
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Back to Lobby Button -->
-  <button class="back-btn" onclick="goBack()" aria-label="Đóng">
-    <i class="fa-solid fa-xmark"></i>
-  </button>
+  <!-- Navigation Header Bar Scaler Wrapper (Matches Character page scaler size) -->
+  <div class="scaler-wrapper" style="
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1927.63px;
+    height: 930px;
+    transform-origin: top center;
+    transform: translateX(-50%) scale(1);
+    pointer-events: none;
+    z-index: 1000;
+  ">
+    <header style="
+      position: absolute;
+      left: 38px;
+      top: 35px;
+      width: 1735.15px;
+      height: 76.48px;
+      background: rgba(253, 250, 244, 0.6);
+      border-radius: 24px;
+      padding: 0 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: auto;
+    ">
+      <div style="display: flex; align-items: center; gap: 15px; cursor: pointer; margin-left: -8px;" onclick="window.location.href='/'">
+        <img src="assets/images/logo.svg" alt="StoryMee Logo" style="height: 60px; width: auto; object-fit: contain;">
+      </div>
+    </header>
+    <!-- Circular close button with an x, placed inline with the navigation bar inside scaler -->
+    <button type="button" onclick="goBack()" aria-label="Đóng" style="
+      position: absolute;
+      right: 38px;
+      top: 35px;
+      width: 76.48px;
+      height: 76.48px;
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+      border: none;
+      color: #FFFFFF;
+      font-size: 2.1rem;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(255, 117, 151, 0.35);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+      pointer-events: auto;
+    " onmouseover="this.style.transform='scale(1.1) rotate(90deg)';" onmouseout="this.style.transform='scale(1) rotate(0deg)';">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
 
   <!-- Success Toast -->
   <div id="success-toast" class="success-toast">
@@ -423,71 +149,259 @@
   </div>
 
   <div class="login-container">
-    <form class="cat" onsubmit="handleLogin(event)">
-      <!-- Left & Right Ears -->
-      <div class="ear left">
-        <div class="ear-inner"></div>
-      </div>
-      <div class="ear right">
-        <div class="ear-inner"></div>
-      </div>
-      
-      <!-- Right eye/ear orange patch -->
-      <div class="cat-spot"></div>
+    <!-- Inline SVG (Cat drawing with linear gradients) -->
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 834.19 711.34" style="width: 100%; height: auto; display: block;">
+      <defs>
+        <style>
+          .cls-1{fill:url(#linear-gradient);}
+          .cls-2{fill:url(#linear-gradient-2);}
+          .cls-3{fill:url(#linear-gradient-3);}
+          .cls-4{fill:url(#linear-gradient-4);}
+          .cls-5{fill:url(#linear-gradient-5);}
+          .cls-6{fill:#f7a424;}
+          .cls-7{fill:#f48108;}
+          .cls-8{fill:none;}
+          .cls-9{fill:url(#linear-gradient-6);}
+          .cls-10{fill:#fffffe;}
+          .cls-11{fill:url(#linear-gradient-7);}
+          .cls-12{fill:url(#linear-gradient-8);}
+          .cls-13{fill:#E5D9CE;}
+        </style>
+        <linearGradient id="linear-gradient" x1="40.83" y1="27.94" x2="184.94" y2="172.05" gradientTransform="translate(-4.99 8.17) rotate(-3.61)" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#fffffe"/>
+          <stop offset="0.32" stop-color="#fcfefe"/>
+          <stop offset="0.58" stop-color="#f2fafd"/>
+          <stop offset="0.82" stop-color="#e1f4fb"/>
+          <stop offset="1" stop-color="#cfeef9"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-2" x1="86.56" y1="75.57" x2="177.19" y2="166.21" gradientTransform="translate(-4.99 8.17) rotate(-3.61)" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#f7a424"/>
+          <stop offset="0" stop-color="#f7a223"/>
+          <stop offset="0.38" stop-color="#f69b1d"/>
+          <stop offset="0.61" stop-color="#f59014"/>
+          <stop offset="0.81" stop-color="#f48108"/>
+          <stop offset="0.98" stop-color="#e6530e"/>
+          <stop offset="1" stop-color="#e5500e"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-3" x1="792.41" y1="27.78" x2="648.3" y2="171.89" gradientTransform="translate(7.49 -49.07) rotate(3.99)" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#f7a424"/>
+          <stop offset="0.48" stop-color="#f69518"/>
+          <stop offset="1" stop-color="#f48108"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-4" x1="746.68" y1="75.41" x2="656.05" y2="166.04" gradientTransform="translate(7.49 -49.07) rotate(3.99)" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#f7a424"/>
+          <stop offset="0" stop-color="#f7a223"/>
+          <stop offset="0.36" stop-color="#f69b1d"/>
+          <stop offset="0.6" stop-color="#f59014"/>
+          <stop offset="0.81" stop-color="#f48108"/>
+          <stop offset="1" stop-color="#e5500e"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-5" x1="417.09" y1="27.39" x2="417.09" y2="711.34" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#fffffe"/>
+          <stop offset="0.47" stop-color="#fffffe"/>
+          <stop offset="0.55" stop-color="#fffffe"/>
+          <stop offset="0.78" stop-color="#fdfefe"/>
+          <stop offset="0.87" stop-color="#f6fcfd"/>
+          <stop offset="0.93" stop-color="#eaf8fc"/>
+          <stop offset="0.98" stop-color="#d9f2fa"/>
+          <stop offset="1" stop-color="#cfeef9"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-6" x1="417.09" y1="198.87" x2="417.09" y2="489.62" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#e5500e"/>
+          <stop offset="0.37" stop-color="#e14e0e"/>
+          <stop offset="0.77" stop-color="#d4470c"/>
+          <stop offset="1" stop-color="#c9420b"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-7" x1="250.85" y1="590.45" x2="0" y2="590.45" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#f7a424"/>
+          <stop offset="0.56" stop-color="#f7a223"/>
+          <stop offset="0.76" stop-color="#f69b1d"/>
+          <stop offset="0.9" stop-color="#f59014"/>
+          <stop offset="1" stop-color="#f48108"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-8" x1="583.34" y1="590.45" x2="834.19" y2="590.45" xlink:href="#linear-gradient-7"/>
+      </defs>
+      <g id="Layer_2" data-name="Layer 2">
+        <g id="Layer_1-2" data-name="Layer 1">
+          <path class="cls-1" d="M266.52,81.88,172,152l-94.54,70.1L61.9,102.33,52.6,30.71a26.86,26.86,0,0,1,38-28.18l65.84,29.7Z"/>
+          <path class="cls-2" d="M230.18,108.57l-59.46,44.1-59.45,44.09-9.78-75.32-5.85-45a16.89,16.89,0,0,1,23.89-17.72l41.41,18.68Z"/>
+          <path class="cls-3" d="M566.73,80.64l94.07,70.73,94.07,70.73,16.34-119.65L781,30.88A26.86,26.86,0,0,0,743.18,2.46l-66,29.26Z"/>
+          <path class="cls-4" d="M602.9,107.58l59.16,44.48,59.16,44.49,10.28-75.26,6.15-45A16.9,16.9,0,0,0,713.87,58.4L672.34,76.81Z"/>
+          <path class="cls-5" d="M417.09,27.39h0A409.06,409.06,0,0,1,826.16,436.45V711.34a0,0,0,0,1,0,0H8a0,0,0,0,1,0,0V436.45A409.06,409.06,0,0,1,417.09,27.39Z"/>
+          <path class="cls-6" d="M738.05,182.82a196,196,0,0,1-129,48.15c-108.65,0-196.74-88.08-196.74-196.73q0-3.42.12-6.82,2.31,0,4.62,0a409.19,409.19,0,0,1,321,155.43Z"/>
+          <path class="cls-7" d="M321.56,138.54h0a5.18,5.18,0,0,1-5.11-4.29,24.77,24.77,0,0,0-48.79,0,5.2,5.2,0,0,1-5.11,4.29h0a5.18,5.18,0,0,1-5.14-6,35.16,35.16,0,0,1,69.28,0A5.17,5.17,0,0,1,321.56,138.54Z"/>
+          <path class="cls-7" d="M571,138.54h0a5.19,5.19,0,0,1-5.11-4.29,24.77,24.77,0,0,0-48.79,0,5.18,5.18,0,0,1-5.11,4.29h0a5.17,5.17,0,0,1-5.13-6,35.16,35.16,0,0,1,69.28,0A5.18,5.18,0,0,1,571,138.54Z"/>
+          <line class="cls-8" x1="327.21" y1="138.54" x2="316.82" y2="138.54"/>
+          <line class="cls-8" x1="267.29" y1="138.54" x2="256.9" y2="138.54"/>
+          <path class="cls-7" d="M434.47,150.91H399.72A7.47,7.47,0,0,0,394,163.17l6.45,7.75L411.35,184a7.58,7.58,0,0,0,.85.85v24.69h9.48V185.14a8.06,8.06,0,0,0,1.16-1.11l10.92-13.11,6.45-7.75A7.47,7.47,0,0,0,434.47,150.91Z"/>
+          <path class="cls-9" transform="translate(0, 198.87) scale(1, 0.91) translate(0, -198.87)" d="M650.06,318.11a171.7,171.7,0,0,1-103.7,157.58q-6.83,2.94-14,5.3c-1,.33-2,.65-3,1s-2.06.63-3.1.93h0c-1,.3-2.07.58-3.1.86s-2.1.56-3.15.82c-1.6.4-3.2.77-4.82,1.12l-2.62.55-.58.12c-.93.18-1.86.36-2.79.52s-2,.36-3,.52c-.5.09-1,.17-1.52.24l-3,.44-1.27.16c-1.87.24-3.74.44-5.62.62l-1.6.14-1.21.1-2.41.17-2.73.15c-.84,0-1.68.08-2.52.1-1,0-2.05.06-3.08.08l-2.68,0H355.63q-1.49,0-3,0l-1.53,0q-5.47-.13-10.86-.62l-2.17-.21c-1.44-.14-2.87-.31-4.3-.49l-1.67-.22c-.87-.12-1.74-.24-2.61-.38l-1.77-.28c-.82-.13-1.65-.27-2.47-.42s-1.41-.25-2.11-.39l-1.93-.38-2.25-.48-1.74-.39-1.91-.44-2.56-.64-2-.54q-4.08-1.11-8.1-2.41l-1.48-.49c-1-.35-2.1-.71-3.14-1.09s-1.81-.65-2.7-1l-1.5-.57q-2.73-1-5.41-2.2l-.58-.25A171.54,171.54,0,0,1,184.13,318.11,119.17,119.17,0,0,1,303.36,198.87H530.83A119.2,119.2,0,0,1,650.06,318.11Z"/>
+          <!-- Orange Tongue/Throat at the bottom of the mouth -->
+          <path id="svg-tongue" class="cls-7" d="M546.36,475.69a171,171,0,0,1-67.82,13.93H355.63a171,171,0,0,1-67.81-13.93,82.91,82.91,0,0,1,129.27-37.12,82.91,82.91,0,0,1,129.27,37.12Z"/>
+          <path class="cls-10" transform="translate(0, 198.87) scale(1, 0.93) translate(0, -198.87)" d="M308.73,197l-9.06,23.14-7.82,20a8.62,8.62,0,0,1-14.47,2.54l-13.7-16.21-13.79-16.33A115.07,115.07,0,0,1,303.36,197Z"/>
+          <path class="cls-10" transform="translate(0, 198.87) scale(1, 0.93) translate(0, -198.87)" d="M584.52,211.63l-14,16-13.7,15.6a8.78,8.78,0,0,1-14.47-2.44l-7.82-19.23-9.21-22.64h5.52A118.53,118.53,0,0,1,584.52,211.63Z"/>
+          
+          <!-- Wrapped hands in group to shift them up by 52px -->
+          <g transform="translate(0, -52)">
+            <path class="cls-6" d="M227,636.82a41.76,41.76,0,0,1-4.94,2C223.73,638.16,225.37,637.5,227,636.82Z"/>
+            <path class="cls-11" d="M250.85,598.31a43.28,43.28,0,0,1-.29,5,41,41,0,0,1-.89,5,42.7,42.7,0,0,1-22.9,28.43l-.22.1c-1.64.68-3.28,1.34-4.94,2l-.06,0A269.07,269.07,0,0,1,8.93,631,15.63,15.63,0,0,1,0,616.92V528.64A4.71,4.71,0,0,1,7.76,525a179.54,179.54,0,0,0,177.05,32.54v-.07a17.76,17.76,0,0,1,12.81-17.19,17.92,17.92,0,0,1,23,17.18,42.61,42.61,0,0,1,21.14,14.45,42.55,42.55,0,0,1,9.13,26.37Z"/>
+            <path class="cls-7" d="M245.32,577.3c-6.4-.95-17.82-1-27.36,8.15a2.5,2.5,0,1,1-3.46-3.62,36.17,36.17,0,0,1,27.22-9.89A42.16,42.16,0,0,1,245.32,577.3Z"/>
+            <path class="cls-7" d="M250.56,603.3a41,41,0,0,1-.89,5,30.74,30.74,0,0,0-22.2-.08,2.49,2.49,0,0,1-1.86,0,2.51,2.51,0,0,1,.08-4.65A35.47,35.47,0,0,1,250.56,603.3Z"/>
+            <path class="cls-6" d="M607.18,636.82a41.76,41.76,0,0,0,4.94,2C610.46,638.16,608.82,637.5,607.18,636.82Z"/>
+            <path class="cls-12" d="M583.34,598.31a43.28,43.28,0,0,0,.29,5,41,41,0,0,0,.89,5,42.7,42.7,0,0,0,22.9,28.43l.22.1c1.64.68,3.28,1.34,4.94,2l.06,0A269.07,269.07,0,0,0,825.26,631a15.63,15.63,0,0,0,8.93-14.09V528.64a4.71,4.71,0,0,0-7.76-3.61,179.54,179.54,0,0,1-177,32.54v-.07a17.76,17.76,0,0,0-12.81-17.19,17.92,17.92,0,0,0-23,17.18,42.61,42.61,0,0,0-21.14,14.45,42.55,42.55,0,0,0-9.13,26.37Z"/>
+            <path class="cls-7" d="M588.87,577.3c6.4-.95,17.82-1,27.36,8.15a2.5,2.5,0,0,0,3.46-3.62,36.17,36.17,0,0,0-27.22-9.89A42.16,42.16,0,0,0,588.87,577.3Z"/>
+            <path class="cls-7" d="M583.63,603.3a41,41,0,0,0,.89,5,30.74,30.74,0,0,1,22.2-.08,2.49,2.49,0,0,0,1.86,0,2.51,2.51,0,0,0-.08-4.65A35.47,35.47,0,0,0,583.63,603.3Z"/>
+          </g>
+          
+          <rect class="cls-10" x="254.59" y="268.37" width="325" height="111.9" rx="11.62"/>
+          <rect class="cls-13" x="254.59" y="320.48" width="325" height="6"/>
+        </g>
+      </g>
+    </svg>
 
-      <!-- Happy Happy Curved Eyes (^) -->
-      <div class="eyes-container">
-        <div class="eye-happy left"></div>
-        <div class="eye-happy right"></div>
-      </div>
-
-      <!-- Nose & Mouth attachment -->
-      <div class="cat-nose"></div>
-
-      <!-- Big mouth behind card -->
-      <div class="cat-mouth">
-        <!-- Throat depth -->
-        <div class="cat-throat"></div>
-        <!-- Fangs -->
-        <div class="fang left"></div>
-        <div class="fang right"></div>
-        <!-- Tongue with double-lobe -->
-        <div class="cat-tongue">
-          <div class="tongue-lobe"></div>
-          <div class="tongue-lobe"></div>
+    <!-- Transparent Interactive Form overlaying precisely the card & button in SVG -->
+    <form onsubmit="handleLogin(event)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
+        <!-- Email and Password Inputs card overlay -->
+        <div style="position: absolute; left: 30.52%; top: 37.6%; width: 38.96%; height: 15.78%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+          <input type="email" id="email" placeholder="Email" required autocomplete="email" style="
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            font-family: 'Mali', sans-serif;
+            font-weight: 500;
+            font-size: 1.5rem;
+            color: #4A3D3C;
+            width: 100%;
+            height: 46%;
+            padding: 0 24px;
+            box-sizing: border-box;
+          ">
+          <div style="height: 8%;"></div> <!-- spacer for divider -->
+          <!-- Password container with show/hide toggle eye icon -->
+          <div style="position: relative; width: 100%; height: 46%;">
+            <input type="password" id="password" placeholder="Mật khẩu" required autocomplete="current-password" style="
+              background: transparent !important;
+              border: none !important;
+              outline: none !important;
+              font-family: 'Mali', sans-serif;
+              font-weight: 500;
+              font-size: 1.5rem;
+              color: #4A3D3C;
+              width: 100%;
+              height: 100%;
+              padding: 0 60px 0 24px;
+              box-sizing: border-box;
+            ">
+            <button type="button" onclick="togglePasswordVisibility()" style="
+              position: absolute;
+              right: 20px;
+              top: 50%;
+              transform: translateY(-50%);
+              background: transparent;
+              border: none;
+              color: #C8B5A7;
+              font-size: 1.3rem;
+              cursor: pointer;
+              outline: none;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 0;
+              margin: 0;
+              z-index: 20;
+              transition: color 0.2s ease;
+            " onmouseover="this.style.color='#ff7597';" onmouseout="this.style.color='#C8B5A7';">
+              <i class="fa-solid fa-eye" id="password-eye-icon"></i>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Login Card -->
-      <div class="login-form-wrapper">
-        <div class="login-card">
-          <div class="input-group">
-            <input type="email" id="email" placeholder="Email" required autocomplete="email">
-          </div>
-          <div class="input-divider"></div>
-          <div class="input-group">
-            <input type="password" id="password" placeholder="Mật khẩu" required autocomplete="current-password">
-          </div>
+        <!-- Forgot Password Link -->
+        <a href="#" style="
+          position: absolute;
+          right: 30.52%;
+          top: 55.1%;
+          color: #FFFFFF;
+          font-family: 'Mali', sans-serif;
+          font-weight: 600;
+          font-size: 1.35rem;
+          text-decoration: none;
+          z-index: 12;
+          opacity: 0.95;
+          transition: opacity 0.2s ease;
+        " onmouseover="this.style.opacity='1'; this.style.textDecoration='underline';" onmouseout="this.style.opacity='0.95'; this.style.textDecoration='none';">Quên mật khẩu?</a>
+       
+       <!-- Login Button (Pink Gradient) placed between the hands -->
+       <button type="submit" class="login-btn" style="
+         position: absolute;
+         left: 26%;
+         top: 69.3%;
+         width: 48%;
+         height: 10.5%;
+         background: linear-gradient(135deg, #ff7597, #ff9eb5) !important;
+         border: none !important;
+         border-radius: 9999px !important;
+         color: #FFFFFF !important;
+         font-family: 'Mali', sans-serif;
+         font-weight: 700;
+         font-size: 2.1rem;
+         text-transform: uppercase;
+         cursor: pointer;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         outline: none;
+         padding: 0;
+         margin: 0;
+         box-shadow: 0 8px 24px rgba(255, 117, 151, 0.4);
+         transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+       ">đăng nhập</button>
+        <!-- Register link placed below the login button on the white cat body background -->
+        <div style="
+          position: absolute;
+          left: 26%;
+          top: 82.1%;
+          width: 48%;
+          text-align: center;
+          font-family: 'Mali', sans-serif;
+          font-weight: 500;
+          font-size: 1.75rem;
+          color: #A99586;
+          z-index: 20;
+          pointer-events: auto;
+        ">
+          Chưa có tài khoản? <a href="#" style="color: #ff7597; font-weight: 700; text-decoration: none;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">Đăng ký</a>
         </div>
-
-        <!-- Submit Button held by cat arms with fingers -->
-        <div class="submit-area">
-          <!-- Left hand with 3 fingers -->
-          <div class="hand left">
-            <div class="finger"></div>
-            <div class="finger"></div>
-            <div class="finger"></div>
-          </div>
-          <button type="submit" class="login-btn">đăng nhập</button>
-          <!-- Right hand with 3 fingers -->
-          <div class="hand right">
-            <div class="finger"></div>
-            <div class="finger"></div>
-            <div class="finger"></div>
-          </div>
-        </div>
-      </div>
     </form>
+
+    <!-- Hands/Paws Overlay to sit on top of the button -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 834.19 711.34" style="position: absolute; top: 0; left: 0; width: 100%; height: auto; pointer-events: none; z-index: 15; display: block;">
+      <defs>
+        <style>
+          .overlay-cls-7{fill:#f48108;}
+          .overlay-cls-11{fill:url(#overlay-linear-gradient-7);}
+          .overlay-cls-12{fill:url(#overlay-linear-gradient-8);}
+        </style>
+        <linearGradient id="overlay-linear-gradient-7" x1="250.85" y1="590.45" x2="0" y2="590.45" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#f7a424"/>
+          <stop offset="0.56" stop-color="#f7a223"/>
+          <stop offset="0.76" stop-color="#f69b1d"/>
+          <stop offset="0.9" stop-color="#f59014"/>
+          <stop offset="1" stop-color="#f48108"/>
+        </linearGradient>
+        <linearGradient id="overlay-linear-gradient-8" x1="583.34" y1="590.45" x2="834.19" y2="590.45" xlink:href="#overlay-linear-gradient-7"/>
+      </defs>
+      <!-- Wrapped overlay hands in group to shift them up by 52px -->
+      <g transform="translate(0, -52)">
+        <!-- Left hand -->
+        <path class="overlay-cls-11" d="M250.85,598.31a43.28,43.28,0,0,1-.29,5,41,41,0,0,1-.89,5,42.7,42.7,0,0,1-22.9,28.43l-.22.1c-1.64.68-3.28,1.34-4.94,2l-.06,0A269.07,269.07,0,0,1,8.93,631,15.63,15.63,0,0,1,0,616.92V528.64A4.71,4.71,0,0,1,7.76,525a179.54,179.54,0,0,0,177.05,32.54v-.07a17.76,17.76,0,0,1,12.81-17.19,17.92,17.92,0,0,1,23,17.18,42.61,42.61,0,0,1,21.14,14.45,42.55,42.55,0,0,1,9.13,26.37Z"/>
+        <path class="overlay-cls-7" d="M245.32,577.3c-6.4-.95-17.82-1-27.36,8.15a2.5,2.5,0,1,1-3.46-3.62,36.17,36.17,0,0,1,27.22-9.89A42.16,42.16,0,0,1,245.32,577.3Z"/>
+        <path class="overlay-cls-7" d="M250.56,603.3a41,41,0,0,1-.89,5,30.74,30.74,0,0,0-22.2-.08,2.49,2.49,0,0,1-1.86,0,2.51,2.51,0,0,1,.08-4.65A35.47,35.47,0,0,1,250.56,603.3Z"/>
+        <!-- Right hand -->
+        <path class="overlay-cls-12" d="M583.34,598.31a43.28,43.28,0,0,0,.29,5,41,41,0,0,0,.89,5,42.7,42.7,0,0,0,22.9,28.43l.22.1c1.64.68,3.28,1.34,4.94,2l.06,0A269.07,269.07,0,0,0,825.26,631a15.63,15.63,0,0,0,8.93-14.09V528.64a4.71,4.71,0,0,0-7.76-3.61,179.54,179.54,0,0,1-177,32.54v-.07a17.76,17.76,0,0,0-12.81-17.19,17.92,17.92,0,0,0-23,17.18,42.61,42.61,0,0,0-21.14,14.45,42.55,42.55,0,0,0-9.13,26.37Z"/>
+        <path class="overlay-cls-7" d="M588.87,577.3c6.4-.95,17.82-1,27.36,8.15a2.5,2.5,0,0,0,3.46-3.62,36.17,36.17,0,0,0-27.22-9.89A42.16,42.16,0,0,0,588.87,577.3Z"/>
+        <path class="overlay-cls-7" d="M583.63,603.3a41,41,0,0,0,.89,5,30.74,30.74,0,0,1,22.2-.08,2.49,2.49,0,0,0,1.86,0,2.51,2.51,0,0,0-.08-4.65A35.47,35.47,0,0,0,583.63,603.3Z"/>
+      </g>
+    </svg>
   </div>
 
   <script>
@@ -516,6 +430,37 @@
         }, 1500);
       }
     }
+
+    // Toggle password visibility (show/hide)
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('password-eye-icon');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function adjustScale() {
+      const wrapper = document.querySelector('.scaler-wrapper');
+      if (!wrapper) return;
+      
+      const targetWidth = 1927.63;
+      const targetHeight = 930;
+      const winWidth = window.innerWidth;
+      const winHeight = window.innerHeight;
+      
+      const scale = Math.min(winWidth / targetWidth, winHeight / targetHeight);
+      
+      wrapper.style.transform = `translateX(-50%) scale(${scale})`;
+    }
+
+    window.addEventListener('resize', adjustScale);
+    window.addEventListener('load', adjustScale);
+    adjustScale();
 
     // Go back
     function goBack() {
