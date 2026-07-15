@@ -954,6 +954,29 @@
 
     <!-- Workspace Wrapper (Holds Container) -->
     <div class="workspace-wrapper">
+      <!-- Toggle Mode Button -->
+      <div style="width: 100%; display: flex; justify-content: flex-start; margin-bottom: -6px; box-sizing: border-box;">
+        <button id="btn-toggle-option" onclick="toggleOption()" style="
+          background: linear-gradient(135deg, #ff7597, #ff9eb5);
+          border: 2px solid #FFFFFF;
+          border-radius: 9999px;
+          color: white;
+          font-family: 'Mali', sans-serif;
+          font-weight: 700;
+          font-size: 1rem;
+          padding: 8px 20px;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        ">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Thay thế: Chuyển sang 3 Câu hỏi + Ảnh</span>
+        </button>
+      </div>
+
       <!-- Workspace Container for Two Panels -->
       <div class="workspace-container">
         <!-- Panel 1: Drawing Canvas -->
@@ -961,8 +984,8 @@
           <!-- Upload & Description Body (Vertical Flow) -->
           <div class="draw-workspace-body" style="flex: 1; display: flex; flex-direction: column; gap: 15px; height: auto; width: 100%; border-radius: 24px; background: transparent; border: none; padding: 0;">
             
-            <!-- Top Section: Ideas (Left) & Upload (Right) -->
-            <div style="display: flex; flex-direction: row; gap: 20px; width: 100%; flex: none; align-items: stretch;">
+            <!-- Top Section Option 1: Ideas (Left) & Upload (Right) -->
+            <div id="option-1-container" style="display: none; flex-direction: row; gap: 20px; width: 100%; flex: none; align-items: stretch;">
               <!-- Left Column: Ideas Panel -->
               <div style="flex: 1.0; min-width: 260px; background: #F5EDE6; border: 3px solid #E5D9CE; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
                 <!-- Title -->
@@ -1077,6 +1100,153 @@
                       " title="Xóa ảnh này">
                       <i class="fa-solid fa-xmark"></i>
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Section Option 2: 6 Questions (Replacer for Image Upload) -->
+            <div id="option-2-container" style="display: block; width: 100%; flex: none; box-sizing: border-box;">
+              <!-- Unified Frame for 6 Questions -->
+              <div style="width: 100%; background: #F5EDE6; border: 3px solid #E5D9CE; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
+                <!-- Title -->
+                <div style="font-family: 'Mali', sans-serif; font-size: 1.3rem; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none;">
+                  <i class="fa-solid fa-clipboard-question" style="color: #FF7597; font-size: 1.3rem;"></i>
+                  <span style="position: relative; top: -1px;">BỘ CÂU HỎI CHI TIẾT</span>
+                </div>
+                
+                <!-- 2-Column Grid Layout for 6 textareas -->
+                <div style="display: flex; flex-direction: row; gap: 20px; width: 100%;">
+                  <!-- Left Column: Questions 1-3 -->
+                  <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Question 1 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">1. CÂU HỎI 1</span>
+                      <textarea id="question-1" placeholder="Ví dụ: câu trả lời câu hỏi 1..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">2. CÂU HỎI 2</span>
+                      <textarea id="question-2" placeholder="Ví dụ: câu trả lời câu hỏi 2..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">3. CÂU HỎI 3</span>
+                      <textarea id="question-3" placeholder="Ví dụ: câu trả lời câu hỏi 3..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+                  </div>
+
+                  <!-- Right Column: Questions 4-6 -->
+                  <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Question 4 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">4. CÂU HỎI 4</span>
+                      <textarea id="question-4" placeholder="Ví dụ: câu trả lời câu hỏi 4..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">5. CÂU HỎI 5</span>
+                      <textarea id="question-5" placeholder="Ví dụ: câu trả lời câu hỏi 5..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">6. CÂU HỎI 6</span>
+                      <textarea id="question-6" placeholder="Ví dụ: câu trả lời câu hỏi 6..." style="
+                          background: #FFFFFF;
+                          border: 2px solid #FFFFFF;
+                          border-radius: 16px;
+                          padding: 10px 16px;
+                          font-family: 'Mali', sans-serif;
+                          font-size: 0.95rem;
+                          color: #4A3D3C;
+                          outline: none;
+                          box-shadow: 0 2px 6px rgba(188, 166, 149, 0.04);
+                          transition: all 0.2s;
+                          height: 66px;
+                          resize: none;
+                          line-height: 1.4;
+                          box-sizing: border-box;
+                        "></textarea>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1398,6 +1568,71 @@
         document.body.removeChild(link);
       }
 
+      let currentOption = 2;
+
+      function toggleOption() {
+        playPopSound();
+        const opt1Container = document.getElementById('option-1-container');
+        const opt2Container = document.getElementById('option-2-container');
+        const btnToggle = document.getElementById('btn-toggle-option');
+        const btnText = btnToggle.querySelector('span');
+
+        if (currentOption === 1) {
+          currentOption = 2;
+          opt1Container.style.display = 'none';
+          opt2Container.style.display = 'flex';
+          btnText.textContent = 'Thay thế: Chuyển sang 3 Câu hỏi + Ảnh';
+          updatePromptFromQuestions();
+        } else {
+          currentOption = 1;
+          opt1Container.style.display = 'flex';
+          opt2Container.style.display = 'none';
+          btnText.textContent = 'Thay thế: Chuyển sang 6 Câu hỏi';
+          updatePromptFromIdeas();
+        }
+      }
+
+      function updatePromptFromQuestions() {
+        const q1 = document.getElementById('question-1').value.trim();
+        const q2 = document.getElementById('question-2').value.trim();
+        const q3 = document.getElementById('question-3').value.trim();
+        const q4 = document.getElementById('question-4').value.trim();
+        const q5 = document.getElementById('question-5').value.trim();
+        const q6 = document.getElementById('question-6').value.trim();
+
+        let tagsHtml = '';
+        let tagsAdded = 0;
+        const vals = [q1, q2, q3, q4, q5, q6];
+
+        vals.forEach(val => {
+          if (val) {
+            let prefixComma = tagsAdded > 0 ? ', ' : '';
+            tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${prefixComma}${val}</span>`;
+            tagsAdded++;
+          }
+        });
+
+        let suffix = tagsAdded > 0 ? '' : '...';
+        let htmlContent = `<span style="color: #4A3D3C; font-weight: 500;">Bản vẽ thiết kế${suffix} </span>` + tagsHtml;
+
+        const displayDiv = document.getElementById('prompt-display');
+        if (displayDiv) {
+          displayDiv.innerHTML = htmlContent;
+        }
+
+        let plainText = `Bản vẽ thiết kế`;
+        let plainParts = vals.filter(v => v);
+        if (plainParts.length > 0) {
+          plainText += ` ` + plainParts.join(`, `);
+        }
+        plainText += '.';
+
+        const promptTextarea = document.getElementById('character-prompt');
+        if (promptTextarea) {
+          promptTextarea.value = plainText;
+        }
+      }
+
       // Initial loading and drag/drop binding
       adjustScale();
       window.addEventListener('load', () => {
@@ -1442,8 +1677,16 @@
           }
         });
 
+        // Bind option 2 inputs change events
+        ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', updatePromptFromQuestions);
+          }
+        });
+
         // Run initially to populate with name/species from feature page
-        updatePromptFromIdeas();
+        updatePromptFromQuestions();
       });
 
       window.addEventListener('resize', adjustScale);
