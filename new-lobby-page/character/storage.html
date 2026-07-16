@@ -1373,7 +1373,7 @@
           type: 'demo',
           description: 'Bạn gấu trúc Yuu béo tròn, năng động và thích khám phá thế giới xung quanh!',
           createdAt: 1784100000000,
-          date: '15/07/2026'
+          date: '15/07'
         },
         {
           id: 'seed-nori',
@@ -1387,7 +1387,7 @@
           type: 'demo',
           description: 'Bạn thỏ con Nori nhút nhát nhưng cực kỳ vẽ đẹp và có giọng ca trong trẻo!',
           createdAt: 1784100000001,
-          date: '15/07/2026'
+          date: '15/07'
         },
         {
           id: 'seed-bong',
@@ -1401,7 +1401,7 @@
           type: 'demo',
           description: 'Bạn cừu nhỏ Bông trắng muốt tinh nghịch, thích học vẽ và hay đi dạo ngắm hoa!',
           createdAt: 1784100000002,
-          date: '15/07/2026'
+          date: '15/07'
         }
       ];
 
@@ -1738,6 +1738,7 @@
       const savedGender = localStorage.getItem('storymee_char_gender') || '';
       const savedSpecies = localStorage.getItem('storymee_char_species') || 'Bé tự tạo';
       const savedDescription = localStorage.getItem('storymee_char_description') || '';
+      const savedBirthday = localStorage.getItem('storymee_char_birthday') || new Date().toLocaleDateString('vi-VN').substring(0, 5);
 
       const newChar = {
         id: 'user-' + Date.now(),
@@ -1751,7 +1752,7 @@
         fullbodyImg: tempUploadImageBase64,
         type: 'user',
         createdAt: Date.now(),
-        date: new Date().toLocaleDateString('vi-VN')
+        date: savedBirthday
       };
 
       characters.unshift(newChar);

@@ -1218,6 +1218,15 @@
           localStorage.setItem('storymee_char_age', ageInput.value.trim());
         });
       }
+      const featureBirthdayInput = document.getElementById('birthday-input');
+      if (featureBirthdayInput) {
+        const savedBirthday = localStorage.getItem('storymee_char_birthday');
+        if (savedBirthday) featureBirthdayInput.value = savedBirthday;
+        
+        featureBirthdayInput.addEventListener('input', () => {
+          localStorage.setItem('storymee_char_birthday', featureBirthdayInput.value.trim());
+        });
+      }
       if (speciesInput) {
         const savedSpecies = localStorage.getItem('storymee_char_species');
         if (savedSpecies) speciesInput.value = savedSpecies;
