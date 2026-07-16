@@ -1504,7 +1504,14 @@
       document.getElementById('detail-info-name').textContent = char.name || '';
       document.getElementById('detail-info-age').textContent = char.age || '';
       document.getElementById('detail-info-gender').textContent = char.gender || '';
-      document.getElementById('detail-info-birthday').textContent = char.date || '';
+      let displayBirthday = char.date || '';
+      if (displayBirthday.includes('/')) {
+        const parts = displayBirthday.split('/');
+        if (parts.length >= 2) {
+          displayBirthday = `${parts[0]}/${parts[1]}`;
+        }
+      }
+      document.getElementById('detail-info-birthday').textContent = displayBirthday;
       document.getElementById('detail-info-description').textContent = char.description || 'Chưa có mô tả cho bạn nhỏ này...';
     }
 
