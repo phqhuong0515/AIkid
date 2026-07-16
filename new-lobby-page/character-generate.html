@@ -60,6 +60,25 @@
       color: #BE123C;
     }
 
+    /* Scrollbar for custom dropdowns */
+    .shape-type-dropdown-options::-webkit-scrollbar,
+    .dropdown-scroll-wrapper::-webkit-scrollbar {
+      width: 6px;
+    }
+    .shape-type-dropdown-options::-webkit-scrollbar-track,
+    .dropdown-scroll-wrapper::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .shape-type-dropdown-options::-webkit-scrollbar-thumb,
+    .dropdown-scroll-wrapper::-webkit-scrollbar-thumb {
+      background: #D1C5B4;
+      border-radius: 10px;
+    }
+    .shape-type-dropdown-options::-webkit-scrollbar-thumb:hover,
+    .dropdown-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #A89C8A;
+    }
+
     /* Clean layout and centering */
     html, body {
       margin: 0;
@@ -1324,7 +1343,7 @@
                       gap: 8px;
                       cursor: pointer;
                       user-select: none;
-                      min-width: 150px;
+                      min-width: 230px;
                       box-sizing: border-box;
                       box-shadow: 0 4px 10px rgba(0,0,0,0.02);
                     ">
@@ -1333,6 +1352,7 @@
                         font-size: 0.95rem;
                         font-weight: 700;
                         color: #8A7463;
+                        white-space: nowrap;
                       ">Hình dáng</span>
                       <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: #8A7463; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; margin-left: auto;">
                         <polyline points="6 9 12 15 18 9"></polyline>
@@ -1354,12 +1374,12 @@
                         padding: 6px;
                         box-sizing: border-box;
                       ">
-                        <div class="cat-option selected" data-value="shape" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Hình dáng</div>
-                        <div class="cat-option" data-value="parts" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Bộ phận</div>
-                        <div class="cat-option" data-value="face" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Khuôn mặt</div>
-                        <div class="cat-option" data-value="hair" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Tóc</div>
-                        <div class="cat-option" data-value="color" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Màu sắc & Chất liệu</div>
-                        <div class="cat-option" data-value="clothes" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Trang phục</div>
+                        <div class="cat-option selected" data-value="shape" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Hình dáng</div>
+                        <div class="cat-option" data-value="parts" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Bộ phận</div>
+                        <div class="cat-option" data-value="face" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Khuôn mặt</div>
+                        <div class="cat-option" data-value="hair" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Tóc</div>
+                        <div class="cat-option" data-value="color" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Màu sắc & Chất liệu</div>
+                        <div class="cat-option" data-value="clothes" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Trang phục</div>
                       </div>
                     </div>
                   </div>
@@ -1877,10 +1897,10 @@
           { label: "4. TỔNG THỂ NHÂN VẬT TẠO CẢM GIÁC GÌ?", subject: "Cảm giác", choices: ["đáng yêu", "vui nhộn", "nhanh nhẹn", "mạnh mẽ", "bí ẩn", "ngốc nghếch", "kỳ lạ"], placeholder: "Ví dụ: đáng yêu, vui nhộn, nhanh nhẹn..." }
         ],
         parts: [
-          { label: "1. TAI NHÂN VẬT?", subject: "Tai", choices: ["tai tròn", "tai nhọn", "tai dài", "tai gấu", "tai mèo", "tai thỏ", "tai chuột", "không có tai"], placeholder: "Ví dụ: tai thỏ dài, tai mèo nhọn, tai gấu tròn..." },
-          { label: "2. ĐUÔI NHÂN VẬT?", subject: "Đuôi", choices: ["đuôi ngắn", "đuôi dài", "đuôi xù bông", "đuôi cá", "không có đuôi"], placeholder: "Ví dụ: đuôi sóc xù bông, đuôi mèo dài..." },
-          { label: "3. TAY NHÂN VẬT?", subject: "Tay", choices: ["tay ngắn", "tay dài", "tay rô bốt", "cánh chim", "vây cá"], placeholder: "Ví dụ: tay ngắn mũm mĩm, tay dài thon..." },
-          { label: "4. CHÂN NHÂN VẬT?", subject: "Chân", choices: ["chân ngắn", "chân dài", "chân mèo đệm thịt", "móng guốc", "đuôi cá (tiên cá)"], placeholder: "Ví dụ: chân ngắn củn đáng yêu, chân dài..." },
+          { label: "1. TAY CỦA NHÂN VẬT THẾ NÀO?", subject: "Tay", choices: ["không có tay", "tay dài", "tay ngắn", "tay mèo", "tay robot", "cánh", "xúc tu"], placeholder: "Ví dụ: tay dài thon, cánh chim, xúc tu..." },
+          { label: "2. CHÂN CỦA NHÂN VẬT THẾ NÀO?", subject: "Chân", choices: ["không có chân", "chân dài", "chân ngắn", "chân mèo", "đuôi cá", "bánh xe", "lò xo"], placeholder: "Ví dụ: chân ngắn củn đáng yêu, chân dài..." },
+          { label: "3. TAI NHÂN VẬT?", subject: "Tai", choices: ["tai tròn", "tai nhọn", "tai dài", "tai gấu", "tai mèo", "tai thỏ", "tai chuột", "không có tai"], placeholder: "Ví dụ: tai thỏ dài, tai mèo nhọn, tai gấu tròn..." },
+          { label: "4. ĐUÔI NHÂN VẬT?", subject: "Đuôi", choices: ["đuôi ngắn", "đuôi dài", "đuôi xù bông", "đuôi cá", "không có đuôi"], placeholder: "Ví dụ: đuôi sóc xù bông, đuôi mèo dài..." },
           { label: "5. SỪNG NHÂN VẬT?", subject: "Sừng", choices: ["không có sừng", "sừng tuần lộc", "sừng trâu", "sừng kỳ lân"], placeholder: "Ví dụ: sừng tuần lộc nhỏ, không có sừng..." },
           { label: "6. MÓNG VUỐT NHÂN VẬT?", subject: "Móng vuốt", choices: ["không có móng", "đệm thịt mềm", "móng vuốt mèo nhọn", "móng vuốt rồng"], placeholder: "Ví dụ: đệm thịt chân tròn trịa, móng vuốt mèo..." }
         ],
@@ -1920,7 +1940,7 @@
 
       let categoryInputs = {
         shape: ["con vật", "tròn trịa", "hình tròn", "đáng yêu", "", ""],
-        parts: ["Tai tròn", "Đuôi ngắn", "Tay ngắn", "Chân ngắn", "Không có sừng", "Đệm thịt mềm"],
+        parts: ["tay ngắn", "chân ngắn", "tai tròn", "đuôi ngắn", "không có sừng", "đệm thịt mềm"],
         face: ["Mắt tròn to", "Miệng cười tươi", "Mũi nút áo", "Tinh nghịch", "Má hồng dễ thương", "Đeo kính gọng tròn"],
         hair: ["Tóc xoăn bồng bềnh", "Màu hạt dẻ", "Tóc ngắn", "Không có phụ kiện", "Mái lệch", "Tóc mềm mượt"],
         color: ["Màu vàng tươi", "Lông trắng muốt", "Lông xù mịn", "Không có họa tiết", "Ánh sáng dịu", "Lông xù dày ấm áp"],
@@ -2050,7 +2070,14 @@
                   padding: 6px;
                   box-sizing: border-box;
                 ">
-                  ${optionsHtml}
+                  <div class="dropdown-scroll-wrapper" style="
+                    max-height: 180px;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    padding-right: 2px;
+                  ">
+                    ${optionsHtml}
+                  </div>
                 </div>
               `;
               
@@ -2225,6 +2252,28 @@
           }
         });
 
+        // Helper to format subject and value without repeating words
+        function formatSubjectValue(subject, value) {
+          if (!subject) return value;
+          const sLower = subject.toLowerCase().trim();
+          const vLower = value.toLowerCase().trim();
+          
+          // If value already contains the subject, don't prepend
+          if (vLower.includes(sLower)) {
+            return value;
+          }
+          
+          // Split subject by spaces/slashes and check if value contains any keyword (e.g. "tóc" in "Kiểu tóc")
+          const sWords = sLower.split(/[\s/]+/);
+          for (let word of sWords) {
+            if (word.length > 2 && vLower.includes(word)) {
+              return value;
+            }
+          }
+          
+          return `${subject} ${value}`;
+        }
+
         // Collect all non-empty values from all 6 categories along with their subjects
         let allValues = [];
         Object.keys(categoryInputs).forEach(cat => {
@@ -2246,7 +2295,7 @@
           if (tagsAdded > 0) {
             tagsHtml += `<span style="color: #4A3D3C; font-weight: 600; margin: 0 1px;">, </span>`;
           }
-          const displayText = item.subject ? `${item.subject} ${item.value}` : item.value;
+          const displayText = formatSubjectValue(item.subject, item.value);
           tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${displayText}</span>`;
           tagsAdded++;
         });
@@ -2262,7 +2311,7 @@
         let plainText = `Bản vẽ thiết kế`;
         if (allValues.length > 0) {
           const formattedList = allValues.map(item => {
-            return item.subject ? `${item.subject} ${item.value}` : item.value;
+            return formatSubjectValue(item.subject, item.value);
           });
           plainText += ` ` + formattedList.join(`, `);
         }
