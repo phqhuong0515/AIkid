@@ -25,15 +25,12 @@
     textarea::placeholder {
       color: #A3A3A3 !important;
       opacity: 1 !important;
-      white-space: nowrap !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
+      white-space: normal !important;
     }
 
     textarea {
-      white-space: nowrap;
-      overflow-x: auto;
-      overflow-y: hidden;
+      white-space: pre-wrap;
+      overflow-y: auto;
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
@@ -43,7 +40,7 @@
     }
 
     .cat-option:hover {
-      background: #FFE4E6;
+      background: #FFF1F2;
       color: #BE123C;
     }
     .cat-option.selected {
@@ -52,7 +49,7 @@
     }
 
     .shape-opt-option:hover {
-      background: #FFE4E6;
+      background: #FFF1F2;
       color: #BE123C;
     }
     .shape-opt-option.selected {
@@ -1197,12 +1194,12 @@
               <!-- Left Column: Ideas Panel -->
               <div style="flex: 1.0; min-width: 260px; background: #F5EDE6; border: 3px solid #E5D9CE; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
                 <!-- Title -->
-                <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.3rem; font-weight: 900; color: #475569; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none; width: 100%; box-sizing: border-box;">
+                <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.3rem; font-weight: 900; color: #475569; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none; width: 100%; box-sizing: border-box; position: relative; top: -2px;">
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-lightbulb" style="color: #FF7597; font-size: 1.3rem;"></i>
                     <span style="position: relative; top: -0.5px;">Ý TƯỞNG CỦA EM</span>
                   </div>
-                  <button class="action-btn" onclick="clearAllInputs()" style="padding: 8px 16px; font-size: 0.95rem; height: auto;" title="Xóa tất cả nội dung để nhập mới">
+                  <button class="action-btn" onclick="clearAllInputs()" style="padding: 8px 16px; font-size: 0.95rem; height: auto; position: relative; top: -2px;" title="Xóa tất cả nội dung để nhập mới">
                     <i class="fa-solid fa-arrow-rotate-left"></i>
                     <span>Làm lại</span>
                   </button>
@@ -1324,7 +1321,7 @@
               <!-- Unified Frame for 6 Questions -->
               <div style="width: 100%; background: #F5EDE6; border: 3px solid #E5D9CE; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
                 <!-- Title -->
-                <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.3rem; font-weight: 900; color: #475569; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none; width: 100%; box-sizing: border-box;">
+                <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.3rem; font-weight: 900; color: #475569; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none; width: 100%; box-sizing: border-box; position: relative; top: -2px;">
                   <div style="display: flex; align-items: center; gap: 12px; position: relative;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                       <i class="fa-solid fa-lightbulb" style="color: #FF7597; font-size: 1.3rem;"></i>
@@ -1334,6 +1331,7 @@
                     <!-- Custom Category Dropdown Trigger -->
                     <div id="category-select-container" style="
                       position: relative;
+                      top: -2px;
                       background: #FFFFFF;
                       border: 3.5px solid #FFFFFF;
                       border-radius: 20px;
@@ -1376,14 +1374,14 @@
                       ">
                         <div class="cat-option selected" data-value="shape" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Hình dáng</div>
                         <div class="cat-option" data-value="parts" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Bộ phận</div>
-                        <div class="cat-option" data-value="face" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Khuôn mặt</div>
-                        <div class="cat-option" data-value="hair" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Tóc</div>
+                        <div class="cat-option" data-value="face" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Đầu và khuôn mặt</div>
+                        <div class="cat-option" data-value="hair" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Tóc và lông</div>
                         <div class="cat-option" data-value="color" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Màu sắc & Chất liệu</div>
                         <div class="cat-option" data-value="clothes" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;">Trang phục</div>
                       </div>
                     </div>
                   </div>
-                  <button class="action-btn" onclick="clearAllInputs()" style="padding: 8px 16px; font-size: 0.95rem; height: auto;" title="Xóa tất cả nội dung để nhập mới">
+                  <button class="action-btn" onclick="clearAllInputs()" style="padding: 8px 16px; font-size: 0.95rem; height: auto; position: relative; top: -2px;" title="Xóa tất cả nội dung để nhập mới">
                     <i class="fa-solid fa-arrow-rotate-left"></i>
                     <span>Làm lại</span>
                   </button>
@@ -1461,7 +1459,7 @@
                   <div id="col-questions-right" style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
                     <!-- Question 4 -->
                     <div id="wrapper-question-4" data-category="hair" style="display: flex; flex-direction: column; gap: 4px;">
-                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">4. TÓC</span>
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">4. TÓC VÀ LÔNG</span>
                       <textarea id="question-4" placeholder="Ví dụ: tóc ngắn xoăn, màu nâu hạt dẻ..." style="
                           background: #FFFFFF;
                           border: 2px solid #FFFFFF;
@@ -1530,7 +1528,7 @@
             <div class="prompt-box" style="flex: 1; min-height: 0; width: 100%; background: #FFFFFF; border: 2px dashed #EBDCD0; border-radius: 24px; padding: 16px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; justify-content: flex-start;">
               <!-- Formula Banner -->
               <div style="background: #FFF0F3; border: 1.5px solid #FFCCD5; border-radius: 14px; padding: 8px 16px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #FF5C8A; display: flex; align-items: center; gap: 8px; user-select: none; flex-shrink: 0;">
-                <i class="fa-solid fa-star" style="color: #FF5C8A; font-size: 0.95rem;"></i> Công thức: [Nhân vật] + [Hình dáng] + [Trang phục] + [Hành động]
+                <i class="fa-solid fa-star" style="color: #FF5C8A; font-size: 0.95rem;"></i> Công thức: [Nhân vật] + [Hình dáng] + [Trang phục]
               </div>
               <!-- Rich Prompt Display Area -->
               <div id="prompt-display" style="flex: 1; min-height: 0; font-family: 'Mali', sans-serif; font-size: 1.15rem; color: #4A3D3C; line-height: 1.8; word-break: break-word; outline: none; overflow-y: auto; text-align: left;">
@@ -1580,8 +1578,8 @@
               </button>
             </div>
           </div>
-          <!-- Next Page Button pointing to /character-generate/feature.html -->
-          <a href="/character-generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="playPopAndNavigate('/character-generate/feature.html'); return false;">
+          <!-- Next Page Button pointing to /character/generate/feature.html -->
+          <a href="/character/generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="playPopAndNavigate('/character/generate/feature.html'); return false;">
             <svg viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -1894,55 +1892,53 @@
           { label: "1. NHÂN VẬT CỦA EM LÀ GÌ?", subject: "Nhân vật", choices: ["con người", "con vật", "đồ vật", "thực vật", "robot"], placeholder: "Ví dụ: con mèo, con gấu, siêu nhân..." },
           { label: "2. NHÂN VẬT CÓ DÁNG NGƯỜI THẾ NÀO?", subject: "Dáng người", choices: ["tròn trịa", "mảnh mai", "nhỏ bé", "cao lớn", "mũm mĩm", "vuông vức"], placeholder: "Ví dụ: dáng vẻ tròn xoe, cao gầy, mũm mĩm..." },
           { label: "3. CƠ THỂ NHÂN VẬT GIỐNG HÌNH GÌ?", subject: "Cơ thể", choices: ["hình tròn", "hình vuông", "hình tam giác", "hình quả trứng"], placeholder: "Ví dụ: hình tròn, hình quả lê, hình tam giác..." },
-          { label: "4. TỔNG THỂ NHÂN VẬT TẠO CẢM GIÁC GÌ?", subject: "Cảm giác", choices: ["đáng yêu", "vui nhộn", "nhanh nhẹn", "mạnh mẽ", "bí ẩn", "ngốc nghếch", "kỳ lạ"], placeholder: "Ví dụ: đáng yêu, vui nhộn, nhanh nhẹn..." }
+          { label: "4. TỔNG THỂ NHÂN VẬT TẠO CẢM GIÁC GÌ?", subject: "Cảm giác", choices: ["đáng yêu", "vui nhộn", "mạnh mẽ", "bí ẩn", "ngốc nghếch", "kỳ lạ", "độc ác"], placeholder: "Ví dụ: đáng yêu, vui nhộn..." }
         ],
         parts: [
-          { label: "1. TAY CỦA NHÂN VẬT THẾ NÀO?", subject: "Tay", choices: ["không có tay", "tay dài", "tay ngắn", "tay mèo", "tay robot", "cánh", "xúc tu"], placeholder: "Ví dụ: tay dài thon, cánh chim, xúc tu..." },
-          { label: "2. CHÂN CỦA NHÂN VẬT THẾ NÀO?", subject: "Chân", choices: ["không có chân", "chân dài", "chân ngắn", "chân mèo", "đuôi cá", "bánh xe", "lò xo"], placeholder: "Ví dụ: chân ngắn củn đáng yêu, chân dài..." },
-          { label: "3. TAI NHÂN VẬT?", subject: "Tai", choices: ["tai tròn", "tai nhọn", "tai dài", "tai gấu", "tai mèo", "tai thỏ", "tai chuột", "không có tai"], placeholder: "Ví dụ: tai thỏ dài, tai mèo nhọn, tai gấu tròn..." },
-          { label: "4. ĐUÔI NHÂN VẬT?", subject: "Đuôi", choices: ["đuôi ngắn", "đuôi dài", "đuôi xù bông", "đuôi cá", "không có đuôi"], placeholder: "Ví dụ: đuôi sóc xù bông, đuôi mèo dài..." },
-          { label: "5. SỪNG NHÂN VẬT?", subject: "Sừng", choices: ["không có sừng", "sừng tuần lộc", "sừng trâu", "sừng kỳ lân"], placeholder: "Ví dụ: sừng tuần lộc nhỏ, không có sừng..." },
-          { label: "6. MÓNG VUỐT NHÂN VẬT?", subject: "Móng vuốt", choices: ["không có móng", "đệm thịt mềm", "móng vuốt mèo nhọn", "móng vuốt rồng"], placeholder: "Ví dụ: đệm thịt chân tròn trịa, móng vuốt mèo..." }
+          { label: "1. TAY CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Tay", choices: ["không có tay", "tay dài", "tay ngắn", "tay mèo", "tay robot", "cánh", "xúc tu"], placeholder: "Ví dụ: 4 tay robot dài..." },
+          { label: "2. CHÂN CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Chân", choices: ["không có chân", "chân dài", "chân ngắn", "chân mèo", "đuôi cá", "bánh xe", "lò xo"], placeholder: "Ví dụ: 2 chân mèo ngắn cũn..." },
+          { label: "3. NHÂN VẬT CÓ CÁNH KHÔNG?", subject: "Cánh", choices: ["cánh chim", "cánh bướm", "cánh dơi", "cánh máy bay", "không có cánh"], placeholder: "Ví dụ: cánh chim màu trắng, cánh bướm rực rỡ..." },
+          { label: "4. NHÂN VẬT CÓ ĐUÔI KHÔNG?", subject: "Đuôi", choices: ["đuôi ngắn", "đuôi dài", "đuôi xù bông", "đuôi cá", "không có đuôi"], placeholder: "Ví dụ: đuôi sóc xù bông, đuôi mèo dài..." },
+          { label: "5. NHÂN VẬT CÓ SỪNG KHÔNG?", subject: "Sừng", choices: ["không có sừng", "sừng tuần lộc", "sừng trâu", "sừng kỳ lân"], placeholder: "Ví dụ: sừng tuần lộc nhỏ, không có sừng..." }
         ],
         face: [
-          { label: "1. MẮT NHÂN VẬT?", subject: "Mắt", choices: ["mắt tròn to", "mắt híp cười vui", "mắt to lấp lánh", "đeo kính gọng tròn"], placeholder: "Ví dụ: mắt tròn to lấp lánh màu xanh, mắt híp..." },
-          { label: "2. MIỆNG NHÂN VẬT?", subject: "Miệng", choices: ["miệng cười tươi", "ngậm kẹo mút", "miệng cười mỉm", "chu môi tinh nghịch"], placeholder: "Ví dụ: miệng cười tươi rói, đang ngậm kẹo..." },
-          { label: "3. MŨI NHÂN VẬT?", subject: "Mũi", choices: ["mũi nhỏ xinh", "mũi nút áo", "mũi chú hề đỏ", "không rõ mũi"], placeholder: "Ví dụ: mũi nút áo dễ thương, mũi chú hề đỏ..." },
-          { label: "4. BIỂU CẢM KHUÔN MẶT?", subject: "Biểu cảm", choices: ["vui vẻ", "tinh nghịch", "đáng yêu", "ngạc nhiên", "hạnh phúc"], placeholder: "Ví dụ: vui vẻ, ngạc nhiên, tinh nghịch..." },
-          { label: "5. MÁ HỒNG NHÂN VẬT?", subject: "Má hồng", choices: ["má hồng dễ thương", "má đỏ hây hây", "không có má hồng"], placeholder: "Ví dụ: má hồng hào dễ thương, má đỏ hây hây..." },
-          { label: "6. PHỤ KIỆN KHUÔN MẶT?", subject: "Phụ kiện mặt", choices: ["đeo kính gọng tròn", "không có phụ kiện", "miếng dán cá nhân", "nốt ruồi dễ thương"], placeholder: "Ví dụ: đeo kính gọng tròn dễ thương, có nốt ruồi..." }
-        ],
+          { label: "1. MẮT CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Mắt", choices: ["không có mắt", "to tròn", "nhỏ xíu", "cụp xuống", "lấp lánh", "khác màu nhau"], placeholder: "Ví dụ: 3 mắt to tròn màu xanh nước biển..." },
+          { label: "2. MIỆNG CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Miệng", choices: ["miệng cười tươi", "ngậm kẹo mút", "miệng mếu", "chu môi tinh nghịch", "không có miệng"], placeholder: "Ví dụ: miệng cười tươi rói, đang ngậm kẹo..." },
+          { label: "3. MŨI CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Mũi", choices: ["mũi nhỏ xinh", "mũi nút áo", "mũi chú hề đỏ", "không rõ mũi"], placeholder: "Ví dụ: mũi nút áo dễ thương, mũi chú hề đỏ..." },
+          { label: "4. TAI CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Tai", choices: ["không có tai", "tai tròn", "tai mèo", "tai người", "tai robot"], placeholder: "Ví dụ: đôi tai mèo tinh nghịch, tai thỏ dài..." },
+          { label: "5. KHUÔN MẶT CÓ GÌ ĐẶC BIỆT KHÔNG?", subject: "Điểm đặc biệt", choices: ["không có", "tàn nhang", "nốt ruồi", "má hồng", "môi hồng", "vết sẹo"], placeholder: "Ví dụ: nốt ruồi ở dưới mắt, sẹo ở ngang mũi..." },
+          { label: "6. BIỂU CẢM CỦA NHÂN VẬT THẾ NÀO?", subject: "Biểu cảm", choices: ["vui vẻ", "tinh nghịch", "đáng yêu", "ngạc nhiên", "hạnh phúc"], placeholder: "Ví dụ: vui vẻ, ngạc nhiên, tinh nghịch..." }        ],
         hair: [
-          { label: "1. KIỂU TÓC NHÂN VẬT?", subject: "Kiểu tóc", choices: ["tóc ngắn", "buộc hai bên", "tóc xoăn bồng bềnh", "không có tóc"], placeholder: "Ví dụ: tóc ngắn xoăn bồng bềnh, buộc hai bên..." },
-          { label: "2. MÀU TÓC NHÂN VẬT?", subject: "Màu tóc", choices: ["màu hạt dẻ", "hồng pastel", "vàng kim", "đen láy", "xanh mint"], placeholder: "Ví dụ: màu nâu hạt dẻ, hồng pastel..." },
-          { label: "3. ĐỘ DÀI TÓC?", subject: "Độ dài tóc", choices: ["tóc ngắn", "tóc ngang vai", "tóc dài thướt tha"], placeholder: "Ví dụ: tóc ngắn cá tính, tóc dài thướt tha..." },
-          { label: "4. PHỤ KIỆN TÓC?", subject: "Phụ kiện tóc", choices: ["không có phụ kiện", "nơ màu hồng", "bờm tai gấu", "kẹp tóc ngôi sao"], placeholder: "Ví dụ: kẹp tóc ngôi sao, bờm tai gấu..." },
-          { label: "5. MÁI TÓC NHÂN VẬT?", subject: "Mái tóc", choices: ["mái ngố dễ thương", "mái lệch", "mái thưa", "không có mái"], placeholder: "Ví dụ: mái ngố dễ thương, mái lệch..." },
-          { label: "6. CHẤT TÓC NHÂN VẬT?", subject: "Chất tóc", choices: ["tóc xù xù đáng yêu", "tóc mềm mượt", "tóc xoăn tít"], placeholder: "Ví dụ: tóc xù xù đáng yêu, tóc bóng mượt..." }
+          { label: "1. KIỂU TÓC/LÔNG CỦA NHÂN VẬT THẾ NÀO?", subject: "Kiểu tóc/lông", choices: ["không tóc/lông", "mượt mà", "xoăn tít", "dựng đứng", "lộn xộn", "phát sáng"], placeholder: "Ví dụ: mượt mà, xoăn tít, dựng đứng..." },
+          { label: "2. TÓC MÁI CỦA NHÂN VẬT TRÔNG THẾ NÀO?", subject: "Tóc mái", choices: ["mái ngố dễ thương", "mái lệch", "mái thưa", "không có mái"], placeholder: "Ví dụ: mái ngố dễ thương, mái lệch..." },
+          { label: "3. MÀU TÓC/LÔNG CỦA NHÂN VẬT LÀ MÀU GÌ?", subject: "Màu tóc/lông", choices: ["màu hạt dẻ", "hồng pastel", "vàng kim", "đen láy", "xanh mint"], placeholder: "Ví dụ: màu nâu hạt dẻ, hồng pastel..." },
+          { label: "4. ĐỘ DÀI TÓC/LÔNG CỦA NHÂN VẬT THẾ NÀO?", subject: "Độ dài tóc/lông", choices: ["tóc ngắn", "tóc ngang vai", "tóc dài thướt tha"], placeholder: "Ví dụ: tóc ngắn cá tính, tóc dài thướt tha..." },
+          { label: "5. TÓC/ LÔNG CÓ ĐIỂM GÌ ĐẶC BIỆT KHÔNG?", subject: "Điểm đặc biệt", choices: ["không có", "highlight", "ombre"], placeholder: "Ví dụ: tóc highlight màu vàng, lông đuôi phát sáng..." },
+          { label: "6. NHÂN VẬT CÓ ĐEO PHỤ KIỆN ĐẦU KHÔNG?", subject: "Phụ kiện đầu", choices: ["không có phụ kiện", "nơ màu hồng", "bờm tai gấu", "kẹp tóc ngôi sao"], placeholder: "Ví dụ: kẹp tóc ngôi sao, bờm tai gấu..." }
         ],
         color: [
-          { label: "1. MÀU CHỦ ĐẠO NHÂN VẬT?", subject: "Màu chủ đạo", choices: ["màu vàng tươi", "màu hồng pastel", "màu trắng tinh", "màu xanh mint"], placeholder: "Ví dụ: màu vàng tươi, màu hồng nhạt..." },
-          { label: "2. MÀU DA HOẶC LÔNG?", subject: "Màu da/lông", choices: ["lông trắng muốt", "da hồng hào", "lông nâu hạt dẻ", "lông xám nhẹ"], placeholder: "Ví dụ: lông trắng muốt, da hồng hào..." },
-          { label: "3. CHẤT LIỆU DA/LÔNG?", subject: "Chất liệu", choices: ["lông xù mịn", "bóng như đất sét", "mịn như nhung", "vải bông mềm"], placeholder: "Ví dụ: lông xù bông mịn, bóng bẩy như đất sét..." },
-          { label: "4. HỌA TIẾT TRÊN NGƯỜI?", subject: "Họa tiết", choices: ["không có họa tiết", "sọc vằn tinh nghịch", "đốm tròn đáng yêu"], placeholder: "Ví dụ: sọc vằn tinh nghịch, đốm tròn..." },
-          { label: "5. ÁNH SÁNG & ĐỘ BÓNG?", subject: "Ánh sáng", choices: ["ánh sáng dịu", "không độ bóng", "lấp lánh nhẹ"], placeholder: "Ví dụ: da lấp lánh nhẹ, không độ bóng..." },
-          { label: "6. ĐỘ DÀY CỦA LÔNG?", subject: "Độ dày lông", choices: ["lông xù dày ấm áp", "lông mỏng", "không có lông"], placeholder: "Ví dụ: lông xù dày ấm áp, lông mỏng..." }
+          { label: "1. MÀU SẮC CHỦ ĐẠO CỦA NHÂN VẬT LÀ GÌ?", subject: "Màu chủ đạo", choices: ["màu vàng tươi", "màu hồng pastel", "màu trắng tinh", "màu xanh mint"], placeholder: "Ví dụ: màu vàng tươi, màu hồng nhạt..." },
+          { label: "2. MÀU DA/LÔNG CỦA NHÂN VẬT LÀ MÀU GÌ?", subject: "Màu da/lông", choices: ["lông trắng muốt", "da hồng hào", "lông nâu hạt dẻ", "lông xám nhẹ"], placeholder: "Ví dụ: lông trắng muốt, da hồng hào..." },
+          { label: "3. CHẤT LIỆU DA/LÔNG CỦA NHÂN VẬT THẾ NÀO?", subject: "Chất liệu", choices: ["lông xù mịn", "bóng như đất sét", "mịn như nhung", "vải bông mềm"], placeholder: "Ví dụ: lông xù bông mịn, bóng bẩy như đất sét..." },
+          { label: "4. NHÂN VẬT CÓ HỌA TIẾT GÌ TRÊN NGƯỜI KHÔNG?", subject: "Họa tiết", choices: ["không có họa tiết", "sọc vằn tinh nghịch", "đốm tròn đáng yêu"], placeholder: "Ví dụ: sọc vằn tinh nghịch, đốm tròn..." },
+          { label: "5. ÁNH SÁNG VÀ ĐỘ BÓNG CỦA NHÂN VẬT THẾ NÀO?", subject: "Ánh sáng", choices: ["ánh sáng dịu", "không độ bóng", "lấp lánh nhẹ"], placeholder: "Ví dụ: da lấp lánh nhẹ, không độ bóng..." },
+          { label: "6. ĐỘ DÀY LÔNG CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Độ dày lông", choices: ["lông xù dày ấm áp", "lông mỏng", "không có lông"], placeholder: "Ví dụ: lông xù dày ấm áp, lông mỏng..." }
         ],
         clothes: [
-          { label: "1. ÁO NHÂN VẬT MẶC?", subject: "Áo", choices: ["không mặc áo", "áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
-          { label: "2. QUẦN HOẶC VÁY?", subject: "Quần/Váy", choices: ["không mặc quần/váy", "váy xếp ly hồng", "quần yếm bò", "quần shorts"], placeholder: "Ví dụ: mặc váy xếp ly hồng, quần yếm bò..." },
-          { label: "3. GIÀY DÉP NHÂN VẬT?", subject: "Giày dép", choices: ["không đi giày dép", "giày thể thao trắng", "ủng đỏ đáng yêu", "sandal"], placeholder: "Ví dụ: đi giày thể thao trắng, ủng đỏ..." },
-          { label: "4. MŨ NHÂN VẬT ĐỘI?", subject: "Mũ", choices: ["không đội mũ", "mũ len quả bông", "mũ phi công", "mũ tai mèo"], placeholder: "Ví dụ: đội mũ len quả bông, mũ phi công..." },
-          { label: "5. PHỤ KIỆN TRANG PHỤC?", subject: "Phụ kiện", choices: ["không có phụ kiện", "khăn quàng cổ đỏ", "ba lô gấu trúc", "túi chéo nhỏ"], placeholder: "Ví dụ: đeo khăn quàng cổ đỏ, đeo ba lô gấu..." },
-          { label: "6. HỌA TIẾT TRANG PHỤC?", subject: "Họa tiết đồ", choices: ["không họa tiết", "họa tiết hoa cúc", "hình ngôi sao", "kẻ caro"], placeholder: "Ví dụ: họa tiết hoa cúc nhí, hình ngôi sao..." }
+          { label: "1. NHÂN VẬT MẶC ÁO KIỂU GÌ?", subject: "Áo", choices: ["không mặc áo", "áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
+          { label: "2. NHÂN VẬT MẶC QUẦN HAY VÁY?", subject: "Quần/Váy", choices: ["không mặc quần/váy", "váy xếp ly hồng", "quần yếm bò", "quần shorts"], placeholder: "Ví dụ: mặc váy xếp ly hồng, quần yếm bò..." },
+          { label: "3. NHÂN VẬT ĐI GIÀY DÉP GÌ?", subject: "Giày dép", choices: ["không đi giày dép", "giày thể thao trắng", "ủng đỏ đáng yêu", "sandal"], placeholder: "Ví dụ: đi giày thể thao trắng, ủng đỏ..." },
+          { label: "4. NHÂN VẬT ĐỘI MŨ GÌ?", subject: "Mũ", choices: ["không đội mũ", "mũ len quả bông", "mũ phi công", "mũ tai mèo"], placeholder: "Ví dụ: đội mũ len quả bông, mũ phi công..." },
+          { label: "5. NHÂN VẬT CÓ PHỤ KIỆN TRANG PHỤC GÌ KHÔNG?", subject: "Phụ kiện", choices: ["không có phụ kiện", "khăn quàng cổ đỏ", "ba lô gấu trúc", "túi chéo nhỏ"], placeholder: "Ví dụ: đeo khăn quàng cổ đỏ, đeo ba lô gấu..." },
+          { label: "6. TRANG PHỤC CỦA NHÂN VẬT CÓ HỌA TIẾT GÌ KHÔNG?", subject: "Họa tiết đồ", choices: ["không họa tiết", "họa tiết hoa cúc", "hình ngôi sao", "kẻ caro"], placeholder: "Ví dụ: họa tiết hoa cúc nhí, hình ngôi sao..." }
         ]
       };
 
       let categoryInputs = {
         shape: ["con vật", "tròn trịa", "hình tròn", "đáng yêu", "", ""],
-        parts: ["tay ngắn", "chân ngắn", "tai tròn", "đuôi ngắn", "không có sừng", "đệm thịt mềm"],
-        face: ["Mắt tròn to", "Miệng cười tươi", "Mũi nút áo", "Tinh nghịch", "Má hồng dễ thương", "Đeo kính gọng tròn"],
-        hair: ["Tóc xoăn bồng bềnh", "Màu hạt dẻ", "Tóc ngắn", "Không có phụ kiện", "Mái lệch", "Tóc mềm mượt"],
+        parts: ["tay ngắn", "chân ngắn", "không có cánh", "đuôi ngắn", "không có sừng", ""],
+        face: ["to tròn", "Miệng cười tươi", "Mũi nút áo", "tai người", "không có", "Tinh nghịch"],
+        hair: ["Tóc xoăn bồng bềnh", "Mái lệch", "Màu hạt dẻ", "Tóc ngắn", "không có", "Không có phụ kiện"],
         color: ["Màu vàng tươi", "Lông trắng muốt", "Lông xù mịn", "Không có họa tiết", "Ánh sáng dịu", "Lông xù dày ấm áp"],
         clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Không đội mũ", "Khăn quàng cổ đỏ", "Hình ngôi sao"]
       };
@@ -2008,16 +2004,32 @@
             
             const textarea = wrapper.querySelector('textarea');
             if (qDef.choices && qDef.choices.length > 0) {
+              // Sort choices so that options starting with "không" are always first
+              const choices = [...qDef.choices].sort((a, b) => {
+                const aStart = a.toLowerCase().startsWith('không');
+                const bStart = b.toLowerCase().startsWith('không');
+                if (aStart && !bStart) return -1;
+                if (!aStart && bStart) return 1;
+                return 0;
+              });
+
               // Ensure we show the textarea, styled correctly
               if (textarea) {
                 textarea.style.display = 'block';
                 textarea.style.paddingRight = '40px'; // leave space for dropdown arrow
                 textarea.placeholder = qDef.placeholder || 'Chọn từ danh sách hoặc tự nhập ở đây...';
                 
+                if (qDef.disableCustom) {
+                  textarea.setAttribute('readonly', 'true');
+                  textarea.style.cursor = 'pointer';
+                } else {
+                  textarea.removeAttribute('readonly');
+                  textarea.style.cursor = 'text';
+                }
+                
                 const currentValue = categoryInputs[newCat][i] || '';
                 // If they selected one of the default options, show it capitalized.
                 // Otherwise show their custom input exactly as typed.
-                const choices = qDef.choices;
                 if (choices.includes(currentValue.toLowerCase())) {
                   textarea.value = currentValue.charAt(0).toUpperCase() + currentValue.slice(1);
                 } else {
@@ -2034,7 +2046,6 @@
               selectDiv.style.cssText = 'position: absolute; right: 16px; top: 47px; z-index: 10;';
               
               const currentValue = categoryInputs[newCat][i] || '';
-              const choices = qDef.choices;
               let isCustom = currentValue !== '' && !choices.includes(currentValue.toLowerCase());
               
               let optionsHtml = '';
@@ -2043,8 +2054,10 @@
                 optionsHtml += `<div class="shape-opt-option ${isSelected ? 'selected' : ''}" data-value="${choice}" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">${choice.charAt(0).toUpperCase() + choice.slice(1)}</div>`;
               });
               
-              const isKhacSelected = isCustom;
-              optionsHtml += `<div class="shape-opt-option ${isKhacSelected ? 'selected' : ''}" data-value="khác" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Khác...</div>`;
+              if (!qDef.disableCustom) {
+                const isKhacSelected = isCustom;
+                optionsHtml += `<div class="shape-opt-option ${isKhacSelected ? 'selected' : ''}" data-value="khác" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Khác...</div>`;
+              }
               
               selectDiv.innerHTML = `
                 <!-- Dropdown Trigger Arrow -->
@@ -2111,6 +2124,13 @@
                     wrapper.style.zIndex = '99';
                   }
                 });
+
+                if (qDef.disableCustom) {
+                  textarea.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    arrowContainer.click();
+                  });
+                }
 
                 // Attach dropdown options selection click handlers
                 const shapeOptions = dropdownOptions.querySelectorAll('.shape-opt-option');
@@ -2279,6 +2299,11 @@
         Object.keys(categoryInputs).forEach(cat => {
           categoryInputs[cat].forEach((val, idx) => {
             if (val && val.trim()) {
+              const valLower = val.toLowerCase().trim();
+              const allowedNegatives = ['không có mắt', 'không có mũi', 'không có miệng', 'không có tai'];
+              if ((valLower.startsWith('không') && !allowedNegatives.includes(valLower)) || valLower === 'none' || valLower === 'no') {
+                return; // Skip negative options
+              }
               const qDef = categoryQuestions[cat][idx];
               const subject = qDef ? qDef.subject : '';
               allValues.push({
