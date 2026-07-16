@@ -2272,6 +2272,48 @@
           }
         });
 
+        // Lock hair questions 2-5 if question 1 is "không tóc/lông"
+        const isHairCategory = activeCategory === 'hair';
+        const q1El = document.getElementById('question-1');
+        const isNoHair = isHairCategory && q1El && q1El.value.trim().toLowerCase() === 'không tóc/lông';
+        
+        const affectedIndices = [1, 2, 3, 4]; // Questions 2, 3, 4, 5
+        
+        if (isHairCategory) {
+          affectedIndices.forEach(idx => {
+            const wrapper = document.getElementById(`wrapper-question-${idx+1}`);
+            if (wrapper) {
+              const textarea = wrapper.querySelector('textarea');
+              if (isNoHair) {
+                wrapper.style.opacity = '0.4';
+                wrapper.style.pointerEvents = 'none';
+                if (textarea) {
+                  textarea.setAttribute('disabled', 'true');
+                }
+              } else {
+                wrapper.style.opacity = '1';
+                wrapper.style.pointerEvents = 'auto';
+                if (textarea) {
+                  textarea.removeAttribute('disabled');
+                }
+              }
+            }
+          });
+        } else {
+          // Reset styling if switching to other categories
+          affectedIndices.forEach(idx => {
+            const wrapper = document.getElementById(`wrapper-question-${idx+1}`);
+            if (wrapper) {
+              wrapper.style.opacity = '1';
+              wrapper.style.pointerEvents = 'auto';
+              const textarea = wrapper.querySelector('textarea');
+              if (textarea) {
+                textarea.removeAttribute('disabled');
+              }
+            }
+          });
+        }
+
         // Helper to format subject and value without repeating words
         function formatSubjectValue(subject, value) {
           if (!subject) return value;
