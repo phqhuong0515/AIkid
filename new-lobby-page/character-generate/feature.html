@@ -785,7 +785,7 @@
                   ">
                   <span
                     style="font-size: 1.15rem; font-weight: 700; color: #8A7463; font-family: 'Mali', sans-serif; user-select: none;">Giới thiệu nhân vật</span>
-                  <textarea placeholder="Nhập giới thiệu, bối cảnh của nhân vật..." style="
+                  <textarea id="description-input" placeholder="Nhập giới thiệu, bối cảnh của nhân vật..." style="
                       font-size: 0.95rem;
                       font-family: 'Mali', sans-serif;
                       color: #BCA695 !important;
@@ -1224,6 +1224,15 @@
         
         speciesInput.addEventListener('input', () => {
           localStorage.setItem('storymee_char_species', speciesInput.value.trim());
+        });
+      }
+      const descInput = document.getElementById('description-input');
+      if (descInput) {
+        const savedDesc = localStorage.getItem('storymee_char_description');
+        if (savedDesc) descInput.value = savedDesc;
+        
+        descInput.addEventListener('input', () => {
+          localStorage.setItem('storymee_char_description', descInput.value.trim());
         });
       }
     });

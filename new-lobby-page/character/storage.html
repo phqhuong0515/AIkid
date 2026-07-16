@@ -187,7 +187,9 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 12%;
+      object-position: center 8%;
+      transform: scale(2.3);
+      transform-origin: center 8%;
       /* Portrait chest-up focus */
     }
 
@@ -311,6 +313,33 @@
     }
 
     .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(255, 117, 151, 0.3);
+    }
+
+    .btn-pink {
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+    }
+
+    .btn-pink:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(255, 117, 151, 0.3);
+    }
+
+    .btn-gallery {
+      background: linear-gradient(135deg, #B794F4, #805AD5);
+    }
+
+    .btn-gallery:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(128, 90, 213, 0.3);
+    }
+
+    .btn-profile {
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+    }
+
+    .btn-profile:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 15px rgba(255, 117, 151, 0.3);
     }
@@ -449,6 +478,18 @@
       border-radius: 9999px;
     }
 
+    /* Scrollbar Style for Description Box */
+    #detail-info-description::-webkit-scrollbar {
+      width: 5px;
+    }
+    #detail-info-description::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #detail-info-description::-webkit-scrollbar-thumb {
+      background: #E2E8F0;
+      border-radius: 9999px;
+    }
+
     .character-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -487,9 +528,16 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 12%;
+      object-position: center 8%;
+      transform: scale(2.3);
+      transform-origin: center 8%;
+      transition: transform 0.25s ease;
       /* Portrait chest-up focus */
       display: block;
+    }
+
+    .char-card:hover img {
+      transform: scale(2.5);
     }
 
     /* Dash Add New Card */
@@ -693,15 +741,18 @@
     }
 
     .delete-confirm-overlay h3 {
-      font-family: 'Fredoka', sans-serif;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
       font-size: 1.3rem;
-      color: #2D3748;
+      color: #8A7463;
       margin-bottom: 6px;
     }
 
     .delete-confirm-overlay p {
+      font-family: 'Mali', sans-serif;
+      font-weight: 500;
       font-size: 0.95rem;
-      color: #718096;
+      color: #8A7463;
       margin-bottom: 20px;
     }
 
@@ -1008,10 +1059,8 @@
             <h3>Xóa Nhân Vật</h3>
             <p>Bé có chắc chắn muốn chia tay bạn nhân vật này không? Hành động này không thể hoàn tác nhé!</p>
             <div class="detail-actions" style="margin-top: 15px;">
-              <button class="btn-action btn-delete" onclick="confirmDeleteCharacter()" style="flex: 1;">Chắc chắn
-                xóa</button>
-              <button class="btn-action" onclick="closeDeleteConfirm()" style="background: #A0AEC0; flex: 1;">Giữ
-                lại</button>
+              <button class="btn-action" onclick="confirmDeleteCharacter()" style="background: #A0AEC0; flex: 1;">Chắc chắn xóa</button>
+              <button class="btn-action btn-edit" onclick="closeDeleteConfirm()" style="flex: 1;">Giữ lại</button>
             </div>
           </div>
 
@@ -1047,15 +1096,27 @@
               </div>
             </div>
 
-            <div class="detail-actions">
-              <button class="btn-action btn-download" onclick="downloadCurrentCharacter()">
-                <i class="fa-solid fa-cloud-arrow-down"></i>
-                <span>Tải Ảnh Về</span>
+            <!-- Giới thiệu nhân vật -->
+            <div style="width: 100%; flex: 1; min-height: 120px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 12px 18px; border: 3px dashed #EBDCD0; border-radius: 20px; background: #FFFFFF; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02); box-sizing: border-box;">
+              <span style="font-size: 0.92rem; font-weight: 700; color: #C8B5A7; font-family: 'Mali', sans-serif; user-select: none; margin-bottom: 6px;">Giới thiệu</span>
+              <div id="detail-info-description" style="font-size: 0.9rem; font-weight: 500; color: #8A7463; line-height: 1.5; overflow-y: auto; width: 100%; text-align: left; flex: 1; padding-right: 4px; font-family: 'Mali', sans-serif;"></div>
+            </div>
+
+            <div class="detail-buttons-wrapper" style="display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: auto;">
+              <button class="btn-action btn-profile" onclick="goToProfile()" style="width: 100%;">
+                <i class="fa-solid fa-id-card"></i>
+                <span>Hồ Sơ Nhân Vật</span>
               </button>
-              <button class="btn-action btn-delete" onclick="openDeleteConfirm()">
-                <i class="fa-solid fa-trash-can"></i>
-                <span>Xóa</span>
-              </button>
+              <div class="detail-actions" style="margin-top: 0; width: 100%; display: flex; gap: 12px;">
+                <button class="btn-action btn-gallery" onclick="goToGallery()" style="flex: 2;">
+                  <i class="fa-solid fa-images"></i>
+                  <span>Kho Ảnh Nhân Vật</span>
+                </button>
+                <button class="btn-action btn-delete" onclick="openDeleteConfirm()" style="flex: 1;">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>Xóa</span>
+                </button>
+              </div>
             </div>
           </div>
           <div id="detail-empty-placeholder" style="display: none;"></div>
@@ -1145,6 +1206,43 @@
           <span>Thêm Vào Bộ Sưu Tập</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Profile Image Preview Modal -->
+  <div class="modal-overlay" id="profile-image-modal" onclick="closeProfileModal(event)" style="background: rgba(10, 10, 10, 0.73); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+    <!-- Close button floating at the top-right corner of the screen -->
+    <button onclick="closeProfileModal(null)" style="position: absolute; top: 25px; right: 25px; background: rgba(255,255,255,0.12); border: none; width: 48px; height: 48px; border-radius: 50%; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 10000;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Content: transparent wrapper containing the side-by-side previews -->
+    <div onclick="event.stopPropagation()" class="modal-content" style="background: transparent !important; border: none !important; box-shadow: none !important; width: auto !important; max-width: 90vw !important; padding: 0 !important; display: flex; flex-direction: row !important; gap: 40px; justify-content: center; align-items: center;">
+      
+      <!-- Left Column: Full Body -->
+      <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+        <span style="font-family: 'Mali', sans-serif; font-weight: 800; color: #FFFFFF; font-size: 1.6rem; text-shadow: 0 2px 5px rgba(0,0,0,0.6);">Ảnh Toàn Thân</span>
+        <img id="profile-modal-img-fullbody" src="" alt="Profile Fullbody" style="max-width: 40vw; max-height: 70vh; object-fit: contain; border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,0.55); display: block;">
+        
+        <!-- Download button fullbody -->
+        <button class="btn-action btn-download" onclick="downloadFullbodyImage()" style="width: auto; padding: 14px 36px; border-radius: 9999px; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.15rem; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; color: white; background: linear-gradient(135deg, #ff9eb5, #ff7597); box-shadow: 0 4px 15px rgba(255,117,151,0.45);">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+          <span>Tải ảnh</span>
+        </button>
+      </div>
+
+      <!-- Right Column: Portrait -->
+      <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+        <span style="font-family: 'Mali', sans-serif; font-weight: 800; color: #FFFFFF; font-size: 1.6rem; text-shadow: 0 2px 5px rgba(0,0,0,0.6);">Ảnh Profile</span>
+        <img id="profile-modal-img-closeup" src="" alt="Profile Closeup" style="max-width: 40vw; max-height: 70vh; object-fit: contain; border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,0.55); display: block;">
+        
+        <!-- Download button closeup -->
+        <button class="btn-action btn-download" onclick="downloadCloseupImage()" style="width: auto; padding: 14px 36px; border-radius: 9999px; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.15rem; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; color: white; background: linear-gradient(135deg, #ff9eb5, #ff7597); box-shadow: 0 4px 15px rgba(255,117,151,0.45);">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+          <span>Tải ảnh</span>
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -1269,8 +1367,11 @@
           species: 'Bé tự tạo',
           age: '12',
           gender: 'Nam',
-          avatar: '/mee/PNG/storage-test-yuu.jpeg',
+          avatar: '/mee/PNG/storage-test-yuu-model.jpeg',
+          profileImg: '/mee/PNG/storage-test-yuu-profile.png',
+          fullbodyImg: '/mee/PNG/storage-test-yuu-model.jpeg',
           type: 'demo',
+          description: 'Bạn gấu trúc Yuu béo tròn, năng động và thích khám phá thế giới xung quanh!',
           createdAt: 1784100000000,
           date: '15/07/2026'
         },
@@ -1280,27 +1381,47 @@
           species: 'Bé tự tạo',
           age: '8',
           gender: 'Nữ',
-          avatar: '/mee/PNG/storage-test-nori.jpeg',
+          avatar: '/mee/PNG/storage-test-nori-model.png',
+          profileImg: '/mee/PNG/storage-test-nori-profile.png',
+          fullbodyImg: '/mee/PNG/storage-test-nori-model.png',
           type: 'demo',
+          description: 'Bạn thỏ con Nori nhút nhát nhưng cực kỳ vẽ đẹp và có giọng ca trong trẻo!',
           createdAt: 1784100000001,
+          date: '15/07/2026'
+        },
+        {
+          id: 'seed-bong',
+          name: 'Bông',
+          species: 'Bé tự tạo',
+          age: '6',
+          gender: 'Nữ',
+          avatar: '/mee/PNG/storage-test-bông-model.jpeg',
+          profileImg: '/mee/PNG/storage-test-bông.jpeg',
+          fullbodyImg: '/mee/PNG/storage-test-bông-model.jpeg',
+          type: 'demo',
+          description: 'Bạn cừu nhỏ Bông trắng muốt tinh nghịch, thích học vẽ và hay đi dạo ngắm hoa!',
+          createdAt: 1784100000002,
           date: '15/07/2026'
         }
       ];
 
       // Clear data once to populate the new examples
-      const cleared = localStorage.getItem('storymee_storage_cleared_v7');
+      const cleared = localStorage.getItem('storymee_storage_cleared_v11');
       if (!cleared) {
         localStorage.setItem('storymee_saved_characters', JSON.stringify(defaultSeeds));
-        localStorage.setItem('storymee_storage_cleared_v7', 'true');
+        localStorage.setItem('storymee_storage_cleared_v11', 'true');
       }
 
       const saved = localStorage.getItem('storymee_saved_characters');
       if (saved) {
         characters = JSON.parse(saved);
-        if (characters.length === 0) {
-          characters = [...defaultSeeds];
-          localStorage.setItem('storymee_saved_characters', JSON.stringify(characters));
-        }
+        // Ensure default seeds (Yuu & Nori) are always present in the database
+        defaultSeeds.forEach(seed => {
+          if (!characters.some(c => c.id === seed.id)) {
+            characters.push(seed);
+          }
+        });
+        localStorage.setItem('storymee_saved_characters', JSON.stringify(characters));
       } else {
         characters = [...defaultSeeds];
         localStorage.setItem('storymee_saved_characters', JSON.stringify(characters));
@@ -1384,6 +1505,7 @@
       document.getElementById('detail-info-age').textContent = char.age || '';
       document.getElementById('detail-info-gender').textContent = char.gender || '';
       document.getElementById('detail-info-species').textContent = char.species || '';
+      document.getElementById('detail-info-description').textContent = char.description || 'Chưa có mô tả cho bạn nhỏ này...';
     }
 
     function selectCharacter(id) {
@@ -1432,6 +1554,63 @@
       const link = document.createElement('a');
       link.href = char.avatar;
       link.download = `${char.name}_${char.species}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function goToGallery() {
+      playPopSound();
+      playPopAndNavigate('/art');
+    }
+
+    function goToProfile() {
+      playPopSound();
+      const char = characters.find(c => c.id === selectedId);
+      if (!char) return;
+
+      const closeupImg = document.getElementById('profile-modal-img-closeup');
+      if (closeupImg) closeupImg.src = char.profileImg || char.avatar;
+
+      const fullbodyImg = document.getElementById('profile-modal-img-fullbody');
+      if (fullbodyImg) fullbodyImg.src = char.fullbodyImg || char.avatar;
+
+      const modal = document.getElementById('profile-image-modal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeProfileModal(event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      playPopSound();
+      const modal = document.getElementById('profile-image-modal');
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    }
+
+    function downloadCloseupImage() {
+      playPopSound();
+      const char = characters.find(c => c.id === selectedId);
+      if (!char) return;
+
+      const link = document.createElement('a');
+      link.href = char.profileImg || char.avatar;
+      link.download = `${char.name}_portrait.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function downloadFullbodyImage() {
+      playPopSound();
+      const char = characters.find(c => c.id === selectedId);
+      if (!char) return;
+
+      const link = document.createElement('a');
+      link.href = char.fullbodyImg || char.avatar;
+      link.download = `${char.name}_fullbody.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1557,6 +1736,7 @@
       const savedAge = localStorage.getItem('storymee_char_age') || '';
       const savedGender = localStorage.getItem('storymee_char_gender') || '';
       const savedSpecies = localStorage.getItem('storymee_char_species') || 'Bé tự tạo';
+      const savedDescription = localStorage.getItem('storymee_char_description') || '';
 
       const newChar = {
         id: 'user-' + Date.now(),
@@ -1564,7 +1744,10 @@
         age: savedAge,
         gender: savedGender,
         species: savedSpecies,
+        description: savedDescription,
         avatar: tempUploadImageBase64,
+        profileImg: tempUploadImageBase64,
+        fullbodyImg: tempUploadImageBase64,
         type: 'user',
         createdAt: Date.now(),
         date: new Date().toLocaleDateString('vi-VN')

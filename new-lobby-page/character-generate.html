@@ -25,6 +25,39 @@
     textarea::placeholder {
       color: #A3A3A3 !important;
       opacity: 1 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    textarea {
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    textarea::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-option:hover {
+      background: #FFE4E6;
+      color: #BE123C;
+    }
+    .cat-option.selected {
+      background: #FFE4E6;
+      color: #BE123C;
+    }
+
+    .shape-opt-option:hover {
+      background: #FFE4E6;
+      color: #BE123C;
+    }
+    .shape-opt-option.selected {
+      background: #FFE4E6;
+      color: #BE123C;
     }
 
     /* Clean layout and centering */
@@ -1138,7 +1171,7 @@
         <!-- Panel 1: Drawing Canvas -->
         <div class="workspace-panel panel-draw">
           <!-- Upload & Description Body (Vertical Flow) -->
-          <div class="draw-workspace-body" style="flex: 1; display: flex; flex-direction: column; gap: 15px; height: auto; width: 100%; border-radius: 24px; background: transparent; border: none; padding: 0;">
+          <div class="draw-workspace-body" style="flex: 1; display: flex; flex-direction: column; gap: 15px; height: 100%; min-height: 0; width: 100%; border-radius: 24px; background: transparent; border: none; padding: 0;">
             
             <!-- Top Section Option 1: Ideas (Left) & Upload (Right) -->
             <div id="option-1-container" style="display: none; flex-direction: row; gap: 20px; width: 100%; flex: none; align-items: stretch;">
@@ -1148,7 +1181,7 @@
                 <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.3rem; font-weight: 900; color: #475569; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none; width: 100%; box-sizing: border-box;">
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-lightbulb" style="color: #FF7597; font-size: 1.3rem;"></i>
-                    <span style="position: relative; top: 1.5px;">Ý TƯỞNG CỦA EM</span>
+                    <span style="position: relative; top: -0.5px;">Ý TƯỞNG CỦA EM</span>
                   </div>
                   <button class="action-btn" onclick="clearAllInputs()" style="padding: 8px 16px; font-size: 0.95rem; height: auto;" title="Xóa tất cả nội dung để nhập mới">
                     <i class="fa-solid fa-arrow-rotate-left"></i>
@@ -1273,9 +1306,62 @@
               <div style="width: 100%; background: #F5EDE6; border: 3px solid #E5D9CE; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
                 <!-- Title -->
                 <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.3rem; font-weight: 900; color: #475569; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px dashed #E5D9CE; padding-bottom: 10px; margin-bottom: 5px; user-select: none; width: 100%; box-sizing: border-box;">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-lightbulb" style="color: #FF7597; font-size: 1.3rem;"></i>
-                    <span style="position: relative; top: 1.5px;">Ý TƯỞNG CỦA EM</span>
+                  <div style="display: flex; align-items: center; gap: 12px; position: relative;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <i class="fa-solid fa-lightbulb" style="color: #FF7597; font-size: 1.3rem;"></i>
+                      <span style="position: relative; top: -0.5px; white-space: nowrap;">Ý TƯỞNG CỦA EM</span>
+                    </div>
+                    
+                    <!-- Custom Category Dropdown Trigger -->
+                    <div id="category-select-container" style="
+                      position: relative;
+                      background: #FFFFFF;
+                      border: 3.5px solid #FFFFFF;
+                      border-radius: 20px;
+                      padding: 6px 18px;
+                      display: inline-flex;
+                      align-items: center;
+                      gap: 8px;
+                      cursor: pointer;
+                      user-select: none;
+                      min-width: 150px;
+                      box-sizing: border-box;
+                      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+                    ">
+                      <span id="category-selected-value" style="
+                        font-family: 'Mali', sans-serif;
+                        font-size: 0.95rem;
+                        font-weight: 700;
+                        color: #8A7463;
+                      ">Hình dáng</span>
+                      <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: #8A7463; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; margin-left: auto;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                      
+                      <!-- Custom Dropdown Menu -->
+                      <div id="category-dropdown-options" style="
+                        display: none;
+                        position: absolute;
+                        top: 46px;
+                        left: -3px;
+                        width: calc(100% + 6px);
+                        background: #FDFAF4;
+                        border: 3.5px solid #FFFFFF;
+                        border-radius: 20px;
+                        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+                        z-index: 9999;
+                        overflow: hidden;
+                        padding: 6px;
+                        box-sizing: border-box;
+                      ">
+                        <div class="cat-option selected" data-value="shape" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Hình dáng</div>
+                        <div class="cat-option" data-value="parts" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Bộ phận</div>
+                        <div class="cat-option" data-value="face" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Khuôn mặt</div>
+                        <div class="cat-option" data-value="hair" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Tóc</div>
+                        <div class="cat-option" data-value="color" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Màu sắc & Chất liệu</div>
+                        <div class="cat-option" data-value="clothes" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Trang phục</div>
+                      </div>
+                    </div>
                   </div>
                   <button class="action-btn" onclick="clearAllInputs()" style="padding: 8px 16px; font-size: 0.95rem; height: auto;" title="Xóa tất cả nội dung để nhập mới">
                     <i class="fa-solid fa-arrow-rotate-left"></i>
@@ -1286,11 +1372,11 @@
                 <!-- 2-Column Grid Layout for 6 textareas -->
                 <div style="display: flex; flex-direction: row; gap: 20px; width: 100%;">
                   <!-- Left Column: Questions 1-3 -->
-                  <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                  <div id="col-questions-left" style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
                     <!-- Question 1 -->
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">1. CÂU HỎI 1</span>
-                      <textarea id="question-1" placeholder="Ví dụ: câu trả lời câu hỏi 1..." style="
+                    <div id="wrapper-question-1" data-category="shape" style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">1. HÌNH DÁNG</span>
+                      <textarea id="question-1" placeholder="Ví dụ: dáng vẻ tròn xoe, cao gầy, mũm mĩm..." style="
                           background: #FFFFFF;
                           border: 2px solid #FFFFFF;
                           border-radius: 16px;
@@ -1309,9 +1395,9 @@
                     </div>
 
                     <!-- Question 2 -->
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">2. CÂU HỎI 2</span>
-                      <textarea id="question-2" placeholder="Ví dụ: câu trả lời câu hỏi 2..." style="
+                    <div id="wrapper-question-2" data-category="parts" style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">2. BỘ PHẬN</span>
+                      <textarea id="question-2" placeholder="Ví dụ: tai thỏ dài, đuôi bông, chân ngắn..." style="
                           background: #FFFFFF;
                           border: 2px solid #FFFFFF;
                           border-radius: 16px;
@@ -1330,9 +1416,9 @@
                     </div>
 
                     <!-- Question 3 -->
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">3. CÂU HỎI 3</span>
-                      <textarea id="question-3" placeholder="Ví dụ: câu trả lời câu hỏi 3..." style="
+                    <div id="wrapper-question-3" data-category="face" style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">3. KHUÔN MẶT</span>
+                      <textarea id="question-3" placeholder="Ví dụ: mắt tròn to lấp lánh, miệng cười tươi..." style="
                           background: #FFFFFF;
                           border: 2px solid #FFFFFF;
                           border-radius: 16px;
@@ -1352,11 +1438,11 @@
                   </div>
 
                   <!-- Right Column: Questions 4-6 -->
-                  <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                  <div id="col-questions-right" style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
                     <!-- Question 4 -->
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">4. CÂU HỎI 4</span>
-                      <textarea id="question-4" placeholder="Ví dụ: câu trả lời câu hỏi 4..." style="
+                    <div id="wrapper-question-4" data-category="hair" style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">4. TÓC</span>
+                      <textarea id="question-4" placeholder="Ví dụ: tóc ngắn xoăn, màu nâu hạt dẻ..." style="
                           background: #FFFFFF;
                           border: 2px solid #FFFFFF;
                           border-radius: 16px;
@@ -1375,9 +1461,9 @@
                     </div>
 
                     <!-- Question 5 -->
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">5. CÂU HỎI 5</span>
-                      <textarea id="question-5" placeholder="Ví dụ: câu trả lời câu hỏi 5..." style="
+                    <div id="wrapper-question-5" data-category="color" style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">5. MÀU SẮC & CHẤT LIỆU</span>
+                      <textarea id="question-5" placeholder="Ví dụ: lông xù màu trắng kem, mịn màng..." style="
                           background: #FFFFFF;
                           border: 2px solid #FFFFFF;
                           border-radius: 16px;
@@ -1396,9 +1482,9 @@
                     </div>
 
                     <!-- Question 6 -->
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">6. CÂU HỎI 6</span>
-                      <textarea id="question-6" placeholder="Ví dụ: câu trả lời câu hỏi 6..." style="
+                    <div id="wrapper-question-6" data-category="clothes" style="display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; user-select: none;">6. TRANG PHỤC</span>
+                      <textarea id="question-6" placeholder="Ví dụ: mặc váy màu hồng phấn, đi giày thể thao..." style="
                           background: #FFFFFF;
                           border: 2px solid #FFFFFF;
                           border-radius: 16px;
@@ -1421,13 +1507,13 @@
             </div>
 
             <!-- Bottom Section: Prompt Box (Full Width & Shortened Height) -->
-            <div class="prompt-box" style="flex: 1; width: 100%; background: #FFFFFF; border: 2px dashed #EBDCD0; border-radius: 24px; padding: 16px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; justify-content: flex-start;">
+            <div class="prompt-box" style="flex: 1; min-height: 0; width: 100%; background: #FFFFFF; border: 2px dashed #EBDCD0; border-radius: 24px; padding: 16px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; justify-content: flex-start;">
               <!-- Formula Banner -->
               <div style="background: #FFF0F3; border: 1.5px solid #FFCCD5; border-radius: 14px; padding: 8px 16px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #FF5C8A; display: flex; align-items: center; gap: 8px; user-select: none; flex-shrink: 0;">
                 <i class="fa-solid fa-star" style="color: #FF5C8A; font-size: 0.95rem;"></i> Công thức: [Nhân vật] + [Hình dáng] + [Trang phục] + [Hành động]
               </div>
               <!-- Rich Prompt Display Area -->
-              <div id="prompt-display" style="flex: 1; font-family: 'Mali', sans-serif; font-size: 1.15rem; color: #4A3D3C; line-height: 1.8; word-break: break-word; outline: none; overflow-y: auto; text-align: left; max-height: 120px;">
+              <div id="prompt-display" style="flex: 1; min-height: 0; font-family: 'Mali', sans-serif; font-size: 1.15rem; color: #4A3D3C; line-height: 1.8; word-break: break-word; outline: none; overflow-y: auto; text-align: left;">
                 <!-- Dynamically populated in JavaScript -->
               </div>
               <textarea id="character-prompt" style="display: none;"></textarea>
@@ -1779,6 +1865,278 @@
         }, 1800);
       }
 
+      // Active Category
+      let activeCategory = 'shape'; // default
+
+      // Question definitions for the 6 categories
+      const categoryQuestions = {
+        shape: [
+          { label: "1. NHÂN VẬT CỦA EM LÀ GÌ?", subject: "Nhân vật", choices: ["con người", "con vật", "đồ vật", "thực vật", "robot"], placeholder: "Ví dụ: con mèo, con gấu, siêu nhân..." },
+          { label: "2. NHÂN VẬT CÓ DÁNG NGƯỜI THẾ NÀO?", subject: "Dáng người", choices: ["tròn trịa", "mảnh mai", "nhỏ bé", "cao lớn", "mũm mĩm", "vuông vức"], placeholder: "Ví dụ: dáng vẻ tròn xoe, cao gầy, mũm mĩm..." },
+          { label: "3. CƠ THỂ NHÂN VẬT GIỐNG HÌNH GÌ?", subject: "Cơ thể", choices: ["hình tròn", "hình vuông", "hình tam giác", "hình quả trứng"], placeholder: "Ví dụ: hình tròn, hình quả lê, hình tam giác..." },
+          { label: "4. TỔNG THỂ NHÂN VẬT TẠO CẢM GIÁC GÌ?", subject: "Cảm giác", choices: ["đáng yêu", "vui nhộn", "nhanh nhẹn", "mạnh mẽ", "bí ẩn", "ngốc nghếch", "kỳ lạ"], placeholder: "Ví dụ: đáng yêu, vui nhộn, nhanh nhẹn..." }
+        ],
+        parts: [
+          { label: "1. TAI NHÂN VẬT?", subject: "Tai", choices: ["tai tròn", "tai nhọn", "tai dài", "tai gấu", "tai mèo", "tai thỏ", "tai chuột", "không có tai"], placeholder: "Ví dụ: tai thỏ dài, tai mèo nhọn, tai gấu tròn..." },
+          { label: "2. ĐUÔI NHÂN VẬT?", subject: "Đuôi", choices: ["đuôi ngắn", "đuôi dài", "đuôi xù bông", "đuôi cá", "không có đuôi"], placeholder: "Ví dụ: đuôi sóc xù bông, đuôi mèo dài..." },
+          { label: "3. TAY NHÂN VẬT?", subject: "Tay", choices: ["tay ngắn", "tay dài", "tay rô bốt", "cánh chim", "vây cá"], placeholder: "Ví dụ: tay ngắn mũm mĩm, tay dài thon..." },
+          { label: "4. CHÂN NHÂN VẬT?", subject: "Chân", choices: ["chân ngắn", "chân dài", "chân mèo đệm thịt", "móng guốc", "đuôi cá (tiên cá)"], placeholder: "Ví dụ: chân ngắn củn đáng yêu, chân dài..." },
+          { label: "5. SỪNG NHÂN VẬT?", subject: "Sừng", choices: ["không có sừng", "sừng tuần lộc", "sừng trâu", "sừng kỳ lân"], placeholder: "Ví dụ: sừng tuần lộc nhỏ, không có sừng..." },
+          { label: "6. MÓNG VUỐT NHÂN VẬT?", subject: "Móng vuốt", choices: ["không có móng", "đệm thịt mềm", "móng vuốt mèo nhọn", "móng vuốt rồng"], placeholder: "Ví dụ: đệm thịt chân tròn trịa, móng vuốt mèo..." }
+        ],
+        face: [
+          { label: "1. MẮT NHÂN VẬT?", subject: "Mắt", choices: ["mắt tròn to", "mắt híp cười vui", "mắt to lấp lánh", "đeo kính gọng tròn"], placeholder: "Ví dụ: mắt tròn to lấp lánh màu xanh, mắt híp..." },
+          { label: "2. MIỆNG NHÂN VẬT?", subject: "Miệng", choices: ["miệng cười tươi", "ngậm kẹo mút", "miệng cười mỉm", "chu môi tinh nghịch"], placeholder: "Ví dụ: miệng cười tươi rói, đang ngậm kẹo..." },
+          { label: "3. MŨI NHÂN VẬT?", subject: "Mũi", choices: ["mũi nhỏ xinh", "mũi nút áo", "mũi chú hề đỏ", "không rõ mũi"], placeholder: "Ví dụ: mũi nút áo dễ thương, mũi chú hề đỏ..." },
+          { label: "4. BIỂU CẢM KHUÔN MẶT?", subject: "Biểu cảm", choices: ["vui vẻ", "tinh nghịch", "đáng yêu", "ngạc nhiên", "hạnh phúc"], placeholder: "Ví dụ: vui vẻ, ngạc nhiên, tinh nghịch..." },
+          { label: "5. MÁ HỒNG NHÂN VẬT?", subject: "Má hồng", choices: ["má hồng dễ thương", "má đỏ hây hây", "không có má hồng"], placeholder: "Ví dụ: má hồng hào dễ thương, má đỏ hây hây..." },
+          { label: "6. PHỤ KIỆN KHUÔN MẶT?", subject: "Phụ kiện mặt", choices: ["đeo kính gọng tròn", "không có phụ kiện", "miếng dán cá nhân", "nốt ruồi dễ thương"], placeholder: "Ví dụ: đeo kính gọng tròn dễ thương, có nốt ruồi..." }
+        ],
+        hair: [
+          { label: "1. KIỂU TÓC NHÂN VẬT?", subject: "Kiểu tóc", choices: ["tóc ngắn", "buộc hai bên", "tóc xoăn bồng bềnh", "không có tóc"], placeholder: "Ví dụ: tóc ngắn xoăn bồng bềnh, buộc hai bên..." },
+          { label: "2. MÀU TÓC NHÂN VẬT?", subject: "Màu tóc", choices: ["màu hạt dẻ", "hồng pastel", "vàng kim", "đen láy", "xanh mint"], placeholder: "Ví dụ: màu nâu hạt dẻ, hồng pastel..." },
+          { label: "3. ĐỘ DÀI TÓC?", subject: "Độ dài tóc", choices: ["tóc ngắn", "tóc ngang vai", "tóc dài thướt tha"], placeholder: "Ví dụ: tóc ngắn cá tính, tóc dài thướt tha..." },
+          { label: "4. PHỤ KIỆN TÓC?", subject: "Phụ kiện tóc", choices: ["không có phụ kiện", "nơ màu hồng", "bờm tai gấu", "kẹp tóc ngôi sao"], placeholder: "Ví dụ: kẹp tóc ngôi sao, bờm tai gấu..." },
+          { label: "5. MÁI TÓC NHÂN VẬT?", subject: "Mái tóc", choices: ["mái ngố dễ thương", "mái lệch", "mái thưa", "không có mái"], placeholder: "Ví dụ: mái ngố dễ thương, mái lệch..." },
+          { label: "6. CHẤT TÓC NHÂN VẬT?", subject: "Chất tóc", choices: ["tóc xù xù đáng yêu", "tóc mềm mượt", "tóc xoăn tít"], placeholder: "Ví dụ: tóc xù xù đáng yêu, tóc bóng mượt..." }
+        ],
+        color: [
+          { label: "1. MÀU CHỦ ĐẠO NHÂN VẬT?", subject: "Màu chủ đạo", choices: ["màu vàng tươi", "màu hồng pastel", "màu trắng tinh", "màu xanh mint"], placeholder: "Ví dụ: màu vàng tươi, màu hồng nhạt..." },
+          { label: "2. MÀU DA HOẶC LÔNG?", subject: "Màu da/lông", choices: ["lông trắng muốt", "da hồng hào", "lông nâu hạt dẻ", "lông xám nhẹ"], placeholder: "Ví dụ: lông trắng muốt, da hồng hào..." },
+          { label: "3. CHẤT LIỆU DA/LÔNG?", subject: "Chất liệu", choices: ["lông xù mịn", "bóng như đất sét", "mịn như nhung", "vải bông mềm"], placeholder: "Ví dụ: lông xù bông mịn, bóng bẩy như đất sét..." },
+          { label: "4. HỌA TIẾT TRÊN NGƯỜI?", subject: "Họa tiết", choices: ["không có họa tiết", "sọc vằn tinh nghịch", "đốm tròn đáng yêu"], placeholder: "Ví dụ: sọc vằn tinh nghịch, đốm tròn..." },
+          { label: "5. ÁNH SÁNG & ĐỘ BÓNG?", subject: "Ánh sáng", choices: ["ánh sáng dịu", "không độ bóng", "lấp lánh nhẹ"], placeholder: "Ví dụ: da lấp lánh nhẹ, không độ bóng..." },
+          { label: "6. ĐỘ DÀY CỦA LÔNG?", subject: "Độ dày lông", choices: ["lông xù dày ấm áp", "lông mỏng", "không có lông"], placeholder: "Ví dụ: lông xù dày ấm áp, lông mỏng..." }
+        ],
+        clothes: [
+          { label: "1. ÁO NHÂN VẬT MẶC?", subject: "Áo", choices: ["không mặc áo", "áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
+          { label: "2. QUẦN HOẶC VÁY?", subject: "Quần/Váy", choices: ["không mặc quần/váy", "váy xếp ly hồng", "quần yếm bò", "quần shorts"], placeholder: "Ví dụ: mặc váy xếp ly hồng, quần yếm bò..." },
+          { label: "3. GIÀY DÉP NHÂN VẬT?", subject: "Giày dép", choices: ["không đi giày dép", "giày thể thao trắng", "ủng đỏ đáng yêu", "sandal"], placeholder: "Ví dụ: đi giày thể thao trắng, ủng đỏ..." },
+          { label: "4. MŨ NHÂN VẬT ĐỘI?", subject: "Mũ", choices: ["không đội mũ", "mũ len quả bông", "mũ phi công", "mũ tai mèo"], placeholder: "Ví dụ: đội mũ len quả bông, mũ phi công..." },
+          { label: "5. PHỤ KIỆN TRANG PHỤC?", subject: "Phụ kiện", choices: ["không có phụ kiện", "khăn quàng cổ đỏ", "ba lô gấu trúc", "túi chéo nhỏ"], placeholder: "Ví dụ: đeo khăn quàng cổ đỏ, đeo ba lô gấu..." },
+          { label: "6. HỌA TIẾT TRANG PHỤC?", subject: "Họa tiết đồ", choices: ["không họa tiết", "họa tiết hoa cúc", "hình ngôi sao", "kẻ caro"], placeholder: "Ví dụ: họa tiết hoa cúc nhí, hình ngôi sao..." }
+        ]
+      };
+
+      let categoryInputs = {
+        shape: ["con vật", "tròn trịa", "hình tròn", "đáng yêu", "", ""],
+        parts: ["Tai tròn", "Đuôi ngắn", "Tay ngắn", "Chân ngắn", "Không có sừng", "Đệm thịt mềm"],
+        face: ["Mắt tròn to", "Miệng cười tươi", "Mũi nút áo", "Tinh nghịch", "Má hồng dễ thương", "Đeo kính gọng tròn"],
+        hair: ["Tóc xoăn bồng bềnh", "Màu hạt dẻ", "Tóc ngắn", "Không có phụ kiện", "Mái lệch", "Tóc mềm mượt"],
+        color: ["Màu vàng tươi", "Lông trắng muốt", "Lông xù mịn", "Không có họa tiết", "Ánh sáng dịu", "Lông xù dày ấm áp"],
+        clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Không đội mũ", "Khăn quàng cổ đỏ", "Hình ngôi sao"]
+      };
+
+      function loadCategoryInputsFromLocalStorage() {
+        const saved = localStorage.getItem('storymee_generate_category_inputs');
+        if (saved) {
+          try {
+            categoryInputs = JSON.parse(saved);
+          } catch(e) {
+            console.error("Failed to parse category inputs", e);
+          }
+        }
+      }
+
+      function saveCategoryInputsToLocalStorage() {
+        localStorage.setItem('storymee_generate_category_inputs', JSON.stringify(categoryInputs));
+      }
+
+      function switchCategory(newCat) {
+        // Save current textarea values first
+        const ids = ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'];
+        ids.forEach((id, idx) => {
+          const wrapper = document.getElementById(`wrapper-question-${idx+1}`);
+          if (wrapper && wrapper.style.display !== 'none') {
+            const textarea = wrapper.querySelector('textarea');
+            if (textarea && textarea.style.display !== 'none') {
+              categoryInputs[activeCategory][idx] = textarea.value.trim();
+            }
+          }
+        });
+        saveCategoryInputsToLocalStorage();
+
+        // Update active category
+        activeCategory = newCat;
+
+        // Populate questions
+        const questions = categoryQuestions[newCat];
+        
+        // Loop over the 6 slots
+        for (let i = 0; i < 6; i++) {
+          const wrapper = document.getElementById(`wrapper-question-${i+1}`);
+          if (!wrapper) continue;
+
+          if (i >= questions.length) {
+            // Hide wrapper if category has fewer than 6 questions (e.g. shape has only 4)
+            wrapper.style.display = 'none';
+          } else {
+            wrapper.style.display = 'flex';
+            
+            // Update Label
+            const span = wrapper.querySelector('span');
+            if (span) {
+              span.textContent = questions[i].label;
+            }
+
+            // Check if custom select type or textarea
+            const qDef = questions[i];
+            
+            // Remove any custom content containers first to prevent duplicates
+            const oldCustom = wrapper.querySelector('.custom-select-container');
+            if (oldCustom) oldCustom.remove();
+            
+            const textarea = wrapper.querySelector('textarea');
+            if (qDef.choices && qDef.choices.length > 0) {
+              // Ensure we show the textarea, styled correctly
+              if (textarea) {
+                textarea.style.display = 'block';
+                textarea.style.paddingRight = '40px'; // leave space for dropdown arrow
+                textarea.placeholder = qDef.placeholder || 'Chọn từ danh sách hoặc tự nhập ở đây...';
+                
+                const currentValue = categoryInputs[newCat][i] || '';
+                // If they selected one of the default options, show it capitalized.
+                // Otherwise show their custom input exactly as typed.
+                const choices = qDef.choices;
+                if (choices.includes(currentValue.toLowerCase())) {
+                  textarea.value = currentValue.charAt(0).toUpperCase() + currentValue.slice(1);
+                } else {
+                  textarea.value = currentValue;
+                }
+              }
+
+              // Create absolute wrapper positioning context
+              wrapper.style.position = 'relative';
+
+              // Create a select container holding ONLY the absolute arrow and absolute options menu
+              const selectDiv = document.createElement('div');
+              selectDiv.className = 'custom-select-container';
+              selectDiv.style.cssText = 'position: absolute; right: 16px; top: 47px; z-index: 10;';
+              
+              const currentValue = categoryInputs[newCat][i] || '';
+              const choices = qDef.choices;
+              let isCustom = currentValue !== '' && !choices.includes(currentValue.toLowerCase());
+              
+              let optionsHtml = '';
+              choices.forEach(choice => {
+                const isSelected = currentValue.toLowerCase() === choice;
+                optionsHtml += `<div class="shape-opt-option ${isSelected ? 'selected' : ''}" data-value="${choice}" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">${choice.charAt(0).toUpperCase() + choice.slice(1)}</div>`;
+              });
+              
+              const isKhacSelected = isCustom;
+              optionsHtml += `<div class="shape-opt-option ${isKhacSelected ? 'selected' : ''}" data-value="khác" style="padding: 8px 12px; font-family: 'Mali', sans-serif; font-size: 0.95rem; font-weight: 700; color: #8A7463; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">Khác...</div>`;
+              
+              selectDiv.innerHTML = `
+                <!-- Dropdown Trigger Arrow -->
+                <div class="shape-type-arrow" style="cursor: pointer; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px;">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: #8A7463; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </div>
+                
+                <!-- Custom Dropdown Options List -->
+                <div class="shape-type-dropdown-options" style="
+                  display: none;
+                  position: absolute;
+                  top: 32px;
+                  right: -10px;
+                  width: 200px;
+                  background: #FDFAF4;
+                  border: 3.5px solid #FFFFFF;
+                  border-radius: 20px;
+                  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+                  z-index: 9999;
+                  overflow: hidden;
+                  padding: 6px;
+                  box-sizing: border-box;
+                ">
+                  ${optionsHtml}
+                </div>
+              `;
+              
+              wrapper.appendChild(selectDiv);
+
+              // Toggle dropdown options menu on arrow click
+              const arrowContainer = selectDiv.querySelector('.shape-type-arrow');
+              const dropdownOptions = selectDiv.querySelector('.shape-type-dropdown-options');
+              
+              if (arrowContainer && dropdownOptions && textarea) {
+                arrowContainer.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  
+                  // Hide all other dropdowns and reset their wrappers' z-index
+                  document.querySelectorAll('.shape-type-dropdown-options').forEach(el => {
+                    if (el !== dropdownOptions) {
+                      el.style.display = 'none';
+                      const pWrapper = el.closest('[id^="wrapper-question-"]');
+                      if (pWrapper) pWrapper.style.zIndex = '1';
+                    }
+                  });
+                  const catDropdown = document.getElementById('category-dropdown-options');
+                  if (catDropdown) catDropdown.style.display = 'none';
+
+                  const isVisible = dropdownOptions.style.display === 'block';
+                  if (isVisible) {
+                    dropdownOptions.style.display = 'none';
+                    wrapper.style.zIndex = '1';
+                  } else {
+                    dropdownOptions.style.display = 'block';
+                    wrapper.style.zIndex = '99';
+                  }
+                });
+
+                // Attach dropdown options selection click handlers
+                const shapeOptions = dropdownOptions.querySelectorAll('.shape-opt-option');
+                shapeOptions.forEach(opt => {
+                  opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = opt.getAttribute('data-value');
+                    const label = opt.textContent;
+
+                    // Toggle selected style
+                    shapeOptions.forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+
+                    dropdownOptions.style.display = 'none';
+                    wrapper.style.zIndex = '1';
+
+                    if (val === 'khác') {
+                      textarea.value = '';
+                      textarea.focus();
+                      categoryInputs[newCat][i] = '';
+                    } else {
+                      textarea.value = label;
+                      categoryInputs[newCat][i] = val;
+                    }
+
+                    saveCategoryInputsToLocalStorage();
+                    updatePromptFromQuestions();
+                  });
+                });
+
+                document.addEventListener('click', () => {
+                  dropdownOptions.style.display = 'none';
+                  wrapper.style.zIndex = '1';
+                });
+              }
+            } else {
+              // Standard Textarea
+              if (textarea) {
+                textarea.style.display = 'block';
+                textarea.placeholder = qDef.placeholder || '';
+                textarea.value = categoryInputs[newCat][i] || '';
+              }
+            }
+          }
+        }
+      }
+
+      function handleTextareaInput(idx, value) {
+        categoryInputs[activeCategory][idx] = value.trim();
+        saveCategoryInputsToLocalStorage();
+        updatePromptFromQuestions();
+      }
+
       function clearAllInputs() {
         playPopSound();
         const opt1Keys = ['idea-shape', 'idea-clothes', 'idea-action'];
@@ -1791,8 +2149,17 @@
           }
         });
         
+        // Reset categoryInputs
+        Object.keys(categoryInputs).forEach(cat => {
+          categoryInputs[cat] = ['', '', '', '', '', ''];
+        });
+        saveCategoryInputsToLocalStorage();
+
         // Clear local storage key
         localStorage.removeItem('storymee_generate_inputs');
+
+        // Re-render current category to reflect cleared state
+        switchCategory(activeCategory);
 
         // Update prompts
         updatePromptFromIdeas();
@@ -1849,23 +2216,39 @@
       }
 
       function updatePromptFromQuestions() {
-        const q1 = document.getElementById('question-1').value.trim();
-        const q2 = document.getElementById('question-2').value.trim();
-        const q3 = document.getElementById('question-3').value.trim();
-        const q4 = document.getElementById('question-4').value.trim();
-        const q5 = document.getElementById('question-5').value.trim();
-        const q6 = document.getElementById('question-6').value.trim();
+        // Sync currently displayed textareas to the active category
+        const ids = ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'];
+        ids.forEach((id, idx) => {
+          const el = document.getElementById(id);
+          if (el) {
+            categoryInputs[activeCategory][idx] = el.value.trim();
+          }
+        });
+
+        // Collect all non-empty values from all 6 categories along with their subjects
+        let allValues = [];
+        Object.keys(categoryInputs).forEach(cat => {
+          categoryInputs[cat].forEach((val, idx) => {
+            if (val && val.trim()) {
+              const qDef = categoryQuestions[cat][idx];
+              const subject = qDef ? qDef.subject : '';
+              allValues.push({
+                subject: subject,
+                value: val.trim()
+              });
+            }
+          });
+        });
 
         let tagsHtml = '';
         let tagsAdded = 0;
-        const vals = [q1, q2, q3, q4, q5, q6];
-
-        vals.forEach(val => {
-          if (val) {
-            let prefixComma = tagsAdded > 0 ? ', ' : '';
-            tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${prefixComma}${val}</span>`;
-            tagsAdded++;
+        allValues.forEach(item => {
+          if (tagsAdded > 0) {
+            tagsHtml += `<span style="color: #4A3D3C; font-weight: 600; margin: 0 1px;">, </span>`;
           }
+          const displayText = item.subject ? `${item.subject} ${item.value}` : item.value;
+          tagsHtml += `<span style="display: inline-block; background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 8px; font-weight: 600; margin: 2px 4px;">${displayText}</span>`;
+          tagsAdded++;
         });
 
         let suffix = tagsAdded > 0 ? '' : '...';
@@ -1877,9 +2260,11 @@
         }
 
         let plainText = `Bản vẽ thiết kế`;
-        let plainParts = vals.filter(v => v);
-        if (plainParts.length > 0) {
-          plainText += ` ` + plainParts.join(`, `);
+        if (allValues.length > 0) {
+          const formattedList = allValues.map(item => {
+            return item.subject ? `${item.subject} ${item.value}` : item.value;
+          });
+          plainText += ` ` + formattedList.join(`, `);
         }
         plainText += '.';
 
@@ -1889,11 +2274,97 @@
         }
       }
 
+      function filterIdeaFields(val) {
+        if (!val) {
+          const activeOpt = document.querySelector('.cat-option.selected');
+          val = activeOpt ? activeOpt.getAttribute('data-value') : 'shape';
+        }
+        
+        // Switch the category inputs and labels
+        switchCategory(val);
+
+        // Smoothly scroll to the first field of the new category
+        const firstWrapper = document.getElementById('wrapper-question-1');
+        if (firstWrapper) {
+          firstWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const textarea = firstWrapper.querySelector('textarea');
+          if (textarea) {
+            textarea.focus();
+            
+            // Add a visual highlight pulse
+            textarea.style.borderColor = '#FF7597';
+            textarea.style.boxShadow = '0 0 12px rgba(255, 117, 151, 0.3)';
+            
+            setTimeout(() => {
+              textarea.style.borderColor = '#FFFFFF';
+              textarea.style.boxShadow = '0 2px 6px rgba(188, 166, 149, 0.04)';
+            }, 800);
+          }
+        }
+      }
+
       // Initial loading and drag/drop binding
       adjustScale();
       window.addEventListener('load', () => {
         adjustScale();
         loadUploadedImageFromLocalStorage();
+        loadCategoryInputsFromLocalStorage();
+
+        // Custom Category Dropdown Toggle Logic
+        const catSelectContainer = document.getElementById('category-select-container');
+        const catDropdownOptions = document.getElementById('category-dropdown-options');
+        const catSelectedValueSpan = document.getElementById('category-selected-value');
+
+        if (catSelectContainer && catDropdownOptions && catSelectedValueSpan) {
+          catSelectContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = catDropdownOptions.style.display === 'block';
+            catDropdownOptions.style.display = isVisible ? 'none' : 'block';
+          });
+
+          const catOptions = catDropdownOptions.querySelectorAll('.cat-option');
+          catOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const val = option.getAttribute('data-value');
+              const label = option.textContent;
+              
+              catSelectedValueSpan.textContent = label;
+
+              // Toggle selected class
+              catOptions.forEach(opt => opt.classList.remove('selected'));
+              option.classList.add('selected');
+
+              catDropdownOptions.style.display = 'none';
+
+              // Run the filter logic
+              filterIdeaFields(val);
+            });
+          });
+
+          document.addEventListener('click', () => {
+            catDropdownOptions.style.display = 'none';
+            document.querySelectorAll('.shape-type-dropdown-options').forEach(el => {
+              el.style.display = 'none';
+            });
+          });
+        }
+
+        // Initialize category selector placeholder
+        if (catSelectedValueSpan) {
+          catSelectedValueSpan.textContent = 'Hình dáng';
+          const catOptions = catDropdownOptions.querySelectorAll('.cat-option');
+          catOptions.forEach(opt => {
+            if (opt.getAttribute('data-value') === 'shape') {
+              opt.classList.add('selected');
+            } else {
+              opt.classList.remove('selected');
+            }
+          });
+        }
+
+        // Initialize inputs to shape category
+        switchCategory('shape');
 
         // Bind drag and drop events
         const uploadBox = document.getElementById('upload-box-container');
@@ -1937,11 +2408,11 @@
         });
 
         // Bind option 2 inputs change events
-        ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'].forEach(id => {
+        ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'].forEach((id, idx) => {
           const el = document.getElementById(id);
           if (el) {
             el.addEventListener('input', () => {
-              updatePromptFromQuestions();
+              handleTextareaInput(idx, el.value);
               saveInputsToLocalStorage();
             });
           }
@@ -1956,12 +2427,6 @@
           'idea-shape': document.getElementById('idea-shape')?.value || '',
           'idea-clothes': document.getElementById('idea-clothes')?.value || '',
           'idea-action': document.getElementById('idea-action')?.value || '',
-          'question-1': document.getElementById('question-1')?.value || '',
-          'question-2': document.getElementById('question-2')?.value || '',
-          'question-3': document.getElementById('question-3')?.value || '',
-          'question-4': document.getElementById('question-4')?.value || '',
-          'question-5': document.getElementById('question-5')?.value || '',
-          'question-6': document.getElementById('question-6')?.value || '',
           'current-option': currentOption
         };
         localStorage.setItem('storymee_generate_inputs', JSON.stringify(data));
@@ -1983,12 +2448,6 @@
           'idea-shape': "Gấu trúc con béo tròn đáng yêu",
           'idea-clothes': "Khăn quàng cổ màu đỏ, mũ đội đầu",
           'idea-action': "Đang ăn trúc vui vẻ",
-          'question-1': "Gấu trúc con béo tròn đáng yêu",
-          'question-2': "Đeo một chiếc khăn quàng cổ màu đỏ nổi bật",
-          'question-3': "Đang ôm một nhánh trúc non gặm ngon lành",
-          'question-4': "Mắt tròn xoe long lanh cười tươi vui vẻ",
-          'question-5': "Rừng trúc xanh mát mẻ, nắng nhẹ xuyên qua kẽ lá",
-          'question-6': "Có vài chú bướm nhỏ bay xung quanh đầu",
           'current-option': 2
         };
 
@@ -1996,9 +2455,8 @@
         const finalData = { ...defaults, ...data };
         
         const opt1Keys = ['idea-shape', 'idea-clothes', 'idea-action'];
-        const opt2Keys = ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'];
 
-        opt1Keys.concat(opt2Keys).forEach(id => {
+        opt1Keys.forEach(id => {
           const el = document.getElementById(id);
           if (el) {
             el.value = finalData[id];
@@ -2021,6 +2479,8 @@
           if (opt1Container) opt1Container.style.display = 'none';
           if (opt2Container) opt2Container.style.display = 'flex';
           if (btnText) btnText.textContent = 'Hình ảnh';
+          
+          switchCategory('shape');
           updatePromptFromQuestions();
         }
       }
