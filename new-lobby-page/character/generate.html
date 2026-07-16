@@ -2342,7 +2342,7 @@
           categoryInputs[cat].forEach((val, idx) => {
             if (val && val.trim()) {
               const valLower = val.toLowerCase().trim();
-              const allowedNegatives = ['không có mắt', 'không có mũi', 'không có miệng', 'không có tai', 'không có tay', 'không có chân', 'không có áo'];
+              const allowedNegatives = ['không có mắt', 'không có mũi', 'không có miệng', 'không có tai', 'không có tay', 'không có chân', 'không có áo', 'không tóc/lông'];
               if ((valLower.startsWith('không') && !allowedNegatives.includes(valLower)) || valLower === 'none' || valLower === 'no') {
                 return; // Skip negative options
               }

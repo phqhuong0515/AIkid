@@ -1086,12 +1086,12 @@
                   <span class="info-value" id="detail-info-age"></span>
                 </div>
                 <div class="info-card">
-                  <span class="info-label">Giới tính</span>
-                  <span class="info-value" id="detail-info-gender"></span>
+                  <span class="info-label">Ngày sinh</span>
+                  <span class="info-value" id="detail-info-birthday"></span>
                 </div>
                 <div class="info-card">
-                  <span class="info-label">Giống loài</span>
-                  <span class="info-value" id="detail-info-species"></span>
+                  <span class="info-label">Giới tính</span>
+                  <span class="info-value" id="detail-info-gender"></span>
                 </div>
               </div>
             </div>
@@ -1504,7 +1504,7 @@
       document.getElementById('detail-info-name').textContent = char.name || '';
       document.getElementById('detail-info-age').textContent = char.age || '';
       document.getElementById('detail-info-gender').textContent = char.gender || '';
-      document.getElementById('detail-info-species').textContent = char.species || '';
+      document.getElementById('detail-info-birthday').textContent = char.date || '';
       document.getElementById('detail-info-description').textContent = char.description || 'Chưa có mô tả cho bạn nhỏ này...';
     }
 
@@ -1553,7 +1553,7 @@
 
       const link = document.createElement('a');
       link.href = char.avatar;
-      link.download = `${char.name}_${char.species}.png`;
+      link.download = `${char.name}_${char.date ? char.date.replace(/\//g, '-') : 'character'}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1668,7 +1668,8 @@
       if (modal) {
         modal.classList.add('active');
         document.getElementById('new-name-input').value = '';
-        document.getElementById('new-species-input').value = '';
+        const newSpeciesInput = document.getElementById('new-species-input');
+        if (newSpeciesInput) newSpeciesInput.value = '';
         removeUploadedFile(null);
       }
     }
