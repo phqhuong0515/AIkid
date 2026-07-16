@@ -1892,7 +1892,9 @@
           { label: "1. NHÂN VẬT CỦA EM LÀ GÌ?", subject: "Nhân vật", choices: ["con người", "con vật", "đồ vật", "thực vật", "robot"], placeholder: "Ví dụ: con mèo, con gấu, siêu nhân..." },
           { label: "2. NHÂN VẬT CÓ DÁNG NGƯỜI THẾ NÀO?", subject: "Dáng người", choices: ["tròn trịa", "mảnh mai", "nhỏ bé", "cao lớn", "mũm mĩm", "vuông vức"], placeholder: "Ví dụ: dáng vẻ tròn xoe, cao gầy, mũm mĩm..." },
           { label: "3. CƠ THỂ NHÂN VẬT GIỐNG HÌNH GÌ?", subject: "Cơ thể", choices: ["hình tròn", "hình vuông", "hình tam giác", "hình quả trứng"], placeholder: "Ví dụ: hình tròn, hình quả lê, hình tam giác..." },
-          { label: "4. TỔNG THỂ NHÂN VẬT TẠO CẢM GIÁC GÌ?", subject: "Cảm giác", choices: ["đáng yêu", "vui nhộn", "mạnh mẽ", "bí ẩn", "ngốc nghếch", "kỳ lạ", "độc ác"], placeholder: "Ví dụ: đáng yêu, vui nhộn..." }
+          { label: "4. NHÂN VẬT CÓ DA MÀU GÌ?", subject: "Màu da", choices: ["trắng hồng", "nâu bánh mật", "rám nắng", "xanh lá cây", "xám sáng"], placeholder: "Ví dụ: da trắng hồng, da rám nắng..." },
+          { label: "5. CHẤT LIỆU CỦA NHÂN VẬT LÀ GÌ?", subject: "Chất liệu", choices: ["da mềm", "lông", "vải bông", "kim loại", "gỗ", "thủy tinh"], placeholder: "Ví dụ: da mềm, vải bông, gỗ..." },
+          { label: "6. TỔNG THỂ NHÂN VẬT TẠO CẢM GIÁC GÌ?", subject: "Cảm giác", choices: ["đáng yêu", "vui nhộn", "mạnh mẽ", "bí ẩn", "ngốc nghếch", "kỳ lạ", "độc ác"], placeholder: "Ví dụ: đáng yêu, vui nhộn..." }
         ],
         parts: [
           { label: "1. TAY CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Tay", choices: ["không có tay", "tay dài", "tay ngắn", "tay mèo", "tay robot", "cánh", "xúc tu"], placeholder: "Ví dụ: 4 tay robot dài..." },
@@ -1918,10 +1920,7 @@
         ],
         color: [
           { label: "1. MÀU SẮC CHỦ ĐẠO CỦA NHÂN VẬT LÀ GÌ?", subject: "Màu chủ đạo", choices: ["màu vàng tươi", "màu hồng pastel", "màu trắng tinh", "màu xanh mint"], placeholder: "Ví dụ: màu vàng tươi, màu hồng nhạt..." },
-          { label: "2. NHÂN VẬT CÓ DA MÀU GÌ?", subject: "Màu da", choices: ["trắng hồng", "nâu bánh mật", "rám nắng", "xanh lá cây", "xám sáng"], placeholder: "Ví dụ: da trắng hồng, da rám nắng..." },
-          { label: "3. CHẤT LIỆU CỦA NHÂN VẬT LÀ GÌ?", subject: "Chất liệu", choices: ["da mềm", "lông", "vải bông", "kim loại", "gỗ", "thủy tinh"], placeholder: "Ví dụ: da mềm, vải bông, gỗ..." },
-          { label: "4. NHÂN VẬT CÓ HỌA TIẾT GÌ TRÊN NGƯỜI KHÔNG?", subject: "Họa tiết", choices: ["không có họa tiết", "sọc vằn tinh nghịch", "đốm tròn đáng yêu"], placeholder: "Ví dụ: sọc vằn tinh nghịch, đốm tròn..." },
-          
+          { label: "2. NHÂN VẬT CÓ HOẠ TIẾT TRÊN NGƯỜI KHÔNG?", subject: "Hoạ tiết", choices: ["không có hoạ tiết", "sọc vằn tinh nghịch", "đốm tròn đáng yêu"], placeholder: "Ví dụ: sọc vằn tinh nghịch, đốm tròn..." }
         ],
         clothes: [
           { label: "1. NHÂN VẬT MẶC ÁO KIỂU GÌ?", subject: "Áo", choices: ["không có áo", "áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
@@ -1934,11 +1933,11 @@
       };
 
       let categoryInputs = {
-        shape: ["con vật", "tròn trịa", "hình tròn", "đáng yêu", "", ""],
+        shape: ["con vật", "tròn trịa", "hình tròn", "trắng hồng", "lông", "đáng yêu"],
         parts: ["tay ngắn", "chân ngắn", "không có cánh", "đuôi ngắn", "không có sừng", ""],
         face: ["to tròn", "Miệng cười tươi", "Mũi nút áo", "tai người", "không có", "Tinh nghịch"],
         hair: ["Tóc xoăn bồng bềnh", "Mái lệch", "Màu hạt dẻ", "Tóc ngắn", "không có", "Không có phụ kiện"],
-        color: ["Màu vàng tươi", "trắng hồng", "lông", "Không có họa tiết", "", ""],
+        color: ["Màu vàng tươi", "Không có họa tiết", "", "", "", ""],
         clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Không đội mũ", "Khăn quàng cổ đỏ", "Hình ngôi sao"]
       };
 
