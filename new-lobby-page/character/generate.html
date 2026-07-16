@@ -1904,7 +1904,7 @@
         face: [
           { label: "1. MẮT CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Mắt", choices: ["không có mắt", "to tròn", "nhỏ xíu", "cụp xuống", "lấp lánh", "khác màu nhau"], placeholder: "Ví dụ: 3 mắt to tròn màu xanh nước biển..." },
           { label: "2. MIỆNG CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Miệng", choices: ["miệng cười tươi", "ngậm kẹo mút", "miệng mếu", "chu môi tinh nghịch", "không có miệng"], placeholder: "Ví dụ: miệng cười tươi rói, đang ngậm kẹo..." },
-          { label: "3. MŨI CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Mũi", choices: ["mũi nhỏ xinh", "mũi nút áo", "mũi chú hề đỏ", "không rõ mũi"], placeholder: "Ví dụ: mũi nút áo dễ thương, mũi chú hề đỏ..." },
+          { label: "3. MŨI CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Mũi", choices: ["mũi nhỏ xinh", "mũi nút áo", "mũi chú hề đỏ", "không có mũi"], placeholder: "Ví dụ: mũi nút áo dễ thương, mũi chú hề đỏ..." },
           { label: "4. TAI CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Tai", choices: ["không có tai", "tai tròn", "tai mèo", "tai người", "tai robot"], placeholder: "Ví dụ: đôi tai mèo tinh nghịch, tai thỏ dài..." },
           { label: "5. KHUÔN MẶT CÓ GÌ ĐẶC BIỆT KHÔNG?", subject: "Điểm đặc biệt", choices: ["không có", "tàn nhang", "nốt ruồi", "má hồng", "môi hồng", "vết sẹo"], placeholder: "Ví dụ: nốt ruồi ở dưới mắt, sẹo ở ngang mũi..." },
           { label: "6. BIỂU CẢM CỦA NHÂN VẬT THẾ NÀO?", subject: "Biểu cảm", choices: ["vui vẻ", "tinh nghịch", "đáng yêu", "ngạc nhiên", "hạnh phúc"], placeholder: "Ví dụ: vui vẻ, ngạc nhiên, tinh nghịch..." }        ],
@@ -1925,7 +1925,7 @@
           { label: "6. ĐỘ DÀY LÔNG CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Độ dày lông", choices: ["lông xù dày ấm áp", "lông mỏng", "không có lông"], placeholder: "Ví dụ: lông xù dày ấm áp, lông mỏng..." }
         ],
         clothes: [
-          { label: "1. NHÂN VẬT MẶC ÁO KIỂU GÌ?", subject: "Áo", choices: ["không mặc áo", "áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
+          { label: "1. NHÂN VẬT MẶC ÁO KIỂU GÌ?", subject: "Áo", choices: ["không có áo", "áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
           { label: "2. NHÂN VẬT MẶC QUẦN HAY VÁY?", subject: "Quần/Váy", choices: ["không mặc quần/váy", "váy xếp ly hồng", "quần yếm bò", "quần shorts"], placeholder: "Ví dụ: mặc váy xếp ly hồng, quần yếm bò..." },
           { label: "3. NHÂN VẬT ĐI GIÀY DÉP GÌ?", subject: "Giày dép", choices: ["không đi giày dép", "giày thể thao trắng", "ủng đỏ đáng yêu", "sandal"], placeholder: "Ví dụ: đi giày thể thao trắng, ủng đỏ..." },
           { label: "4. NHÂN VẬT ĐỘI MŨ GÌ?", subject: "Mũ", choices: ["không đội mũ", "mũ len quả bông", "mũ phi công", "mũ tai mèo"], placeholder: "Ví dụ: đội mũ len quả bông, mũ phi công..." },
@@ -2300,7 +2300,7 @@
           categoryInputs[cat].forEach((val, idx) => {
             if (val && val.trim()) {
               const valLower = val.toLowerCase().trim();
-              const allowedNegatives = ['không có mắt', 'không có mũi', 'không có miệng', 'không có tai'];
+              const allowedNegatives = ['không có mắt', 'không có mũi', 'không có miệng', 'không có tai', 'không có tay', 'không có chân', 'không có áo'];
               if ((valLower.startsWith('không') && !allowedNegatives.includes(valLower)) || valLower === 'none' || valLower === 'no') {
                 return; // Skip negative options
               }
