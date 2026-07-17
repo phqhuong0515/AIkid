@@ -876,11 +876,37 @@
     </a>
 
     <!-- Right next button pointing to feature-next -->
-    <a href="/character/generate/feature-next" class="nav-btn btn-right" title="Tiếp tục" onclick="playPopAndNavigate('/character/generate/feature-next'); return false;">
+    <a href="/character/generate/feature-next" class="nav-btn btn-right" title="Tiếp tục" onclick="showCharacterConfirmModal(); return false;">
       <svg viewBox="0 0 24 24">
         <path d="M8 5v14l11-7z" />
       </svg>
     </a>
+  </div>
+
+  <!-- Confirm Character Modal -->
+  <div class="confirm-modal-overlay" id="confirm-character-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;">
+    <div class="confirm-modal-content" style="background: #FDFAF4; border: 6px solid #FFFFFF; border-radius: 36px; padding: 30px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15); text-align: center; max-width: 600px; width: 90%; transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      <!-- Title -->
+      <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.6rem; font-weight: 900; color: #FF5C8A;">
+        Sử dụng nhân vật này?
+      </div>
+      <!-- Body Text -->
+      <div style="font-family: 'Mali', sans-serif; font-size: 1.15rem; font-weight: 500; color: #8A7463; line-height: 1.6;">
+        Em có chắc chắn muốn sử dụng nhân vật đáng yêu này để tiếp tục câu chuyện không nhỉ?
+        <div style="font-size: 0.95rem; color: #FF7597; font-weight: 700; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <i class="fa-solid fa-circle-exclamation"></i> Lưu ý: Sau khi tiếp tục, em sẽ không thể thay đổi nhân vật này nữa đâu nhé!
+        </div>
+      </div>
+      <!-- Actions -->
+      <div style="display: flex; gap: 15px; width: 100%; margin-top: 10px;">
+        <button class="confirm-modal-btn" onclick="closeCharacterConfirmModal()" style="flex: 1; background: #E5D9CE; border: 2.5px solid #FFFFFF; border-radius: 9999px; color: #8A7463; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.1rem; padding: 12px 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(138, 116, 99, 0.15); transition: all 0.2s; outline: none; transition: all 0.2s;">
+          Đợi một chút...
+        </button>
+        <button class="confirm-modal-btn" onclick="proceedToFeaturesPage()" style="flex: 1; background: linear-gradient(135deg, #FF5C8A, #FF85A7); border: none; border-radius: 9999px; color: #FFFFFF; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.1rem; padding: 14.5px 20px; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 92, 138, 0.35); transition: all 0.2s; outline: none; transition: all 0.2s;">
+          Tiếp tục
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1384,6 +1410,48 @@
     document.addEventListener('focusin', () => {
       setTimeout(resetWindowScroll, 0);
     });
+
+    // Modal control functions
+    function showCharacterConfirmModal() {
+      const modal = document.getElementById('confirm-character-modal');
+      const content = modal.querySelector('.confirm-modal-content');
+      modal.style.display = 'flex';
+      // force reflow
+      modal.offsetHeight;
+      modal.style.opacity = '1';
+      content.style.transform = 'scale(1)';
+    }
+
+    // Make buttons hover active zoom works smoothly
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = `
+      .confirm-modal-btn {
+        transition: all 0.25s ease !important;
+      }
+      .confirm-modal-btn:hover {
+        transform: translateY(-2px) scale(1.02);
+        filter: brightness(1.05);
+      }
+      .confirm-modal-btn:active {
+        transform: translateY(0) scale(1);
+      }
+    `;
+    document.head.appendChild(styleElement);
+
+    function closeCharacterConfirmModal() {
+      const modal = document.getElementById('confirm-character-modal');
+      const content = modal.querySelector('.confirm-modal-content');
+      modal.style.opacity = '0';
+      content.style.transform = 'scale(0.8)';
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    function proceedToFeaturesPage() {
+      closeCharacterConfirmModal();
+      playPopAndNavigate('/character/generate/feature-next');
+    }
 
     window.addEventListener('load', hidePageLoader);
     window.addEventListener('pageshow', (e) => {

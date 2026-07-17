@@ -1117,28 +1117,7 @@
     </div>
   </div>
 
-  <!-- Confirm Character Modal -->
-  <div class="confirm-modal-overlay" id="confirm-character-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;">
-    <div class="confirm-modal-content" style="background: #FDFAF4; border: 6px solid #FFFFFF; border-radius: 36px; padding: 30px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15); text-align: center; max-width: 600px; width: 90%; transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; gap: 20px;">
-      <!-- Title -->
-      <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.6rem; font-weight: 900; color: #FF5C8A;">
-        Sử dụng nhân vật này?
-      </div>
-      <!-- Body Text -->
-      <div style="font-family: 'Mali', sans-serif; font-size: 1.15rem; font-weight: 500; color: #8A7463; line-height: 1.6;">
-        Em có chắc chắn muốn sử dụng nhân vật đáng yêu này để tiếp tục câu chuyện không nhỉ?
-      </div>
-      <!-- Actions -->
-      <div style="display: flex; gap: 15px; width: 100%; margin-top: 10px;">
-        <button class="confirm-modal-btn" onclick="closeCharacterConfirmModal()" style="flex: 1; background: #E5D9CE; border: 2.5px solid #FFFFFF; border-radius: 9999px; color: #8A7463; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.1rem; padding: 12px 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(138, 116, 99, 0.15); transition: all 0.2s; outline: none; transition: all 0.2s;">
-          Đợi một chút...
-        </button>
-        <button class="confirm-modal-btn" onclick="proceedToFeaturesPage()" style="flex: 1; background: linear-gradient(135deg, #FF5C8A, #FF85A7); border: none; border-radius: 9999px; color: #FFFFFF; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.1rem; padding: 14.5px 20px; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 92, 138, 0.35); transition: all 0.2s; outline: none; transition: all 0.2s;">
-          Tiếp tục
-        </button>
-      </div>
-    </div>
-  </div>
+
 
   <div class="scaler-wrapper">
     <!-- Top Navigation Header from StoryMee Universe -->
@@ -1600,7 +1579,7 @@
             </div>
           </div>
           <!-- Next Page Button pointing to /character/generate/feature.html -->
-          <a href="/character/generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="showCharacterConfirmModal(); return false;">
+          <a href="/character/generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="playPopAndNavigate('/character/generate/feature.html'); return false;">
             <svg viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -1754,6 +1733,23 @@
           }
         } catch (e) {
           console.error("Failed to load uploaded image from localStorage", e);
+        }
+      }
+
+      function loadGeneratedImageFromLocalStorage() {
+        try {
+          const savedImg = localStorage.getItem('storymee_generated_character_img');
+          if (savedImg) {
+            const viewportBox = document.querySelector('.panel-ai .viewport-box');
+            if (viewportBox) {
+              viewportBox.innerHTML = `
+                <img src="${savedImg}" class="ai-result-img" style="width: 100%; height: 100%; object-fit: contain; border-radius: 24px;">
+              `;
+              isFirstImageGenerated = true;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load generated image from localStorage", e);
         }
       }
 
@@ -2606,6 +2602,7 @@
       window.addEventListener('load', () => {
         adjustScale();
         loadUploadedImageFromLocalStorage();
+        loadGeneratedImageFromLocalStorage();
         loadCategoryInputsFromLocalStorage();
 
         // Custom Category Dropdown Toggle Logic
@@ -2790,6 +2787,7 @@
 
       // Clear or reset inputs depending on option mode
       function clearAllInputs() {
+        playPopSound();
         if (currentOption === 1) {
           // Reset Option 1 (Ideas) to defaults
           const defaults = {
@@ -2817,48 +2815,34 @@
           switchCategory(savedCat);
           updatePromptFromQuestions();
         }
-      }
 
-      // Modal control functions
-      function showCharacterConfirmModal() {
-        const modal = document.getElementById('confirm-character-modal');
-        const content = modal.querySelector('.confirm-modal-content');
-        modal.style.display = 'flex';
-        // force reflow
-        modal.offsetHeight;
-        modal.style.opacity = '1';
-        content.style.transform = 'scale(1)';
-      }
-
-      // Make buttons hover active zoom works smoothly
-      const styleElement = document.createElement('style');
-      styleElement.innerHTML = `
-        .confirm-modal-btn {
-          transition: all 0.25s ease !important;
+        // Clear generated image from storage and reset preview viewport
+        try {
+          localStorage.removeItem('storymee_generated_character_img');
+        } catch (e) {
+          console.error(e);
         }
-        .confirm-modal-btn:hover {
-          transform: translateY(-2px) scale(1.02);
-          filter: brightness(1.05);
+        isFirstImageGenerated = false;
+        const viewportBox = document.querySelector('.panel-ai .viewport-box');
+        if (viewportBox) {
+          viewportBox.innerHTML = `
+            <div class="ai-placeholder">
+              <div class="magic-wand-icon">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <div class="ai-placeholder-text">
+                Hãy sáng tạo nhân vật hoặc tải ảnh lên, sau đó bấm <strong>AI Vẽ Lại</strong> để xem phép thuật nhé!
+              </div>
+              <button class="magic-btn" onclick="triggerAIGeneration()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>AI Vẽ Lại</span>
+              </button>
+            </div>
+          `;
         }
-        .confirm-modal-btn:active {
-          transform: translateY(0) scale(1);
-        }
-      `;
-      document.head.appendChild(styleElement);
-
-      function closeCharacterConfirmModal() {
-        const modal = document.getElementById('confirm-character-modal');
-        const content = modal.querySelector('.confirm-modal-content');
-        modal.style.opacity = '0';
-        content.style.transform = 'scale(0.8)';
-        setTimeout(() => {
-          modal.style.display = 'none';
-        }, 300);
-      }
-
-      function proceedToFeaturesPage() {
-        closeCharacterConfirmModal();
-        playPopAndNavigate('/character/generate/feature.html');
+        
+        // Clear uploaded image preview and input as well
+        removeUploadedImage(null);
       }
 
       window.addEventListener('resize', adjustScale);
