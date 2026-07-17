@@ -166,6 +166,111 @@
     .mini-1 { top: 25%; left: 15%; animation: miniFlight 1.6s linear infinite; animation-delay: 0.4s; }
     .mini-2 { top: 75%; left: 5%; animation: miniFlight 1.9s linear infinite; animation-delay: 0.9s; }
     .mini-3 { top: 85%; left: 50%; animation: miniFlight 1.4s linear infinite; animation-delay: 0.1s; }
+
+    /* 2-Column Cards Container */
+    .lobby-cards-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -40%);
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+      align-items: center;
+      width: 90%;
+      max-width: 860px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Individual Card with white border and solid #FDFAF4 background */
+    .lobby-card-item {
+      position: relative;
+      flex: 1;
+      height: 380px;
+      background: #FDFAF4 !important;
+      border: 10px solid #FFFFFF;
+      border-radius: 48px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+
+    .lobby-card-item:hover {
+      transform: translateY(-16px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    .lobby-card-item:active {
+      transform: translateY(-8px) scale(0.98);
+    }
+
+    /* Content wrapper */
+    .lobby-card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* Gradient Pink Icon */
+    .lobby-card-icon {
+      font-size: 5rem;
+      background: linear-gradient(135deg, #FF5E97 0%, #FF9EB5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @keyframes iconWiggle {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.1) rotate(-8deg); }
+      75% { transform: scale(1.1) rotate(8deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .lobby-card-item:hover .lobby-card-icon {
+      animation: iconWiggle 1.0s ease-in-out infinite;
+    }
+
+    .lobby-card-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: #475569;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 5px;
+    }
+
+    /* Toast Message */
+    .toast-message {
+        position: fixed;
+        bottom: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #334155;
+        color: #FFFFFF;
+        padding: 16px 32px;
+        border-radius: 20px;
+        font-family: 'Mali', sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 1000000;
+        transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-message.show {
+        bottom: 40px;
+    }
   </style>
 </head>
 
@@ -239,7 +344,31 @@
         <span>Trở Về</span>
       </button>
     </div>
+
+    <!-- Center Content: 2-Column Cards -->
+    <div class="lobby-cards-container">
+      
+      <!-- Left Card: Truyện Chữ -->
+      <div class="lobby-card-item" onclick="showComingSoon('Truyện Chữ')">
+        <div class="lobby-card-content">
+          <i class="fa-solid fa-book lobby-card-icon"></i>
+          <div class="lobby-card-title">Truyện Chữ</div>
+        </div>
+      </div>
+
+      <!-- Right Card: Truyện Tranh -->
+      <div class="lobby-card-item" onclick="showComingSoon('Truyện Tranh')">
+        <div class="lobby-card-content">
+          <i class="fa-solid fa-book-open-reader lobby-card-icon"></i>
+          <div class="lobby-card-title">Truyện Tranh</div>
+        </div>
+      </div>
+
+    </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-message"></div>
 
   <script>
     // Bubble pop sound using Web Audio API
@@ -273,6 +402,16 @@
       setTimeout(() => {
         window.location.href = url;
       }, 350);
+    }
+
+    function showComingSoon(featureName) {
+      playPopSound();
+      const toast = document.getElementById('toast');
+      toast.innerText = `${featureName} - Tính năng đang được phát triển!`;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
     }
 
     function adjustScale() {
