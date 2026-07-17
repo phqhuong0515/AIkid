@@ -8,3 +8,5 @@ cloudflared.exe
 JPG/
 Logo/
 paco/
+.env
+new-lobby-page/.env
