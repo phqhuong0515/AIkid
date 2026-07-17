@@ -880,6 +880,9 @@
       // Center the active card dynamically
       updateCardPositions(index);
 
+      // Save selected style name
+      localStorage.setItem('storymee_selected_style', styleName);
+
       // Show toast
       const toast = document.getElementById('toast');
       toast.innerText = `Đã chọn phong cách ${styleName}!`;

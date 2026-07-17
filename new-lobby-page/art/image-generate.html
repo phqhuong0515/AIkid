@@ -1871,14 +1871,62 @@
       reader.readAsDataURL(file);
     }
 
-    function triggerAIGeneration() {
+    async function triggerAIGeneration() {
       playPopSound();
-      alert('Chức năng AI đang chuẩn bị biến hóa phép thuật của bé! Cùng chờ đón nhé ✨');
+      const aiPanel = document.querySelector('.panel-ai');
+      const viewportBox = aiPanel ? aiPanel.querySelector('.viewport-box') : null;
+      if (viewportBox) {
+        viewportBox.innerHTML = `
+          <div class="ai-loading-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 16px; background: #FDFAF4; border-radius: 24px;">
+            <i class="fa-solid fa-wand-magic-sparkles fa-spin" style="font-size: 3rem; color: #FF7597; animation: fa-spin 2s linear infinite;"></i>
+            <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.2rem; color: #8A7463; font-weight: 900;">AI đang biến hóa phép thuật...</div>
+          </div>
+        `;
+      }
+
+      const canvas = document.getElementById('drawing-canvas');
+      const imageDataUrl = canvas ? canvas.toDataURL('image/png') : '';
+      const styleName = localStorage.getItem('storymee_selected_style') || 'Màu Nước';
+
+      try {
+        const response = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            image: imageDataUrl,
+            style: styleName
+          })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        if (viewportBox && data.url) {
+          viewportBox.innerHTML = `
+            <img src="${data.url}" class="ai-result-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 24px;">
+          `;
+        }
+      } catch (error) {
+        console.error("AI Art Generation Error:", error);
+        if (viewportBox) {
+          viewportBox.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 12px; background: #FFF5F5; border: 3px solid #FEB2B2; border-radius: 24px; padding: 20px; text-align: center; box-sizing: border-box;">
+              <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: #E53E3E;"></i>
+              <div style="font-family: 'Mali', sans-serif; font-weight: 700; color: #C53030; font-size: 1.1rem;">Lỗi vẽ tranh AI</div>
+              <div style="font-size: 0.9rem; color: #9B2C2C; word-break: break-word;">${error.message || 'Vui lòng kiểm tra lại cấu hình API key trong file .env'}</div>
+              <button class="magic-btn" onclick="triggerAIGeneration()" style="margin-top: 8px;">Thử lại</button>
+            </div>
+          `;
+        }
+      }
     }
 
     function regenerateAI() {
-      playPopSound();
-      alert('Chức năng làm lại ảnh AI đang được chuẩn bị! Cùng chờ đón nhé ✨');
+      triggerAIGeneration();
     }
 
     function downloadAIImage() {
@@ -1886,14 +1934,59 @@
       const aiPanel = document.querySelector('.panel-ai');
       const aiImg = aiPanel ? aiPanel.querySelector('.ai-result-img, img:not(.magic-wand-icon img)') : null;
       
-      const link = document.createElement('a');
+      let imgSrc = null;
+      let defaultFilename = 'storymee_ai_artwork.jpg';
+
       if (aiImg && aiImg.src) {
-        link.href = aiImg.src;
-        link.download = 'storymee_ai_artwork.png';
+        imgSrc = aiImg.src;
+        defaultFilename = 'storymee_ai_artwork.jpg';
       } else {
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'storymee_drawing.png';
+        if (typeof canvas !== 'undefined') {
+          imgSrc = canvas.toDataURL('image/png');
+          defaultFilename = 'storymee_drawing.jpg';
+        }
       }
+
+      if (!imgSrc) {
+        alert('Chưa có ảnh nào để tải về!');
+        return;
+      }
+
+      if (imgSrc.startsWith('data:image/jpeg') || imgSrc.startsWith('data:image/jpg')) {
+        triggerDownload(imgSrc, defaultFilename);
+      } else {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = img.naturalWidth || img.width;
+          tempCanvas.height = img.naturalHeight || img.height;
+          const ctx = tempCanvas.getContext('2d');
+          
+          // Fill background white in case of transparency
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+          
+          ctx.drawImage(img, 0, 0);
+          try {
+            const jpegUrl = tempCanvas.toDataURL('image/jpeg', 0.95);
+            triggerDownload(jpegUrl, defaultFilename);
+          } catch (e) {
+            console.error("Canvas export to JPEG failed, downloading original.", e);
+            triggerDownload(imgSrc, defaultFilename);
+          }
+        };
+        img.onerror = function() {
+          triggerDownload(imgSrc, defaultFilename);
+        };
+        img.src = imgSrc;
+      }
+    }
+
+    function triggerDownload(dataUrl, filename) {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

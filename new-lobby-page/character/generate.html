@@ -125,7 +125,7 @@
       align-items: center;
       width: 94%;
       max-width: 1512px;
-      margin-top: 225px;
+      margin-top: 230px;
       /* Space for navbar */
       margin-bottom: 20px;
       gap: 16px;
@@ -1117,6 +1117,29 @@
     </div>
   </div>
 
+  <!-- Confirm Character Modal -->
+  <div class="confirm-modal-overlay" id="confirm-character-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 999999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;">
+    <div class="confirm-modal-content" style="background: #FDFAF4; border: 6px solid #FFFFFF; border-radius: 36px; padding: 30px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15); text-align: center; max-width: 600px; width: 90%; transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      <!-- Title -->
+      <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.6rem; font-weight: 900; color: #FF5C8A;">
+        Sử dụng nhân vật này?
+      </div>
+      <!-- Body Text -->
+      <div style="font-family: 'Mali', sans-serif; font-size: 1.15rem; font-weight: 500; color: #8A7463; line-height: 1.6;">
+        Em có chắc chắn muốn sử dụng nhân vật đáng yêu này để tiếp tục câu chuyện không nhỉ?
+      </div>
+      <!-- Actions -->
+      <div style="display: flex; gap: 15px; width: 100%; margin-top: 10px;">
+        <button class="confirm-modal-btn" onclick="closeCharacterConfirmModal()" style="flex: 1; background: #E5D9CE; border: 2.5px solid #FFFFFF; border-radius: 9999px; color: #8A7463; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.1rem; padding: 12px 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(138, 116, 99, 0.15); transition: all 0.2s; outline: none; transition: all 0.2s;">
+          Đợi một chút...
+        </button>
+        <button class="confirm-modal-btn" onclick="proceedToFeaturesPage()" style="flex: 1; background: linear-gradient(135deg, #FF5C8A, #FF85A7); border: none; border-radius: 9999px; color: #FFFFFF; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1.1rem; padding: 14.5px 20px; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 92, 138, 0.35); transition: all 0.2s; outline: none; transition: all 0.2s;">
+          Tiếp tục
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="scaler-wrapper">
     <!-- Top Navigation Header from StoryMee Universe -->
     <header class="universe-header">
@@ -1159,33 +1182,31 @@
 
     <!-- Workspace Wrapper (Holds Container) -->
     <div class="workspace-wrapper">
-      <!-- Toggle Mode Button -->
-      <div style="width: 100%; display: flex; justify-content: flex-start; margin-bottom: -6px; box-sizing: border-box;">
-        <button id="btn-toggle-option" onclick="toggleOption()" style="
-          background: linear-gradient(135deg, #ff7597, #ff9eb5);
-          border: 2px solid #FFFFFF;
-          border-radius: 9999px;
-          color: white;
-          font-family: 'Mali', sans-serif;
-          font-weight: 700;
-          font-size: 1rem;
-          padding: 8px 20px;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        ">
-          <i class="fa-solid fa-arrows-rotate"></i>
-          <span>Hình ảnh</span>
-        </button>
-      </div>
-
       <!-- Workspace Container for Two Panels -->
       <div class="workspace-container">
-        <!-- Panel 1: Drawing Canvas -->
-        <div class="workspace-panel panel-draw">
+        <div class="workspace-panel panel-draw" style="position: relative;">
+          <!-- Toggle Mode Button inside panel-draw -->
+          <div style="position: absolute; right: 24px; top: -42px; z-index: 10;">
+            <button id="btn-toggle-option" onclick="toggleOption()" style="
+              background: linear-gradient(135deg, #ff7597, #ff9eb5);
+              border: 2.5px solid #FFFFFF;
+              border-radius: 9999px;
+              color: white;
+              font-family: 'Mali', sans-serif;
+              font-weight: 700;
+              font-size: 1.25rem;
+              padding: 11px 28px;
+              cursor: pointer;
+              display: inline-flex;
+              align-items: center;
+              gap: 10px;
+              box-shadow: 0 5px 15px rgba(255, 117, 151, 0.3);
+              transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            ">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Hình ảnh</span>
+            </button>
+          </div>
           <!-- Upload & Description Body (Vertical Flow) -->
           <div class="draw-workspace-body" style="flex: 1; display: flex; flex-direction: column; gap: 15px; height: 100%; min-height: 0; width: 100%; border-radius: 24px; background: transparent; border: none; padding: 0;">
             
@@ -1579,7 +1600,7 @@
             </div>
           </div>
           <!-- Next Page Button pointing to /character/generate/feature.html -->
-          <a href="/character/generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="playPopAndNavigate('/character/generate/feature.html'); return false;">
+          <a href="/character/generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="showCharacterConfirmModal(); return false;">
             <svg viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -1808,7 +1829,7 @@
 
       let isFirstImageGenerated = false;
 
-      function triggerAIGeneration() {
+      async function triggerAIGeneration() {
         playPopSound();
         const viewportBox = document.querySelector('.panel-ai .viewport-box');
         if (viewportBox) {
@@ -1820,14 +1841,47 @@
           `;
         }
 
-        setTimeout(() => {
-          if (viewportBox) {
+        const promptTextarea = document.getElementById('character-prompt');
+        const promptText = promptTextarea ? promptTextarea.value : 'Bản vẽ thiết kế nhân vật dễ thương.';
+
+        try {
+          const response = await fetch('/api/generate-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: promptText })
+          });
+
+          const data = await response.json();
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          if (viewportBox && data.url) {
             viewportBox.innerHTML = `
-              <img src="/mee/PNG/storage-test-yuu.jpeg" class="ai-result-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 24px;">
+              <img src="${data.url}" class="ai-result-img" style="width: 100%; height: 100%; object-fit: contain; border-radius: 24px;">
             `;
+            try {
+              localStorage.setItem('storymee_generated_character_img', data.url);
+            } catch (err) {
+              console.error(err);
+            }
           }
           isFirstImageGenerated = true;
-        }, 1500);
+        } catch (error) {
+          console.error("AI Generation Error:", error);
+          if (viewportBox) {
+            viewportBox.innerHTML = `
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 12px; background: #FFF5F5; border: 3px solid #FEB2B2; border-radius: 24px; padding: 20px; text-align: center; box-sizing: border-box;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: #E53E3E;"></i>
+                <div style="font-family: 'Mali', sans-serif; font-weight: 700; color: #C53030; font-size: 1.1rem;">Lỗi kết nối AI</div>
+                <div style="font-size: 0.9rem; color: #9B2C2C; word-break: break-word;">${error.message || 'Vui lòng kiểm tra lại cấu hình API key trong file .env'}</div>
+                <button class="magic-btn" onclick="triggerAIGeneration()" style="margin-top: 8px;">Thử lại</button>
+              </div>
+            `;
+          }
+        }
       }
 
       function openEditAIModal() {
@@ -1853,7 +1907,7 @@
         }
       }
 
-      function confirmEditAIGeneration() {
+      async function confirmEditAIGeneration() {
         playPopSound();
         const promptArea = document.getElementById('edit-ai-prompt');
         const editPromptText = promptArea ? promptArea.value.trim() : '';
@@ -1865,6 +1919,9 @@
         }
 
         const viewportBox = document.querySelector('.panel-ai .viewport-box');
+        const existingImg = viewportBox ? viewportBox.querySelector('.ai-result-img') : null;
+        const existingImgSrc = existingImg ? existingImg.src : null;
+
         if (viewportBox) {
           viewportBox.innerHTML = `
             <div class="ai-loading-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 16px; background: #FDFAF4; border-radius: 24px;">
@@ -1874,17 +1931,53 @@
           `;
         }
 
-        setTimeout(() => {
+        const originalPrompt = document.getElementById('character-prompt')?.value || '';
+        const combinedPrompt = originalPrompt ? `${originalPrompt} Yêu cầu chỉnh sửa thêm: ${editPromptText}` : editPromptText;
+
+        try {
+          const response = await fetch('/api/generate-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              prompt: combinedPrompt,
+              existingImage: existingImgSrc
+            })
+          });
+
+          const data = await response.json();
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          if (viewportBox && data.url) {
+            viewportBox.innerHTML = `
+              <img src="${data.url}" class="ai-result-img" style="width: 100%; height: 100%; object-fit: contain; border-radius: 24px;">
+            `;
+            try {
+              localStorage.setItem('storymee_generated_character_img', data.url);
+            } catch (err) {
+              console.error(err);
+            }
+          }
+        } catch (error) {
+          console.error("AI Edit Generation Error:", error);
           if (viewportBox) {
             viewportBox.innerHTML = `
-              <img src="/mee/PNG/storage-test-yuu-model.jpeg" class="ai-result-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 24px;">
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 12px; background: #FFF5F5; border: 3px solid #FEB2B2; border-radius: 24px; padding: 20px; text-align: center; box-sizing: border-box;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: #E53E3E;"></i>
+                <div style="font-family: 'Mali', sans-serif; font-weight: 700; color: #C53030; font-size: 1.1rem;">Lỗi sửa ảnh bằng AI</div>
+                <div style="font-size: 0.9rem; color: #9B2C2C; word-break: break-word;">${error.message || 'Vui lòng kiểm tra lại cấu hình API key trong file .env'}</div>
+                <button class="magic-btn" onclick="openEditAIModal()" style="margin-top: 8px;">Thử lại</button>
+              </div>
             `;
           }
-        }, 1800);
+        }
       }
 
       // Active Category
-      let activeCategory = 'shape'; // default
+      let activeCategory = null;
 
       // Question definitions for the 6 categories
       const categoryQuestions = {
@@ -1905,11 +1998,11 @@
         ],
         face: [
           { label: "1. MẮT CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Mắt", choices: ["không có mắt", "to tròn", "nhỏ xíu", "cụp xuống", "lấp lánh", "khác màu nhau"], placeholder: "Ví dụ: 3 mắt to tròn màu xanh nước biển..." },
-          { label: "2. MIỆNG CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Miệng", choices: ["miệng cười tươi", "ngậm kẹo mút", "miệng mếu", "chu môi tinh nghịch", "không có miệng"], placeholder: "Ví dụ: miệng cười tươi rói, đang ngậm kẹo..." },
+          { label: "2. MIỆNG CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Miệng", choices: ["miệng cười tươi", "ngậm kẹo mút", "miệng mếu", "chu môi", "không có miệng"], placeholder: "Ví dụ: miệng cười tươi rói, đang ngậm kẹo..." },
           { label: "3. MŨI CỦA NHÂN VẬT NHƯ THẾ NÀO?", subject: "Mũi", choices: ["mũi nhỏ xinh", "mũi nút áo", "mũi chú hề đỏ", "không có mũi"], placeholder: "Ví dụ: mũi nút áo dễ thương, mũi chú hề đỏ..." },
           { label: "4. TAI CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?", subject: "Tai", choices: ["không có tai", "tai tròn", "tai mèo", "tai người", "tai robot"], placeholder: "Ví dụ: đôi tai mèo tinh nghịch, tai thỏ dài..." },
           { label: "5. KHUÔN MẶT CÓ GÌ ĐẶC BIỆT KHÔNG?", subject: "Điểm đặc biệt", choices: ["không có", "tàn nhang", "nốt ruồi", "má hồng", "môi hồng", "vết sẹo"], placeholder: "Ví dụ: nốt ruồi ở dưới mắt, sẹo ở ngang mũi..." },
-          { label: "6. BIỂU CẢM CỦA NHÂN VẬT THẾ NÀO?", subject: "Biểu cảm", choices: ["vui vẻ", "tinh nghịch", "đáng yêu", "ngạc nhiên", "hạnh phúc"], placeholder: "Ví dụ: vui vẻ, ngạc nhiên, tinh nghịch..." }        ],
+          { label: "6. BIỂU CẢM CỦA NHÂN VẬT THẾ NÀO?", subject: "Biểu cảm", choices: ["vui vẻ", "tinh nghịch", "ngạc nhiên", "lo lắng", "độc ác"], placeholder: "Ví dụ: vui vẻ, ngạc nhiên, lo lắng..." }        ],
         hair: [
           { label: "1. KIỂU TÓC/LÔNG CỦA NHÂN VẬT THẾ NÀO?", subject: "Kiểu tóc/lông", choices: ["không tóc/lông", "mượt mà", "xoăn tít", "dựng đứng", "lộn xộn", "phát sáng"], placeholder: "Ví dụ: mượt mà, xoăn tít, dựng đứng..." },
           { label: "2. TÓC MÁI CỦA NHÂN VẬT TRÔNG THẾ NÀO?", subject: "Tóc mái", choices: ["mái ngố dễ thương", "mái lệch", "mái thưa", "không có mái"], placeholder: "Ví dụ: mái ngố dễ thương, mái lệch..." },
@@ -1919,12 +2012,10 @@
           { label: "6. NHÂN VẬT CÓ ĐEO PHỤ KIỆN ĐẦU KHÔNG?", subject: "Phụ kiện đầu", choices: ["không có phụ kiện", "nơ màu hồng", "bờm tai gấu", "kẹp tóc ngôi sao"], placeholder: "Ví dụ: kẹp tóc ngôi sao, bờm tai gấu..." }
         ],
         clothes: [
-          { label: "1. NHÂN VẬT MẶC ÁO KIỂU GÌ?", subject: "Áo", choices: ["không có áo", "áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
-          { label: "2. NHÂN VẬT MẶC QUẦN HAY VÁY?", subject: "Quần/Váy", choices: ["không mặc quần/váy", "váy xếp ly hồng", "quần yếm bò", "quần shorts"], placeholder: "Ví dụ: mặc váy xếp ly hồng, quần yếm bò..." },
+          { label: "1. NHÂN VẬT MẶC ÁO KIỂU GÌ?", subject: "Áo", choices: ["áo hoodie khủng long", "áo thun kẻ sọc", "áo khoác len"], placeholder: "Ví dụ: mặc áo hoodie khủng long, áo thun sọc..." },
+          { label: "2. NHÂN VẬT MẶC QUẦN HAY VÁY?", subject: "Quần/Váy", choices: ["váy xếp ly hồng", "quần yếm bò", "quần shorts"], placeholder: "Ví dụ: mặc váy xếp ly hồng, quần yếm bò..." },
           { label: "3. NHÂN VẬT ĐI GIÀY DÉP GÌ?", subject: "Giày dép", choices: ["không đi giày dép", "giày thể thao trắng", "ủng đỏ đáng yêu", "sandal"], placeholder: "Ví dụ: đi giày thể thao trắng, ủng đỏ..." },
-          { label: "4. NHÂN VẬT ĐỘI MŨ GÌ?", subject: "Mũ", choices: ["không đội mũ", "mũ len quả bông", "mũ phi công", "mũ tai mèo"], placeholder: "Ví dụ: đội mũ len quả bông, mũ phi công..." },
-          { label: "5. NHÂN VẬT CÓ PHỤ KIỆN TRANG PHỤC GÌ KHÔNG?", subject: "Phụ kiện", choices: ["không có phụ kiện", "khăn quàng cổ đỏ", "ba lô gấu trúc", "túi chéo nhỏ"], placeholder: "Ví dụ: đeo khăn quàng cổ đỏ, đeo ba lô gấu..." },
-          { label: "6. TRANG PHỤC CỦA NHÂN VẬT CÓ HỌA TIẾT GÌ KHÔNG?", subject: "Họa tiết đồ", choices: ["không họa tiết", "họa tiết hoa cúc", "hình ngôi sao", "kẻ caro"], placeholder: "Ví dụ: họa tiết hoa cúc nhí, hình ngôi sao..." }
+          { label: "4. NHÂN VẬT ĐEO PHỤ KIỆN GÌ?", subject: "Phụ kiện", choices: ["không có phụ kiện", "khăn quàng cổ đỏ", "ba lô gấu trúc", "túi chéo nhỏ"], placeholder: "Ví dụ: đeo khăn quàng cổ đỏ, đeo ba lô gấu..." }
         ]
       };
 
@@ -1933,7 +2024,7 @@
         parts: ["tay ngắn", "chân ngắn", "không có cánh", "đuôi ngắn", "không có sừng", ""],
         face: ["to tròn", "Miệng cười tươi", "Mũi nút áo", "tai người", "không có", "Tinh nghịch"],
         hair: ["Tóc xoăn bồng bềnh", "Mái lệch", "Màu hạt dẻ", "Tóc ngắn", "không có", "Không có phụ kiện"],
-        clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Không đội mũ", "Khăn quàng cổ đỏ", "Hình ngôi sao"]
+        clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Khăn quàng cổ đỏ"]
       };
 
       function loadCategoryInputsFromLocalStorage() {
@@ -1952,21 +2043,33 @@
       }
 
       function switchCategory(newCat) {
-        // Save current textarea values first
+        // Save current textarea values first (only if switching from a valid, active category)
         const ids = ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'];
-        ids.forEach((id, idx) => {
-          const wrapper = document.getElementById(`wrapper-question-${idx+1}`);
-          if (wrapper && wrapper.style.display !== 'none') {
-            const textarea = wrapper.querySelector('textarea');
-            if (textarea && textarea.style.display !== 'none') {
-              categoryInputs[activeCategory][idx] = textarea.value.trim();
+        if (activeCategory && activeCategory !== newCat) {
+          const questions = categoryQuestions[activeCategory] || [];
+          ids.forEach((id, idx) => {
+            const wrapper = document.getElementById(`wrapper-question-${idx+1}`);
+            if (wrapper && wrapper.style.display !== 'none') {
+              const textarea = wrapper.querySelector('textarea');
+              if (textarea && textarea.style.display !== 'none') {
+                if (idx < questions.length) {
+                  categoryInputs[activeCategory][idx] = textarea.value.trim();
+                } else {
+                  categoryInputs[activeCategory][idx] = '';
+                }
+              }
             }
-          }
-        });
-        saveCategoryInputsToLocalStorage();
+          });
+          saveCategoryInputsToLocalStorage();
+        }
 
         // Update active category
         activeCategory = newCat;
+        try {
+          localStorage.setItem('storymee_generate_active_category', newCat);
+        } catch (e) {
+          console.error(e);
+        }
 
         // Populate questions
         const questions = categoryQuestions[newCat];
@@ -2198,6 +2301,12 @@
 
         // Clear local storage key
         localStorage.removeItem('storymee_generate_inputs');
+        try {
+          localStorage.removeItem('storymee_generate_active_category');
+          localStorage.removeItem('storymee_generated_character_img');
+        } catch (e) {
+          console.error(e);
+        }
 
         // Re-render current category to reflect cleared state
         switchCategory(activeCategory);
@@ -2205,27 +2314,89 @@
         // Update prompts
         updatePromptFromIdeas();
         updatePromptFromQuestions();
+
+        // Reset viewport box to initial placeholder state (deleting the generated image)
+        const viewportBox = document.querySelector('.panel-ai .viewport-box');
+        if (viewportBox) {
+          viewportBox.innerHTML = `
+            <div class="ai-placeholder">
+              <div class="magic-wand-icon">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <div class="ai-placeholder-text">
+                Hãy sáng tạo nhân vật hoặc tải ảnh lên, sau đó bấm <strong>AI Vẽ Lại</strong> để xem phép thuật nhé!
+              </div>
+              <button class="magic-btn" onclick="triggerAIGeneration()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>AI Vẽ Lại</span>
+              </button>
+            </div>
+          `;
+        }
+
+        // Clear uploaded image preview and input as well
+        removeUploadedImage(null);
       }
 
       function downloadAIImage() {
         playPopSound();
         const aiPanel = document.querySelector('.panel-ai');
         const aiImg = aiPanel ? aiPanel.querySelector('.ai-result-img, img:not(.magic-wand-icon img)') : null;
+        
+        let imgSrc = null;
+        let defaultFilename = 'storymee_ai_artwork.jpg';
 
-        const link = document.createElement('a');
         if (aiImg && aiImg.src) {
-          link.href = aiImg.src;
-          link.download = 'storymee_ai_artwork.png';
+          imgSrc = aiImg.src;
+          defaultFilename = 'storymee_ai_artwork.jpg';
         } else {
           const previewImg = document.getElementById('uploaded-image-preview');
           if (previewImg && previewImg.src) {
-            link.href = previewImg.src;
-            link.download = 'storymee_upload.png';
-          } else {
-            alert('Chưa có ảnh nào để tải về!');
-            return;
+            imgSrc = previewImg.src;
+            defaultFilename = 'storymee_upload.jpg';
           }
         }
+
+        if (!imgSrc) {
+          alert('Chưa có ảnh nào để tải về!');
+          return;
+        }
+
+        if (imgSrc.startsWith('data:image/jpeg') || imgSrc.startsWith('data:image/jpg')) {
+          triggerDownload(imgSrc, defaultFilename);
+        } else {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const ctx = canvas.getContext('2d');
+            
+            // Fill background white in case of transparency in PNG
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.drawImage(img, 0, 0);
+            try {
+              const jpegUrl = canvas.toDataURL('image/jpeg', 0.95);
+              triggerDownload(jpegUrl, defaultFilename);
+            } catch (e) {
+              console.error("Canvas export to JPEG failed, downloading original.", e);
+              triggerDownload(imgSrc, defaultFilename);
+            }
+          };
+          img.onerror = function() {
+            triggerDownload(imgSrc, defaultFilename);
+          };
+          img.src = imgSrc;
+        }
+      }
+
+      function triggerDownload(dataUrl, filename) {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -2257,12 +2428,17 @@
       }
 
       function updatePromptFromQuestions() {
-        // Sync currently displayed textareas to the active category
+        // Sync currently displayed textareas to the active category (avoiding out of bounds pollution)
         const ids = ['question-1', 'question-2', 'question-3', 'question-4', 'question-5', 'question-6'];
+        const questions = categoryQuestions[activeCategory] || [];
         ids.forEach((id, idx) => {
           const el = document.getElementById(id);
           if (el) {
-            categoryInputs[activeCategory][idx] = el.value.trim();
+            if (idx < questions.length) {
+              categoryInputs[activeCategory][idx] = el.value.trim();
+            } else {
+              categoryInputs[activeCategory][idx] = '';
+            }
           }
         });
 
@@ -2336,8 +2512,18 @@
           categoryInputs[cat].forEach((val, idx) => {
             if (val && val.trim()) {
               const valLower = val.toLowerCase().trim();
-              const allowedNegatives = ['không có mắt', 'không có mũi', 'không có miệng', 'không có tai', 'không có tay', 'không có chân', 'không có áo', 'không tóc/lông'];
-              if ((valLower.startsWith('không') && !allowedNegatives.includes(valLower)) || valLower === 'none' || valLower === 'no') {
+              const skippedNegatives = [
+                'không có',
+                'không có sừng',
+                'không có cánh',
+                'không có đuôi',
+                'không có mái',
+                'không có phụ kiện',
+                'không có họa tiết',
+                'none',
+                'no'
+              ];
+              if (skippedNegatives.includes(valLower)) {
                 return; // Skip negative options
               }
               const qDef = categoryQuestions[cat][idx];
@@ -2413,6 +2599,8 @@
         }
       }
 
+
+
       // Initial loading and drag/drop binding
       adjustScale();
       window.addEventListener('load', () => {
@@ -2462,19 +2650,23 @@
 
         // Initialize category selector placeholder
         if (catSelectedValueSpan) {
-          catSelectedValueSpan.textContent = 'Hình dáng';
+          const savedCat = localStorage.getItem('storymee_generate_active_category') || 'shape';
+          let label = 'Hình dáng';
           const catOptions = catDropdownOptions.querySelectorAll('.cat-option');
           catOptions.forEach(opt => {
-            if (opt.getAttribute('data-value') === 'shape') {
+            if (opt.getAttribute('data-value') === savedCat) {
               opt.classList.add('selected');
+              label = opt.textContent;
             } else {
               opt.classList.remove('selected');
             }
           });
+          catSelectedValueSpan.textContent = label;
         }
 
-        // Initialize inputs to shape category
-        switchCategory('shape');
+        // Initialize inputs to shape category (or saved active category)
+        const savedCat = localStorage.getItem('storymee_generate_active_category') || 'shape';
+        switchCategory(savedCat);
 
         // Bind drag and drop events
         const uploadBox = document.getElementById('upload-box-container');
@@ -2590,9 +2782,83 @@
           if (opt2Container) opt2Container.style.display = 'flex';
           if (btnText) btnText.textContent = 'Hình ảnh';
           
-          switchCategory('shape');
+          const savedCat = localStorage.getItem('storymee_generate_active_category') || 'shape';
+          switchCategory(savedCat);
           updatePromptFromQuestions();
         }
+      }
+
+      // Clear or reset inputs depending on option mode
+      function clearAllInputs() {
+        if (currentOption === 1) {
+          // Reset Option 1 (Ideas) to defaults
+          const defaults = {
+            'idea-shape': "Gấu trúc con béo tròn đáng yêu",
+            'idea-clothes': "Khăn quàng cổ màu đỏ, mũ đội đầu",
+            'idea-action': "Đang ăn trúc vui vẻ"
+          };
+          Object.keys(defaults).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = defaults[id];
+          });
+          updatePromptFromIdeas();
+          saveInputsToLocalStorage();
+        } else {
+          // Reset Option 2 (Questions) to defaults
+          categoryInputs = {
+            shape: ["con vật", "tròn trịa", "trắng hồng", "lông", "không có họa tiết", "đáng yêu"],
+            parts: ["tay ngắn", "chân ngắn", "không có cánh", "đuôi ngắn", "không có sừng", ""],
+            face: ["to tròn", "Miệng cười tươi", "Mũi nút áo", "tai người", "không có", "Tinh nghịch"],
+            hair: ["Tóc xoăn bồng bềnh", "Mái lệch", "Màu hạt dẻ", "Tóc ngắn", "không có", "Không có phụ kiện"],
+            clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Khăn quàng cổ đỏ"]
+          };
+          saveCategoryInputsToLocalStorage();
+          const savedCat = localStorage.getItem('storymee_generate_active_category') || 'shape';
+          switchCategory(savedCat);
+          updatePromptFromQuestions();
+        }
+      }
+
+      // Modal control functions
+      function showCharacterConfirmModal() {
+        const modal = document.getElementById('confirm-character-modal');
+        const content = modal.querySelector('.confirm-modal-content');
+        modal.style.display = 'flex';
+        // force reflow
+        modal.offsetHeight;
+        modal.style.opacity = '1';
+        content.style.transform = 'scale(1)';
+      }
+
+      // Make buttons hover active zoom works smoothly
+      const styleElement = document.createElement('style');
+      styleElement.innerHTML = `
+        .confirm-modal-btn {
+          transition: all 0.25s ease !important;
+        }
+        .confirm-modal-btn:hover {
+          transform: translateY(-2px) scale(1.02);
+          filter: brightness(1.05);
+        }
+        .confirm-modal-btn:active {
+          transform: translateY(0) scale(1);
+        }
+      `;
+      document.head.appendChild(styleElement);
+
+      function closeCharacterConfirmModal() {
+        const modal = document.getElementById('confirm-character-modal');
+        const content = modal.querySelector('.confirm-modal-content');
+        modal.style.opacity = '0';
+        content.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+
+      function proceedToFeaturesPage() {
+        closeCharacterConfirmModal();
+        playPopAndNavigate('/character/generate/feature.html');
       }
 
       window.addEventListener('resize', adjustScale);

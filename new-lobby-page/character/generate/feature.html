@@ -36,6 +36,12 @@
       background: transparent !important;
       opacity: 0;
       transition: opacity 0.4s ease;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      height: 930px;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(1);
     }
 
     /* Common navigation button styles */
@@ -494,46 +500,68 @@
       </div>
     </header>
 
-    <div class="app-container" style="position: relative;">
-      <main class="main-content" style="position: relative; border: none; background: transparent; box-shadow: none;">
+    <div class="app-container" style="width: 100% !important; position: relative;">
+      <main class="main-content" style="display: block !important; width: 100% !important; height: auto !important; position: relative; border: none; background: transparent; box-shadow: none;">
 
         <!-- Character Profile Layout -->
         <div class="profile-layout-container" style="
           display: flex;
           width: 100%;
           height: 600px;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 50px;
+          justify-content: center;
+          align-items: center;
+          gap: 25px;
           padding: 20px 10px;
-          margin-top: 10px;
+          margin-top: 85px;
         ">
-          <!-- Left Panel: Character Portrait -->
+          <!-- Left Panel: Character Portrait Frame -->
           <div class="profile-left-panel" style="
-            width: 420px;
+            width: 588px;
+            margin-left: 0;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            height: 100%;
+            height: auto;
           ">
-            <img id="character-portrait-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Mee Character" style="
-              visibility: hidden;
-              height: 480px;
-              object-fit: contain;
-              filter: drop-shadow(0 15px 30px rgba(0,0,0,0.15));
+            <!-- 1:1 Aspect Ratio Polaroid/Canvas Frame -->
+            <div style="
+              width: 588px;
+              height: 588px;
+              background: #FFFFFF;
+              border: 12px solid #FFFFFF;
+              border-radius: 36px;
+              box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12), 0 5px 18px rgba(138, 116, 99, 0.06);
+              box-sizing: border-box;
+              overflow: hidden;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              position: relative;
+              /* Soft border overlay to match the theme */
+              outline: 3.5px dashed #EBDCD0;
+              outline-offset: -14px;
             ">
+              <img id="character-portrait-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Mee Character" style="
+                visibility: hidden;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 20px;
+              ">
+            </div>
           </div>
 
-          <!-- Right Panel: Actions & Details Card -->
           <div class="profile-right-panel" style="
-            width: 825px;
+            width: 660px;
+            flex-shrink: 0;
             zoom: 1.2;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            height: 100%;
+            height: auto;
           ">
             <!-- Main Profile Card -->
             <div class="profile-card-box" style="
@@ -544,8 +572,10 @@
               box-shadow: 0 20px 45px rgba(0, 0, 0, 0.06);
               display: flex;
               width: 660px;
-              margin-left: 70px;
-              margin-top: 40px;
+              margin-left: 0;
+              margin-right: 0;
+              margin-top: 0;
+              margin-bottom: 0;
               height: 490px;
             ">
               <!-- Left side fields list -->
@@ -1244,6 +1274,15 @@
           localStorage.setItem('storymee_char_description', descInput.value.trim());
         });
       }
+      // Load generated character image directly inside the 3:4 frame
+      const savedImg = localStorage.getItem('storymee_generated_character_img');
+      if (savedImg) {
+        const portraitImg = document.getElementById('character-portrait-img');
+        if (portraitImg) {
+          portraitImg.src = savedImg;
+          portraitImg.style.visibility = 'visible';
+        }
+      }
     });
 
     function adjustScale() {
@@ -1332,6 +1371,20 @@
         }, 400);
       }
     }
+    // Prevent browser auto-scroll on input focus
+    function resetWindowScroll() {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollLeft = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+    window.addEventListener('scroll', resetWindowScroll);
+    document.addEventListener('scroll', resetWindowScroll);
+    document.addEventListener('focusin', () => {
+      setTimeout(resetWindowScroll, 0);
+    });
+
     window.addEventListener('load', hidePageLoader);
     window.addEventListener('pageshow', (e) => {
       if (e.persisted) hidePageLoader();
