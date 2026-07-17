@@ -222,24 +222,24 @@
     <!-- Top Navigation Header from StoryMee Universe -->
     <header class="universe-header">
     <div class="universe-header-left">
-      <div class="universe-logo" onclick="playPopAndNavigate('http://localhost:8000'); return false;">
+      <div class="universe-logo" onclick="playPopAndNavigate('__HOME__'); return false;">
         <img src="logo.svg" alt="StoryMee Logo" class="logo-image">
       </div>
     </div>
     <div class="universe-header-right">
-      <button class="universe-signup-btn" onclick="playPopAndNavigate('http://localhost:8000/login'); return false;">Đăng Nhập</button>
+      <button class="universe-signup-btn" onclick="playPopAndNavigate('__LOGIN__'); return false;">Đăng Nhập</button>
     </div>
   </header>
 
-  <!-- Sound Effects -->
-  <audio id="pop-audio" src="/assets/audio/pop.mp3" preload="auto"></audio>
+  <!-- Sound Effects (relative path — works under Expo /mee-html and node server) -->
+  <audio id="pop-audio" src="pop.mp3" preload="auto"></audio>
 
   <div class="app-container">
     <header class="app-header">
       <div class="header-left">
-        <a href="http://localhost:8000" class="btn btn-done"
+        <a href="#" class="btn btn-done"
           style="text-decoration: none; display: inline-flex; align-items: center;"
-          onclick="playPopAndNavigate('http://localhost:8000'); return false;">
+          onclick="playPopAndNavigate('__HOME__'); return false;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
           </svg>
@@ -583,6 +583,28 @@
       }
     }
 
+    /** true when loaded inside AIkidApp Expo iframe (?embed=1) */
+    function isExpoEmbed() {
+      try {
+        return window.parent && window.parent !== window;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function resolveNavUrl(url) {
+      // Special tokens for AIkidApp + standalone lobby server
+      if (url === '__HOME__' || url === '/' || url === 'http://localhost:8000' || url === 'http://localhost:8000/') {
+        if (isExpoEmbed()) return { target: 'parent', href: '/lobby' };
+        return { target: 'self', href: '/' };
+      }
+      if (url === '__LOGIN__' || url === 'http://localhost:8000/login' || /\/login\/?$/.test(url)) {
+        if (isExpoEmbed()) return { target: 'parent', href: '/login' };
+        return { target: 'self', href: '/login.html' };
+      }
+      return { target: 'self', href: url };
+    }
+
     function playPopAndNavigate(url) {
       playPopSound();
       const loader = document.getElementById('page-loader-overlay');
@@ -592,9 +614,29 @@
         loader.style.opacity = '1';
       }
       setTimeout(function () {
-        window.location.href = url;
+        const nav = resolveNavUrl(url);
+        if (nav.target === 'parent') {
+          try {
+            window.parent.location.href = nav.href;
+            return;
+          } catch (e) {
+            console.warn('parent navigate failed', e);
+          }
+        }
+        window.location.href = nav.href;
       }, 350);
     }
+
+    // Embed mode: hide universe top bar when inside AIkidApp (auth already done)
+    (function applyEmbedMode() {
+      try {
+        const q = new URLSearchParams(window.location.search);
+        if (q.get('embed') === '1' || isExpoEmbed()) {
+          document.documentElement.classList.add('mee-embed');
+          document.body.classList.add('mee-embed');
+        }
+      } catch (e) { /* ignore */ }
+    })();
 
     let loaderFaded = false;
     let pageLoaded = false;
@@ -656,6 +698,7 @@
     adjustScale();
 
   </script>
+  <script src="/aikid-nav-bridge.js"></script>
 </body>
 
 </html>

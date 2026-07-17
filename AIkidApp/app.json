@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "AIkid",
+    "slug": "AIkidApp",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "scheme": "aikid",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF7ED"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.storymee.aikid",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.storymee.aikid",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF7ED",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router", "expo-secure-store", "expo-screen-orientation"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "privacyPolicyUrl": "https://aikids.storymee.com/privacy",
+      "termsOfServiceUrl": "https://aikids.storymee.com/terms",
+      "supportEmail": "storymee.com@gmail.com"
+    }
+  }
+}

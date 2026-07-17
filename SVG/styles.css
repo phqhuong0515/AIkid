@@ -1,4 +1,16 @@
 /* Cute Child-Friendly UI Styles for Mee Character Customizer */
+/* Embed inside AIkidApp Expo: hide universe chrome; layout stays design-locked 1927×930 */
+html.mee-embed .universe-header,
+body.mee-embed .universe-header {
+  display: none !important;
+}
+
+html.mee-embed .app-container,
+body.mee-embed .app-container {
+  /* Original design assumes universe header height; keep spacing for title row */
+  margin-top: 100px !important;
+}
+
 :root {
   --font-main: 'Mali', 'Fredoka', 'Outfit', sans-serif;
 
