@@ -1869,6 +1869,65 @@
       async function triggerAIGeneration() {
         playPopSound();
         const viewportBox = document.querySelector('.panel-ai .viewport-box');
+
+        // Check if user has not written anything or has not uploaded any image
+        let isEmpty = false;
+        if (currentOption === 1) {
+          const shapeVal = document.getElementById('idea-shape') ? document.getElementById('idea-shape').value.trim() : '';
+          const clothesVal = document.getElementById('idea-clothes') ? document.getElementById('idea-clothes').value.trim() : '';
+          const actionVal = document.getElementById('idea-action') ? document.getElementById('idea-action').value.trim() : '';
+          const previewImg = document.getElementById('uploaded-image-preview');
+          const uploadedImg = previewImg ? previewImg.src : '';
+          const hasUploadedImg = uploadedImg && !uploadedImg.startsWith('data:image/gif') && uploadedImg !== '';
+          
+          if (!shapeVal && !clothesVal && !actionVal && !hasUploadedImg) {
+            isEmpty = true;
+          }
+        } else {
+          let hasAnyInput = false;
+          Object.keys(categoryInputs).forEach(cat => {
+            categoryInputs[cat].forEach(val => {
+              if (val && val.trim()) {
+                hasAnyInput = true;
+              }
+            });
+          });
+          if (!hasAnyInput) {
+            isEmpty = true;
+          }
+        }
+
+        if (isEmpty) {
+          if (viewportBox) {
+            viewportBox.innerHTML = `
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 12px; background: #FFF5F5; border: 3px solid #FEB2B2; border-radius: 24px; padding: 20px; text-align: center; box-sizing: border-box;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 3.5rem; color: #E53E3E;"></i>
+                <div style="font-family: 'Chiron GoRound TC', sans-serif; font-weight: 900; color: #C53030; font-size: 1.35rem; margin-top: 5px;">Không có nhân vật</div>
+                <div style="font-family: 'Mali', sans-serif; font-size: 0.95rem; color: #9B2C2C; max-width: 320px; line-height: 1.5; margin-top: 5px;">
+                  Bé vui lòng điền ý tưởng hoặc tải ảnh phác họa lên trước khi bấm AI Vẽ Lại nhé!
+                </div>
+              </div>
+            `;
+            setTimeout(() => {
+              viewportBox.innerHTML = `
+                <div class="ai-placeholder">
+                  <div class="magic-wand-icon">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  </div>
+                  <div class="ai-placeholder-text">
+                    Hãy sáng tạo nhân vật hoặc tải ảnh lên, sau đó bấm <strong>AI Vẽ Lại</strong> để xem phép thuật nhé!
+                  </div>
+                  <button class="magic-btn" onclick="triggerAIGeneration()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>AI Vẽ Lại</span>
+                  </button>
+                </div>
+              `;
+            }, 5000);
+          }
+          return;
+        }
+
         if (viewportBox) {
           viewportBox.innerHTML = `
             <div class="ai-loading-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 16px; background: #FDFAF4; border-radius: 24px;">
