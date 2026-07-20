@@ -2317,6 +2317,7 @@
         } catch (e) {
           console.error(e);
         }
+        isFirstImageGenerated = false;
 
         // Re-render current category to reflect cleared state
         switchCategory(activeCategory);
@@ -2799,65 +2800,7 @@
         }
       }
 
-      // Clear or reset inputs depending on option mode
-      function clearAllInputs() {
-        playPopSound();
-        if (currentOption === 1) {
-          // Reset Option 1 (Ideas) to defaults
-          const defaults = {
-            'idea-shape': "Gấu trúc con béo tròn đáng yêu",
-            'idea-clothes': "Khăn quàng cổ màu đỏ, mũ đội đầu",
-            'idea-action': "Đáng yêu và vui nhộn"
-          };
-          Object.keys(defaults).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = defaults[id];
-          });
-          updatePromptFromIdeas();
-          saveInputsToLocalStorage();
-        } else {
-          // Reset Option 2 (Questions) to defaults
-          categoryInputs = {
-            shape: ["con vật", "tròn trịa", "trắng hồng", "lông", "không có họa tiết", "đáng yêu"],
-            parts: ["tay ngắn", "chân ngắn", "không có cánh", "đuôi ngắn", "không có sừng", ""],
-            face: ["to tròn", "Miệng cười tươi", "Mũi nút áo", "tai người", "không có", "Tinh nghịch"],
-            hair: ["Tóc xoăn bồng bềnh", "Mái lệch", "Màu hạt dẻ", "Tóc ngắn", "không có", "Không có phụ kiện"],
-            clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Khăn quàng cổ đỏ"]
-          };
-          saveCategoryInputsToLocalStorage();
-          const savedCat = localStorage.getItem('storymee_generate_active_category') || 'shape';
-          switchCategory(savedCat);
-          updatePromptFromQuestions();
-        }
 
-        // Clear generated image from storage and reset preview viewport
-        try {
-          localStorage.removeItem('storymee_generated_character_img');
-        } catch (e) {
-          console.error(e);
-        }
-        isFirstImageGenerated = false;
-        const viewportBox = document.querySelector('.panel-ai .viewport-box');
-        if (viewportBox) {
-          viewportBox.innerHTML = `
-            <div class="ai-placeholder">
-              <div class="magic-wand-icon">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-              </div>
-              <div class="ai-placeholder-text">
-                Hãy sáng tạo nhân vật hoặc tải ảnh lên, sau đó bấm <strong>AI Vẽ Lại</strong> để xem phép thuật nhé!
-              </div>
-              <button class="magic-btn" onclick="triggerAIGeneration()">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span>AI Vẽ Lại</span>
-              </button>
-            </div>
-          `;
-        }
-        
-        // Clear uploaded image preview and input as well
-        removeUploadedImage(null);
-      }
 
       window.addEventListener('resize', adjustScale);
     </script>
