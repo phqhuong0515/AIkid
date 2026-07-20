@@ -1405,8 +1405,13 @@
         }
       ];
 
-      // Safe initialization check to prevent wiping custom saved characters
-      const cleared = localStorage.getItem('storymee_storage_cleared_v11');
+      // Clear data once to populate the new examples and clear the massive uncompressed characters blocking LocalStorage
+      const cleared = localStorage.getItem('storymee_storage_cleared_v12');
+      if (!cleared) {
+        localStorage.setItem('storymee_saved_characters', JSON.stringify(defaultSeeds));
+        localStorage.setItem('storymee_storage_cleared_v12', 'true');
+      }
+
       const saved = localStorage.getItem('storymee_saved_characters');
 
       if (saved) {
@@ -1421,10 +1426,6 @@
       } else {
         characters = [...defaultSeeds];
         localStorage.setItem('storymee_saved_characters', JSON.stringify(characters));
-      }
-
-      if (!cleared) {
-        localStorage.setItem('storymee_storage_cleared_v11', 'true');
       }
 
       // Set initial selected character

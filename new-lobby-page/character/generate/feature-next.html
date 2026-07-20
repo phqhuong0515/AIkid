@@ -1122,10 +1122,44 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
       }
     });
 
-    function saveCharacter() {
+    function compressImage(base64Str, maxWidth, quality = 0.7) {
+      return new Promise((resolve) => {
+        if (!base64Str || !base64Str.startsWith('data:')) {
+          resolve(base64Str);
+          return;
+        }
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round(height * (maxWidth / width));
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(base64Str);
+        img.src = base64Str;
+      });
+    }
+
+    async function saveCharacter() {
       playPopSound();
       const imgEl = document.getElementById('generated-profile-img');
       if (imgEl && imgEl.src && !imgEl.src.startsWith('data:image/gif')) {
+        const saveBtn = document.getElementById('btn-save-character');
+        let originalHtml = "";
+        if (saveBtn) {
+          originalHtml = saveBtn.innerHTML;
+          saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+          saveBtn.style.pointerEvents = 'none';
+        }
+
         // Save to cache
         localStorage.setItem('storymee_saved_profile_sheet', imgEl.src);
 
@@ -1137,7 +1171,11 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
           const species = localStorage.getItem('storymee_char_species') || 'Bé tự tạo';
           const description = localStorage.getItem('storymee_char_description') || 'Một bạn nhỏ đáng yêu!';
           const birthday = localStorage.getItem('storymee_char_birthday') || new Date().toLocaleDateString('vi-VN').substring(0, 5);
-          const avatar = localStorage.getItem('storymee_generated_character_img') || imgEl.src;
+          const rawAvatar = localStorage.getItem('storymee_generated_character_img') || imgEl.src;
+
+          // Compress to avoid LocalStorage quota limits (~200KB total)
+          const avatar = await compressImage(rawAvatar, 300, 0.7);
+          const profileImg = await compressImage(imgEl.src, 1000, 0.7);
 
           const newChar = {
             id: 'user-' + Date.now(),
@@ -1147,7 +1185,7 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
             species: species,
             description: description,
             avatar: avatar,
-            profileImg: imgEl.src,
+            profileImg: profileImg,
             fullbodyImg: avatar,
             type: 'user',
             createdAt: Date.now(),
@@ -1163,6 +1201,12 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
           localStorage.setItem('storymee_saved_characters', JSON.stringify(savedChars));
         } catch (e) {
           console.error("Failed to save character to warehouse database", e);
+          alert("Lỗi bộ nhớ: Không thể lưu nhân vật vì kho đã đầy. Vui lòng thử lại hoặc xóa bớt nhân vật cũ!");
+          if (saveBtn) {
+            saveBtn.innerHTML = originalHtml;
+            saveBtn.style.pointerEvents = 'auto';
+          }
+          return;
         }
 
         isSaved = true;
