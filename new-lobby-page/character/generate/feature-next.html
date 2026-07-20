@@ -766,6 +766,37 @@
     setTimeout(hidePageLoader, 1500); // Safety fallback timeout
 
     function generatePersonalityTraits(name, description, appearance) {
+      const descLower = description.toLowerCase();
+      
+      // Define a dictionary of target personality adjectives
+      const traitsDict = [
+        "tinh nghịch", "nghịch ngợm", "năng động", "hoạt bát", "lém lỉnh",
+        "thông minh", "sáng tạo", "tự tin", "độc lập", "dũng cảm", "mạnh mẽ",
+        "nhút nhát", "rụt rè", "hiền lành", "ngoan ngoãn", "dịu dàng", "nhẹ nhàng",
+        "thân thiện", "tốt bụng", "hòa đồng", "ấm áp", "ngọt ngào", "mơ mộng",
+        "bí ẩn", "lạnh lùng", "trầm tính", "ít nói", "dễ thương", "đáng yêu"
+      ];
+      
+      // Find matching adjectives in user description
+      const matched = [];
+      traitsDict.forEach(trait => {
+        if (descLower.includes(trait)) {
+          // Capitalize first letter of each word in trait
+          const capitalized = trait.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          if (!matched.includes(capitalized)) {
+            matched.push(capitalized);
+          }
+        }
+      });
+      
+      // If user described traits (found at least 2), use them!
+      if (matched.length >= 2) {
+        const line1 = matched.slice(0, 2).join(' • ');
+        const line2 = matched.length >= 4 ? matched.slice(2, 4).join(' • ') : (matched[2] ? matched[2] + ' • Thông minh' : 'Thân thiện • Dễ thương');
+        return `${line1}\n${line2}`;
+      }
+      
+      // Otherwise, fall back to automatic determination based on appearance + description keywords
       const text = (name + " " + description + " " + appearance).toLowerCase();
       
       // Rule 1: Mysterious / Cool / Gothic (Dracula, Vampire, Bat, Castle, Dark)
@@ -904,7 +935,7 @@ Show exactly 4 full-body turnaround views arranged evenly in one row:
 
 Rules:
 - Exactly 4 views only
-- No text labels under the views
+- No text labels under the views (do not write words like 'Front', 'Side', 'Back' under the views, keep it completely empty of text labels)
 - All four views must have identical proportions, outfit, hairstyle, accessories, materials, scale, and lighting
 - All full-body views must be completely visible
 - All views must align to the same floor line
@@ -922,7 +953,7 @@ Examples:
 
 Rules:
 - Exactly 5 expressions only
-- No text labels under the expressions
+- No text labels under the expressions (do not write words like 'Happy', 'Sad', etc. under the expressions, keep it completely empty of text labels)
 - Same camera angle, crop, head size, lighting, hairstyle, and outfit in every expression
 - Expressions must feel natural and character-specific
 
@@ -940,7 +971,7 @@ Examples:
 
 Rules:
 - Exactly 5 action poses only
-- No text labels under the action poses
+- No text labels under the action poses (do not write words like 'Run', 'Jump', 'Wave', 'Pose Confidently', etc. under the poses, keep it completely empty of text labels)
 - Every pose must be fully visible
 - Every pose must be consistently scaled
 - Poses must be clearly separated
@@ -1090,6 +1121,8 @@ TECHNICAL REQUIREMENTS
 - No text beneath the expression row
 - No text beneath the action row
 - No text beneath the color palette
+- Absolutely no text labels, words, or captions must be written anywhere inside the XOAY NHÂN VẬT, BIỂU CẢM, and HÀNH ĐỘNG sections. All labels under individual poses, heads, and views are strictly forbidden.
+- Ensure all Vietnamese texts inside the THÔNG TIN CƠ BẢN, MÔ TẢ NHÂN VẬT, CÂU NÓI CỬA MIỆNG, and TÍNH CÁCH sections are written with correct Vietnamese spelling and accents (diacritics), with no typo letters.
 - Maintain consistent alignment and spacing
 - Keep the background clean and uncluttered
 - Preserve strong visual hierarchy
