@@ -70,8 +70,8 @@
     ) {
       return { target: 'self', href: '/art/image-generate.html' };
     }
-    if (u === '/art/comic' || u === '/art/comic.html') {
-      return { target: 'self', href: '/art/comic.html' };
+    if (u === '/art/story' || u === '/art/story.html' || u === '/art/comic' || u === '/art/comic.html') {
+      return { target: 'self', href: '/art/story.html' };
     }
 
     // Relative next/html within mee

@@ -5,7 +5,7 @@ export default function ComicHubScreen() {
   return (
     <HtmlEmbed
       title="Sáng tác truyện"
-      src="/art/comic.html"
+      src="/art/story.html"
       nativeHint="Truyện dùng layout web gốc. Mở trên trình duyệt."
     />
   );

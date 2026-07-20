@@ -1870,15 +1870,28 @@
         playPopSound();
         const viewportBox = document.querySelector('.panel-ai .viewport-box');
 
+        // Resolve existing uploaded image first (checking valid base64 data URLs)
+        let existingImgSrc = null;
+        if (currentOption === 1) {
+          const previewImg = document.getElementById('uploaded-image-preview');
+          const srcAttr = previewImg ? previewImg.getAttribute('src') : '';
+          if (srcAttr && srcAttr.startsWith('data:')) {
+            existingImgSrc = srcAttr;
+          } else {
+            const savedImg = localStorage.getItem('storymee_uploaded_image');
+            if (savedImg && savedImg.startsWith('data:')) {
+              existingImgSrc = savedImg;
+            }
+          }
+        }
+
         // Check if user has not written anything or has not uploaded any image
         let isEmpty = false;
         if (currentOption === 1) {
           const shapeVal = document.getElementById('idea-shape') ? document.getElementById('idea-shape').value.trim() : '';
           const clothesVal = document.getElementById('idea-clothes') ? document.getElementById('idea-clothes').value.trim() : '';
           const actionVal = document.getElementById('idea-action') ? document.getElementById('idea-action').value.trim() : '';
-          const previewImg = document.getElementById('uploaded-image-preview');
-          const uploadedImg = previewImg ? previewImg.src : '';
-          const hasUploadedImg = uploadedImg && !uploadedImg.startsWith('data:image/gif') && uploadedImg !== '';
+          const hasUploadedImg = !!existingImgSrc;
           
           if (!shapeVal && !clothesVal && !actionVal && !hasUploadedImg) {
             isEmpty = true;
@@ -1939,16 +1952,6 @@
 
         const promptTextarea = document.getElementById('character-prompt');
         const promptText = promptTextarea ? promptTextarea.value : 'Bản vẽ thiết kế nhân vật dễ thương.';
-
-        let existingImgSrc = null;
-        if (currentOption === 1) {
-          const previewImg = document.getElementById('uploaded-image-preview');
-          if (previewImg && previewImg.src && !previewImg.src.startsWith('data:image/gif') && previewImg.src !== '') {
-            existingImgSrc = previewImg.src;
-          } else {
-            existingImgSrc = localStorage.getItem('storymee_uploaded_image');
-          }
-        }
 
         try {
           const response = await fetch('/api/generate-image', {

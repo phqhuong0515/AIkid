@@ -195,7 +195,56 @@
         <div class="lobby-logo" onclick="window.location.href='/'">
             <img src="assets/images/logo.svg" alt="StoryMee Logo" class="logo-image">
         </div>
-        <button class="auth-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+        <button class="auth-btn" id="login-auth-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+        <div id="user-avatar-container" style="
+            display: none;
+            width: 76.48px;
+            height: 76.48px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 4px solid #ff7597;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255,117,151,0.25);
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        " onclick="toggleUserDropdown(event)" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <img id="user-avatar-img" src="assets/images/storage-test-nori.jpeg" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+
+        <!-- Cute kids-style User Dropdown -->
+        <div id="user-dropdown" style="
+            display: none;
+            position: absolute;
+            right: 0px;
+            top: 90px;
+            width: 150px;
+            background: #ffffff;
+            border: 3px solid #ff7597;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(255,117,151,0.2);
+            z-index: 9999;
+            flex-direction: column;
+            padding: 10px;
+            font-family: 'Mali', sans-serif;
+            text-align: center;
+            pointer-events: auto;
+        ">
+            <button onclick="handleLogout()" style="
+                background: linear-gradient(135deg, #ff7597, #ff9eb5);
+                border: none;
+                color: #FFFFFF;
+                padding: 8px 16px;
+                border-radius: 12px;
+                font-family: 'Mali', sans-serif;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                width: 100%;
+                box-shadow: 0 4px 10px rgba(255, 117, 151, 0.3);
+            ">Đăng xuất</button>
+        </div>
     </header>
 
     <div class="lobby-wrapper">
@@ -387,6 +436,67 @@
                 loader.style.display = 'none';
             }, 400);
         }
+
+        // Check login state and swap auth button with avatar
+        function checkLoginState() {
+            const isLoggedIn = localStorage.getItem('user_logged_in') === 'true';
+            const authBtn = document.getElementById('login-auth-btn');
+            const avatarContainer = document.getElementById('user-avatar-container');
+            const avatarImg = document.getElementById('user-avatar-img');
+
+            if (isLoggedIn) {
+                if (authBtn) authBtn.style.display = 'none';
+                if (avatarContainer) {
+                    avatarContainer.style.display = 'flex';
+                    
+                    // Use custom generated character image as avatar if available
+                    const savedChar = localStorage.getItem('storymee_generated_character_img');
+                    if (savedChar) {
+                        avatarImg.src = savedChar;
+                        avatarImg.style.width = '100%';
+                        avatarImg.style.height = '100%';
+                        avatarImg.style.objectFit = 'cover';
+                    } else {
+                        avatarImg.src = 'assets/images/storage-test-nori.jpeg';
+                        avatarImg.style.width = '100%';
+                        avatarImg.style.height = '100%';
+                        avatarImg.style.objectFit = 'contain';
+                    }
+                }
+            } else {
+                if (authBtn) authBtn.style.display = 'block';
+                if (avatarContainer) avatarContainer.style.display = 'none';
+            }
+        }
+
+        // Toggle user dropdown menu
+        function toggleUserDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) {
+                const isCurrentlyDisplayed = dropdown.style.display === 'flex';
+                dropdown.style.display = isCurrentlyDisplayed ? 'none' : 'flex';
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('user_logged_in');
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+            checkLoginState();
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', () => {
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Initialize state on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', checkLoginState);
 
         window.addEventListener('load', () => {
             hidePageLoader();

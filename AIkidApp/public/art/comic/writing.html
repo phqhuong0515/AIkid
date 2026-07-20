@@ -25,7 +25,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-image: url('/assets/images/bg-art.png') !important;
+      background-image: url('/lobby-assets/images/bg-art.png') !important;
       background-repeat: no-repeat !important;
       background-position: center center !important;
       background-size: cover !important;
@@ -335,7 +335,7 @@
     <!-- Floating Back Button -->
     <div class="back-btn-container"
       style="position: absolute; left: 38px; top: 131px; z-index: 1000; transform: scale(1.1); transform-origin: left top;">
-      <button onclick="playPopAndNavigate('/art/story')" style="
+      <button onclick="playPopAndNavigate('/art/comic')" style="
         background: linear-gradient(135deg, #ff9eb5, #ff7597);
         border: none;
         border-radius: 9999px;
@@ -356,7 +356,7 @@
       </button>
     </div>
 
-    <!-- Center Content: Comic Genre Selection -->
+    <!-- Center Content: Comic Genre Selection -> Changed to Story Writing -->
     <div style="
       position: absolute;
       top: calc(52% + 40px);
@@ -369,7 +369,7 @@
       border-radius: 40px;
       box-shadow: 0 24px 50px rgba(0, 0, 0, 0.08), 0 5px 18px rgba(138, 116, 99, 0.04);
       box-sizing: border-box;
-      padding: 35px 50px;
+      padding: 40px 60px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -385,289 +385,26 @@
         letter-spacing: 1px;
         text-shadow: 0 2px 4px rgba(0,0,0,0.05);
         position: relative;
-        top: -15px;
-      ">Thể Loại</h2>
+        top: -10px;
+      ">Chọn Nhân Vật</h2>
 
-      <div style="
+      <!-- Character Grid Container -->
+      <div id="character-grid" style="
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
         width: 100%;
+        max-height: 380px;
+        overflow-y: auto;
+        padding: 10px;
         margin-bottom: 20px;
+        box-sizing: border-box;
       ">
-        <!-- Genre Card 1 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Viễn Tưởng')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #4a90e2;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-rocket"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Viễn Tưởng</span>
-        </div>
-
-        <!-- Genre Card 2 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Phiêu Lưu')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #84fab0, #8fd3f4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #2bb673;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-compass"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Phiêu Lưu</span>
-        </div>
-
-        <!-- Genre Card 3 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Đời Thường')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #f6d365, #fda085);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #e67e22;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-house-chimney"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Đời Thường</span>
-        </div>
-
-        <!-- Genre Card 4 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Hài Hước')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #ffecd2, #fcb69f);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #d35400;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-face-grin-tears"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Hài Hước</span>
-        </div>
-
-        <!-- Genre Card 5 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Trinh Thám')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #cfd9df, #e2ebf0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #7f8c8d;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-user-secret"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Trinh Thám</span>
-        </div>
-
-        <!-- Genre Card 6 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Cổ Tích')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #a18cd1, #fbc2eb);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #8e44ad;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Cổ Tích</span>
-        </div>
-
-        <!-- Genre Card 7 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Kinh Dị')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #30cfd0, #330867);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-ghost"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Kinh Dị</span>
-        </div>
-
-        <!-- Genre Card 8 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Siêu Anh Hùng')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c0392b;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-bolt-lightning"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Siêu Anh Hùng</span>
-        </div>
-
-        <!-- Genre Card 9 -->
-        <div class="genre-card" onclick="selectGenre(this, 'Tình Cảm')" style="
-          background: #fffffe;
-          border: 3px dashed #EBDCD0;
-          border-radius: 24px;
-          padding: 15px 20px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-          user-select: none;
-        ">
-          <div style="
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #e91e63;
-            font-size: 1.5rem;
-          ">
-            <i class="fa-solid fa-heart"></i>
-          </div>
-          <span style="font-size: 1.2rem; font-weight: 700; color: #5c4e4d;">Tình Cảm</span>
-        </div>
+        <!-- Will be populated dynamically by JavaScript -->
       </div>
 
       <!-- Action Button -->
-      <button onclick="confirmGenreSelection()" style="
+      <button onclick="confirmCharacterSelection()" style="
         background: linear-gradient(135deg, #ff7597, #ff9eb5);
         border: none;
         border-radius: 9999px;
@@ -682,7 +419,7 @@
         text-transform: uppercase;
         margin-top: 15px;
         position: relative;
-        top: 15px;
+        top: 10px;
       " onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
         Tiếp Tục
       </button>
@@ -736,26 +473,158 @@
       }, 2500);
     }
 
-    let selectedGenre = null;
+    let characters = [];
+    let selectedCharacterId = null;
 
-    function selectGenre(card, genreName) {
-      playPopSound();
-      // Remove selected class from all cards
-      document.querySelectorAll('.genre-card').forEach(c => {
-        c.classList.remove('selected');
-      });
-      // Add selected class to current card
-      card.classList.add('selected');
-      selectedGenre = genreName;
+    function initCharacterSelection() {
+      const defaultSeeds = [
+        {
+          id: 'seed-yuu',
+          name: 'Yuu',
+          species: 'Gấu trúc',
+          age: '12',
+          gender: 'Nam',
+          avatar: '/mee/PNG/storage-test-yuu-profile.png'
+        },
+        {
+          id: 'seed-nori',
+          name: 'Nori',
+          species: 'Thỏ con',
+          age: '8',
+          gender: 'Nữ',
+          avatar: '/mee/PNG/storage-test-nori-profile.png'
+        },
+        {
+          id: 'seed-bong',
+          name: 'Bông',
+          species: 'Cừu nhỏ',
+          age: '6',
+          gender: 'Nữ',
+          avatar: '/mee/PNG/storage-test-bông.jpeg'
+        }
+      ];
+
+      const saved = localStorage.getItem('storymee_saved_characters');
+      if (saved) {
+        try {
+          characters = JSON.parse(saved);
+        } catch(e) {
+          characters = defaultSeeds;
+        }
+      } else {
+        characters = defaultSeeds;
+      }
+
+      if (!characters || characters.length === 0) {
+        characters = defaultSeeds;
+      }
+
+      renderCharacterGrid();
     }
 
-    function confirmGenreSelection() {
-      if (!selectedGenre) {
-        showComingSoon('Cảnh báo: Vui lòng chọn thể loại');
+    function renderCharacterGrid() {
+      const grid = document.getElementById('character-grid');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+      characters.forEach(char => {
+        const isSelected = char.id === selectedCharacterId;
+        const card = document.createElement('div');
+        card.className = `character-card${isSelected ? ' selected' : ''}`;
+        card.onclick = () => selectCharacter(char.id);
+        card.style = `
+          background: #fffffe;
+          border: 3px dashed ${isSelected ? '#ff7597' : '#EBDCD0'};
+          border-radius: 24px;
+          padding: 15px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+          user-select: none;
+          position: relative;
+          background: ${isSelected ? '#FFF5F7' : '#fffffe'};
+          transform: ${isSelected ? 'scale(1.03)' : 'scale(1)'};
+        `;
+
+        card.onmouseover = () => {
+          if (char.id !== selectedCharacterId) {
+            card.style.transform = 'scale(1.05)';
+            card.style.borderColor = '#ff9eb5';
+            card.style.boxShadow = '0 8px 20px rgba(138, 116, 99, 0.08)';
+          }
+        };
+        card.onmouseout = () => {
+          if (char.id !== selectedCharacterId) {
+            card.style.transform = 'scale(1)';
+            card.style.borderColor = '#EBDCD0';
+            card.style.boxShadow = '0 4px 10px rgba(0,0,0,0.02)';
+          }
+        };
+
+        card.innerHTML = `
+          <!-- Checkmark Badge -->
+          <div style="
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff7597, #ff9eb5);
+            color: white;
+            display: ${isSelected ? 'flex' : 'none'};
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(255,117,151,0.3);
+          ">
+            <i class="fa-solid fa-check"></i>
+          </div>
+
+          <!-- Avatar -->
+          <div style="
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #EBDCD0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            background: #FFFFFF;
+          ">
+            <img src="${char.avatar || '/mee/PNG/storage-test-yuu-profile.png'}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+
+          <!-- Name & Details -->
+          <div style="text-align: center;">
+            <h3 style="font-family: 'Mali', sans-serif; font-size: 1.25rem; font-weight: 700; color: #5c4e4d; margin: 0 0 4px 0;">${char.name}</h3>
+            <span style="font-family: 'Mali', sans-serif; font-size: 0.9rem; font-weight: 600; color: #A99586;">${char.species || 'Bé tự tạo'} • ${char.age} tuổi</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function selectCharacter(id) {
+      playPopSound();
+      selectedCharacterId = id;
+      renderCharacterGrid();
+    }
+
+    function confirmCharacterSelection() {
+      if (!selectedCharacterId) {
+        showComingSoon('Cảnh báo: Vui lòng chọn một nhân vật!');
         return;
       }
-      playPopAndNavigate('/art/comic/writing');
+      const selectedChar = characters.find(c => c.id === selectedCharacterId);
+      playPopSound();
+      showComingSoon(`Đang khởi tạo truyện tranh với ${selectedChar.name}...`);
     }
+
+    window.addEventListener('DOMContentLoaded', initCharacterSelection);
 
     function adjustScale() {
       const wrapper = document.querySelector('.scaler-wrapper');
