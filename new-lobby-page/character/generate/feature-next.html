@@ -765,6 +765,38 @@
     });
     setTimeout(hidePageLoader, 1500); // Safety fallback timeout
 
+    function generatePersonalityTraits(name, description, appearance) {
+      const text = (name + " " + description + " " + appearance).toLowerCase();
+      
+      // Rule 1: Mysterious / Cool / Gothic (Dracula, Vampire, Bat, Castle, Dark)
+      if (text.includes("dracula") || text.includes("dơi") || text.includes("vampire") || text.includes("bí ẩn") || text.includes("lâu đài") || text.includes("lạnh lùng") || text.includes("ác")) {
+        return `Bí ẩn • Thông minh\nLạnh lùng • Tự tin`;
+      }
+      
+      // Rule 2: Shy / Gentle / Cute (Thỏ, Nhút nhát, Hiền, Ngoan, Sheep)
+      if (text.includes("nhút nhát") || text.includes("hiền") || text.includes("ngoan") || text.includes("sợ") || text.includes("nhỏ bé")) {
+        return `Hiền lành • Ngoan ngoãn\nNhút nhát • Đáng yêu`;
+      }
+      
+      // Rule 3: Energetic / Mischievous / Playful (Nghịch, Khám phá, Chơi, Siêu nhân, Năng động)
+      if (text.includes("nghịch") || text.includes("khám phá") || text.includes("chơi") || text.includes("siêu nhân") || text.includes("năng động") || text.includes("tinh nghịch")) {
+        return `Tinh nghịch • Năng động\nSáng tạo • Tự tin`;
+      }
+      
+      // Rule 4: Soft / Dreamy / Artistic (Tiên, Vẽ, Hoa, Nhạc, Mơ mộng, Nhẹ nhàng)
+      if (text.includes("tiên") || text.includes("vẽ") || text.includes("hoa") || text.includes("nhạc") || text.includes("mơ mộng") || text.includes("nhẹ nhàng") || text.includes("ngọt ngào")) {
+        return `Nhẹ nhàng • Tốt bụng\nMơ mộng • Sáng tạo`;
+      }
+
+      // Rule 5: Strong / Heroic / Bold (Rồng, Hổ, Sư tử, Khủng long, Mạnh mẽ, Dũng cảm)
+      if (text.includes("rồng") || text.includes("hổ") || text.includes("sư tử") || text.includes("khủng long") || text.includes("mạnh") || text.includes("dũng cảm")) {
+        return `Dũng cảm • Mạnh mẽ\nTự tin • Độc lập`;
+      }
+      
+      // Default cute traits
+      return `Thân thiện • Dễ thương\nThông minh • Tốt bụng`;
+    }
+
     // Profile Generation Logic
     window.addEventListener('DOMContentLoaded', async () => {
       const name = localStorage.getItem('storymee_char_name') || 'Gia Bảo';
@@ -774,13 +806,15 @@
       const description = localStorage.getItem('storymee_char_description') || 'Một chú thỏ nhỏ đáng yêu tinh nghịch thích ăn cà rốt.';
       const catchphrase = localStorage.getItem('storymee_char_catchphrase') || 'Cà rốt muôn năm!';
       const parentImage = localStorage.getItem('storymee_generated_character_img') || '';
+      const savedCatInputs = localStorage.getItem('storymee_generate_category_inputs') || '';
+      const personalityTraits = generatePersonalityTraits(name, description, savedCatInputs);
 
       const imgEl = document.getElementById('generated-profile-img');
       const overlayEl = document.getElementById('generating-overlay');
       const saveBtn = document.getElementById('btn-save-character');
 
       // Check if we already have a cached profile sheet matching the current character metadata
-      const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase + "_v15";
+      const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase + "_" + personalityTraits + "_v16";
       const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
       const cachedMeta = localStorage.getItem('storymee_profile_sheet_meta');
 
@@ -1032,8 +1066,7 @@ CÂU NÓI CỬA MIỆNG
 “${catchphrase}”
 
 TÍNH CÁCH
-Năng động • Thông minh
-Thân thiện • Dễ thương
+${personalityTraits}
 
 TECHNICAL REQUIREMENTS
 
