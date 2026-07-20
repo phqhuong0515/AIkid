@@ -221,6 +221,17 @@
       position: relative;
     }
   </style>
+  <script>
+    function adjustContainerRatio(img) {
+      if (img && img.naturalWidth && img.naturalHeight) {
+        const ratio = img.naturalWidth / img.naturalHeight;
+        const container = document.getElementById('profile-sheet-view');
+        if (container) {
+          container.style.height = (1210 / ratio) + 'px';
+        }
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -466,7 +477,7 @@
           <div style="font-family: 'Mali', sans-serif; font-size: 1rem; color: #BCA695;">Quá trình này có thể mất khoảng 15-20 giây</div>
         </div>
 
-        <img id="generated-profile-img" style="
+        <img id="generated-profile-img" onload="adjustContainerRatio(this)" style="
           width: 100%;
           height: 100%;
           object-fit: contain;
