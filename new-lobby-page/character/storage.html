@@ -1530,7 +1530,11 @@
         }
       }
       document.getElementById('detail-info-birthday').textContent = displayBirthday;
-      document.getElementById('detail-info-description').textContent = char.description || 'Chưa có mô tả cho bạn nhỏ này...';
+      let desc = char.description || 'Chưa có mô tả cho bạn nhỏ này...';
+      if (desc && desc !== 'Chưa có mô tả cho bạn nhỏ này...') {
+        desc = desc.trim().charAt(0).toUpperCase() + desc.trim().slice(1);
+      }
+      document.getElementById('detail-info-description').textContent = desc;
     }
 
     function selectCharacter(id) {
