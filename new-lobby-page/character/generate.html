@@ -1114,6 +1114,47 @@
         <button class="edit-modal-btn btn-cancel" onclick="closeEditAIModal(null)">Hủy</button>
         <button class="edit-modal-btn btn-confirm" onclick="confirmEditAIGeneration()">AI Vẽ Lại</button>
       </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Character Warning Modal -->
+  <div class="edit-modal-overlay" id="no-char-modal" onclick="closeNoCharModal(event)">
+    <div class="edit-modal-content" onclick="event.stopPropagation()" style="width: 420px; max-width: 90%; border-radius: 36px; padding: 32px; text-align: center; align-items: center;">
+      <!-- Close X button absolute -->
+      <button onclick="closeNoCharModal(null)" style="
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #F0E6DF;
+        border: none;
+        color: #8A7463;
+        font-size: 1.3rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      " onmouseover="this.style.background='#E5D9CE'" onmouseout="this.style.background='#F0E6DF'">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Warning Icon -->
+      <div style="margin-top: 10px; margin-bottom: 16px;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 3.8rem; color: #FF7597;"></i>
+      </div>
+
+      <!-- Message Header -->
+      <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.45rem; font-weight: 900; color: #475569; margin-bottom: 10px;">Bé chưa tạo nhân vật rồi!</div>
+      
+      <!-- Message Subtext -->
+      <div style="font-family: 'Mali', sans-serif; font-size: 1.05rem; color: #8A7463; line-height: 1.6;">
+        Bé hãy hoàn thành thiết kế hoặc bấm nút <strong>AI Vẽ Lại</strong> để tạo nhân vật trước khi tiếp tục nhé!
+      </div>
     </div>
   </div>
 
@@ -1579,7 +1620,7 @@
             </div>
           </div>
           <!-- Next Page Button pointing to /character/generate/feature.html -->
-          <a href="/character/generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="playPopAndNavigate('/character/generate/feature.html'); return false;">
+          <a href="/character/generate/feature.html" class="next-page-btn" title="Tiếp tục chuyển trang" onclick="handleNextPageClick(event); return false;">
             <svg viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -1913,6 +1954,37 @@
         const modal = document.getElementById('edit-ai-modal');
         if (modal) {
           modal.classList.remove('active');
+        }
+      }
+
+      function openNoCharModal() {
+        playPopSound();
+        const modal = document.getElementById('no-char-modal');
+        if (modal) {
+          modal.classList.add('active');
+        }
+      }
+
+      function closeNoCharModal(event) {
+        if (event && event.stopPropagation) {
+          event.stopPropagation();
+        }
+        playPopSound();
+        const modal = document.getElementById('no-char-modal');
+        if (modal) {
+          modal.classList.remove('active');
+        }
+      }
+
+      function handleNextPageClick(event) {
+        if (event && event.preventDefault) {
+          event.preventDefault();
+        }
+        const generatedImg = localStorage.getItem('storymee_generated_character_img');
+        if (!generatedImg || generatedImg === '') {
+          openNoCharModal();
+        } else {
+          playPopAndNavigate('/character/generate/feature.html');
         }
       }
 
