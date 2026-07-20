@@ -670,106 +670,217 @@
         return; // Exit and do not generate again
       }
 
-      const promptTemplate = `Create one horizontal character profile sheet with size 16:9 (exactly 1210px width by 681px height) for a single stylized 3D chibi character.
+      const promptTemplate = `Create one single horizontal 16:9 (exactly 1210px width by 681px height) character profile sheet for a single stylized 3D chibi character.
 
-First, analyze the character’s visual design and identify exactly 4 main colors only:
+First, analyze the character’s visual design and determine the following:
+
+1. Tổng thể nhân vật tạo cảm giác gì?
+   Examples: cute, soft, sweet, innocent, gentle, elegant, calm, refined, dreamy, energetic, mischievous, bold, sporty, mysterious, cool, quiet, etc.
+
+2. Identify exactly 4 key template colors based only on the character design:
 - 1 primary dominant color
 - 1 secondary supporting color
-- 1 light neutral color
-- 1 dark accent color
+- 1 light neutral background color
+- 1 dark accent color for headings, borders, outlines, and text
 
-These 4 colors must be the only core palette used for the entire template design. The full visual identity of the template must be derived from these 4 colors only.
+The entire template must be custom-designed based on these 4 colors only.
+Do not introduce unrelated colors outside this palette.
 
-Apply the 4-color palette consistently across the template:
+TEMPLATE COLOR RULES
+
+Use a clean custom-colored character reference board fully derived from the character’s own palette rather than a fixed lavender theme.
+
+Apply the 4-color palette consistently:
 - Use the primary and secondary colors for the main border, section borders, dividers, headings, icons, decorative symbols, and character name.
-- Use the light neutral color for the background and light panel fills.
-- Use the dark accent color for text, outlines, borders, and important details.
-- Keep strong contrast between the character, text, borders, and background.
-- Avoid unrelated colors that do not appear in the character design.
-- The final template must feel custom-designed specifically for this character.
+- Use the light neutral color for the general background and large open negative-space areas.
+- Use pale tinted panel backgrounds derived only from the chosen 4 colors for the information cards and content panels.
+- Use the dark accent color or a darker variation of the dominant palette for body text.
+- Maintain clear contrast between the character, background, text, and borders.
+- The final board must feel like a template specifically designed for this exact character.
 
 LAYOUT AND COMPOSITION
 
-Create one clean, polished, cute, easy-to-read horizontal character profile sheet with size 16:9, with balanced spacing, rounded panels, thin borders, soft inner shadows, and a clear visual hierarchy.
+Create one clean, polished, easy-to-read character profile sheet in a horizontal 16:9 format.
+
+Use:
+- soft background
+- thin rounded borders
+- subtle inner shadows
+- balanced spacing
+- generous margins
+- clear visual hierarchy
+- no clutter
 
 Divide the sheet into two main columns.
 
 LEFT COLUMN — approximately 45% of the canvas:
 - Place one large half-body character portrait occupying most of the left side.
-- Keep this portrait clearly larger and more dominant than every other character image.
-- Fix the character name in a consistent position at the top center-left area, above the information cards and beside the large portrait.
-- Place four compact rounded information cards beside or below the large portrait:
+- This portrait must be the dominant visual element and clearly larger than every other character image on the board.
+- Place the character name at a fixed position near the top center-left area above or slightly above the information-card zone.
+- The name position must remain stable and visually prominent.
+- Place four compact rounded information cards beside or below the large portrait in a neat vertical arrangement:
   1. THÔNG TIN CƠ BẢN
   2. MÔ TẢ NHÂN VẬT
   3. CÂU NÓI CỬA MIỆNG
   4. TÍNH CÁCH
-- Add one horizontal 4-color palette at the bottom-left using exactly the 4 main character colors.
-- Keep the portrait dominant and the text area neat, aligned, and easy to read.
+- Add one horizontal 4-color palette bar at the bottom-left using the four selected template colors.
 
 RIGHT COLUMN — approximately 55% of the canvas:
-Arrange three stacked rounded panels.
+Arrange three stacked rounded panels with clean spacing.
 
-TOP PANEL:
-- Show exactly 4 full-body turnaround views arranged evenly in one row.
-- The 4 views must be:
-  1. Front view
-  2. Three-quarter front view
-  3. Side view
-  4. Back view
-- Every view must have identical character proportions, outfit, hairstyle, accessories, materials, scale, and lighting.
-- Keep all full-body views completely visible and aligned to the same floor line.
-- Do not place any text labels under or above each turnaround image.
+TOP PANEL — XOAY NHÂN VẬT
+Show exactly 4 full-body turnaround views arranged evenly in one row:
+1. Front view
+2. Three-quarter front view
+3. Side view
+4. Back view
 
-MIDDLE PANEL:
-- Show exactly 5 head-and-shoulder facial expressions arranged evenly in one row.
-- The 5 expressions must be generated based on the character’s personality.
-- Choose expressions that best reflect the character’s traits.
-- Keep the same camera angle, crop, head size, lighting, hairstyle, and outfit for every expression.
-- Do not place any text labels under or above each expression.
+Rules:
+- Exactly 4 views only
+- No text labels under the views
+- All four views must have identical proportions, outfit, hairstyle, accessories, materials, scale, and lighting
+- All full-body views must be completely visible
+- All views must align to the same floor line
+- No duplicated or inconsistent views
 
-BOTTOM PANEL:
-- Show exactly 5 full-body action poses arranged evenly in one row.
-- The 5 action poses must be generated based on the character’s personality and hobbies or interests.
-- Choose actions that feel natural and specific to the character.
-- Keep every pose fully visible, consistently scaled, and visually separated.
-- Do not place any text labels under or above each action pose.
+MIDDLE PANEL — BIỂU CẢM
+Show exactly 5 head-and-shoulder facial expressions arranged evenly in one row.
 
-Use thin rounded borders, soft inner shadows, generous spacing, balanced margins, and a clear visual hierarchy. Keep the design clean, polished, cute, calm, and easy to read. Decorative icons such as stars, sparkles, paw prints, flowers, leaves, small character-related symbols, or simple doodles may be placed near the borders, but they must match the 4-color palette and must never overlap the character or text.
+The 5 expressions must be selected based on the character’s personality, not random generic choices.
+Choose expressions that best reflect the character’s emotional identity.
+
+Examples:
+- a shy, quiet character may have: neutral, surprised, gentle smile, embarrassed, thoughtful
+- an energetic character may have: cheerful, excited, mischievous, curious, determined, etc.
+
+Rules:
+- Exactly 5 expressions only
+- No text labels under the expressions
+- Same camera angle, crop, head size, lighting, hairstyle, and outfit in every expression
+- Expressions must feel natural and character-specific
+
+BOTTOM PANEL — HÀNH ĐỘNG
+Show exactly 5 full-body action poses arranged evenly in one row.
+
+The 5 actions must be selected based on the character’s personality and hobbies/interests.
+Do not choose random actions.
+The actions should communicate who the character is.
+
+Examples:
+- a calm book-loving character may: hold a notebook, read, write, wave softly, stand thoughtfully
+- an energetic sporty character may: run, jump, wave, cheer, pose confidently
+- an artistic character may: draw, hold sketchbook, paint, observe, pose proudly
+
+Rules:
+- Exactly 5 action poses only
+- No text labels under the action poses
+- Every pose must be fully visible
+- Every pose must be consistently scaled
+- Poses must be clearly separated
+- The actions must feel coherent with the character’s personality and interests
+
+DECORATIVE ELEMENTS
+
+Decorative icons may be added lightly around the borders to enrich the template, but they must remain subtle and not clutter the layout.
+
+Possible elements:
+- stars
+- sparkles
+- flowers
+- leaves
+- paw prints
+- hearts
+- simple doodles
+- small symbols related to the character’s personality or hobbies
+
+Rules:
+- Decorative elements must use only the selected 4-color palette
+- Decorative elements must never overlap the character or text
+- Keep them light and balanced
 
 VISUAL STYLE
 
 High-quality stylized 3D chibi character render.
-Large head, small body, soft rounded anatomy, expressive glossy eyes, smooth facial features, subtle skin texture, soft blush, detailed layered hair, realistic fabric texture, clean stylized materials, and gentle studio lighting.
+
+Character design requirements:
+- large head
+- small body
+- soft rounded anatomy
+- expressive glossy eyes
+- smooth facial features
+- subtle blush
+- layered detailed hair
+- soft skin shading
+- clean stylized materials
+- realistic fabric texture
+- soft studio lighting
+- polished rendering
+- cute, premium, friendly, elegant presentation
+
+All character instances on the sheet must remain fully consistent in:
+- face design
+- body proportions
+- hair shape
+- outfit
+- accessories
+- colors
+- rendering quality
+- lighting direction
 
 TYPOGRAPHY
 
-Use a rounded, friendly, highly legible Vietnamese font.
+Use a rounded, friendly, highly legible Vietnamese font for all readable text.
 
-The character name should use a large playful bubble-style display font based on the character’s dominant palette, with:
-- a soft gradient
-- a white inner highlight
-- a darker colored outline
-- subtle depth or shadow
+CHARACTER NAME TYPOGRAPHY RULE
 
-The name position must remain fixed at the top center-left area of the layout.
+Before styling the character name, answer internally:
+“Tổng thể nhân vật tạo cảm giác gì?”
 
-Section headings should be:
+Then adapt the font style of the character name accordingly.
+
+Examples:
+- If the character feels cute, soft, sweet, innocent, or gentle:
+  use a rounded, bubbly, playful, soft font style
+- If the character feels elegant, calm, refined, or dreamy:
+  use a graceful, smooth, clean, slightly delicate display font
+- If the character feels energetic, mischievous, bold, or sporty:
+  use a lively, chunky, dynamic, playful display font
+- If the character feels mysterious, cool, or quiet:
+  use a cleaner, more minimal, stylish, slightly sharp display font
+
+The character name must:
+- stay fixed near the top center-left area
+- be visually prominent
+- be highly legible
+- match the emotional feeling of the character
+- use the selected palette colors
+- include a soft gradient
+- include a subtle white inner highlight
+- include a darker outline
+- include soft depth or a gentle shadow
+
+SECTION HEADINGS
+
+Section headings must be:
 - uppercase
 - bold
 - centered
-- based on the character’s dark accent color
-
-Body text should be:
-- short
-- dark navy, deep brown, dark gray, or the dark accent color
-- evenly spaced
 - clearly readable
+- based on the selected dark accent color
+
+BODY TEXT
+
+Body text must be:
+- short
+- clean
+- evenly spaced
+- dark and readable
 - correctly written in Vietnamese
+- concise to reduce spelling errors
 
 Do not distort letters.
 Do not miss Vietnamese diacritics.
 Do not generate random, broken, or unreadable text.
-Keep every text section concise to reduce spelling errors.
 
 CONTENT PLACEHOLDERS
 
@@ -793,34 +904,34 @@ Thân thiện • Dễ thương
 
 TECHNICAL REQUIREMENTS
 
-- One single horizontal image with size 16:9 (aspect ratio 16:9, exactly 1210px width by 681px height).
-- Full-frame character profile sheet.
-- Balanced margins on all four sides.
-- No cropped character parts.
-- No overlapping panels.
-- No duplicated characters.
-- No inconsistent clothing.
-- No inconsistent hairstyle.
-- No inconsistent accessories.
-- No inconsistent proportions.
-- No extra limbs.
-- No missing limbs.
-- No malformed hands.
-- No distorted face.
-- Exactly 4 turnaround views only.
-- Exactly 5 facial expressions only.
-- Exactly 5 action poses only.
-- Turnaround views must have no text labels.
-- Facial expressions must have no text labels.
-- Action poses must have no text labels.
-- Color palette must contain exactly 4 colors only.
-- No text beneath the color palette.
-- Keep the background clean and uncluttered.
-- Preserve strong visual hierarchy.
-- Maintain consistent spacing and alignment.
-- The template colors must automatically adapt to each new character’s dominant 4-color palette.
-- Facial expressions must be based on the character’s personality.
-- Action poses must be based on the character’s personality and hobbies or interests.`;
+- Generate one single horizontal 16:9 image (exactly 1210px width by 681px height)
+- Full-frame character profile sheet
+- Clean professional layout
+- Balanced margins on all four sides
+- No cropped character parts
+- No overlapping panels
+- No duplicated characters
+- No inconsistent clothing
+- No inconsistent hairstyle
+- No inconsistent accessories
+- No inconsistent proportions
+- No extra limbs
+- No missing limbs
+- No malformed hands
+- No distorted fingers
+- No distorted face
+- No text beneath the turnaround views
+- No text beneath the expression row
+- No text beneath the action row
+- No text beneath the color palette
+- Maintain consistent alignment and spacing
+- Keep the background clean and uncluttered
+- Preserve strong visual hierarchy
+- Template colors must adapt automatically to the character’s dominant palette
+- Use only the 4 selected key colors as the base identity of the template
+
+AVOID / NEGATIVE PROMPT:
+vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy, irregular grid, poor spacing, cropped body, cropped hair, cropped feet, inconsistent character design, different outfits, different hairstyles, different accessories, different face design, duplicate poses, repeated expressions, extra limbs, missing limbs, malformed hands, distorted fingers, distorted face, random text, broken text, misspelled Vietnamese, missing Vietnamese accents, unreadable typography, text under turnaround, text under expressions, text under actions, text under color palette, too many colors, unrelated colors, fixed lavender theme, excessive decoration, dark background, harsh shadows, flat vector art, rough sketch, low detail, blurry render, watermark, logo`;
 
       try {
         const response = await fetch('/api/generate-image', {
