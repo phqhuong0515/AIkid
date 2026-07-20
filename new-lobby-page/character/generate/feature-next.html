@@ -404,6 +404,32 @@
       </div>
     </header>
 
+    <!-- Floating Back Button -->
+    <div class="back-btn-container"
+      style="position: absolute; left: 38px; top: 131px; z-index: 1000; transform: scale(1.1); transform-origin: left top;">
+      <button onclick="playPopAndNavigate('/character/generate/feature.html')" style="
+        background: linear-gradient(135deg, #ff9eb5, #ff7597);
+        border: none;
+        border-radius: 9999px;
+        color: white;
+        font-family: 'Mali', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 10px 25px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      ">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Trở Về</span>
+      </button>
+    </div>
+
     <div class="app-container" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
       <!-- Profile Sheet Container -->
       <div id="profile-sheet-view" style="
@@ -478,26 +504,7 @@
       </div>
 
       <!-- Action Buttons Row -->
-      <div style="display: flex; gap: 24px; margin-top: 22px; margin-bottom: 15px; z-index: 1001;">
-        <button class="profile-action-btn" onclick="playPopAndNavigate('/character/generate/feature.html')" style="
-          background: linear-gradient(135deg, #ff9eb5, #ff7597);
-          border: none;
-          border-radius: 9999px;
-          color: #FFFFFF;
-          font-family: 'Mali', sans-serif;
-          font-weight: 700;
-          font-size: 1.25rem;
-          padding: 15.5px 39.5px;
-          cursor: pointer;
-          box-shadow: 0 8px 20px rgba(255, 117, 151, 0.3);
-          outline: none;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        ">
-          <i class="fa-solid fa-arrow-left"></i> Trở về
-        </button>
-        
+      <div style="display: flex; justify-content: center; margin-top: 22px; margin-bottom: 15px; z-index: 1001;">
         <button id="btn-save-character" class="profile-action-btn" onclick="saveCharacter()" style="
           background: linear-gradient(135deg, #FF5C8A, #FF85A7);
           border: none;
