@@ -12,7 +12,7 @@
     href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
-  
+
   <!-- Base styling -->
   <style>
     * {
@@ -48,7 +48,7 @@
       align-items: center;
     }
 
-    .scaler-wrapper > * {
+    .scaler-wrapper>* {
       pointer-events: auto;
     }
 
@@ -103,10 +103,12 @@
     .profile-action-btn {
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+
     .profile-action-btn:hover {
       transform: translateY(-3px) scale(1.03);
       filter: brightness(1.05);
     }
+
     .profile-action-btn:active {
       transform: translateY(0) scale(1);
     }
@@ -221,6 +223,17 @@
       position: relative;
     }
   </style>
+  <script>
+    function adjustContainerRatio(img) {
+      if (img && img.naturalWidth && img.naturalHeight) {
+        const ratio = img.naturalWidth / img.naturalHeight;
+        const container = document.getElementById('profile-sheet-view');
+        if (container) {
+          container.style.width = (680.625 * ratio * 0.909) + 'px';
+        }
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -255,34 +268,58 @@
           transform: translate(60vw, -60vh) rotate(150deg);
           opacity: 0;
         }
+
         10% {
           opacity: 1;
         }
+
         90% {
           opacity: 1;
         }
+
         100% {
           transform: translate(-60vw, 60vh) rotate(150deg);
           opacity: 0;
         }
       }
+
       @keyframes miniFlight {
         0% {
           transform: translate(60vw, -60vh) rotate(150deg);
           opacity: 0;
         }
-        15% { opacity: 0.6; }
-        85% { opacity: 0.6; }
+
+        15% {
+          opacity: 0.6;
+        }
+
+        85% {
+          opacity: 0.6;
+        }
+
         100% {
           transform: translate(-60vw, 60vh) rotate(150deg);
           opacity: 0;
         }
       }
+
       @keyframes loadingDots {
-        0%, 20% { content: "."; }
-        40% { content: ".."; }
-        60%, 100% { content: "..."; }
+
+        0%,
+        20% {
+          content: ".";
+        }
+
+        40% {
+          content: "..";
+        }
+
+        60%,
+        100% {
+          content: "...";
+        }
       }
+
       .loading-dots::after {
         content: "";
         animation: loadingDots 1.5s infinite steps(1);
@@ -290,6 +327,7 @@
         width: 24px;
         text-align: left;
       }
+
       .meteor-container {
         position: relative;
         width: 320px;
@@ -300,29 +338,55 @@
         animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
         z-index: 10;
       }
+
       .meteor-head {
         width: 80px;
         height: 80px;
         background: radial-gradient(circle at 35% 35%, #FFF0F5 0%, #FFB6C1 25%, #FF5E97 60%, #9D1C7F 100%);
         border-radius: 50%;
-        box-shadow: 
+        box-shadow:
           0 0 25px rgba(255, 94, 151, 0.9),
           0 0 60px rgba(157, 28, 127, 0.6),
           0 0 120px rgba(157, 28, 127, 0.4);
         position: relative;
         flex-shrink: 0;
       }
+
       .meteor-crater {
         position: absolute;
         background: rgba(0, 0, 0, 0.08);
         border-radius: 50%;
-        box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+        box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.15);
       }
-      .meteor-crater-1 { width: 14px; height: 14px; top: 22px; left: 18px; }
-      .meteor-crater-2 { width: 20px; height: 20px; top: 32px; left: 32px; }
-      .meteor-crater-3 { width: 12px; height: 12px; top: 18px; left: 45px; }
-      .meteor-crater-4 { width: 10px; height: 10px; top: 48px; left: 20px; }
-      
+
+      .meteor-crater-1 {
+        width: 14px;
+        height: 14px;
+        top: 22px;
+        left: 18px;
+      }
+
+      .meteor-crater-2 {
+        width: 20px;
+        height: 20px;
+        top: 32px;
+        left: 32px;
+      }
+
+      .meteor-crater-3 {
+        width: 12px;
+        height: 12px;
+        top: 18px;
+        left: 45px;
+      }
+
+      .meteor-crater-4 {
+        width: 10px;
+        height: 10px;
+        top: 48px;
+        left: 20px;
+      }
+
       .meteor-trail {
         width: 600px;
         height: 70px;
@@ -331,6 +395,7 @@
         margin-right: -40px;
         filter: blur(2px);
       }
+
       .mini-meteor {
         position: absolute;
         width: 160px;
@@ -341,18 +406,21 @@
         filter: blur(1.5px);
         transform: rotate(150deg);
       }
+
       .mini-1 {
         top: 15%;
         left: 10%;
         animation: miniFlight 1.6s linear infinite;
         animation-delay: 0.4s;
       }
+
       .mini-2 {
         top: 75%;
         left: 5%;
         animation: miniFlight 1.9s linear infinite;
         animation-delay: 0.9s;
       }
+
       .mini-3 {
         top: 85%;
         left: 50%;
@@ -430,7 +498,8 @@
       </button>
     </div>
 
-    <div class="app-container" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%;">
+    <div class="app-container"
+      style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%;">
       <!-- Profile Sheet Container -->
       <div id="profile-sheet-view" style="
         box-sizing: content-box;
@@ -461,19 +530,25 @@
           gap: 20px;
           z-index: 100;
         ">
-          <i class="fa-solid fa-wand-magic-sparkles fa-spin" style="font-size: 3.5rem; color: #FF7597; animation: fa-spin 2.3s linear infinite;"></i>
-          <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.5rem; color: #8A7463; font-weight: 900;">AI đang phác họa Hồ sơ Nhân vật...</div>
-          <div style="font-family: 'Mali', sans-serif; font-size: 1rem; color: #BCA695;">Quá trình này có thể mất khoảng 15-20 giây</div>
+          <i class="fa-solid fa-wand-magic-sparkles fa-spin"
+            style="font-size: 3.5rem; color: #FF7597; animation: fa-spin 2.3s linear infinite;"></i>
+          <div
+            style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.5rem; color: #8A7463; font-weight: 900;">
+            AI đang phác họa Hồ sơ Nhân vật...</div>
+          <div style="font-family: 'Mali', sans-serif; font-size: 1rem; color: #BCA695;">Quá trình này có thể mất khoảng
+            15-20 giây</div>
         </div>
 
         <img id="generated-profile-img" style="
           width: 100%;
           height: 100%;
           object-fit: contain;
+          transform: scale(1.08);
+          transform-origin: center center;
           display: none;
         " alt="Hồ Sơ Nhân Vật">
         <script>
-          (function() {
+          (function () {
             try {
               const name = localStorage.getItem('storymee_char_name') || 'Gia Bảo';
               const age = localStorage.getItem('storymee_char_age') || '8';
@@ -481,7 +556,7 @@
               const species = localStorage.getItem('storymee_char_species') || 'Thỏ';
               const description = localStorage.getItem('storymee_char_description') || 'Một chú thỏ nhỏ đáng yêu tinh nghịch thích ăn cà rốt.';
               const catchphrase = localStorage.getItem('storymee_char_catchphrase') || 'Cà rốt muôn năm!';
-              
+
               const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase;
               const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
               const cachedMeta = localStorage.getItem('storymee_profile_sheet_meta');
@@ -492,6 +567,7 @@
                 if (imgEl) {
                   imgEl.src = cachedProfileSheet;
                   imgEl.style.display = 'block';
+                  if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
                 }
                 if (overlayEl) {
                   overlayEl.style.display = 'none';
@@ -646,6 +722,15 @@
       const overlayEl = document.getElementById('generating-overlay');
       const saveBtn = document.getElementById('btn-save-character');
 
+      if (imgEl) {
+        if (imgEl.complete) {
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
+        }
+        imgEl.addEventListener('load', () => {
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
+        });
+      }
+
       // Check if we already have a cached profile sheet matching the current character metadata
       const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase;
       const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
@@ -659,6 +744,7 @@
         if (imgEl) {
           imgEl.src = cachedProfileSheet;
           imgEl.style.display = 'block';
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
         }
         if (overlayEl) {
           overlayEl.style.display = 'none';
@@ -670,7 +756,7 @@
         return; // Exit and do not generate again
       }
 
-      const promptTemplate = `Create one single horizontal 16:9 character profile sheet for a single stylized 3D chibi character. It must be a full-bleed layout with absolutely no outer white borders, margins, or padding around the design, fitting the image canvas from edge to edge.
+      const promptTemplate = `Create one single horizontal 16:9 (exactly 1210px width by 681px height) character profile sheet for a single stylized 3D chibi character.
 
 First, analyze the character’s visual design and determine the following:
 
@@ -904,10 +990,10 @@ Thân thiện • Dễ thương
 
 TECHNICAL REQUIREMENTS
 
-- Generate one single horizontal 16:9 image
+- Generate one single horizontal 16:9 image (exactly 1210px width by 681px height)
 - Full-frame character profile sheet
 - Clean professional layout
-- Full-bleed layout with absolutely no outer margins, no outer padding, and no white borders around the canvas edges. The template outline must touch the outer edges of the image.
+- Balanced margins on all four sides
 - No cropped character parts
 - No overlapping panels
 - No duplicated characters
@@ -958,6 +1044,7 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
         if (imgEl && data.url) {
           imgEl.src = data.url;
           imgEl.style.display = 'block';
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
           // Cache the generated sheet and its metadata matching the character config
           try {
             localStorage.setItem('storymee_generated_profile_sheet', data.url);
@@ -995,7 +1082,7 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
       if (imgEl && imgEl.src && !imgEl.src.startsWith('data:image/gif')) {
         // Save to localStorage
         localStorage.setItem('storymee_saved_profile_sheet', imgEl.src);
-        
+
         // Trigger download
         const link = document.createElement('a');
         link.href = imgEl.src;
