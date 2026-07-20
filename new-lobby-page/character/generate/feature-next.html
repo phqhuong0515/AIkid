@@ -699,9 +699,30 @@
       pendingExitUrl = null;
     }
 
+    function resetCharacterGenerationData() {
+      const keysToClear = [
+        'storymee_generated_character_img',
+        'storymee_char_name',
+        'storymee_char_age',
+        'storymee_char_gender',
+        'storymee_char_species',
+        'storymee_char_description',
+        'storymee_char_catchphrase',
+        'storymee_char_birthday',
+        'storymee_uploaded_image',
+        'storymee_generated_profile_sheet',
+        'storymee_profile_sheet_meta',
+        'storymee_generate_category_inputs',
+        'storymee_generate_active_category',
+        'storymee_generate_inputs'
+      ];
+      keysToClear.forEach(key => localStorage.removeItem(key));
+    }
+
     function confirmExit() {
       isSaved = true;
       closeExitModal();
+      resetCharacterGenerationData();
       playPopAndNavigateInternal('/');
     }
 
