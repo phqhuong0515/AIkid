@@ -1265,6 +1265,9 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
           }
           savedChars.push(newChar);
           localStorage.setItem('storymee_saved_characters', JSON.stringify(savedChars));
+          
+          // Clear temporary character creation cache on successful save
+          resetCharacterGenerationData();
         } catch (e) {
           console.error("Failed to save character to warehouse database", e);
           alert("Lỗi bộ nhớ: Không thể lưu nhân vật vì kho đã đầy. Vui lòng thử lại hoặc xóa bớt nhân vật cũ!");
