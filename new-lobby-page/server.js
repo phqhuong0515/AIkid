@@ -152,7 +152,7 @@ const NEGATIVE_PROMPT = `multiple views, duplicate characters, character sheet, 
 
 async function generateImageFromAPI(userPrompt, existingImage, aspectRatio = "1:1", isProfileSheet = false) {
     const aiProvider = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
-    
+
     // Merge prompt on server side to hide STYLE_PROMPT unless generating the profile sheet
     let finalPrompt;
     if (isProfileSheet) {
@@ -211,10 +211,10 @@ async function callGeminiEngine(prompt, apiKey, existingImage, aspectRatio = "1:
                 parts: parts
             }
         ],
-        generationConfig: {
-            responseModalities: ["IMAGE"],
-            imageConfig: {
-                aspectRatio: aspectRatio
+        generation_config: {
+            response_modalities: ["IMAGE"],
+            image_config: {
+                aspect_ratio: aspectRatio
             }
         }
     });
@@ -238,7 +238,7 @@ async function callOpenAIEngine(prompt, apiKey, aspectRatio = "1:1") {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
     };
-    
+
     // Map DALL-E sizes based on requested ratio
     let size = '1024x1024';
     if (aspectRatio === '16:9') {
