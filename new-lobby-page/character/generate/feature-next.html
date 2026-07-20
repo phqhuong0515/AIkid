@@ -503,6 +503,7 @@
                 if (imgEl) {
                   imgEl.src = cachedProfileSheet;
                   imgEl.style.display = 'block';
+                  if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
                 }
                 if (overlayEl) {
                   overlayEl.style.display = 'none';
@@ -657,6 +658,15 @@
       const overlayEl = document.getElementById('generating-overlay');
       const saveBtn = document.getElementById('btn-save-character');
 
+      if (imgEl) {
+        if (imgEl.complete) {
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
+        }
+        imgEl.addEventListener('load', () => {
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
+        });
+      }
+
       // Check if we already have a cached profile sheet matching the current character metadata
       const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase;
       const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
@@ -670,6 +680,7 @@
         if (imgEl) {
           imgEl.src = cachedProfileSheet;
           imgEl.style.display = 'block';
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
         }
         if (overlayEl) {
           overlayEl.style.display = 'none';
@@ -969,6 +980,7 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
         if (imgEl && data.url) {
           imgEl.src = data.url;
           imgEl.style.display = 'block';
+          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
           // Cache the generated sheet and its metadata matching the character config
           try {
             localStorage.setItem('storymee_generated_profile_sheet', data.url);
