@@ -211,10 +211,10 @@ async function callGeminiEngine(prompt, apiKey, existingImage, aspectRatio = "1:
                 parts: parts
             }
         ],
-        generation_config: {
-            response_modalities: ["IMAGE"],
-            image_config: {
-                aspect_ratio: aspectRatio
+        generationConfig: {
+            responseModalities: ["IMAGE"],
+            imageConfig: {
+                aspectRatio: aspectRatio
             }
         }
     });
