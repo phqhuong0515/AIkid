@@ -1173,9 +1173,9 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
           const birthday = localStorage.getItem('storymee_char_birthday') || new Date().toLocaleDateString('vi-VN').substring(0, 5);
           const rawAvatar = localStorage.getItem('storymee_generated_character_img') || imgEl.src;
 
-          // Compress to avoid LocalStorage quota limits (~200KB total)
-          const avatar = await compressImage(rawAvatar, 300, 0.7);
-          const profileImg = await compressImage(imgEl.src, 1000, 0.7);
+          // Compress to avoid LocalStorage quota limits with high visual quality (~400KB total)
+          const avatar = await compressImage(rawAvatar, 800, 0.9);
+          const profileImg = await compressImage(imgEl.src, 1200, 0.9);
 
           const newChar = {
             id: 'user-' + Date.now(),
