@@ -52,7 +52,7 @@ const server = http.createServer((req, res) => {
                 if (data.image) {
                     result = await redrawUserDrawing(data.image, data.style);
                 } else if (data.prompt) {
-                    result = await generateImageFromAPI(data.prompt, data.existingImage);
+                    result = await generateImageFromAPI(data.prompt, data.existingImage, data.aspectRatio, data.isProfileSheet);
                 } else {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: 'Prompt or Image is required' }));
@@ -150,35 +150,40 @@ const STYLE_PROMPT = `A single character, centered, centered in frame, strictly 
 
 const NEGATIVE_PROMPT = `multiple views, duplicate characters, character sheet, multiple poses, split screen, grid, turnaround, orthographic views, cut off characters on the sides, no room, no blurred backdrop, no shadowy environment, no gray background, no colored background, no dark background, no shadows on the background, no gradients on the background, no three-dimensional background elements. Avoid plastic skin, waxy face, glossy skin, toy-like plastic texture, overly smooth synthetic skin, hard specular highlights, rubbery texture, flat skin shading, lifeless skin, cheap toy plastic, low-detail materials, stiff hair, plastic-looking hair, plastic-looking fur, waxy hair, waxy fur, helmet hair, chunky clumps, rigid strand blocks, solid sculpted hair masses, overly uniform strand flow, glossy synthetic strands, matted fur, stiff feathers, harsh outlines, rough shading, noisy texture, flat mechanical shading, messy panel lines, unrealistic reflections, and any solid molded surface that looks plastic-like.`;
 
-async function generateImageFromAPI(userPrompt, existingImage) {
+async function generateImageFromAPI(userPrompt, existingImage, aspectRatio = "1:1", isProfileSheet = false) {
     const aiProvider = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
     
-    // Merge prompt on server side to hide STYLE_PROMPT and prevent client side manipulation
-    const finalPrompt = `${userPrompt}
+    // Merge prompt on server side to hide STYLE_PROMPT unless generating the profile sheet
+    let finalPrompt;
+    if (isProfileSheet) {
+        finalPrompt = userPrompt;
+    } else {
+        finalPrompt = `${userPrompt}
 
 STYLE REQUIREMENTS:
 ${STYLE_PROMPT}
 
 AVOID:
 ${NEGATIVE_PROMPT}`;
+    }
 
     if (aiProvider === 'openai') {
         const apiKey = process.env.OPENAI_API_KEY;
         if (!apiKey || apiKey.startsWith('your_')) {
             throw new Error('OpenAI API Key is not configured in .env');
         }
-        return await callOpenAIEngine(finalPrompt, apiKey);
+        return await callOpenAIEngine(finalPrompt, apiKey, aspectRatio);
     } else {
         // default is gemini
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey || apiKey.startsWith('your_')) {
             throw new Error('Gemini API Key is not configured in .env');
         }
-        return await callGeminiEngine(finalPrompt, apiKey, existingImage);
+        return await callGeminiEngine(finalPrompt, apiKey, existingImage, aspectRatio);
     }
 }
 
-async function callGeminiEngine(prompt, apiKey, existingImage) {
+async function callGeminiEngine(prompt, apiKey, existingImage, aspectRatio = "1:1") {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
     const headers = {
         'Content-Type': 'application/json'
@@ -206,8 +211,11 @@ async function callGeminiEngine(prompt, apiKey, existingImage) {
                 parts: parts
             }
         ],
-        generationConfig: {
-            responseModalities: ["IMAGE"]
+        generation_config: {
+            response_modalities: ["IMAGE"],
+            image_config: {
+                aspect_ratio: aspectRatio
+            }
         }
     });
 
@@ -224,17 +232,26 @@ async function callGeminiEngine(prompt, apiKey, existingImage) {
     throw new Error('Gemini API did not return any image data. Response: ' + JSON.stringify(resData));
 }
 
-async function callOpenAIEngine(prompt, apiKey) {
+async function callOpenAIEngine(prompt, apiKey, aspectRatio = "1:1") {
     const url = 'https://api.openai.com/v1/images/generations';
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
     };
+    
+    // Map DALL-E sizes based on requested ratio
+    let size = '1024x1024';
+    if (aspectRatio === '16:9') {
+        size = '1792x1024';
+    } else if (aspectRatio === '9:16') {
+        size = '1024x1792';
+    }
+
     const body = JSON.stringify({
         model: 'dall-e-3',
         prompt: prompt,
         n: 1,
-        size: '1024x1024'
+        size: size
     });
 
     const resData = await makeHttpsPost(url, headers, body);

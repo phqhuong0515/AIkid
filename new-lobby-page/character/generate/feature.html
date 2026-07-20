@@ -844,8 +844,8 @@
                     height: 68px;
                   ">
                   <span
-                    style="font-size: 1.15rem; font-weight: 700; color: #A0AEC0; font-family: 'Mali', sans-serif; user-select: none;">Câu nói cửa miệng</span>
-                  <input type="text" value="" placeholder="Nhập câu nói cửa miệng..." style="
+                    style="font-size: 1.15rem; font-weight: 700; color: #8A7463; font-family: 'Mali', sans-serif; user-select: none;">Câu nói cửa miệng</span>
+                  <input type="text" id="catchphrase-input" value="" placeholder="Nhập câu nói cửa miệng..." style="
                       font-size: 0.95rem;
                       font-weight: 600;
                       color: #BCA695 !important;
@@ -1298,6 +1298,15 @@
         
         descInput.addEventListener('input', () => {
           localStorage.setItem('storymee_char_description', descInput.value.trim());
+        });
+      }
+      const catchphraseInput = document.getElementById('catchphrase-input');
+      if (catchphraseInput) {
+        const savedCatch = localStorage.getItem('storymee_char_catchphrase');
+        if (savedCatch) catchphraseInput.value = savedCatch;
+        
+        catchphraseInput.addEventListener('input', () => {
+          localStorage.setItem('storymee_char_catchphrase', catchphraseInput.value.trim());
         });
       }
       // Load generated character image directly inside the 3:4 frame

@@ -85,6 +85,32 @@
       left: 104px;
     }
 
+    .action-btn-mii {
+      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .action-btn-mii:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08) !important;
+      border-color: #CBD5E0 !important;
+      background: #F8FAFC !important;
+    }
+
+    .action-btn-mii:active {
+      transform: translateY(0);
+    }
+
+    .profile-action-btn {
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .profile-action-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      filter: brightness(1.05);
+    }
+    .profile-action-btn:active {
+      transform: translateY(0) scale(1);
+    }
+
     .btn-left svg {
       margin-right: 2px;
     }
@@ -378,12 +404,128 @@
       </div>
     </header>
 
-    <div class="app-container" style="position: relative;">
-      <!-- Main Content Box Removed -->
+    <div class="app-container" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+      <!-- Profile Sheet Container -->
+      <div id="profile-sheet-view" style="
+        width: 1100px;
+        height: 620px;
+        background: #FDFAF4;
+        border: 10px solid #FFFFFF;
+        border-radius: 44px;
+        box-shadow: 0 30px 65px rgba(0, 0, 0, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        margin-top: 15px;
+      ">
+        <div id="generating-overlay" style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: #FDFAF4;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+          z-index: 100;
+        ">
+          <i class="fa-solid fa-wand-magic-sparkles fa-spin" style="font-size: 3.5rem; color: #FF7597; animation: fa-spin 2.3s linear infinite;"></i>
+          <div style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.5rem; color: #8A7463; font-weight: 900;">AI đang phác họa Hồ sơ Nhân vật...</div>
+          <div style="font-family: 'Mali', sans-serif; font-size: 1rem; color: #BCA695;">Quá trình này có thể mất khoảng 15-20 giây</div>
+        </div>
+
+        <img id="generated-profile-img" style="
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          display: none;
+        " alt="Hồ Sơ Nhân Vật">
+        <script>
+          (function() {
+            try {
+              const name = localStorage.getItem('storymee_char_name') || 'Gia Bảo';
+              const age = localStorage.getItem('storymee_char_age') || '8';
+              const gender = localStorage.getItem('storymee_char_gender') || 'Nam';
+              const species = localStorage.getItem('storymee_char_species') || 'Thỏ';
+              const description = localStorage.getItem('storymee_char_description') || 'Một chú thỏ nhỏ đáng yêu tinh nghịch thích ăn cà rốt.';
+              const catchphrase = localStorage.getItem('storymee_char_catchphrase') || 'Cà rốt muôn năm!';
+              
+              const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase;
+              const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
+              const cachedMeta = localStorage.getItem('storymee_profile_sheet_meta');
+
+              if (cachedProfileSheet && cachedMeta === currentMeta) {
+                const imgEl = document.getElementById('generated-profile-img');
+                const overlayEl = document.getElementById('generating-overlay');
+                if (imgEl) {
+                  imgEl.src = cachedProfileSheet;
+                  imgEl.style.display = 'block';
+                }
+                if (overlayEl) {
+                  overlayEl.style.display = 'none';
+                }
+              }
+            } catch (e) {
+              console.error("Cache pre-load failed", e);
+            }
+          })();
+        </script>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div style="display: flex; gap: 24px; margin-top: 22px; margin-bottom: 15px; z-index: 1001;">
+        <button class="profile-action-btn" onclick="playPopAndNavigate('/character/generate/feature.html')" style="
+          background: #E5D9CE;
+          border: 3.5px solid #FFFFFF;
+          border-radius: 9999px;
+          color: #8A7463;
+          font-family: 'Mali', sans-serif;
+          font-weight: 700;
+          font-size: 1.25rem;
+          padding: 12px 36px;
+          cursor: pointer;
+          box-shadow: 0 8px 20px rgba(138, 116, 99, 0.15);
+          outline: none;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        ">
+          <i class="fa-solid fa-arrow-left"></i> Trở về
+        </button>
+        
+        <button id="btn-save-character" class="profile-action-btn" onclick="saveCharacter()" style="
+          background: linear-gradient(135deg, #FF5C8A, #FF85A7);
+          border: 3.5px solid #FFFFFF;
+          border-radius: 9999px;
+          color: #FFFFFF;
+          font-family: 'Mali', sans-serif;
+          font-weight: 700;
+          font-size: 1.25rem;
+          padding: 12px 42px;
+          cursor: pointer;
+          box-shadow: 0 8px 20px rgba(255, 92, 138, 0.3);
+          outline: none;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          opacity: 0.55;
+          pointer-events: none;
+        ">
+          <i class="fa-solid fa-floppy-disk"></i> Lưu Nhân Vật
+        </button>
+      </div>
     </div>
 
 
   </div>
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script>
     function adjustScale() {
@@ -481,6 +623,269 @@
       if (e.persisted) hidePageLoader();
     });
     setTimeout(hidePageLoader, 1500); // Safety fallback timeout
+
+    // Profile Generation Logic
+    window.addEventListener('DOMContentLoaded', async () => {
+      const name = localStorage.getItem('storymee_char_name') || 'Gia Bảo';
+      const age = localStorage.getItem('storymee_char_age') || '8';
+      const gender = localStorage.getItem('storymee_char_gender') || 'Nam';
+      const species = localStorage.getItem('storymee_char_species') || 'Thỏ';
+      const description = localStorage.getItem('storymee_char_description') || 'Một chú thỏ nhỏ đáng yêu tinh nghịch thích ăn cà rốt.';
+      const catchphrase = localStorage.getItem('storymee_char_catchphrase') || 'Cà rốt muôn năm!';
+      const parentImage = localStorage.getItem('storymee_generated_character_img') || '';
+
+      const imgEl = document.getElementById('generated-profile-img');
+      const overlayEl = document.getElementById('generating-overlay');
+      const saveBtn = document.getElementById('btn-save-character');
+
+      // Check if we already have a cached profile sheet matching the current character metadata
+      const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase;
+      const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
+      const cachedMeta = localStorage.getItem('storymee_profile_sheet_meta');
+
+      if (cachedProfileSheet && cachedMeta === currentMeta) {
+        // Render from cache directly
+        if (imgEl) {
+          imgEl.src = cachedProfileSheet;
+          imgEl.style.display = 'block';
+        }
+        if (overlayEl) {
+          overlayEl.style.display = 'none';
+        }
+        if (saveBtn) {
+          saveBtn.style.opacity = '1';
+          saveBtn.style.pointerEvents = 'auto';
+        }
+        return; // Exit and do not generate again
+      }
+
+      const promptTemplate = `Create one horizontal 16:9 character profile sheet for a single stylized 3D chibi character.
+
+First, analyze the character’s visual design and identify exactly 4 main colors only:
+- 1 primary dominant color
+- 1 secondary supporting color
+- 1 light neutral color
+- 1 dark accent color
+
+These 4 colors must be the only core palette used for the entire template design. The full visual identity of the template must be derived from these 4 colors only.
+
+Apply the 4-color palette consistently across the template:
+- Use the primary and secondary colors for the main border, section borders, dividers, headings, icons, decorative symbols, and character name.
+- Use the light neutral color for the background and light panel fills.
+- Use the dark accent color for text, outlines, borders, and important details.
+- Keep strong contrast between the character, text, borders, and background.
+- Avoid unrelated colors that do not appear in the character design.
+- The final template must feel custom-designed specifically for this character.
+
+LAYOUT AND COMPOSITION
+
+Create one clean, polished, cute, easy-to-read horizontal 16:9 character profile sheet with balanced spacing, rounded panels, thin borders, soft inner shadows, and a clear visual hierarchy.
+
+Divide the sheet into two main columns.
+
+LEFT COLUMN — approximately 45% of the canvas:
+- Place one large half-body character portrait occupying most of the left side.
+- Keep this portrait clearly larger and more dominant than every other character image.
+- Fix the character name in a consistent position at the top center-left area, above the information cards and beside the large portrait.
+- Place four compact rounded information cards beside or below the large portrait:
+  1. THÔNG TIN CƠ BẢN
+  2. MÔ TẢ NHÂN VẬT
+  3. CÂU NÓI CỬA MIỆNG
+  4. TÍNH CÁCH
+- Add one horizontal 4-color palette at the bottom-left using exactly the 4 main character colors.
+- Keep the portrait dominant and the text area neat, aligned, and easy to read.
+
+RIGHT COLUMN — approximately 55% of the canvas:
+Arrange three stacked rounded panels.
+
+TOP PANEL:
+- Show exactly 4 full-body turnaround views arranged evenly in one row.
+- The 4 views must be:
+  1. Front view
+  2. Three-quarter front view
+  3. Side view
+  4. Back view
+- Every view must have identical character proportions, outfit, hairstyle, accessories, materials, scale, and lighting.
+- Keep all full-body views completely visible and aligned to the same floor line.
+- Do not place any text labels under or above each turnaround image.
+
+MIDDLE PANEL:
+- Show exactly 5 head-and-shoulder facial expressions arranged evenly in one row.
+- The 5 expressions must be generated based on the character’s personality.
+- Choose expressions that best reflect the character’s traits.
+- Keep the same camera angle, crop, head size, lighting, hairstyle, and outfit for every expression.
+- Do not place any text labels under or above each expression.
+
+BOTTOM PANEL:
+- Show exactly 5 full-body action poses arranged evenly in one row.
+- The 5 action poses must be generated based on the character’s personality and hobbies or interests.
+- Choose actions that feel natural and specific to the character.
+- Keep every pose fully visible, consistently scaled, and visually separated.
+- Do not place any text labels under or above each action pose.
+
+Use thin rounded borders, soft inner shadows, generous spacing, balanced margins, and a clear visual hierarchy. Keep the design clean, polished, cute, calm, and easy to read. Decorative icons such as stars, sparkles, paw prints, flowers, leaves, small character-related symbols, or simple doodles may be placed near the borders, but they must match the 4-color palette and must never overlap the character or text.
+
+VISUAL STYLE
+
+High-quality stylized 3D chibi character render.
+Large head, small body, soft rounded anatomy, expressive glossy eyes, smooth facial features, subtle skin texture, soft blush, detailed layered hair, realistic fabric texture, clean stylized materials, and gentle studio lighting.
+
+TYPOGRAPHY
+
+Use a rounded, friendly, highly legible Vietnamese font.
+
+The character name should use a large playful bubble-style display font based on the character’s dominant palette, with:
+- a soft gradient
+- a white inner highlight
+- a darker colored outline
+- subtle depth or shadow
+
+The name position must remain fixed at the top center-left area of the layout.
+
+Section headings should be:
+- uppercase
+- bold
+- centered
+- based on the character’s dark accent color
+
+Body text should be:
+- short
+- dark navy, deep brown, dark gray, or the dark accent color
+- evenly spaced
+- clearly readable
+- correctly written in Vietnamese
+
+Do not distort letters.
+Do not miss Vietnamese diacritics.
+Do not generate random, broken, or unreadable text.
+Keep every text section concise to reduce spelling errors.
+
+CONTENT PLACEHOLDERS
+
+Character name:
+${name}
+
+THÔNG TIN CƠ BẢN
+Tuổi: ${age}
+Giới tính: ${gender}
+Giống loài: ${species}
+
+MÔ TẢ NHÂN VẬT
+${description}
+
+CÂU NÓI CỬA MIỆNG
+“${catchphrase}”
+
+TÍNH CÁCH
+Năng động • Thông minh
+Thân thiện • Dễ thương
+
+TECHNICAL REQUIREMENTS
+
+- One single horizontal 16:9 image.
+- Full-frame character profile sheet.
+- Balanced margins on all four sides.
+- No cropped character parts.
+- No overlapping panels.
+- No duplicated characters.
+- No inconsistent clothing.
+- No inconsistent hairstyle.
+- No inconsistent accessories.
+- No inconsistent proportions.
+- No extra limbs.
+- No missing limbs.
+- No malformed hands.
+- No distorted face.
+- Exactly 4 turnaround views only.
+- Exactly 5 facial expressions only.
+- Exactly 5 action poses only.
+- Turnaround views must have no text labels.
+- Facial expressions must have no text labels.
+- Action poses must have no text labels.
+- Color palette must contain exactly 4 colors only.
+- No text beneath the color palette.
+- Keep the background clean and uncluttered.
+- Preserve strong visual hierarchy.
+- Maintain consistent spacing and alignment.
+- The template colors must automatically adapt to each new character’s dominant 4-color palette.
+- Facial expressions must be based on the character’s personality.
+- Action poses must be based on the character’s personality and hobbies or interests.`;
+
+      try {
+        const response = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: promptTemplate,
+            existingImage: parentImage,
+            aspectRatio: '16:9',
+            isProfileSheet: true
+          })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        const imgEl = document.getElementById('generated-profile-img');
+        const overlayEl = document.getElementById('generating-overlay');
+        const saveBtn = document.getElementById('btn-save-character');
+        if (imgEl && data.url) {
+          imgEl.src = data.url;
+          imgEl.style.display = 'block';
+          // Cache the generated sheet and its metadata matching the character config
+          try {
+            localStorage.setItem('storymee_generated_profile_sheet', data.url);
+            localStorage.setItem('storymee_profile_sheet_meta', currentMeta);
+          } catch (e) {
+            console.warn("Storage quota exceeded, could not cache locally:", e);
+          }
+        }
+        if (overlayEl) {
+          overlayEl.style.display = 'none';
+        }
+        if (saveBtn) {
+          saveBtn.style.opacity = '1';
+          saveBtn.style.pointerEvents = 'auto';
+        }
+      } catch (err) {
+        console.error("Failed to generate character profile sheet:", err);
+        const overlayEl = document.getElementById('generating-overlay');
+        if (overlayEl) {
+          overlayEl.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: #FFF5F5; border: 3px solid #FEB2B2; border-radius: 24px; padding: 24px; text-align: center; box-sizing: border-box; max-width: 500px;">
+              <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: #E53E3E;"></i>
+              <div style="font-family: 'Mali', sans-serif; font-weight: 700; color: #C53030; font-size: 1.2rem;">Lỗi tạo Hồ sơ Nhân vật</div>
+              <div style="font-size: 0.95rem; color: #9B2C2C; word-break: break-word;">${err.message || 'Vui lòng kiểm tra kết nối mạng hoặc API key'}</div>
+              <button onclick="window.location.reload()" style="margin-top: 12px; font-family: 'Mali', sans-serif; background: #FF7597; border: none; border-radius: 9999px; color: #FFFFFF; font-weight: 700; font-size: 1rem; padding: 10px 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 117, 151, 0.3);">Thử lại</button>
+            </div>
+          `;
+        }
+      }
+    });
+
+    function saveCharacter() {
+      playPopSound();
+      const imgEl = document.getElementById('generated-profile-img');
+      if (imgEl && imgEl.src && !imgEl.src.startsWith('data:image/gif')) {
+        // Save to localStorage
+        localStorage.setItem('storymee_saved_profile_sheet', imgEl.src);
+        
+        // Trigger download
+        const link = document.createElement('a');
+        link.href = imgEl.src;
+        const charName = localStorage.getItem('storymee_char_name') || 'nhan_vat';
+        link.download = `Ho_So_Nhan_Vat_${charName.replace(/\s+/g, '_')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        alert("🎉 Chúc mừng! Hồ sơ nhân vật của em đã được lưu và tải xuống thành công!");
+      }
+    }
   </script>
 </body>
 

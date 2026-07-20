@@ -12,7 +12,7 @@ html {
     font-family: 'Fredoka', 'Mali', sans-serif;
     background-color: #FED7D7;
     /* Fallback peach/pink */
-    background-image: url('/lobby-assets/images/bg-art.png');
+    background-image: url('/assets/images/bg-art.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
