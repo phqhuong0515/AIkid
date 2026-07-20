@@ -1107,8 +1107,44 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
       playPopSound();
       const imgEl = document.getElementById('generated-profile-img');
       if (imgEl && imgEl.src && !imgEl.src.startsWith('data:image/gif')) {
-        // Save to localStorage
+        // Save to cache
         localStorage.setItem('storymee_saved_profile_sheet', imgEl.src);
+
+        // Save to warehouse database
+        try {
+          const name = localStorage.getItem('storymee_char_name') || 'Gia Bảo';
+          const age = localStorage.getItem('storymee_char_age') || '8';
+          const gender = localStorage.getItem('storymee_char_gender') || 'Nam';
+          const species = localStorage.getItem('storymee_char_species') || 'Bé tự tạo';
+          const description = localStorage.getItem('storymee_char_description') || 'Một bạn nhỏ đáng yêu!';
+          const birthday = localStorage.getItem('storymee_char_birthday') || new Date().toLocaleDateString('vi-VN').substring(0, 5);
+          const avatar = localStorage.getItem('storymee_generated_character_img') || imgEl.src;
+
+          const newChar = {
+            id: 'user-' + Date.now(),
+            name: name,
+            age: age,
+            gender: gender,
+            species: species,
+            description: description,
+            avatar: avatar,
+            profileImg: imgEl.src,
+            fullbodyImg: avatar,
+            type: 'user',
+            createdAt: Date.now(),
+            date: birthday
+          };
+
+          let savedChars = [];
+          const savedStr = localStorage.getItem('storymee_saved_characters');
+          if (savedStr) {
+            savedChars = JSON.parse(savedStr);
+          }
+          savedChars.push(newChar);
+          localStorage.setItem('storymee_saved_characters', JSON.stringify(savedChars));
+        } catch (e) {
+          console.error("Failed to save character to warehouse database", e);
+        }
 
         // Trigger download
         const link = document.createElement('a');
@@ -1121,6 +1157,9 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
 
         isSaved = true;
         alert("🎉 Chúc mừng! Hồ sơ nhân vật của em đã được lưu và tải xuống thành công!");
+        
+        // Redirect to warehouse storage
+        playPopAndNavigate('/character/storage.html');
       }
     }
   </script>
