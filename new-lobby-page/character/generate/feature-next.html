@@ -833,9 +833,18 @@
       const name = localStorage.getItem('storymee_char_name') || 'Gia Bảo';
       const age = localStorage.getItem('storymee_char_age') || '8';
       const gender = localStorage.getItem('storymee_char_gender') || 'Nam';
-      const species = localStorage.getItem('storymee_char_species') || 'Thỏ';
-      const description = localStorage.getItem('storymee_char_description') || 'Một chú thỏ nhỏ đáng yêu tinh nghịch thích ăn cà rốt.';
-      const catchphrase = localStorage.getItem('storymee_char_catchphrase') || 'Cà rốt muôn năm!';
+      let species = localStorage.getItem('storymee_char_species') || 'Thỏ';
+      let description = localStorage.getItem('storymee_char_description') || 'Một chú thỏ nhỏ đáng yêu tinh nghịch thích ăn cà rốt.';
+      let catchphrase = localStorage.getItem('storymee_char_catchphrase') || 'Cà rốt muôn năm!';
+
+      // Auto-capitalize first letter of sentences/phrases
+      if (species) species = species.trim().charAt(0).toUpperCase() + species.trim().slice(1);
+      if (description) description = description.trim().charAt(0).toUpperCase() + description.trim().slice(1);
+      if (catchphrase) {
+        let cleanCp = catchphrase.trim().replace(/^['"“‘](.*)['"”’]$/, '$1');
+        catchphrase = cleanCp.charAt(0).toUpperCase() + cleanCp.slice(1);
+      }
+
       const parentImage = localStorage.getItem('storymee_generated_character_img') || '';
       const savedCatInputs = localStorage.getItem('storymee_generate_category_inputs') || '';
       const personalityTraits = generatePersonalityTraits(name, description, savedCatInputs);
@@ -1075,6 +1084,8 @@ Body text must be:
 - dark and readable
 - correctly written in Vietnamese
 - concise to reduce spelling errors
+- Crucially, capitalize the first letter of every sentence and every phrase in the sections MÔ TẢ NHÂN VẬT, CÂU NÓI CỬA MIỆNG, TÍNH CÁCH, and THÔNG TIN CƠ BẢN (e.g. 'Giống loài: Thỏ con', 'Bí ẩn • Thông minh').
+- The first letter of every sentence, list item, or paragraph must be strictly capitalized. Do not start any text with a lowercase letter.
 
 Do not distort letters.
 Do not miss Vietnamese diacritics.
