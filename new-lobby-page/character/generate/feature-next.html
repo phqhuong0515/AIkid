@@ -492,7 +492,7 @@
       <!-- Profile Sheet Container -->
       <div id="profile-sheet-view" style="
         box-sizing: content-box;
-        width: 1090px;
+        width: 1050px;
         height: 680.625px;
         background: #FDFAF4;
         border: 10px solid #FFFFFF;
@@ -544,7 +544,7 @@
               const description = localStorage.getItem('storymee_char_description') || 'Một chú thỏ nhỏ đáng yêu tinh nghịch thích ăn cà rốt.';
               const catchphrase = localStorage.getItem('storymee_char_catchphrase') || 'Cà rốt muôn năm!';
 
-              const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase + "_v13";
+              const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase + "_v14";
               const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
               const cachedMeta = localStorage.getItem('storymee_profile_sheet_meta');
 
@@ -709,7 +709,7 @@
       const saveBtn = document.getElementById('btn-save-character');
 
       // Check if we already have a cached profile sheet matching the current character metadata
-      const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase + "_v13";
+      const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase + "_v14";
       const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
       const cachedMeta = localStorage.getItem('storymee_profile_sheet_meta');
 
