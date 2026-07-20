@@ -1840,13 +1840,26 @@
         const promptTextarea = document.getElementById('character-prompt');
         const promptText = promptTextarea ? promptTextarea.value : 'Bản vẽ thiết kế nhân vật dễ thương.';
 
+        let existingImgSrc = null;
+        if (currentOption === 1) {
+          const previewImg = document.getElementById('uploaded-image-preview');
+          if (previewImg && previewImg.src && !previewImg.src.startsWith('data:image/gif') && previewImg.src !== '') {
+            existingImgSrc = previewImg.src;
+          } else {
+            existingImgSrc = localStorage.getItem('storymee_uploaded_image');
+          }
+        }
+
         try {
           const response = await fetch('/api/generate-image', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ prompt: promptText })
+            body: JSON.stringify({ 
+              prompt: promptText,
+              existingImage: existingImgSrc
+            })
           });
 
           const data = await response.json();
