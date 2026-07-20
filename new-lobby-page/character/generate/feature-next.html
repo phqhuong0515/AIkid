@@ -221,17 +221,6 @@
       position: relative;
     }
   </style>
-  <script>
-    function adjustContainerRatio(img) {
-      if (img && img.naturalWidth && img.naturalHeight) {
-        const ratio = img.naturalWidth / img.naturalHeight;
-        const container = document.getElementById('profile-sheet-view');
-        if (container) {
-          container.style.width = (680.625 * ratio * 0.909) + 'px';
-        }
-      }
-    }
-  </script>
 </head>
 
 <body>
@@ -477,10 +466,10 @@
           <div style="font-family: 'Mali', sans-serif; font-size: 1rem; color: #BCA695;">Quá trình này có thể mất khoảng 15-20 giây</div>
         </div>
 
-        <img id="generated-profile-img" onload="adjustContainerRatio(this)" style="
+        <img id="generated-profile-img" style="
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           display: none;
         " alt="Hồ Sơ Nhân Vật">
         <script>
@@ -503,7 +492,6 @@
                 if (imgEl) {
                   imgEl.src = cachedProfileSheet;
                   imgEl.style.display = 'block';
-                  if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
                 }
                 if (overlayEl) {
                   overlayEl.style.display = 'none';
@@ -658,15 +646,6 @@
       const overlayEl = document.getElementById('generating-overlay');
       const saveBtn = document.getElementById('btn-save-character');
 
-      if (imgEl) {
-        if (imgEl.complete) {
-          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
-        }
-        imgEl.addEventListener('load', () => {
-          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
-        });
-      }
-
       // Check if we already have a cached profile sheet matching the current character metadata
       const currentMeta = name + "_" + age + "_" + gender + "_" + species + "_" + description.substring(0, 50) + "_" + catchphrase;
       const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
@@ -680,7 +659,6 @@
         if (imgEl) {
           imgEl.src = cachedProfileSheet;
           imgEl.style.display = 'block';
-          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
         }
         if (overlayEl) {
           overlayEl.style.display = 'none';
@@ -692,7 +670,7 @@
         return; // Exit and do not generate again
       }
 
-      const promptTemplate = `Create one single horizontal 16:9 (exactly 1210px width by 681px height) character profile sheet for a single stylized 3D chibi character.
+      const promptTemplate = `Create one single horizontal 16:9 character profile sheet for a single stylized 3D chibi character. It must be a full-bleed layout with absolutely no outer white borders, margins, or padding around the design, fitting the image canvas from edge to edge.
 
 First, analyze the character’s visual design and determine the following:
 
@@ -926,10 +904,10 @@ Thân thiện • Dễ thương
 
 TECHNICAL REQUIREMENTS
 
-- Generate one single horizontal 16:9 image (exactly 1210px width by 681px height)
+- Generate one single horizontal 16:9 image
 - Full-frame character profile sheet
 - Clean professional layout
-- Balanced margins on all four sides
+- Full-bleed layout with absolutely no outer margins, no outer padding, and no white borders around the canvas edges. The template outline must touch the outer edges of the image.
 - No cropped character parts
 - No overlapping panels
 - No duplicated characters
@@ -980,7 +958,6 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
         if (imgEl && data.url) {
           imgEl.src = data.url;
           imgEl.style.display = 'block';
-          if (typeof adjustContainerRatio === 'function') adjustContainerRatio(imgEl);
           // Cache the generated sheet and its metadata matching the character config
           try {
             localStorage.setItem('storymee_generated_profile_sheet', data.url);
