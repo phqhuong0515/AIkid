@@ -227,7 +227,7 @@
         const ratio = img.naturalWidth / img.naturalHeight;
         const container = document.getElementById('profile-sheet-view');
         if (container) {
-          container.style.width = (680.625 * ratio) + 'px';
+          container.style.width = (680.625 * ratio * 0.909) + 'px';
         }
       }
     }
@@ -480,7 +480,7 @@
         <img id="generated-profile-img" onload="adjustContainerRatio(this)" style="
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
           display: none;
         " alt="Hồ Sơ Nhân Vật">
         <script>
