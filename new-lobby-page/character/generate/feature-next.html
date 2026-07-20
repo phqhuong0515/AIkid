@@ -702,9 +702,7 @@
     function confirmExit() {
       isSaved = true;
       closeExitModal();
-      if (pendingExitUrl) {
-        playPopAndNavigateInternal(pendingExitUrl);
-      }
+      playPopAndNavigateInternal('/');
     }
 
     window.addEventListener('beforeunload', (e) => {
