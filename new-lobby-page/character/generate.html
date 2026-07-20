@@ -2016,11 +2016,11 @@
       };
 
       let categoryInputs = {
-        shape: ["con vật", "tròn trịa", "trắng hồng", "lông", "không có họa tiết", "đáng yêu"],
-        parts: ["tay ngắn", "chân ngắn", "không có cánh", "đuôi ngắn", "không có sừng", ""],
-        face: ["to tròn", "Miệng cười tươi", "Mũi nút áo", "tai người", "không có", "Tinh nghịch"],
-        hair: ["Tóc xoăn bồng bềnh", "Mái lệch", "Màu hạt dẻ", "Tóc ngắn", "không có", "Không có phụ kiện"],
-        clothes: ["Áo hoodie khủng long", "Quần yếm bò", "Giày thể thao trắng", "Khăn quàng cổ đỏ"]
+        shape: ["", "", "", "", "", ""],
+        parts: ["", "", "", "", "", ""],
+        face: ["", "", "", "", "", ""],
+        hair: ["", "", "", "", "", ""],
+        clothes: ["", "", "", ""]
       };
 
       function loadCategoryInputsFromLocalStorage() {
@@ -2742,11 +2742,11 @@
           }
         }
 
-        // Default panda values if empty
+        // Default values if empty
         const defaults = {
-          'idea-shape': "Gấu trúc con béo tròn đáng yêu",
-          'idea-clothes': "Khăn quàng cổ màu đỏ, mũ đội đầu",
-          'idea-action': "Đang ăn trúc vui vẻ",
+          'idea-shape': "",
+          'idea-clothes': "",
+          'idea-action': "",
           'current-option': 2
         };
 
