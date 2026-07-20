@@ -651,7 +651,10 @@
       const cachedProfileSheet = localStorage.getItem('storymee_generated_profile_sheet');
       const cachedMeta = localStorage.getItem('storymee_profile_sheet_meta');
 
-      if (cachedProfileSheet && cachedMeta === currentMeta) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceReload = urlParams.get('t') === 'force_reload' || urlParams.get('force') === 'true';
+
+      if (!forceReload && cachedProfileSheet && cachedMeta === currentMeta) {
         // Render from cache directly
         if (imgEl) {
           imgEl.src = cachedProfileSheet;
