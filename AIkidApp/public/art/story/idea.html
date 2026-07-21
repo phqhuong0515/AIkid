@@ -370,8 +370,9 @@
       max-width: 800px;
       margin: 0 auto 21px auto;
       display: flex;
-      flex-direction: column;
-      gap: 6px;
+      flex-direction: row;
+      align-items: center;
+      gap: 15px;
     }
 
     .progress-info-row {
@@ -1423,9 +1424,9 @@
         <!-- Question Header -->
         <div class="plot-header-area">
           <div class="progress-bar-container">
-
-            <div class="progress-track">
-              <div class="progress-fill" id="progress-fill-bar" style="width: 45%;">
+            <span id="progress-step-label" style="font-family: 'Chiron GoRound TC', sans-serif; font-weight: 900; color: #F97316; font-size: 1.15rem; width: 45px; text-align: right;">0/9</span>
+            <div class="progress-track" style="flex: 1;">
+              <div class="progress-fill" id="progress-fill-bar" style="width: 0%;">
                 <div class="progress-star-handle">
                   <i class="fa-solid fa-star"></i>
                 </div>
@@ -2065,14 +2066,17 @@
     }
 
     let currentStepIndex = 1;
-    let unlockedStepIndex = 1;
+    let completedSteps = new Set();
+
+    function updateProgressUI() {
+      const pct = Math.round((completedSteps.size / 9) * 100);
+      const fill = document.getElementById('progress-fill-bar');
+      const label = document.getElementById('progress-step-label');
+      if (fill) fill.style.width = `${pct}%`;
+      if (label) label.innerText = `${completedSteps.size}/9`;
+    }
 
     function selectStep(stepNumber) {
-      if (stepNumber > unlockedStepIndex) {
-        showComingSoon('Vui lòng hoàn thành mục trước đó!');
-        return;
-      }
-      
       playPopSound();
       currentStepIndex = stepNumber;
       const items = document.querySelectorAll('.step-item');
@@ -2083,11 +2087,8 @@
           item.classList.remove('active');
         }
       });
-      const pct = Math.round((stepNumber / 9) * 100);
-      const fill = document.getElementById('progress-fill-bar');
-      const label = document.getElementById('progress-step-label');
-      if (fill) fill.style.width = `${pct}%`;
-      if (label) label.innerText = `Bước ${stepNumber} / 9`;
+      
+      updateProgressUI();
 
       // Update title and subtitle
       const titleEl = document.querySelector('.plot-question-title');
@@ -2139,16 +2140,19 @@
 
     function confirmIdeaNext() {
       playPopSound();
+      let isValid = false;
       if (currentStepIndex === 1) {
         if (!document.getElementById('main-char-slot').classList.contains('filled')) {
           showComingSoon('Vui lòng chọn nhân vật chính!');
           return;
         }
+        isValid = true;
       } else if (currentStepIndex === 2) {
         if (!selectedTime || !selectedSpace) {
           showComingSoon('Vui lòng chọn cả thời gian và không gian!');
           return;
         }
+        isValid = true;
       } else {
         const customInput = document.getElementById('custom-idea-text');
         const customVal = customInput ? customInput.value.trim() : '';
@@ -2156,15 +2160,22 @@
           showComingSoon('Vui lòng chọn hoặc tự viết một ý tưởng!');
           return;
         }
+        isValid = true;
       }
 
-      if (currentStepIndex < 9) {
-        if (currentStepIndex === unlockedStepIndex) {
-          unlockedStepIndex++;
+      if (isValid) {
+        completedSteps.add(currentStepIndex);
+        updateProgressUI();
+        
+        if (currentStepIndex < 9) {
+          selectStep(currentStepIndex + 1);
+        } else {
+          if (completedSteps.size < 9) {
+            showComingSoon('Vui lòng hoàn thành tất cả các mục!');
+          } else {
+            playPopAndNavigate('/character/generate/feature.html');
+          }
         }
-        selectStep(currentStepIndex + 1);
-      } else {
-        playPopAndNavigate('/character/generate/feature.html');
       }
     }
 
