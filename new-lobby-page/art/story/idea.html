@@ -415,6 +415,7 @@
       background: linear-gradient(90deg, #FDBA74, #F97316);
       border-radius: 9999px;
       position: relative;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .progress-star-handle {
@@ -2063,8 +2064,17 @@
       if (addBtn && subCharCount < 3) addBtn.style.display = 'inline-flex';
     }
 
+    let currentStepIndex = 1;
+    let unlockedStepIndex = 1;
+
     function selectStep(stepNumber) {
+      if (stepNumber > unlockedStepIndex) {
+        showComingSoon('Vui lòng hoàn thành mục trước đó!');
+        return;
+      }
+      
       playPopSound();
+      currentStepIndex = stepNumber;
       const items = document.querySelectorAll('.step-item');
       items.forEach((item, index) => {
         if (index + 1 === stepNumber) {
@@ -2128,14 +2138,34 @@
     }
 
     function confirmIdeaNext() {
-      const customVal = document.getElementById('custom-idea-text').value.trim();
-      const finalIdea = customVal || selectedIdeaText;
-
-      if (!finalIdea) {
-        showComingSoon('Vui lòng chọn hoặc tự viết một ý tưởng!');
-        return;
+      playPopSound();
+      if (currentStepIndex === 1) {
+        if (!document.getElementById('main-char-slot').classList.contains('filled')) {
+          showComingSoon('Vui lòng chọn nhân vật chính!');
+          return;
+        }
+      } else if (currentStepIndex === 2) {
+        if (!selectedTime || !selectedSpace) {
+          showComingSoon('Vui lòng chọn cả thời gian và không gian!');
+          return;
+        }
+      } else {
+        const customInput = document.getElementById('custom-idea-text');
+        const customVal = customInput ? customInput.value.trim() : '';
+        if (!customVal && !selectedIdeaText) {
+          showComingSoon('Vui lòng chọn hoặc tự viết một ý tưởng!');
+          return;
+        }
       }
-      playPopAndNavigate('/character/generate/feature.html');
+
+      if (currentStepIndex < 9) {
+        if (currentStepIndex === unlockedStepIndex) {
+          unlockedStepIndex++;
+        }
+        selectStep(currentStepIndex + 1);
+      } else {
+        playPopAndNavigate('/character/generate/feature.html');
+      }
     }
 
     function adjustScale() {
