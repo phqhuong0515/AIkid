@@ -2512,8 +2512,10 @@ function exportAsJPEG() {
         setTimeout(() => {
           if (window.isExpoEmbed && window.isExpoEmbed()) {
             if (window.parent) {
-              window.parent.location.href = '/lobby';
+              window.parent.location.href = '/mee/next';
             }
+          } else {
+            window.location.href = 'next.html';
           }
         }, 1500);
         
