@@ -726,10 +726,10 @@
       }, 350);
     }
 
-    function showComingSoon(featureName) {
+    function showToast(message) {
       playPopSound();
       const toast = document.getElementById('toast');
-      toast.innerText = `${featureName} - Tính năng đang được phát triển!`;
+      toast.innerText = message;
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
@@ -751,7 +751,7 @@
 
     function confirmGenreSelection() {
       if (!selectedGenre) {
-        showComingSoon('Cảnh báo: Vui lòng chọn thể loại');
+        showToast('Vui lòng chọn thể loại truyện!');
         return;
       }
       playPopAndNavigate('/art/story/idea');
