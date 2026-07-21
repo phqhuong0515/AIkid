@@ -1225,7 +1225,10 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
       });
     }
 
+    let isSaving = false;
     async function saveCharacter() {
+      if (isSaving || isSaved) return;
+      isSaving = true;
       playPopSound();
       const imgEl = document.getElementById('generated-profile-img');
       if (imgEl && imgEl.src && !imgEl.src.startsWith('data:image/gif')) {
@@ -1286,10 +1289,12 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
             saveBtn.innerHTML = originalHtml;
             saveBtn.style.pointerEvents = 'auto';
           }
+          isSaving = false;
           return;
         }
 
         isSaved = true;
+        isSaving = false;
         alert("🎉 Chúc mừng! Hồ sơ nhân vật của em đã được lưu thành công vào Kho nhé!");
         
         // Redirect to warehouse storage
