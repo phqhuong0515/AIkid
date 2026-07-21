@@ -492,6 +492,10 @@
       box-shadow: 0 6px 16px rgba(255, 117, 151, 0.25) !important;
     }
 
+    .opening-action-card, .opening-emotion-card {
+      border-style: solid !important;
+    }
+
     .idea-card-icon-box {
       width: 50px;
       height: 50px;
@@ -717,8 +721,9 @@
       display: flex;
     }
 
-    /* ========== CONTEXT STEP PANEL ========== */
-    .context-step-panel {
+    /* ========== CONTEXT & OPENING STEP PANEL ========== */
+    .context-step-panel,
+    .opening-step-panel {
       display: none;
       flex-direction: column;
       gap: 24px;
@@ -734,19 +739,40 @@
       margin-right: -16px;
     }
 
-    .context-step-panel.active {
+    .context-step-panel.active,
+    .opening-step-panel.active {
       display: flex;
     }
 
-    /* Hide scrollbars for step panels */
+    /* Custom scrollbars for step panels to indicate scrolling */
     .char-step-panel::-webkit-scrollbar,
-    .context-step-panel::-webkit-scrollbar {
-      display: none;
+    .context-step-panel::-webkit-scrollbar,
+    .opening-step-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+    .char-step-panel::-webkit-scrollbar-track,
+    .context-step-panel::-webkit-scrollbar-track,
+    .opening-step-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 10px;
+    }
+    .char-step-panel::-webkit-scrollbar-thumb,
+    .context-step-panel::-webkit-scrollbar-thumb,
+    .opening-step-panel::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 117, 151, 0.5);
+      border-radius: 10px;
+      border: 2px solid #FFFFFF;
+    }
+    .char-step-panel::-webkit-scrollbar-thumb:hover,
+    .context-step-panel::-webkit-scrollbar-thumb:hover,
+    .opening-step-panel::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 117, 151, 0.8);
     }
     .char-step-panel,
-    .context-step-panel {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+    .context-step-panel,
+    .opening-step-panel {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 117, 151, 0.5) rgba(0, 0, 0, 0.02);
     }
     
     .context-section-label {
@@ -762,7 +788,7 @@
 
     .context-section-label i {
       font-size: 1rem;
-      color: #0EA5E9;
+      color: #FF7597;
     }
 
     .time-cards-grid, .space-cards-grid {
@@ -1384,7 +1410,7 @@
 
         <div class="step-item" onclick="selectStep(3)">
           <i class="fa-solid fa-book-open step-icon" style="color: #F59E0B;"></i>
-          <span>Mở đầu</span>
+          <span>Khởi đầu</span>
         </div>
 
         <div class="step-item active" onclick="selectStep(4)">
@@ -1399,12 +1425,12 @@
 
         <div class="step-item" onclick="selectStep(6)">
           <i class="fa-solid fa-lightbulb step-icon" style="color: #F59E0B;"></i>
-          <span>Cách giải quyết</span>
+          <span>Nhân vật thử làm gì?</span>
         </div>
 
         <div class="step-item" onclick="selectStep(7)">
           <i class="fa-solid fa-cloud step-icon" style="color: #38BDF8;"></i>
-          <span>Nhân vật nhận ra điều gì</span>
+          <span>Nhân vật nhận ra điều gì?</span>
         </div>
 
         <div class="step-item" onclick="selectStep(8)">
@@ -1442,7 +1468,10 @@
 
           <!-- Main Character -->
           <div>
-            <p class="char-section-label"><i class="fa-solid fa-star"></i> Nhân vật chính</p>
+            <p class="char-section-label">
+              <i class="fa-solid fa-star"></i> 
+              Nhân vật chính 
+            </p>
             <!-- Selected slot -->
             <div class="char-slot-box" id="main-char-slot">
               <div class="char-slot-avatar" id="main-char-avatar">
@@ -1457,12 +1486,12 @@
             <!-- Character Questions Box -->
             <div class="char-questions-box" id="main-char-questions">
               <div class="char-question-item">
-                <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện?</label>
-                <input type="text" class="char-question-input" placeholder="Ví dụ: Anh hùng, người dẫn đường...">
+                <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện? <span style="color: #E11D48;">*</span></label>
+                <input type="text" id="main-char-role-input" class="char-question-input" placeholder="Ví dụ: Anh hùng, người dẫn đường..." oninput="checkStep1Completion()">
               </div>
               <div class="char-question-item">
-                <label class="char-question-label">Mục đích của nhân vật trong câu chuyện này là gì?</label>
-                <input type="text" class="char-question-input" placeholder="Ví dụ: Tìm kho báu, giải cứu bạn bè...">
+                <label class="char-question-label">Mục đích của nhân vật trong câu chuyện này là gì? <span style="color: #E11D48;">*</span></label>
+                <input type="text" id="main-char-purpose-input" class="char-question-input" placeholder="Ví dụ: Tìm kho báu, giải cứu bạn bè..." oninput="checkStep1Completion()">
               </div>
             </div>
 
@@ -1526,7 +1555,7 @@
 
           <!-- Space Section -->
           <div>
-            <p class="context-section-label">Không gian</p>
+            <p class="context-section-label"><i class="fa-solid fa-location-dot"></i> Không gian</p>
             <div class="space-cards-grid">
               <div class="context-card space-card" onclick="selectSpaceCard(this, 'Khu rừng thần tiên')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF; margin-bottom: 8px;">
@@ -1590,6 +1619,113 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- ===== STEP 3: OPENING PANEL ===== -->
+        <div class="opening-step-panel" id="opening-step-panel">
+          <!-- Section 1: Hành động -->
+          <div style="margin-bottom: 24px;">
+            <p class="context-section-label"><i class="fa-solid fa-person-running"></i> Nhân vật đang làm gì?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nhân vật tìm thấy một vật lạ')" style="background: #EEF9F6; border-color: #A7F3D0;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #3B82F6); color: #FFFFFF;">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div class="idea-card-text">Nhân vật tìm thấy một vật lạ</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Một cánh cửa bí mật xuất hiện')" style="background: #F5F3FF; border-color: #DDD6FE;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;">
+                  <i class="fa-solid fa-door-closed"></i>
+                </div>
+                <div class="idea-card-text">Một cánh cửa bí mật xuất hiện</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Có tiếng động kỳ lạ')" style="background: #FFF7ED; border-color: #FFEDD5;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
+                  <i class="fa-solid fa-volume-high"></i>
+                </div>
+                <div class="idea-card-text">Có tiếng động kỳ lạ</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Một món đồ quan trọng biến mất')" style="background: #FEFCE8; border-color: #FEF08A;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
+                  <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div class="idea-card-text">Một món đồ quan trọng biến mất</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Một người bạn bị mắc kẹt')" style="background: #EFF6FF; border-color: #BFDBFE;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #3B82F6); color: #FFFFFF;">
+                  <i class="fa-solid fa-paw"></i>
+                </div>
+                <div class="idea-card-text">Một người bạn bị mắc kẹt</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Một món đồ bỗng biết nói')" style="background: #FDF2F8; border-color: #FBCFE8;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                  <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <div class="idea-card-text">Một món đồ bỗng biết nói</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nhân vật bị đưa đến nơi khác')" style="background: #EEF2FF; border-color: #C7D2FE;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #818CF8, #4F46E5); color: #FFFFFF;">
+                  <i class="fa-solid fa-dharmachakra"></i>
+                </div>
+                <div class="idea-card-text">Nhân vật bị đưa đến nơi khác</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Tự viết ý tưởng của em')" style="background: #F0FDF4; border-color: #BBF7D0;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF;">
+                  <i class="fa-solid fa-pen-nib"></i>
+                </div>
+                <div class="idea-card-text">Tự viết ý tưởng của em</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="char-section-divider">
+
+          <!-- Section 2: Cảm xúc -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-face-smile-beam"></i> Cảm xúc của nhân vật</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Vui vẻ')" style="background: #FEFCE8; border-color: #FEF08A;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-face-laugh-beam"></i></div>
+                <div class="idea-card-text">Vui vẻ</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Háo hức')" style="background: #FFF7ED; border-color: #FFEDD5;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-face-grin-stars"></i></div>
+                <div class="idea-card-text">Háo hức</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Sợ hãi')" style="background: #F5F3FF; border-color: #DDD6FE;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-face-grimace"></i></div>
+                <div class="idea-card-text">Sợ hãi</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tức giận')" style="background: #FEF2F2; border-color: #FECACA;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-face-angry"></i></div>
+                <div class="idea-card-text">Tức giận</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Buồn bã')" style="background: #EFF6FF; border-color: #BFDBFE;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #3B82F6); color: #FFFFFF;"><i class="fa-solid fa-face-sad-tear"></i></div>
+                <div class="idea-card-text">Buồn bã</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tò mò')" style="background: #ECFEFF; border-color: #A5F3FC;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-face-flushed"></i></div>
+                <div class="idea-card-text">Tò mò</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Ngạc nhiên')" style="background: #FDF2F8; border-color: #FBCFE8;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-face-surprise"></i></div>
+                <div class="idea-card-text">Ngạc nhiên</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Lo lắng')" style="background: #F0FDF4; border-color: #BBF7D0;">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF;"><i class="fa-solid fa-face-frown-open"></i></div>
+                <div class="idea-card-text">Lo lắng</div>
+              </div>
+            </div>
+            <div class="custom-idea-box" style="margin-top: 16px;">
+              <div class="custom-idea-icon" style="background: linear-gradient(135deg, #F472B6, #DB2777);"><i class="fa-solid fa-heart"></i></div>
+              <div class="custom-idea-input-wrapper">
+                <div class="custom-idea-label">Cảm xúc khác</div>
+                <input type="text" id="custom-opening-emotion" class="custom-idea-input" placeholder="Viết cảm xúc của em vào đây..." maxlength="50" oninput="document.getElementById('emotion-char-counter').innerText = this.value.length + ' / 50'; selectedOpeningEmotion = ''; document.querySelectorAll('.opening-emotion-card').forEach(c => c.classList.remove('selected'));">
+              </div>
+              <div class="custom-idea-counter" id="emotion-char-counter">0 / 50</div>
+            </div>
+          </div>
         </div>
 
         <!-- 8 Option Cards Grid -->
@@ -1678,7 +1814,7 @@
         </div>
 
         <!-- Custom Idea Input Box -->
-        <div class="custom-idea-box">
+        <div class="custom-idea-box" id="generic-custom-idea-box">
           <div class="custom-idea-icon">
             <i class="fa-solid fa-clipboard-list"></i>
           </div>
@@ -2001,6 +2137,60 @@
       }
 
       closeCharAlbumModal();
+      checkStep1Completion();
+    }
+
+    function checkStep1Completion() {
+      const mainSlot = document.getElementById('main-char-slot');
+      const isMainFilled = mainSlot && mainSlot.classList.contains('filled');
+      
+      const roleInput = document.getElementById('main-char-role-input');
+      const purposeInput = document.getElementById('main-char-purpose-input');
+      const roleVal = roleInput ? roleInput.value.trim() : '';
+      const purposeVal = purposeInput ? purposeInput.value.trim() : '';
+
+      if (isMainFilled && roleVal && purposeVal) {
+        completedSteps.add(1);
+      } else {
+        completedSteps.delete(1);
+      }
+      updateProgressUI();
+    }
+
+    function saveCharacterStepData() {
+      const mainName = document.getElementById('main-char-name')?.innerText || '';
+      const mainAvaImg = document.getElementById('main-selected-ava-img')?.src || '';
+      const mainRole = document.getElementById('main-char-role-input')?.value.trim() || '';
+      const mainPurpose = document.getElementById('main-char-purpose-input')?.value.trim() || '';
+
+      const subChars = [];
+      for (let i = 1; i <= nextSubCharId; i++) {
+        const block = document.getElementById(`sub-char-block-${i}`);
+        if (block) {
+          const subName = document.getElementById(`sub-char-name-${i}`)?.innerText || '';
+          const subAvaImg = document.getElementById(`sub-selected-ava-img-${i}`)?.src || '';
+          const inputs = block.querySelectorAll('.char-question-input');
+          const subRole = inputs[0] ? inputs[0].value.trim() : '';
+          const subPurpose = inputs[1] ? inputs[1].value.trim() : '';
+          subChars.push({ name: subName, avatar: subAvaImg, role: subRole, purpose: subPurpose });
+        }
+      }
+
+      const characterData = {
+        mainCharacter: {
+          name: mainName,
+          avatar: mainAvaImg,
+          role: mainRole,
+          purpose: mainPurpose
+        },
+        supportingCharacters: subChars
+      };
+
+      try {
+        localStorage.setItem('storymee_current_story_characters', JSON.stringify(characterData));
+      } catch (e) {
+        console.warn('Cannot save character data to localStorage', e);
+      }
     }
 
     function addMoreSubChar() {
@@ -2012,7 +2202,9 @@
       const labelText = nextSubCharId === 1 ? 'Nhân vật phụ' : `Nhân vật phụ ${nextSubCharId}`;
       const html = `
         <div id="sub-char-block-${idx}" style="margin-top: 16px;">
-          <p class="char-section-label"><i class="fa-solid fa-users"></i> ${labelText}</p>
+          <p class="char-section-label">
+            <i class="fa-solid fa-users"></i> ${labelText} 
+          </p>
           <div class="char-slot-box" id="sub-char-slot-${idx}" style="margin-bottom: 10px;">
             <button class="sub-char-remove-btn" onclick="removeSubCharBlock(${idx})" title="Xóa nhân vật phụ này">
               <i class="fa-solid fa-xmark"></i>
@@ -2028,11 +2220,11 @@
           <div class="char-questions-box" id="sub-char-questions-${idx}">
             <div class="char-question-item">
               <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện?</label>
-              <input type="text" class="char-question-input" placeholder="Ví dụ: Anh hùng, người dẫn đường...">
+              <input type="text" class="char-question-input" placeholder="Ví dụ: Người đồng hành, trợ thủ...">
             </div>
             <div class="char-question-item">
               <label class="char-question-label">Mục đích của nhân vật trong câu chuyện này là gì?</label>
-              <input type="text" class="char-question-input" placeholder="Ví dụ: Tìm kho báu, giải cứu bạn bè...">
+              <input type="text" class="char-question-input" placeholder="Ví dụ: Giúp đỡ bạn bè, bảo vệ rừng...">
             </div>
           </div>
           <div class="char-action-row">
@@ -2097,8 +2289,9 @@
       // Toggle between character panel, context panel, and idea cards
       const charPanel = document.getElementById('char-step-panel');
       const contextPanel = document.getElementById('context-step-panel');
+      const openingPanel = document.getElementById('opening-step-panel');
       const ideaGrid = document.getElementById('idea-cards-grid');
-      const customBox = document.querySelector('.custom-idea-box');
+      const customBox = document.getElementById('generic-custom-idea-box');
       
       if (stepNumber === 1) {
         if (titleEl) titleEl.innerText = 'Câu chuyện có nhân vật nào?';
@@ -2106,6 +2299,7 @@
         
         charPanel.classList.add('active');
         if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 2) {
@@ -2114,20 +2308,35 @@
         
         charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.add('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 3) {
+        const stepName = document.querySelectorAll('.step-item span')[stepNumber - 1].innerText;
+        if (titleEl) titleEl.innerText = stepName;
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật đang làm gì và cảm thấy như thế nào?';
+        
+        charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.add('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else {
-        if (stepNumber === 4) {
-          if (titleEl) titleEl.innerText = 'Điều bất ngờ nào xảy ra?';
-          if (subtitleEl) subtitleEl.innerText = 'Chọn một sự việc làm cho câu chuyện bắt đầu thú vị hơn.';
-        } else {
-          const stepName = document.querySelectorAll('.step-item span')[stepNumber - 1].innerText;
-          if (titleEl) titleEl.innerText = stepName;
-          if (subtitleEl) subtitleEl.innerText = 'Hãy chọn một ý tưởng bên dưới hoặc tự viết ý tưởng của bạn.';
+        const stepName = document.querySelectorAll('.step-item span')[stepNumber - 1].innerText;
+        if (titleEl) titleEl.innerText = stepName;
+        
+        if (subtitleEl) {
+          if (stepNumber === 4) subtitleEl.innerText = 'Sự việc nào làm thay đổi nhân vật và khiến nhân vật có mục tiêu?';
+          else if (stepNumber === 5) subtitleEl.innerText = 'Điều gì khiến nhân vật chưa thể đạt mục tiêu?';
+          else if (stepNumber === 6) subtitleEl.innerText = 'Nhân vật lựa chọn cách nào để vượt qua trở ngại?';
+          else if (stepNumber === 7) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
+          else if (stepNumber === 8) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
+          else if (stepNumber === 9) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
         }
         
         charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'grid';
         if (customBox) customBox.style.display = 'flex';
       }
@@ -2135,21 +2344,92 @@
 
     function saveDraft() {
       playPopSound();
-      showComingSoon('Đã lưu nháp ý tưởng cốt truyện!');
+      
+      // Save Character Step
+      saveCharacterStepData();
+      
+      // Save Context Step
+      const contextData = {
+        time: selectedTime,
+        space: selectedSpace
+      };
+      
+      // Save Opening Step (Step 3)
+      const actionInput = document.getElementById('custom-opening-action');
+      const actionVal = actionInput ? actionInput.value.trim() : '';
+      const emotionInput = document.getElementById('custom-opening-emotion');
+      const emotionVal = emotionInput ? emotionInput.value.trim() : '';
+      const openingData = {
+        action: actionVal || selectedOpeningAction,
+        emotion: emotionVal || selectedOpeningEmotion
+      };
+      
+      // Save current Idea Step (Steps 4-9)
+      const customInput = document.getElementById('custom-idea-text');
+      const customVal = customInput ? customInput.value.trim() : '';
+      const currentIdeaData = {
+        step: currentStepIndex,
+        selectedIdea: selectedIdeaText,
+        customIdea: customVal
+      };
+
+      const draftData = {
+        context: contextData,
+        opening: openingData,
+        currentIdea: currentIdeaData,
+        lastActiveStep: currentStepIndex,
+        savedAt: Date.now()
+      };
+
+      try {
+        localStorage.setItem('storymee_draft_idea', JSON.stringify(draftData));
+        showComingSoon('Đã lưu nháp thành công!');
+      } catch (e) {
+        console.warn('Cannot save draft data', e);
+        showComingSoon('Đã lưu nháp ý tưởng cốt truyện!');
+      }
     }
 
     function confirmIdeaNext() {
       playPopSound();
       let isValid = false;
       if (currentStepIndex === 1) {
-        if (!document.getElementById('main-char-slot').classList.contains('filled')) {
+        const mainSlot = document.getElementById('main-char-slot');
+        if (!mainSlot || !mainSlot.classList.contains('filled')) {
           showComingSoon('Vui lòng chọn nhân vật chính!');
           return;
         }
+
+        const roleInput = document.getElementById('main-char-role-input');
+        const purposeInput = document.getElementById('main-char-purpose-input');
+        const roleVal = roleInput ? roleInput.value.trim() : '';
+        const purposeVal = purposeInput ? purposeInput.value.trim() : '';
+
+        if (!roleVal || !purposeVal) {
+          showComingSoon('Vui lòng điền vai trò và mục đích của nhân vật chính!');
+          return;
+        }
+
+        saveCharacterStepData();
         isValid = true;
       } else if (currentStepIndex === 2) {
         if (!selectedTime || !selectedSpace) {
           showComingSoon('Vui lòng chọn cả thời gian và không gian!');
+          return;
+        }
+        isValid = true;
+      } else if (currentStepIndex === 3) {
+        const actionInput = document.getElementById('custom-opening-action');
+        const actionVal = actionInput ? actionInput.value.trim() : '';
+        const emotionInput = document.getElementById('custom-opening-emotion');
+        const emotionVal = emotionInput ? emotionInput.value.trim() : '';
+        
+        if (!actionVal && !selectedOpeningAction) {
+          showComingSoon('Vui lòng chọn hoặc viết hành động của nhân vật!');
+          return;
+        }
+        if (!emotionVal && !selectedOpeningEmotion) {
+          showComingSoon('Vui lòng chọn hoặc viết cảm xúc của nhân vật!');
           return;
         }
         isValid = true;

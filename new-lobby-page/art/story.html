@@ -282,6 +282,130 @@
     .toast-message.show {
         bottom: 40px;
     }
+
+    /* Create Type Modal */
+    .create-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s ease;
+    }
+    .create-modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .create-modal-card {
+      background: #FFFFFF;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 36px;
+      padding: 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+      transform: translateY(30px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+    .create-modal-overlay.show .create-modal-card {
+      transform: translateY(0) scale(1);
+    }
+    .create-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .create-modal-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .create-modal-close-btn {
+      background: #F1F5F9;
+      border: none;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      color: #64748B;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .create-modal-close-btn:hover {
+      background: #E2E8F0;
+      color: #0F172A;
+      transform: rotate(90deg);
+    }
+    .create-options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .create-option-card {
+      background: #FDFAF4;
+      border: 3px dashed #E2D9CF;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .create-option-card:hover:not(.locked) {
+      background: #FFF5F7;
+      border-color: #FF9EB5;
+      transform: translateX(6px);
+      box-shadow: 0 8px 20px rgba(255, 158, 181, 0.2);
+    }
+    .create-option-card.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+      filter: grayscale(100%);
+    }
+    .create-option-icon {
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .create-option-info {
+      flex: 1;
+    }
+    .create-option-name {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      color: #334155;
+      margin: 0 0 4px 0;
+    }
+    .create-option-desc {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.95rem;
+      color: #64748B;
+      margin: 0;
+      line-height: 1.4;
+    }
+    .lock-icon-badge {
+      font-size: 1.4rem;
+      color: #94A3B8;
+    }
   </style>
 </head>
 
@@ -360,7 +484,7 @@
     <div class="lobby-cards-container">
       
       <!-- Left Card: Tạo Truyện Mới -->
-      <div class="lobby-card-item" onclick="playPopAndNavigate('/art/story/genre')">
+      <div class="lobby-card-item" onclick="openCreateTypeModal()">
         <div class="lobby-card-content">
           <i class="fa-solid fa-circle-plus lobby-card-icon"></i>
           <div class="lobby-card-title">Tạo Truyện Mới</div>
@@ -380,6 +504,57 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast-message"></div>
+
+  <!-- Create Type Modal -->
+  <div id="create-type-modal" class="create-modal-overlay">
+    <div class="create-modal-card">
+      <div class="create-modal-header">
+        <div class="create-modal-title">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: #FF5E97;"></i>
+          <span>Bạn muốn tạo gì?</span>
+        </div>
+        <button class="create-modal-close-btn" onclick="closeCreateTypeModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="create-options-container">
+        <!-- Plot Option -->
+        <div class="create-option-card" onclick="playPopAndNavigate('/art/story/genre')">
+          <div class="create-option-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div class="create-option-info">
+            <h4 class="create-option-name">Cốt truyện</h4>
+            <p class="create-option-desc">Tạo bộ khung ý tưởng và nhân vật cho câu chuyện mới.</p>
+          </div>
+        </div>
+        
+        <!-- Text Story Option -->
+        <div class="create-option-card" id="option-text-story" onclick="handleOptionClick('text')">
+          <div class="create-option-icon" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+          <div class="create-option-info">
+            <h4 class="create-option-name">Truyện chữ</h4>
+            <p class="create-option-desc">Viết chi tiết câu chuyện từ cốt truyện đã có.</p>
+          </div>
+          <i class="fa-solid fa-lock lock-icon-badge" id="lock-icon-text"></i>
+        </div>
+        
+        <!-- Comic Option -->
+        <div class="create-option-card" id="option-comic" onclick="handleOptionClick('comic')">
+          <div class="create-option-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+            <i class="fa-solid fa-images"></i>
+          </div>
+          <div class="create-option-info">
+            <h4 class="create-option-name">Truyện tranh</h4>
+            <p class="create-option-desc">Tạo truyện tranh với hình ảnh sinh động từ cốt truyện.</p>
+          </div>
+          <i class="fa-solid fa-lock lock-icon-badge" id="lock-icon-comic"></i>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Bubble pop sound using Web Audio API
@@ -418,11 +593,72 @@
     function showComingSoon(featureName) {
       playPopSound();
       const toast = document.getElementById('toast');
-      toast.innerText = `${featureName} - Tính năng đang được phát triển!`;
+      toast.innerText = `${featureName}`;
+      if (!toast.innerText.includes('Tính năng')) {
+         toast.innerText = `${featureName} - Tính năng đang được phát triển!`;
+      }
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
       }, 2500);
+    }
+
+    function openCreateTypeModal() {
+      playPopSound();
+      const modal = document.getElementById('create-type-modal');
+      const optionText = document.getElementById('option-text-story');
+      const optionComic = document.getElementById('option-comic');
+      const lockText = document.getElementById('lock-icon-text');
+      const lockComic = document.getElementById('lock-icon-comic');
+
+      // Check if user has at least 1 saved plot
+      let hasPlots = false;
+      try {
+        const savedPlots = localStorage.getItem('storymee_saved_plots');
+        if (savedPlots) {
+          const parsed = JSON.parse(savedPlots);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            hasPlots = true;
+          }
+        }
+      } catch(e) {}
+
+      if (hasPlots) {
+        optionText.classList.remove('locked');
+        optionComic.classList.remove('locked');
+        lockText.style.display = 'none';
+        lockComic.style.display = 'none';
+      } else {
+        optionText.classList.add('locked');
+        optionComic.classList.add('locked');
+        lockText.style.display = 'block';
+        lockComic.style.display = 'block';
+      }
+
+      modal.classList.add('show');
+    }
+
+    function closeCreateTypeModal() {
+      playPopSound();
+      document.getElementById('create-type-modal').classList.remove('show');
+    }
+
+    function handleOptionClick(type) {
+      const option = document.getElementById(`option-${type === 'text' ? 'text-story' : 'comic'}`);
+      if (option.classList.contains('locked')) {
+        playPopSound();
+        const toast = document.getElementById('toast');
+        toast.innerText = 'Bạn cần có ít nhất 1 cốt truyện trong kho để mở tính năng này!';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+        return;
+      }
+      // If unlocked
+      playPopSound();
+      const toast = document.getElementById('toast');
+      toast.innerText = `Tính năng tạo ${type === 'text' ? 'Truyện chữ' : 'Truyện tranh'} - Đang được phát triển!`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
     let characters = [];
