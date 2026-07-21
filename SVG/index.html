@@ -210,6 +210,15 @@
     <script>
       // Apply correct transform scale immediately before rendering any DOM nodes to prevent jumps
       (function() {
+        // Detect embed (Expo iframe) FIRST — skip scale, use responsive CSS instead
+        var isEmbed = false;
+        try { isEmbed = window.parent && window.parent !== window; } catch(e) {}
+        try { if (!isEmbed) isEmbed = new URLSearchParams(window.location.search).get('embed') === '1'; } catch(e) {}
+        if (isEmbed) {
+          // Add mee-embed class immediately so CSS !important takes effect before paint
+          document.documentElement.classList.add('mee-embed');
+          return; // Skip JS scale — CSS handles responsive layout
+        }
         const targetWidth = 1927.63;
         const targetHeight = 930;
         const winWidth = window.innerWidth;
@@ -255,9 +264,11 @@
         <button id="btn-done" class="btn btn-done" style="display: inline-flex; align-items: center;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
           </svg>
-          <span>Tải về</span>
+          <span id="btn-done-text">Lưu nhân vật</span>
         </button>
       </div>
     </header>
@@ -565,6 +576,15 @@
       const wrapper = document.querySelector('.scaler-wrapper');
       if (!wrapper) return;
       
+      // In embed (Expo iframe), CSS handles responsive layout — skip JS scale
+      const embed = document.documentElement.classList.contains('mee-embed')
+        || document.body.classList.contains('mee-embed');
+      if (embed) {
+        wrapper.style.transform = '';  // clear any previously set transform
+        wrapper.style.position = '';
+        return;
+      }
+
       const targetWidth = 1927.63;
       const targetHeight = 930;
       const winWidth = window.innerWidth;
@@ -607,24 +627,25 @@
 
     function playPopAndNavigate(url) {
       playPopSound();
+      const nav = resolveNavUrl(url);
+      // Parent SPA: never leave HTML loader stuck
+      if (nav.target === 'parent') {
+        try {
+          window.parent.location.href = nav.href;
+          return;
+        } catch (e) {
+          console.warn('parent navigate failed', e);
+        }
+      }
       const loader = document.getElementById('page-loader-overlay');
       if (loader) {
         loader.style.display = 'flex';
-        loader.offsetHeight; // Force reflow
+        loader.offsetHeight;
         loader.style.opacity = '1';
       }
       setTimeout(function () {
-        const nav = resolveNavUrl(url);
-        if (nav.target === 'parent') {
-          try {
-            window.parent.location.href = nav.href;
-            return;
-          } catch (e) {
-            console.warn('parent navigate failed', e);
-          }
-        }
         window.location.href = nav.href;
-      }, 350);
+      }, 280);
     }
 
     // Embed mode: hide universe top bar when inside AIkidApp (auth already done)

@@ -2424,8 +2424,17 @@ function exportAsSVG() {
   URL.revokeObjectURL(url);
 }
 
-// Export Character as JPEG file download
+// Export Character as JPEG file download or upload to Gallery
 function exportAsJPEG() {
+  const btn = document.getElementById('btn-done');
+  const btnText = document.getElementById('btn-done-text');
+  
+  if (btn && btnText) {
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    btnText.textContent = 'Đang lưu...';
+  }
+
   const svgContent = composeCharacterSVG();
   const canvas = document.getElementById('export-canvas');
   const ctx = canvas.getContext('2d');
@@ -2456,18 +2465,82 @@ function exportAsJPEG() {
   const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
 
-  img.onload = function () {
+  img.onload = async function () {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
     const jpegUrl = canvas.toDataURL('image/jpeg', 0.95);
-    const link = document.createElement('a');
-    link.href = jpegUrl;
-    link.download = `mee-character-${state.gender}-clothed.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
     URL.revokeObjectURL(url);
+    
+    // Check if we are embedded in AIkidApp with valid session
+    const token = localStorage.getItem('storymee.access_token');
+    const ipId = localStorage.getItem('storymee.active_ip_id');
+    const apiUrl = localStorage.getItem('aikid.api_url') || 'https://dev-hub.storymee.com';
+    
+    if (token && ipId) {
+      try {
+        // Convert base64 Data URL to Blob
+        const res = await fetch(jpegUrl);
+        const blob = await res.blob();
+        
+        const fd = new FormData();
+        fd.append('ipId', ipId);
+        fd.append('permanent', '1');
+        fd.append('file', blob, `mee-character-${state.gender}-${Date.now()}.jpg`);
+        
+        const uploadRes = await fetch(`${apiUrl}/internal/v1/media/upload?assetType=character`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: fd
+        });
+        
+        if (!uploadRes.ok) {
+          throw new Error('Upload failed with status ' + uploadRes.status);
+        }
+        
+        const data = await uploadRes.json();
+        console.log('Character saved to gallery:', data);
+        
+        // Show success
+        if (btnText) btnText.textContent = 'Đã lưu!';
+        if (btn) {
+          btn.style.backgroundColor = '#10AC84'; 
+          btn.style.borderColor = '#0A7A5D';
+        }
+        
+        // Optionally auto-navigate back after a short delay
+        setTimeout(() => {
+          if (window.isExpoEmbed && window.isExpoEmbed()) {
+            if (window.parent) {
+              window.parent.location.href = '/lobby';
+            }
+          }
+        }, 1500);
+        
+      } catch (err) {
+        console.error('Failed to save character to gallery', err);
+        alert('Có lỗi khi lưu nhân vật vào thư viện.');
+        if (btn && btnText) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btnText.textContent = 'Thử lại';
+        }
+      }
+    } else {
+      // Fallback for standalone web desktop usage
+      const link = document.createElement('a');
+      link.href = jpegUrl;
+      link.download = `mee-character-${state.gender}-clothed.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      if (btn && btnText) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btnText.textContent = 'Đã tải về';
+      }
+    }
   };
 
   img.src = url;

@@ -1,14 +1,70 @@
 /* Cute Child-Friendly UI Styles for Mee Character Customizer */
-/* Embed inside AIkidApp Expo: hide universe chrome; layout stays design-locked 1927×930 */
+/* Embed inside AIkidApp Expo: hide universe chrome; fit viewport (no page scroll) */
 html.mee-embed .universe-header,
 body.mee-embed .universe-header {
   display: none !important;
 }
 
+html.mee-embed,
+html.mee-embed body,
+body.mee-embed {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
 html.mee-embed .app-container,
 body.mee-embed .app-container {
-  /* Original design assumes universe header height; keep spacing for title row */
-  margin-top: 100px !important;
+  margin-top: 8px !important;
+}
+
+html.mee-embed .scaler-wrapper,
+body.mee-embed .scaler-wrapper {
+  /* Reset JS-injected inline transform — CSS !important overrides element.style */
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  transform: none !important;
+  transform-origin: top center !important;
+  overflow: visible !important;
+}
+
+/* Smaller catalog tiles — modal-like density, less inner scroll */
+html.mee-embed .cards-grid,
+body.mee-embed .cards-grid {
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+html.mee-embed .selector-card,
+body.mee-embed .selector-card {
+  padding: 4px !important;
+}
+
+html.mee-embed .options-panel .options-card,
+body.mee-embed .options-panel .options-card {
+  padding: 14px !important;
+}
+
+html.mee-embed .tab-content.active,
+body.mee-embed .tab-content.active {
+  gap: 12px !important;
+  padding: 4px 6px 4px 4px !important;
+}
+
+html.mee-embed .preview-viewport,
+body.mee-embed .preview-viewport {
+  max-height: 340px !important;
+}
+
+html.mee-embed .group-title,
+body.mee-embed .group-title {
+  font-size: 0.95rem !important;
 }
 
 :root {
