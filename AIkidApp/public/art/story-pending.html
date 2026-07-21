@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lobby Nhân Vật - AIkid</title>
+  <title>Sáng Tác Truyện - AIkid</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +15,7 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Link to the common universe styles -->
+  <!-- Link to common universe styles -->
   <link rel="stylesheet" href="/mee/styles.css">
 
   <style>
@@ -24,12 +25,12 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-image: url('/assets/images/bg-character-feature.png') !important;
+      background-image: url('/assets/images/bg-art.png') !important;
       background-repeat: no-repeat !important;
       background-position: center center !important;
       background-size: cover !important;
       background-attachment: fixed !important;
-      background-color: #fad698 !important;
+      background-color: #FED7D7 !important;
       font-family: 'Mali', sans-serif;
       box-sizing: border-box;
       position: relative;
@@ -52,142 +53,6 @@
       pointer-events: auto;
     }
 
-    /* 2-Column Cards Container */
-    .lobby-cards-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -40%);
-      display: flex;
-      gap: 50px;
-      justify-content: center;
-      align-items: center;
-      width: 90%;
-      max-width: 860px;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    /* Individual Card with white border and solid #F5EDE6 background */
-    .lobby-card-item {
-      position: relative;
-      flex: 1;
-      height: 380px;
-      background: #FDFAF4 !important;
-      border: 10px solid #FFFFFF;
-      border-radius: 48px;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      pointer-events: auto;
-      box-sizing: border-box;
-    }
-
-    .lobby-card-item:hover {
-      transform: translateY(-16px);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
-    }
-
-    .lobby-card-item:active {
-      transform: translateY(-8px) scale(0.98);
-    }
-
-    /* Content wrapper */
-    .lobby-card-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-    }
-
-    /* Gradient Pink Icon */
-    .lobby-card-icon {
-      font-size: 5rem;
-      background: linear-gradient(135deg, #FF5E97 0%, #FF9EB5 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    /* Interactive Box Container */
-    .interactive-box {
-      width: 90px;
-      height: 90px;
-      position: relative;
-      margin-bottom: 5px;
-    }
-
-    /* Box Lid */
-    .box-lid {
-      width: 90px;
-      height: 22px;
-      background: linear-gradient(135deg, #FF5E97 0%, #FF9EB5 100%);
-      border-radius: 7px;
-      position: absolute;
-      top: 12px;
-      left: 0;
-      z-index: 3;
-      transform-origin: bottom right;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    /* Box Body */
-    .box-body {
-      width: 80px;
-      height: 56px;
-      background: linear-gradient(135deg, #FF5E97 0%, #FF9EB5 100%);
-      border-radius: 0 0 16px 16px;
-      position: absolute;
-      top: 32px;
-      left: 5px;
-      z-index: 2;
-      display: flex;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-
-    /* Handle Slot */
-    .box-handle {
-      width: 32px;
-      height: 7px;
-      background: #FDFAF4;
-      border-radius: 9999px;
-      margin-top: 10px;
-    }
-
-    /* Hover States triggered by lobby-card-item */
-    .lobby-card-item:hover .box-lid {
-      transform: translate(-15px, -38px) rotate(-25deg);
-    }
-
-    /* Right Card: Magic Wand Sparkle Hover Effect */
-    @keyframes wandSparkle {
-      0% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.15) rotate(15deg); }
-      100% { transform: scale(1) rotate(0deg); }
-    }
-    
-    .lobby-card-item:hover .lobby-card-icon {
-      animation: wandSparkle 1.2s ease-in-out infinite;
-    }
-
-    .lobby-card-title {
-      font-family: 'Chiron GoRound TC', sans-serif;
-      font-weight: 900;
-      font-size: 1.6rem;
-      color: #475569;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 5px;
-    }
-
-    /* Custom high-fidelity rounded Vietnamese letter đ */
     .custom-đ {
       position: relative;
       display: inline-block;
@@ -301,8 +166,114 @@
     .mini-1 { top: 25%; left: 15%; animation: miniFlight 1.6s linear infinite; animation-delay: 0.4s; }
     .mini-2 { top: 75%; left: 5%; animation: miniFlight 1.9s linear infinite; animation-delay: 0.9s; }
     .mini-3 { top: 85%; left: 50%; animation: miniFlight 1.4s linear infinite; animation-delay: 0.1s; }
+
+    /* 2-Column Cards Container */
+    .lobby-cards-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -40%);
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+      align-items: center;
+      width: 90%;
+      max-width: 860px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Individual Card with white border and solid #FDFAF4 background */
+    .lobby-card-item {
+      position: relative;
+      flex: 1;
+      height: 380px;
+      background: #FDFAF4 !important;
+      border: 10px solid #FFFFFF;
+      border-radius: 48px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+
+    .lobby-card-item:hover {
+      transform: translateY(-16px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    .lobby-card-item:active {
+      transform: translateY(-8px) scale(0.98);
+    }
+
+    /* Content wrapper */
+    .lobby-card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* Gradient Pink Icon */
+    .lobby-card-icon {
+      font-size: 5rem;
+      background: linear-gradient(135deg, #FF5E97 0%, #FF9EB5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @keyframes iconWiggle {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.1) rotate(-8deg); }
+      75% { transform: scale(1.1) rotate(8deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .lobby-card-item:hover .lobby-card-icon {
+      animation: iconWiggle 1.0s ease-in-out infinite;
+    }
+
+    .lobby-card-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: #475569;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 5px;
+    }
+
+    /* Toast Message */
+    .toast-message {
+        position: fixed;
+        bottom: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #334155;
+        color: #FFFFFF;
+        padding: 16px 32px;
+        border-radius: 20px;
+        font-family: 'Mali', sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 1000000;
+        transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-message.show {
+        bottom: 40px;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Global Meteor Loading Overlay -->
@@ -353,7 +324,7 @@
     <!-- Floating Back Button -->
     <div class="back-btn-container"
       style="position: absolute; left: 38px; top: 131px; z-index: 1000; transform: scale(1.1); transform-origin: left top;">
-      <button onclick="playPopAndNavigate('/')" style="
+      <button onclick="playPopAndNavigate('/art/')" style="
         background: linear-gradient(135deg, #ff9eb5, #ff7597);
         border: none;
         border-radius: 9999px;
@@ -369,9 +340,7 @@
         box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       ">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-        </svg>
+        <i class="fa-solid fa-house"></i>
         <span>Trở Về</span>
       </button>
     </div>
@@ -379,30 +348,27 @@
     <!-- Center Content: 2-Column Cards -->
     <div class="lobby-cards-container">
       
-      <!-- Left Card: Tạo nhân vật -->
-      <div class="lobby-card-item" onclick="playPopAndNavigate('/character/generate')">
+      <!-- Left Card: Truyện Chữ -->
+      <div class="lobby-card-item" onclick="showComingSoon('Truyện Chữ')">
         <div class="lobby-card-content">
-          <i class="fa-solid fa-circle-plus lobby-card-icon"></i>
-          <div class="lobby-card-title">Tạo nhân vật</div>
+          <i class="fa-solid fa-book lobby-card-icon"></i>
+          <div class="lobby-card-title">Truyện Chữ</div>
         </div>
       </div>
 
-      <!-- Right Card: Kho nhân vật -->
-      <div class="lobby-card-item" onclick="playPopAndNavigate('/character/storage')">
+      <!-- Right Card: Truyện Tranh -->
+      <div class="lobby-card-item" onclick="playPopAndNavigate('/art/comic')">
         <div class="lobby-card-content">
-          <!-- Interactive Animating Box -->
-          <div class="interactive-box">
-            <div class="box-lid"></div>
-            <div class="box-body">
-              <div class="box-handle"></div>
-            </div>
-          </div>
-          <div class="lobby-card-title">Kho nhân vật</div>
+          <i class="fa-solid fa-book-open-reader lobby-card-icon"></i>
+          <div class="lobby-card-title">Truyện Tranh</div>
         </div>
       </div>
 
     </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-message"></div>
 
   <script>
     // Bubble pop sound using Web Audio API
@@ -427,10 +393,6 @@
 
     function playPopAndNavigate(url) {
       playPopSound();
-      if (url === '#') {
-        alert("Tính năng Kho nhân vật đang được phát triển bé nhé!");
-        return;
-      }
       const loader = document.getElementById('page-loader-overlay');
       if (loader) {
         loader.style.display = 'flex';
@@ -440,6 +402,16 @@
       setTimeout(() => {
         window.location.href = url;
       }, 350);
+    }
+
+    function showComingSoon(featureName) {
+      playPopSound();
+      const toast = document.getElementById('toast');
+      toast.innerText = `${featureName} - Tính năng đang được phát triển!`;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
     }
 
     function adjustScale() {
@@ -474,6 +446,7 @@
     }
 
     window.addEventListener('load', hidePageLoader);
+    setTimeout(hidePageLoader, 500); // Fallback: hide loader after 500ms
     window.addEventListener('pageshow', (e) => {
       if (e.persisted) {
         pageLoaded = false;
@@ -481,5 +454,6 @@
       }
     });
   </script>
+  <script src="/aikid-nav-bridge.js"></script>
 </body>
 </html>

@@ -70,8 +70,17 @@
     ) {
       return { target: 'self', href: '/art/image-generate.html' };
     }
-    if (u === '/art/story' || u === '/art/story.html' || u === '/art/comic' || u === '/art/comic.html') {
+    if (u === '/art/story/idea' || u === '/art/story/idea.html' || u === '/art/comic/writing' || u === '/art/comic/writing.html') {
+      return { target: 'self', href: '/art/story/idea.html' };
+    }
+    if (u === '/art/story/genre' || u === '/art/story/genre.html' || u === '/art/comic' || u === '/art/comic.html') {
+      return { target: 'self', href: '/art/story/genre.html' };
+    }
+    if (u === '/art/story' || u === '/art/story.html') {
       return { target: 'self', href: '/art/story.html' };
+    }
+    if (u === '/art/story-pending' || u === '/art/story-pending.html') {
+      return { target: 'self', href: '/art/story-pending.html' };
     }
 
     // Relative next/html within mee

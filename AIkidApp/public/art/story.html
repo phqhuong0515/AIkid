@@ -25,7 +25,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-image: url('/lobby-assets/images/bg-art.png') !important;
+      background-image: url('/assets/images/bg-art.png') !important;
       background-repeat: no-repeat !important;
       background-position: center center !important;
       background-size: cover !important;
@@ -47,6 +47,17 @@
       background: transparent !important;
       overflow: hidden;
       pointer-events: none;
+    }
+
+    .genre-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      border-color: #ff7597 !important;
+      box-shadow: 0 10px 20px rgba(255, 117, 151, 0.1) !important;
+    }
+    .genre-card.selected {
+      border-color: #ff7597 !important;
+      background: #FFF0F3 !important;
+      box-shadow: 0 10px 20px rgba(255, 117, 151, 0.15) !important;
     }
 
     .scaler-wrapper > * {
@@ -345,22 +356,22 @@
       </button>
     </div>
 
-    <!-- Center Content: 2-Column Cards -->
+    <!-- Center Content: 2-Column Options -->
     <div class="lobby-cards-container">
       
-      <!-- Left Card: Truyện Chữ -->
-      <div class="lobby-card-item" onclick="showComingSoon('Truyện Chữ')">
+      <!-- Left Card: Tạo Truyện Mới -->
+      <div class="lobby-card-item" onclick="playPopAndNavigate('/art/story/genre')">
         <div class="lobby-card-content">
-          <i class="fa-solid fa-book lobby-card-icon"></i>
-          <div class="lobby-card-title">Truyện Chữ</div>
+          <i class="fa-solid fa-circle-plus lobby-card-icon"></i>
+          <div class="lobby-card-title">Tạo Truyện Mới</div>
         </div>
       </div>
 
-      <!-- Right Card: Truyện Tranh -->
-      <div class="lobby-card-item" onclick="playPopAndNavigate('/art/comic')">
+      <!-- Right Card: Kho Truyện -->
+      <div class="lobby-card-item" onclick="playPopAndNavigate('/art/story/library')">
         <div class="lobby-card-content">
-          <i class="fa-solid fa-book-open-reader lobby-card-icon"></i>
-          <div class="lobby-card-title">Truyện Tranh</div>
+          <i class="fa-solid fa-book lobby-card-icon"></i>
+          <div class="lobby-card-title">Kho Truyện</div>
         </div>
       </div>
 
@@ -413,6 +424,159 @@
         toast.classList.remove('show');
       }, 2500);
     }
+
+    let characters = [];
+    let selectedCharacterId = null;
+
+    function initCharacterSelection() {
+      const defaultSeeds = [
+        {
+          id: 'seed-yuu',
+          name: 'Yuu',
+          species: 'Gấu trúc',
+          age: '12',
+          gender: 'Nam',
+          avatar: '/mee/PNG/storage-test-yuu-profile.png'
+        },
+        {
+          id: 'seed-nori',
+          name: 'Nori',
+          species: 'Thỏ con',
+          age: '8',
+          gender: 'Nữ',
+          avatar: '/mee/PNG/storage-test-nori-profile.png'
+        },
+        {
+          id: 'seed-bong',
+          name: 'Bông',
+          species: 'Cừu nhỏ',
+          age: '6',
+          gender: 'Nữ',
+          avatar: '/mee/PNG/storage-test-bông.jpeg'
+        }
+      ];
+
+      const saved = localStorage.getItem('storymee_saved_characters');
+      if (saved) {
+        try {
+          characters = JSON.parse(saved);
+        } catch(e) {
+          characters = defaultSeeds;
+        }
+      } else {
+        characters = defaultSeeds;
+      }
+
+      if (!characters || characters.length === 0) {
+        characters = defaultSeeds;
+      }
+
+      renderCharacterGrid();
+    }
+
+    function renderCharacterGrid() {
+      const grid = document.getElementById('character-grid');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+      characters.forEach(char => {
+        const isSelected = char.id === selectedCharacterId;
+        const card = document.createElement('div');
+        card.className = `character-card${isSelected ? ' selected' : ''}`;
+        card.onclick = () => selectCharacter(char.id);
+        card.style = `
+          background: #fffffe;
+          border: 3px dashed ${isSelected ? '#ff7597' : '#EBDCD0'};
+          border-radius: 24px;
+          padding: 15px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+          user-select: none;
+          position: relative;
+          background: ${isSelected ? '#FFF5F7' : '#fffffe'};
+          transform: ${isSelected ? 'scale(1.03)' : 'scale(1)'};
+        `;
+
+        card.onmouseover = () => {
+          if (char.id !== selectedCharacterId) {
+            card.style.transform = 'scale(1.05)';
+            card.style.borderColor = '#ff9eb5';
+            card.style.boxShadow = '0 8px 20px rgba(138, 116, 99, 0.08)';
+          }
+        };
+        card.onmouseout = () => {
+          if (char.id !== selectedCharacterId) {
+            card.style.transform = 'scale(1)';
+            card.style.borderColor = '#EBDCD0';
+            card.style.boxShadow = '0 4px 10px rgba(0,0,0,0.02)';
+          }
+        };
+
+        card.innerHTML = `
+          <!-- Checkmark Badge -->
+          <div style="
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff7597, #ff9eb5);
+            color: white;
+            display: ${isSelected ? 'flex' : 'none'};
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(255,117,151,0.3);
+          ">
+            <i class="fa-solid fa-check"></i>
+          </div>
+
+          <!-- Avatar -->
+          <div style="
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #EBDCD0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            background: #FFFFFF;
+          ">
+            <img src="${char.avatar || '/mee/PNG/storage-test-yuu-profile.png'}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+
+          <!-- Name & Details -->
+          <div style="text-align: center;">
+            <h3 style="font-family: 'Mali', sans-serif; font-size: 1.25rem; font-weight: 700; color: #5c4e4d; margin: 0 0 4px 0;">${char.name}</h3>
+            <span style="font-family: 'Mali', sans-serif; font-size: 0.9rem; font-weight: 600; color: #A99586;">${char.species || 'Bé tự tạo'} • ${char.age} tuổi</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function selectCharacter(id) {
+      playPopSound();
+      selectedCharacterId = id;
+      renderCharacterGrid();
+    }
+
+    function confirmCharacterSelection() {
+      if (!selectedCharacterId) {
+        showComingSoon('Cảnh báo: Vui lòng chọn một nhân vật!');
+        return;
+      }
+      const selectedChar = characters.find(c => c.id === selectedCharacterId);
+      playPopSound();
+      showComingSoon(`Đang khởi tạo truyện tranh với ${selectedChar.name}...`);
+    }
+
+    window.addEventListener('DOMContentLoaded', initCharacterSelection);
 
     function adjustScale() {
       const wrapper = document.querySelector('.scaler-wrapper');
