@@ -2465,38 +2465,28 @@
     }
 
     function updateContextIdeaText() {
-      if (selectedTime && selectedSpace) {
-        selectedIdeaText = `${selectedTime}, tại ${selectedSpace.toLowerCase()}`;
-      } else if (selectedTime) {
-        selectedIdeaText = selectedTime;
-      } else if (selectedSpace) {
-        selectedIdeaText = `Tại ${selectedSpace.toLowerCase()}`;
-      } else {
-        selectedIdeaText = '';
-      }
-      
-      const input = document.getElementById('custom-idea-text');
-      if (input) {
-        input.value = selectedIdeaText;
-        updateCharCounter(input);
-      }
+      // Step 2 time & space context update
     }
 
-    let selectedIdeaText = null;
+    let selectedClimax = '';
 
     function selectIdeaCard(card, ideaText) {
       playPopSound();
-      document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
-      selectedIdeaText = ideaText;
+      selectedClimax = ideaText;
 
       const input = document.getElementById('custom-idea-text');
-      if (ideaText === 'Tự viết ý tưởng của em') {
-        input.focus();
-      } else {
-        input.value = ideaText;
-        updateCharCounter(input);
+      if (input) {
+        if (ideaText === 'Tự viết ý tưởng của em') {
+          input.focus();
+        } else {
+          input.value = ideaText;
+          updateCharCounter(input);
+        }
       }
+      saveCurrentStepState(6);
+      updateProgressUI();
     }
 
     function updateCharCounter(input) {
@@ -2798,7 +2788,8 @@
           completedSteps.delete(5);
         }
       } else if (stepIdx === 6) {
-        const customVal = document.getElementById('custom-idea-text')?.value.trim() || selectedIdeaText;
+        const customInput = document.getElementById('custom-idea-text');
+        const customVal = (currentStepIndex === 6 && customInput) ? customInput.value.trim() : selectedClimax;
         if (customVal) {
           completedSteps.add(6);
         } else {
@@ -2937,16 +2928,16 @@
         }
       } else if (stepIdx === 6) {
         const customInput = document.getElementById('custom-idea-text');
-        if (selectedIdeaText) {
+        if (selectedClimax) {
           let matched = false;
           document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => {
-            if (c.innerText.trim().toLowerCase() === selectedIdeaText.toLowerCase()) {
+            if (c.innerText.trim().toLowerCase() === selectedClimax.toLowerCase()) {
               c.classList.add('selected');
               matched = true;
             }
           });
           if (customInput) {
-            customInput.value = selectedIdeaText;
+            customInput.value = selectedClimax;
             updateCharCounter(customInput);
           }
         }
