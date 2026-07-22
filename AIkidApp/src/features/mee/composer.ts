@@ -5,6 +5,41 @@ function inner(svg: string): string {
   return svg.match(/<svg[\s\S]*?>([\s\S]*?)<\/svg>/i)?.[1] || '';
 }
 
+/** React Native SVG does not reliably apply CSS rules from embedded <style>. */
+function inlineClassStyles(svg: string): string {
+  const rules = new Map<string, Array<[string, string]>>();
+  for (const style of svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) {
+    for (const rule of style[1].matchAll(/([^{}]+)\{([^{}]+)\}/g)) {
+      const declarations = rule[2].split(';').map((declaration) => declaration.trim()).filter(Boolean)
+        .map((declaration) => declaration.split(/:(.*)/s).slice(0, 2) as [string, string])
+        .filter(([name, value]) => Boolean(name && value));
+      for (const selector of rule[1].split(',')) {
+        const className = selector.trim().match(/^\.([\w-]+)$/)?.[1];
+        if (className) rules.set(className, declarations);
+      }
+    }
+  }
+  if (!rules.size) return svg;
+
+  return svg
+    .replace(/<([a-z][\w:-]*)([^<>]*?)\sclass=(["'])([^"']+)\3([^<>]*?)>/gi,
+      (tag, name: string, before: string, quote: string, classes: string, after: string) => {
+        let attributes = `${before} class=${quote}${classes}${quote}${after}`;
+        const selfClosing = /\/\s*$/.test(attributes);
+        if (selfClosing) attributes = attributes.replace(/\/\s*$/, '');
+        for (const className of classes.split(/\s+/)) {
+          for (const [property, value] of rules.get(className) || []) {
+            const escapedProperty = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const existing = new RegExp(`\\s${escapedProperty}=(['"])[\\s\\S]*?\\1`, 'i');
+            const attribute = ` ${property}="${value.trim()}"`;
+            attributes = existing.test(attributes) ? attributes.replace(existing, attribute) : `${attributes}${attribute}`;
+          }
+        }
+        return `<${name}${attributes}${selfClosing ? '/' : ''}>`;
+      })
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+}
+
 function prefixIds(svg: string, prefix: string): string {
   const ids = [...svg.matchAll(/\bid=["']([^"']+)["']/gi)].map((match) => match[1]);
   let result = ids.reduce((value, id) => value
@@ -24,7 +59,7 @@ function prefixIds(svg: string, prefix: string): string {
 
 function layer(svg: string, prefix: string, transform = ''): string {
   if (!svg) return '';
-  return `<g id="${prefix}"${transform ? ` transform="${transform}"` : ''}>${inner(prefixIds(svg, prefix))}</g>`;
+  return `<g id="${prefix}"${transform ? ` transform="${transform}"` : ''}>${inner(prefixIds(inlineClassStyles(svg), prefix))}</g>`;
 }
 
 function recolorBody(svg: string, draft: MeeDraft): string {
@@ -60,7 +95,7 @@ const translate = (x: number, y: number) => `translate(${x.toFixed(3)} ${y.toFix
 /** Compose the original Illustrator layers without a DOM/WebView. */
 export function buildMeeAssetSvg(draft: MeeDraft): string {
   const bodyVariant = MEE_ASSETS.body.clothes[draft.gender];
-  let body = recolorBody(bodyVariant.default || bodyVariant[draft.skinTone] || '', draft);
+  let body = recolorBody(bodyVariant[draft.skinTone] || bodyVariant.default || bodyVariant[1] || '', draft);
   const behind = meeAssetFor('behind', draft.behind, draft);
   const face = meeAssetFor('face', draft.face, draft);
   const eyes = meeAssetFor('eyes', draft.eyes, draft);
