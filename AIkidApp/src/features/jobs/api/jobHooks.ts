@@ -36,7 +36,7 @@ export type JobRecord = {
 
 export type CreateImageJobInput = {
   prompt: string;
-  /** Default: google-native (Imagen/Gemini path trên core-job-api) */
+  /** Optional preference only. Omit to use the server's plan/settings route. */
   provider?: string;
   ipId?: string;
   /** Public URLs (đã upload) — gflow/sdk/google-native */
@@ -89,12 +89,12 @@ export function firstOutputUri(job: JobRecord | null | undefined): string | null
 export async function createImageJob(input: CreateImageJobInput): Promise<string> {
   const ipId =
     input.ipId ?? useWorkspace.getState().getActiveIpId();
-  const provider = input.provider ?? 'google-native';
+  const provider = input.provider;
   const refUrls = (input.referenceImageUrls || []).filter(Boolean);
 
   const inputParams: Record<string, unknown> = {
     prompt: input.prompt.trim(),
-    provider,
+    ...(provider ? { provider } : {}),
   };
 
   if (refUrls.length > 0) {

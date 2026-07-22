@@ -20,20 +20,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/core/auth/useAuth';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { ART_STYLES, type ArtStyle } from '@/features/art/constants';
+import { buildArtRedrawPrompt } from '@/features/art/buildArtRedrawPrompt';
 import {
   DrawingCanvas,
   type DrawingCanvasHandle,
   type DrawingStroke,
 } from '@/features/art/canvas/DrawingCanvas';
 import { useArtDraft } from '@/features/art/store/useArtDraft';
-import {
-  buildArtRedrawPrompt,
-  generateImageViaGateway,
-} from '@/features/creative/generateImageViaGateway';
+import { generateImageViaGateway } from '@/features/creative/generateImageViaGateway';
 import { useFamily } from '@/features/family/store/useFamily';
 import { useInvalidateMediaAfterJob } from '@/features/jobs/api/jobHooks';
 import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
-import { PrimaryButton, SectionCard } from '@/features/kids-ui/CreativeKit';
+import { SectionCard } from '@/features/kids-ui/CreativeKit';
 import { ScreenChrome } from '@/features/kids-ui/ScreenChrome';
 import { uploadPickedImageAsPublicRef } from '@/features/media/api/mediaHooks';
 
@@ -97,9 +95,11 @@ export default function ArtScreen() {
   const [hasCanvasDrawing, setHasCanvasDrawing] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [canvasModalVisible, setCanvasModalVisible] = useState(false);
+  const [photoPickerVisible, setPhotoPickerVisible] = useState(false);
   const [canvasSaving, setCanvasSaving] = useState(false);
   const [canvasStrokes, setCanvasStrokes] = useState<DrawingStroke[]>([]);
   const [canvasRevision, setCanvasRevision] = useState(0);
+  const [styleGridWidth, setStyleGridWidth] = useState(0);
   const [confirmedCanvasRevision, setConfirmedCanvasRevision] = useState(0);
   const [drawingPreviewUri, setDrawingPreviewUri] = useState<string | null>(null);
   const drawingCanvasRef = useRef<DrawingCanvasHandle>(null);
@@ -129,7 +129,12 @@ export default function ArtScreen() {
     [draft.styleId],
   );
   const useGrid = width >= 760;
-  const cardWidth = useGrid ? Math.min(220, (width - 84) / 4) : 172;
+  const contentWidth = Math.min(Math.max(width - 32, 320), 1180);
+  const styleInnerWidth = Math.max(styleGridWidth || contentWidth - 32, 288);
+  const styleColumns = Math.min(5, Math.max(2, Math.floor((styleInnerWidth + 12) / 212)));
+  const cardWidth = useGrid
+    ? (styleInnerWidth - (styleColumns - 1) * 12) / styleColumns
+    : 172;
   const canvasHasUnconfirmedChanges = canvasRevision !== confirmedCanvasRevision;
 
   async function openCanvas() {
@@ -235,6 +240,7 @@ export default function ArtScreen() {
   }
 
   async function choose(camera: boolean) {
+    setPhotoPickerVisible(false);
     const permission = camera
       ? await ImagePicker.requestCameraPermissionsAsync()
       : await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -320,9 +326,8 @@ export default function ArtScreen() {
 
       setBusyStage('generating');
       const result = await generateImageViaGateway({
-        userPrompt: `${buildArtRedrawPrompt(selectedStyle.labelVi)} ${draft.prompt}`.trim(),
+        userPrompt: buildArtRedrawPrompt(selectedStyle, draft.prompt),
         referenceHttpsUrl: referenceUrl,
-        provider: 'google-native',
         childProfileId: child.id,
         ipId,
       });
@@ -358,91 +363,61 @@ export default function ArtScreen() {
 
   return <>
     <ScreenChrome title="Xưởng vẽ AI" subtitle="Ảnh mẫu → chọn phong cách → AI vẽ lại" backHref="/(app)/lobby">
-      <ScrollView scrollEnabled={!busyStage} contentContainerStyle={{ padding: 16, paddingBottom: 64 }}>
+      <ScrollView scrollEnabled={!busyStage} contentContainerStyle={{ padding: 16, paddingBottom: 64, alignItems: 'center' }}>
+        <View style={{ width: '100%', maxWidth: 1180 }}>
         <SectionCard title="1. Tạo hoặc chọn tranh mẫu" hint="Bé có thể tự vẽ, chụp tranh giấy hoặc chọn ảnh. Tranh được lưu vào Gallery trước khi gửi AI.">
-          <View className="mb-3 flex-row rounded-2xl bg-orange-50 p-1">
+          <View className="flex-row" style={{ gap: 12 }}>
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Mở bảng để bé tự vẽ"
+              accessibilityState={{ selected: referenceMode === 'drawing', disabled: !!busyStage }}
               disabled={!!busyStage}
-              onPress={() => { setReferenceMode('drawing'); patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null }); }}
-              className={`flex-1 rounded-xl py-3 ${referenceMode === 'drawing' ? 'bg-brand' : ''}`}
+              onPress={() => void openCanvas()}
+              className="flex-1 overflow-hidden rounded-[22px] bg-orange-50 disabled:opacity-50"
+              style={{ minHeight: useGrid ? 210 : 168, borderWidth: referenceMode === 'drawing' ? 3 : 1, borderColor: referenceMode === 'drawing' ? '#FF6670' : '#FED7AA' }}
             >
-              <Text className={`text-center font-extrabold ${referenceMode === 'drawing' ? 'text-white' : 'text-orange-900'}`}>🎨 Bé tự vẽ</Text>
+              {drawingPreviewUri ? <Image source={{ uri: drawingPreviewUri }} style={{ width: '100%', flex: 1, minHeight: 112, backgroundColor: '#FFFFFF' }} contentFit="cover" /> : <View className="flex-1 items-center justify-center px-3"><Text className="text-4xl">🎨</Text><Text className="mt-2 text-center text-sm font-extrabold text-orange-900">Bé tự vẽ</Text><Text className="mt-1 text-center text-[11px] text-slate-500">Chạm để mở bảng vẽ</Text></View>}
+              {drawingPreviewUri ? <View className="px-3 py-2"><Text className="text-center text-xs font-extrabold text-orange-900">🎨 {canvasHasUnconfirmedChanges ? 'Có nét mới' : 'Bản vẽ của bé'}</Text></View> : null}
             </Pressable>
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Chụp ảnh hoặc chọn từ thư viện"
+              accessibilityState={{ selected: referenceMode === 'photo', disabled: !!busyStage }}
               disabled={!!busyStage}
-              onPress={() => { setReferenceMode('photo'); patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null }); }}
-              className={`flex-1 rounded-xl py-3 ${referenceMode === 'photo' ? 'bg-brand' : ''}`}
+              onPress={() => { setReferenceMode('photo'); setPhotoPickerVisible(true); }}
+              className="flex-1 overflow-hidden rounded-[22px] bg-orange-50 disabled:opacity-50"
+              style={{ minHeight: useGrid ? 210 : 168, borderWidth: referenceMode === 'photo' ? 3 : 1, borderColor: referenceMode === 'photo' ? '#FF6670' : '#FED7AA' }}
             >
-              <Text className={`text-center font-extrabold ${referenceMode === 'photo' ? 'text-white' : 'text-orange-900'}`}>📷 Ảnh có sẵn</Text>
+              {draft.referenceUri || draft.uploadedReferenceUrl ? <Image source={{ uri: draft.referenceUri ?? draft.uploadedReferenceUrl! }} style={{ width: '100%', flex: 1, minHeight: 112, backgroundColor: '#FFFFFF' }} contentFit="cover" /> : <View className="flex-1 items-center justify-center px-3"><Text className="text-4xl">📷</Text><Text className="mt-2 text-center text-sm font-extrabold text-orange-900">Ảnh có sẵn</Text><Text className="mt-1 text-center text-[11px] text-slate-500">Camera hoặc thư viện</Text></View>}
+              {draft.referenceUri || draft.uploadedReferenceUrl ? <View className="px-3 py-2"><Text className="text-center text-xs font-extrabold text-orange-900">📷 Chạm để đổi ảnh</Text></View> : null}
             </Pressable>
           </View>
-
-          {referenceMode === 'drawing' ? (
-            <View className="overflow-hidden rounded-2xl border border-orange-100 bg-orange-50 p-3">
-              {drawingPreviewUri ? (
-                <Image source={{ uri: drawingPreviewUri }} style={{ width: '100%', height: 220, borderRadius: 14, backgroundColor: '#FFFFFF' }} contentFit="contain" />
-              ) : (
-                <View className="h-40 items-center justify-center rounded-2xl border border-dashed border-orange-200 bg-white">
-                  <Text className="text-4xl">🎨</Text>
-                  <Text className="mt-2 font-bold text-slate-400">Bảng vẽ đang chờ bé</Text>
-                </View>
-              )}
-              <Text className={`mt-3 text-center text-xs font-bold ${canvasHasUnconfirmedChanges ? 'text-amber-600' : hasCanvasDrawing ? 'text-emerald-600' : 'text-slate-500'}`}>
-                {canvasHasUnconfirmedChanges ? 'Có nét mới chưa bấm Xong — nét vẫn đang được giữ' : hasCanvasDrawing ? '✓ Bảng vẽ đã sẵn sàng cho AI' : 'Mở toàn màn hình để bắt đầu vẽ'}
-              </Text>
-              <Pressable accessibilityRole="button" accessibilityLabel="Mở bảng vẽ toàn màn hình" disabled={!!busyStage} onPress={() => void openCanvas()} className="mt-3 rounded-2xl bg-brand py-4 disabled:opacity-50">
-                <Text className="text-center text-base font-extrabold text-white">{hasCanvasDrawing ? '🎨 Mở lại bảng vẽ' : '🎨 Mở bảng vẽ'}</Text>
-              </Pressable>
-            </View>
-          ) : null}
-
-          {referenceMode === 'photo' ? <View>
-            <View className="flex-row gap-2">
-              <Pressable onPress={() => void choose(true)} disabled={!!busyStage} className="flex-1 rounded-2xl bg-orange-50 py-4">
-                <Text className="text-center font-extrabold text-orange-900">📷 Chụp ảnh</Text>
-              </Pressable>
-              <Pressable onPress={() => void choose(false)} disabled={!!busyStage} className="flex-1 rounded-2xl bg-orange-50 py-4">
-                <Text className="text-center font-extrabold text-orange-900">🖼️ Thư viện</Text>
-              </Pressable>
-            </View>
-          {draft.referenceUri || draft.uploadedReferenceUrl ? (
-            <View className="mt-3 overflow-hidden rounded-2xl bg-orange-50">
-              <Image source={{ uri: draft.referenceUri ?? draft.uploadedReferenceUrl! }} style={{ width: '100%', height: 260 }} contentFit="contain" />
-              <View className="flex-row items-center justify-between px-3 py-2">
-                <Text className="text-xs font-bold text-emerald-700">
-                  {draft.uploadedReferenceUrl ? '✓ Đã lưu ảnh mẫu' : 'Sẵn sàng tải lên'}
-                </Text>
-                <Pressable disabled={!!busyStage} onPress={() => patch({ referenceUri: null, referenceFileName: null, referenceMimeType: null, uploadedReferenceUrl: null, resultUri: null, resultJobId: null })}>
-                  <Text className="text-xs font-bold text-red-500">Bỏ ảnh</Text>
-                </Pressable>
-              </View>
-            </View>
-          ) : (
-            <View className="mt-3 h-36 items-center justify-center rounded-2xl border border-dashed border-orange-200">
-              <Text className="text-4xl">🖍️</Text>
-              <Text className="mt-2 text-slate-400">Chọn bức vẽ bé muốn AI vẽ lại</Text>
-            </View>
-          )}</View> : null}
+          <Text className={`mt-3 text-center text-xs font-bold ${referenceMode === 'drawing' && canvasHasUnconfirmedChanges ? 'text-amber-600' : 'text-emerald-600'}`}>
+            {referenceMode === 'drawing' ? canvasHasUnconfirmedChanges ? 'Nét mới vẫn được giữ — mở bảng và bấm Xong để cập nhật' : hasCanvasDrawing ? '✓ Bản vẽ đã sẵn sàng' : 'Chọn “Bé tự vẽ” để bắt đầu' : draft.referenceUri || draft.uploadedReferenceUrl ? '✓ Ảnh mẫu đã sẵn sàng' : 'Chọn “Ảnh có sẵn” để thêm tranh mẫu'}
+          </Text>
         </SectionCard>
 
         <SectionCard title="2. Bé thích phong cách nào?" hint="Chạm vào ảnh mẫu để xem và chọn phong cách.">
+          <View className="mb-4 flex-row overflow-hidden rounded-[22px] border-2 border-brand bg-rose-50">
+            <Image source={selectedStyle.thumbnail} style={{ width: useGrid ? 190 : 116, minHeight: useGrid ? 142 : 112 }} contentFit="cover" />
+            <View className="flex-1 justify-center p-4">
+              <View className="self-start rounded-full bg-brand px-3 py-1">
+                <Text className="text-[10px] font-extrabold uppercase tracking-wide text-white">✓ Phong cách đang chọn</Text>
+              </View>
+              <Text className="mt-2 text-xl font-extrabold text-slate-900">{selectedStyle.labelVi}</Text>
+              <Text className="mt-1 text-xs leading-5 text-slate-600" numberOfLines={useGrid ? 3 : 2}>{selectedStyle.descriptionVi}</Text>
+            </View>
+          </View>
+          <Text className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Tất cả phong cách</Text>
           {useGrid ? (
-            <View className="flex-row flex-wrap" style={{ gap: 12 }}>
+            <View className="flex-row flex-wrap" style={{ gap: 12 }} onLayout={(event) => setStyleGridWidth(event.nativeEvent.layout.width)}>
               {ART_STYLES.map((item) => <StyleCard key={item.id} item={item} selected={draft.styleId === item.id} width={cardWidth} onPress={() => patch({ styleId: item.id })} />)}
             </View>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 8 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={cardWidth + 12} decelerationRate="fast" contentContainerStyle={{ gap: 12, paddingRight: 8 }}>
               {ART_STYLES.map((item) => <StyleCard key={item.id} item={item} selected={draft.styleId === item.id} width={cardWidth} onPress={() => patch({ styleId: item.id })} />)}
             </ScrollView>
           )}
-          <View className="mt-4 flex-row overflow-hidden rounded-2xl border-2 border-brand bg-rose-50">
-            <Image source={selectedStyle.thumbnail} style={{ width: 112, minHeight: 104 }} contentFit="cover" />
-            <View className="flex-1 justify-center p-3">
-              <Text className="text-xs font-bold uppercase text-brand">Đang chọn</Text>
-              <Text className="mt-1 text-lg font-extrabold text-slate-900">{selectedStyle.labelVi}</Text>
-              <Text className="mt-1 text-xs leading-5 text-slate-600">{selectedStyle.descriptionVi}</Text>
-            </View>
-          </View>
         </SectionCard>
 
         <SectionCard title="3. Điều mình muốn giữ lại" hint="Ví dụ: giữ nụ cười, chiếc mũ đỏ hoặc màu của chú mèo.">
@@ -458,20 +433,19 @@ export default function ArtScreen() {
         </SectionCard>
 
         {busyStage ? (
-          <View className="mb-4 items-center rounded-[24px] border border-orange-100 bg-white px-5 py-8">
-            <ActivityIndicator size="large" color="#FF6670" />
-            <Text className="mt-4 text-lg font-extrabold text-slate-900">
+          <View className="mb-4 min-h-20 justify-center rounded-[22px] border border-rose-200 bg-white px-5 py-4">
+            <View className="flex-row items-center justify-center" style={{ gap: 12 }}><ActivityIndicator color="#FF6670" />
+            <Text className="text-base font-extrabold text-slate-900">
               {busyStage === 'preparing' ? 'Đang đóng khung nét vẽ…' : busyStage === 'uploading' ? 'Đang lưu tranh mẫu…' : `AI đang vẽ kiểu ${selectedStyle.labelVi}…`}
-            </Text>
-            <Text className="mt-2 text-center text-sm text-slate-500">
-              {busyStage === 'preparing' ? 'Xưởng đang biến bảng vẽ thành ảnh PNG.' : busyStage === 'uploading' ? 'Ảnh sẽ xuất hiện trong Gallery của bé.' : 'Bức tranh có thể cần vài phút để hoàn thành.'}
-            </Text>
-            <View className="mt-5 h-3 w-full overflow-hidden rounded-full bg-orange-100">
+            </Text></View>
+            <View className="mt-3 h-2 w-full overflow-hidden rounded-full bg-orange-100">
               <View className={`h-full rounded-full bg-brand ${busyStage === 'preparing' ? 'w-1/4' : busyStage === 'uploading' ? 'w-1/2' : 'w-3/4'}`} />
             </View>
           </View>
         ) : (
-          <PrimaryButton label="✨ AI vẽ lại bức tranh" disabled={referenceMode === 'drawing' ? !hasCanvasDrawing : !draft.referenceUri && !draft.uploadedReferenceUrl} onPress={() => void generate()} />
+          <Pressable accessibilityRole="button" accessibilityLabel={`AI vẽ lại theo phong cách ${selectedStyle.labelVi}`} disabled={referenceMode === 'drawing' ? !hasCanvasDrawing : !draft.referenceUri && !draft.uploadedReferenceUrl} onPress={() => void generate()} className="mb-4 min-h-16 w-full flex-row items-center justify-center rounded-[22px] bg-brand px-5 disabled:opacity-50" style={{ gap: 12, shadowColor: '#FF6670', shadowOpacity: 0.22, shadowRadius: 14, shadowOffset: { width: 0, height: 7 } }}>
+            <Text className="text-2xl">✨</Text><Text className="text-base font-extrabold text-white">AI vẽ lại bức tranh</Text><Text className="text-lg text-white/80">→</Text>
+          </Pressable>
         )}
 
         {draft.resultUri ? (
@@ -492,8 +466,24 @@ export default function ArtScreen() {
             </Pressable>
           </View>
         ) : null}
+        </View>
       </ScrollView>
     </ScreenChrome>
+    <Modal transparent visible={photoPickerVisible} animationType="fade" onRequestClose={() => setPhotoPickerVisible(false)}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Đóng chọn nguồn ảnh" onPress={() => setPhotoPickerVisible(false)} className="flex-1 items-center justify-center bg-slate-950/40 px-5">
+        <Pressable accessibilityRole="none" onPress={(event) => event.stopPropagation()} className="w-full max-w-md rounded-[28px] bg-white p-5" style={{ shadowColor: '#0F172A', shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 12 } }}>
+          <Text className="text-center text-xl font-extrabold text-slate-900">Thêm tranh mẫu</Text>
+          <Text className="mt-1 text-center text-sm text-slate-500">Bé muốn dùng nguồn ảnh nào?</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="Chụp ảnh bằng camera" onPress={() => void choose(true)} className="mt-5 min-h-14 flex-row items-center rounded-2xl bg-brand px-4" style={{ gap: 12 }}>
+            <Text className="text-2xl">📷</Text><View className="flex-1"><Text className="font-extrabold text-white">Chụp ảnh</Text><Text className="text-xs text-white/80">Chụp tranh giấy ngay bây giờ</Text></View><Text className="text-white">→</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Chọn ảnh từ thư viện" onPress={() => void choose(false)} className="mt-3 min-h-14 flex-row items-center rounded-2xl border border-orange-100 bg-orange-50 px-4" style={{ gap: 12 }}>
+            <Text className="text-2xl">🖼️</Text><View className="flex-1"><Text className="font-extrabold text-orange-900">Thư viện ảnh</Text><Text className="text-xs text-slate-500">Chọn ảnh đã có trên thiết bị</Text></View><Text className="text-orange-900">→</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Huỷ chọn ảnh" onPress={() => setPhotoPickerVisible(false)} className="mt-3 py-3"><Text className="text-center font-bold text-slate-500">Huỷ</Text></Pressable>
+        </Pressable>
+      </Pressable>
+    </Modal>
     <Modal visible={canvasModalVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={requestCloseCanvas} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
       <SafeAreaView className="flex-1 bg-orange-50" edges={['top', 'right', 'bottom', 'left']}>
         <View className="flex-1 p-1">

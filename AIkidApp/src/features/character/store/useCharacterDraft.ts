@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import {
   createEmptyDraft,
+  defaultSelectedAnswerKeys,
   defaultCategoryInputs,
 } from '../constants';
 import {
@@ -19,6 +20,7 @@ import type {
   SavedCharacter,
 } from '../types';
 import { buildCharacterUserPrompt } from '../constants';
+import { CATEGORY_QUESTIONS } from '../constants';
 
 type CharacterState = {
   draft: CharacterDraft;
@@ -43,8 +45,9 @@ type CharacterState = {
   setIdeaShape: (value: string) => void;
   setGeneratedImageUri: (uri: string | null) => void;
   resetDraft: () => void;
+  randomizeDraft: () => void;
   persistDraft: () => Promise<void>;
-  saveCurrentToStorage: () => Promise<SavedCharacter | null>;
+  saveCurrentToStorage: (childProfileId?: string | null) => Promise<SavedCharacter | null>;
   removeSaved: (id: string) => Promise<void>;
   getUserPrompt: () => string;
 };
@@ -88,6 +91,9 @@ export const useCharacterDraft = create<CharacterState>((set, get) => ({
               defaultCategoryInputs(),
               parsed.categoryInputs,
             ),
+            selectedAnswerKeys: Array.isArray(parsed.selectedAnswerKeys)
+              ? parsed.selectedAnswerKeys
+              : defaultSelectedAnswerKeys(),
             schemaVersion: 1,
           };
         } catch {
@@ -102,6 +108,7 @@ export const useCharacterDraft = create<CharacterState>((set, get) => ({
             defaultCategoryInputs(),
             legacy.categoryInputs,
           ),
+          selectedAnswerKeys: defaultSelectedAnswerKeys(),
           schemaVersion: 1,
           updatedAt: new Date().toISOString(),
         };
@@ -166,6 +173,10 @@ export const useCharacterDraft = create<CharacterState>((set, get) => ({
             ...s.draft.categoryInputs,
             [cat]: arr,
           },
+          selectedAnswerKeys: Array.from(new Set([
+            ...(s.draft.selectedAnswerKeys || []),
+            `${cat}-${index}`,
+          ])),
           updatedAt: new Date().toISOString(),
         },
       };
@@ -201,12 +212,31 @@ export const useCharacterDraft = create<CharacterState>((set, get) => ({
     void saveDraftJson(JSON.stringify(draft));
   },
 
+  randomizeDraft: () => {
+    const categoryInputs = (Object.keys(CATEGORY_QUESTIONS) as CharacterCategoryId[]).reduce((result, category) => {
+      result[category] = CATEGORY_QUESTIONS[category].map((question) => question.choices[Math.floor(Math.random() * question.choices.length)] || '');
+      return result;
+    }, {} as CategoryAnswers);
+    set((state) => ({
+      draft: {
+        ...state.draft,
+        categoryInputs,
+        selectedAnswerKeys: (Object.keys(CATEGORY_QUESTIONS) as CharacterCategoryId[]).flatMap((category) =>
+          CATEGORY_QUESTIONS[category].map((_, index) => `${category}-${index}`),
+        ),
+        generatedImageUri: null,
+        updatedAt: new Date().toISOString(),
+      },
+    }));
+    void get().persistDraft();
+  },
+
   persistDraft: async () => {
     const next = await writeDraft(get().draft);
     set({ draft: next });
   },
 
-  saveCurrentToStorage: async () => {
+  saveCurrentToStorage: async (childProfileId) => {
     const { draft, saved } = get();
     const name = draft.name.trim() || 'Nhân vật chưa đặt tên';
     const prompt = buildCharacterUserPrompt(draft);
@@ -220,6 +250,7 @@ export const useCharacterDraft = create<CharacterState>((set, get) => ({
       birthday: draft.birthday || undefined,
       avatarUri: draft.generatedImageUri || draft.uploadedImageUri || '',
       source: draft.generatedImageUri ? 'ai' : 'draft',
+      childProfileId: childProfileId || undefined,
       createdAt: new Date().toISOString(),
       userPrompt: prompt,
     };

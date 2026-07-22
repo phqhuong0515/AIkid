@@ -344,6 +344,10 @@ export function defaultCategoryInputs(): CategoryAnswers {
   };
 }
 
+export function defaultSelectedAnswerKeys(): string[] {
+  return CATEGORY_QUESTIONS.shape.map((_, index) => `shape-${index}`);
+}
+
 export function createEmptyDraft(): CharacterDraft {
   return {
     schemaVersion: 1,
@@ -355,6 +359,7 @@ export function createEmptyDraft(): CharacterDraft {
     description: '',
     activeCategory: 'shape',
     categoryInputs: defaultCategoryInputs(),
+    selectedAnswerKeys: defaultSelectedAnswerKeys(),
     ideaNotes: {},
     uploadedImageUri: null,
     generatedImageUri: null,
@@ -380,7 +385,9 @@ export function buildCharacterUserPrompt(draft: CharacterDraft): string {
     const answers = draft.categoryInputs[cat] || [];
     questions.forEach((q, i) => {
       const ans = (answers[i] || '').trim();
-      if (ans) parts.push(`${q.subject}: ${ans}`);
+      if (ans && (cat === 'shape' || draft.selectedAnswerKeys?.includes(`${cat}-${i}`))) {
+        parts.push(`${q.subject}: ${ans}`);
+      }
     });
   });
 

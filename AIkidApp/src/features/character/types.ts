@@ -25,6 +25,8 @@ export type CharacterDraft = {
   description: string;
   activeCategory: CharacterCategoryId;
   categoryInputs: CategoryAnswers;
+  /** Fields explicitly chosen by the child; defaults stay as UI suggestions only. */
+  selectedAnswerKeys?: string[];
   ideaNotes?: { shape?: string };
   uploadedImageUri: string | null;
   generatedImageUri: string | null;

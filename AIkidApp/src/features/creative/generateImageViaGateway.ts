@@ -50,7 +50,7 @@ export async function generateImageViaGateway(
 
   const jobId = await createImageJob({
     prompt,
-    provider: input.provider ?? 'google-native',
+    provider: input.provider,
     ipId: input.ipId,
     referenceImageUrls: refs.length ? refs : undefined,
     childProfileId: input.childProfileId,
@@ -63,17 +63,6 @@ export async function generateImageViaGateway(
   }
 
   return { jobId, imageUrl };
-}
-
-/** Art redraw prompt — user style label only (server may still add templates later) */
-export function buildArtRedrawPrompt(styleName: string): string {
-  const style = styleName.trim() || 'Màu Nước';
-  return [
-    `Redraw this children's drawing as a polished illustration.`,
-    `Art style: ${style}.`,
-    `Single centered subject, kid-friendly, clean composition,`,
-    `soft lighting, high quality, no text, no watermark, no multi-panel sheet.`,
-  ].join(' ');
 }
 
 /** Character prompt wrapper for job-api (user fields already in base) */

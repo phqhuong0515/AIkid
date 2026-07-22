@@ -40,6 +40,58 @@ function inlineClassStyles(svg: string): string {
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
 }
 
+type GradientDefinition = { tag: string; attributes: string; content: string };
+
+/**
+ * react-native-svg does not consistently inherit stops/coordinates through
+ * xlink:href. Illustrator uses that shorthand for the mirrored right leg, so
+ * native falls back to black although browsers render it correctly. Resolve
+ * every gradient chain into a standalone definition before IDs are prefixed.
+ */
+function materializeGradientInheritance(svg: string): string {
+  const gradientPattern = /<(linearGradient|radialGradient)\b([^>]*?)\s*(?:\/\s*>|>([\s\S]*?)<\/\1\s*>)/gi;
+  const definitions = new Map<string, GradientDefinition>();
+  for (const match of svg.matchAll(gradientPattern)) {
+    const id = match[2].match(/\bid=(['"])([^'"]+)\1/i)?.[2];
+    if (id) definitions.set(id, { tag: match[1], attributes: match[2], content: match[3] || '' });
+  }
+
+  const parseAttributes = (value: string) => {
+    const result = new Map<string, string>();
+    for (const match of value.matchAll(/([:\w-]+)\s*=\s*(['"])(.*?)\2/g)) result.set(match[1], match[3]);
+    return result;
+  };
+  const resolved = new Map<string, GradientDefinition>();
+  const resolve = (id: string, visiting = new Set<string>()): GradientDefinition | undefined => {
+    if (resolved.has(id)) return resolved.get(id);
+    const current = definitions.get(id);
+    if (!current || visiting.has(id)) return current;
+    visiting.add(id);
+    const attributes = parseAttributes(current.attributes);
+    const inheritedId = attributes.get('xlink:href')?.replace(/^#/, '') || attributes.get('href')?.replace(/^#/, '');
+    const inherited = inheritedId ? resolve(inheritedId, visiting) : undefined;
+    const merged = inherited ? parseAttributes(inherited.attributes) : new Map<string, string>();
+    for (const [name, value] of attributes) merged.set(name, value);
+    merged.delete('href');
+    merged.delete('xlink:href');
+    const content = /<stop\b/i.test(current.content) ? current.content : inherited?.content || current.content;
+    const definition = {
+      tag: current.tag,
+      attributes: [...merged].map(([name, value]) => `${name}="${value.replace(/"/g, '&quot;')}"`).join(' '),
+      content,
+    };
+    resolved.set(id, definition);
+    visiting.delete(id);
+    return definition;
+  };
+
+  return svg.replace(gradientPattern, (original, _tag: string, attributes: string) => {
+    const id = attributes.match(/\bid=(['"])([^'"]+)\1/i)?.[2];
+    const definition = id ? resolve(id) : undefined;
+    return definition ? `<${definition.tag} ${definition.attributes}>${definition.content}</${definition.tag}>` : original;
+  });
+}
+
 function prefixIds(svg: string, prefix: string): string {
   const ids = [...svg.matchAll(/\bid=["']([^"']+)["']/gi)].map((match) => match[1]);
   let result = ids.reduce((value, id) => value
@@ -59,7 +111,8 @@ function prefixIds(svg: string, prefix: string): string {
 
 function layer(svg: string, prefix: string, transform = ''): string {
   if (!svg) return '';
-  return `<g id="${prefix}"${transform ? ` transform="${transform}"` : ''}>${inner(prefixIds(inlineClassStyles(svg), prefix))}</g>`;
+  const nativeSafeSvg = materializeGradientInheritance(inlineClassStyles(svg));
+  return `<g id="${prefix}"${transform ? ` transform="${transform}"` : ''}>${inner(prefixIds(nativeSafeSvg, prefix))}</g>`;
 }
 
 function recolorBody(svg: string, draft: MeeDraft): string {

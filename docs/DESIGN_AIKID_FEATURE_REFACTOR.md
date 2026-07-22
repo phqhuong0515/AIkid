@@ -1135,3 +1135,26 @@ Full `STYLE_PROMPT` / `NEGATIVE_PROMPT` strings live in `AIkid/new-lobby-page/se
 ## Revision Summary
 
 **Rev 2 (2026-07-17)** — Addressed design review Issues 1–17: backend contract spike PR-00; Class A/B module policy; media `ensurePublicImageUrls` + web FormData; AI identity matrix; nested Mee pack schema + recolor strategy + storage.storymee.com default; compose port inventory + goldens; KD-13–18; split PR-09 and PR-14a–d; character category + art style catalogs; dual-read storage; SVG XSS rules; observability minimum; kids-ui path locked; Alt E; inventory nits (~1.3k SVG, 1927×930); testing matrix.
+## Responsive prompt-token composer (2026-07-22)
+
+Character and comic creation share `PromptComposer`, `CompactOptionField`, and `OptionPicker` from `src/features/kids-ui/CreativeKit.tsx`.
+
+- A selected answer is rendered as a colored prompt token; pressing it opens the same option catalog used by the compact field.
+- Every picker includes a free-form “Tự viết” path. The chosen value remains the single draft value used to build the user prompt—there is no separate visual-only selection state.
+- At `>= 900–920px`, editors use a bounded two-column canvas (`maxWidth: 1180`). On mobile, the prompt/result/action surface appears before the longer detail editor so a child can create without scrolling through the entire form.
+- Transparent overlays use fade animation. Option pickers are centered dialogs on web and bottom sheets on mobile.
+
+### Character prompt and Gallery
+
+- `Hình dáng` là baseline: các giá trị mặc định luôn đi vào prompt.
+- `Bộ phận`, `Khuôn mặt`, `Tóc/lông`, `Trang phục` chỉ đi vào prompt sau khi người dùng chọn hoặc bấm Random.
+- Hồ sơ nhân vật nằm trong `Gallery > Nhân vật`, tách khỏi asset `Ảnh AI` và `Ảnh tải lên`; mở thẻ nhân vật để xem prompt.
+
+### Comic story hierarchy
+
+- Mỗi trang là một câu chuyện hoàn chỉnh, ngắn và dễ hiểu. Bé chỉ nhập ý tưởng, chọn `2`, `4` hoặc `6` panel; không phải cấu hình góc máy, toàn cảnh hay thuật ngữ điện ảnh.
+- Project giữ `cast` như một Character Bible dùng chung. Mỗi nhân vật có vai `chính`/`phụ`, tính cách, mô tả ngoại hình, ảnh tham chiếu và có thể được lấy từ Mee hoặc `Gallery > Nhân vật`.
+- Nút **AI chia thành các panel** tạo `jobType: llm`. Universal Media Coordinator chạy đúng chuỗi `Vertex -> Gemini`; kết quả bắt buộc là JSON gồm đúng số panel với `action`, `speaker`, `dialogue`. Parser có normalize schema và local scaffold fallback khi LLM không phản hồi.
+- Bé chỉ sửa hành động và lời thoại từng panel. Image job nhận Character Bible, ảnh tham chiếu, sơ đồ lưới cứng `2×1`, `2×2` hoặc `3×2`, cùng dialogue chính xác để tạo **một ảnh trang truyện hoàn chỉnh**.
+- App không phủ SVG/text overlay lên ảnh. Thay đổi dialogue sau khi đã sinh ảnh yêu cầu vẽ lại trang; prompt cấm model tự thêm caption hoặc sound effect ngoài dialogue đã cung cấp.
+- `schemaVersion: 4` tự migrate draft cũ: `characters` thành nhân vật chính, `idea/storyBeat` thành ý tưởng trang và dữ liệu trang cũ thành panel scaffold. Native mobile vuốt snap giữa card; web hẹp dùng nút Panel trước/sau; desktop rộng dùng lưới editor hai cột và preview bên phải.

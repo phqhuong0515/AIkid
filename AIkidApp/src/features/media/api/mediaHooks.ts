@@ -402,6 +402,7 @@ export async function uploadPickedImageAsPublicRef(input: {
   childId: string;
   ipId: string;
   assetType?: string;
+  tags?: string;
 }): Promise<string> {
   const mimeType = input.mimeType || 'image/jpeg';
   const fileName = input.fileName || guessFileName(input.uri, mimeType);
@@ -433,7 +434,7 @@ export async function uploadPickedImageAsPublicRef(input: {
     const uploaded = await mediaApi.upload(form, {
       ipId: input.ipId,
       assetType: input.assetType ?? 'uploaded',
-      tags: `child:${input.childId},art-reference`,
+      tags: `child:${input.childId},${input.tags || 'art-reference'}`,
       permanent: 'true',
     });
     const publicUrl = pickUploadPublicUrl(uploaded);

@@ -20,10 +20,10 @@ const ACTIONS = [
     emoji: '✨',
   },
   {
-    href: '/(app)/character/storage',
-    title: 'Kho nhân vật',
-    desc: 'Danh sách đã lưu trên máy',
-    emoji: '📦',
+    href: '/(app)/gallery',
+    title: 'Gallery nhân vật',
+    desc: 'Ảnh AI · ảnh tải lên · hồ sơ và prompt',
+    emoji: '🖼️',
   },
 ] as const;
 
