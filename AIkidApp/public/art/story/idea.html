@@ -1619,9 +1619,9 @@
               </div>
               <div class="custom-space-input-wrapper" style="justify-content: center;">
                 <input type="text" id="custom-space-input" class="custom-space-input"
-                  placeholder="Viết ý tưởng của em vào đây..." maxlength="30" onfocus="onCustomSpaceFocus()" oninput="updateSpaceCharCounter(this); onCustomSpaceInput()">
+                  placeholder="Viết ý tưởng của em vào đây..." maxlength="50" onfocus="onCustomSpaceFocus()" oninput="updateSpaceCharCounter(this); onCustomSpaceInput()">
               </div>
-              <div class="custom-space-counter" id="space-char-counter">0 / 30</div>
+              <div class="custom-space-counter" id="space-char-counter">0 / 50</div>
             </div>
           </div>
 
@@ -2072,7 +2072,7 @@
     function updateSpaceCharCounter(input) {
       const counter = document.getElementById('space-char-counter');
       if (counter) {
-        counter.innerText = `${input.value.length} / 30`;
+        counter.innerText = `${input.value.length} / 50`;
       }
     }
 
