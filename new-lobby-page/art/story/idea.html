@@ -723,12 +723,13 @@
       display: flex;
     }
 
-    /* ========== CONTEXT, OPENING, UNEXPECTED, OBSTACLE & ATTEMPT STEP PANEL ========== */
+    /* ========== CONTEXT, OPENING, UNEXPECTED, OBSTACLE, ATTEMPT & INSIGHT STEP PANEL ========== */
     .context-step-panel,
     .opening-step-panel,
     .unexpected-step-panel,
     .obstacle-step-panel,
-    .attempt-step-panel {
+    .attempt-step-panel,
+    .insight-step-panel {
       display: none;
       flex-direction: column;
       height: auto;
@@ -744,7 +745,8 @@
     .opening-step-panel.active,
     .unexpected-step-panel.active,
     .obstacle-step-panel.active,
-    .attempt-step-panel.active {
+    .attempt-step-panel.active,
+    .insight-step-panel.active {
       display: flex;
     }
 
@@ -754,7 +756,8 @@
     .opening-step-panel::-webkit-scrollbar,
     .unexpected-step-panel::-webkit-scrollbar,
     .obstacle-step-panel::-webkit-scrollbar,
-    .attempt-step-panel::-webkit-scrollbar {
+    .attempt-step-panel::-webkit-scrollbar,
+    .insight-step-panel::-webkit-scrollbar {
       width: 8px;
     }
     .char-step-panel::-webkit-scrollbar-track,
@@ -762,7 +765,8 @@
     .opening-step-panel::-webkit-scrollbar-track,
     .unexpected-step-panel::-webkit-scrollbar-track,
     .obstacle-step-panel::-webkit-scrollbar-track,
-    .attempt-step-panel::-webkit-scrollbar-track {
+    .attempt-step-panel::-webkit-scrollbar-track,
+    .insight-step-panel::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.02);
       border-radius: 10px;
     }
@@ -771,7 +775,8 @@
     .opening-step-panel::-webkit-scrollbar-thumb,
     .unexpected-step-panel::-webkit-scrollbar-thumb,
     .obstacle-step-panel::-webkit-scrollbar-thumb,
-    .attempt-step-panel::-webkit-scrollbar-thumb {
+    .attempt-step-panel::-webkit-scrollbar-thumb,
+    .insight-step-panel::-webkit-scrollbar-thumb {
       background-color: rgba(255, 117, 151, 0.5);
       border-radius: 10px;
       border: 2px solid #FFFFFF;
@@ -781,7 +786,8 @@
     .opening-step-panel::-webkit-scrollbar-thumb:hover,
     .unexpected-step-panel::-webkit-scrollbar-thumb:hover,
     .obstacle-step-panel::-webkit-scrollbar-thumb:hover,
-    .attempt-step-panel::-webkit-scrollbar-thumb:hover {
+    .attempt-step-panel::-webkit-scrollbar-thumb:hover,
+    .insight-step-panel::-webkit-scrollbar-thumb:hover {
       background-color: rgba(255, 117, 151, 0.8);
     }
     .char-step-panel,
@@ -789,7 +795,8 @@
     .opening-step-panel,
     .unexpected-step-panel,
     .obstacle-step-panel,
-    .attempt-step-panel {
+    .attempt-step-panel,
+    .insight-step-panel {
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 117, 151, 0.5) rgba(0, 0, 0, 0.02);
     }
@@ -1976,6 +1983,54 @@
           </div>
         </div>
 
+        <!-- ===== STEP 7: INSIGHT PANEL ===== -->
+        <div class="insight-step-panel" id="insight-step-panel">
+          <div class="idea-cards-grid">
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Mình không thể làm mọi thứ một mình')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-handshake-angle"></i></div>
+              <div class="idea-card-text">Mình không thể làm mọi thứ một mình</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Cần bình tĩnh hơn')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-brain"></i></div>
+              <div class="idea-card-text">Cần bình tĩnh hơn</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Phải tin vào bản thân')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-star"></i></div>
+              <div class="idea-card-text">Phải tin vào bản thân</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Mình đã hiểu sai vấn đề')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-puzzle-piece"></i></div>
+              <div class="idea-card-text">Mình đã hiểu sai vấn đề</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Người khác thật ra muốn giúp')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-heart"></i></div>
+              <div class="idea-card-text">Người khác thật ra muốn giúp</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Cần nói ra sự thật')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-comment-dots"></i></div>
+              <div class="idea-card-text">Cần nói ra sự thật</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Thất bại không có nghĩa là bỏ cuộc')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-mountain-sun"></i></div>
+              <div class="idea-card-text">Thất bại không có nghĩa là bỏ cuộc</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Điều quan trọng ở ngay trước mắt')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-gem"></i></div>
+              <div class="idea-card-text">Điều quan trọng ở ngay trước mắt</div>
+            </div>
+          </div>
+
+          <div class="custom-space-box" style="margin-top: 16px;">
+            <div class="custom-space-icon">
+              <i class="fa-solid fa-pen-fancy"></i>
+            </div>
+            <div class="custom-space-input-wrapper" style="justify-content: center;">
+              <input type="text" id="custom-insight-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('insight-char-counter').innerText = this.value.length + ' / 60'; selectedInsight = this.value.trim(); document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));">
+            </div>
+            <div class="custom-space-counter" id="insight-char-counter">0 / 60</div>
+          </div>
+        </div>
+
         <!-- 8 Option Cards Grid -->
         <div class="idea-cards-grid" id="idea-cards-grid">
 
@@ -2175,6 +2230,20 @@
     let selectedUnexpectedEmotion = '';
     let selectedObstacle = '';
     let selectedAttempt = '';
+    let selectedInsight = '';
+
+    function selectInsightCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedInsight = text;
+      const input = document.getElementById('custom-insight-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('insight-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+    }
 
     function selectAttemptCard(card, text) {
       playPopSound();
@@ -2641,6 +2710,7 @@
       const unexpectedPanel = document.getElementById('unexpected-step-panel');
       const obstaclePanel = document.getElementById('obstacle-step-panel');
       const attemptPanel = document.getElementById('attempt-step-panel');
+      const insightPanel = document.getElementById('insight-step-panel');
       const ideaGrid = document.getElementById('idea-cards-grid');
       const customBox = document.getElementById('generic-custom-idea-box');
       
@@ -2654,6 +2724,7 @@
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (attemptPanel) attemptPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 2) {
@@ -2666,6 +2737,7 @@
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (attemptPanel) attemptPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 3) {
@@ -2679,6 +2751,7 @@
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (attemptPanel) attemptPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 4) {
@@ -2691,6 +2764,7 @@
         if (unexpectedPanel) unexpectedPanel.classList.add('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (attemptPanel) attemptPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 5) {
@@ -2703,6 +2777,7 @@
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.add('active');
         if (attemptPanel) attemptPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 6) {
@@ -2715,6 +2790,20 @@
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (attemptPanel) attemptPanel.classList.add('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 7) {
+        if (titleEl) titleEl.innerText = 'Nhân vật nhận ra điều gì?';
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
+        
+        charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (attemptPanel) attemptPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.add('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else {
@@ -2722,8 +2811,7 @@
         if (titleEl) titleEl.innerText = stepName;
         
         if (subtitleEl) {
-          if (stepNumber === 7) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
-          else if (stepNumber === 8) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
+          if (stepNumber === 8) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
           else if (stepNumber === 9) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
         }
         
@@ -2733,6 +2821,7 @@
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (attemptPanel) attemptPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'grid';
         if (customBox) customBox.style.display = 'flex';
       }
@@ -2861,6 +2950,15 @@
           return;
         }
         selectedIdeaText = attemptVal || selectedAttempt;
+        isValid = true;
+      } else if (currentStepIndex === 7) {
+        const insightInput = document.getElementById('custom-insight-text');
+        const insightVal = insightInput ? insightInput.value.trim() : '';
+        if (!insightVal && !selectedInsight) {
+          showComingSoon('Vui lòng chọn hoặc tự viết điều nhân vật nhận ra!');
+          return;
+        }
+        selectedIdeaText = insightVal || selectedInsight;
         isValid = true;
       } else {
         const customInput = document.getElementById('custom-idea-text');
