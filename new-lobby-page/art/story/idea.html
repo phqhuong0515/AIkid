@@ -1456,21 +1456,16 @@
         </div>
 
         <div class="step-item" onclick="selectStep(6)">
-          <i class="fa-solid fa-lightbulb step-icon" style="color: #F59E0B;"></i>
-          <span>Nhân vật thử làm gì?</span>
-        </div>
-
-        <div class="step-item" onclick="selectStep(7)">
           <i class="fa-solid fa-cloud step-icon" style="color: #38BDF8;"></i>
           <span>Nhân vật nhận ra điều gì?</span>
         </div>
 
-        <div class="step-item" onclick="selectStep(8)">
+        <div class="step-item" onclick="selectStep(7)">
           <i class="fa-solid fa-fire step-icon" style="color: #F97316;"></i>
           <span>Cao trào</span>
         </div>
 
-        <div class="step-item" onclick="selectStep(9)">
+        <div class="step-item" onclick="selectStep(8)">
           <i class="fa-solid fa-flag-checkered step-icon" style="color: #9333EA;"></i>
           <span>Kết thúc</span>
         </div>
@@ -1482,7 +1477,7 @@
         <!-- Question Header -->
         <div class="plot-header-area">
           <div class="progress-bar-container">
-            <span id="progress-step-label" style="font-family: 'Chiron GoRound TC', sans-serif; font-weight: 900; color: #F97316; font-size: 1.15rem; width: 45px; text-align: right;">0/9</span>
+            <span id="progress-step-label" style="font-family: 'Chiron GoRound TC', sans-serif; font-weight: 900; color: #F97316; font-size: 1.15rem; width: 45px; text-align: right;">0/8</span>
             <div class="progress-track" style="flex: 1;">
               <div class="progress-fill" id="progress-fill-bar" style="width: 0%;">
                 <div class="progress-star-handle">
@@ -2687,11 +2682,11 @@
     let completedSteps = new Set();
 
     function updateProgressUI() {
-      const pct = Math.round((completedSteps.size / 9) * 100);
+      const pct = Math.round((completedSteps.size / 8) * 100);
       const fill = document.getElementById('progress-fill-bar');
       const label = document.getElementById('progress-step-label');
       if (fill) fill.style.width = `${pct}%`;
-      if (label) label.innerText = `${completedSteps.size}/9`;
+      if (label) label.innerText = `${completedSteps.size}/8`;
     }
 
     function selectStep(stepNumber) {
@@ -2718,7 +2713,6 @@
       const openingPanel = document.getElementById('opening-step-panel');
       const unexpectedPanel = document.getElementById('unexpected-step-panel');
       const obstaclePanel = document.getElementById('obstacle-step-panel');
-      const attemptPanel = document.getElementById('attempt-step-panel');
       const insightPanel = document.getElementById('insight-step-panel');
       const ideaGrid = document.getElementById('idea-cards-grid');
       const customBox = document.getElementById('generic-custom-idea-box');
@@ -2732,7 +2726,6 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (attemptPanel) attemptPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2745,7 +2738,6 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (attemptPanel) attemptPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2759,7 +2751,6 @@
         if (openingPanel) openingPanel.classList.add('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (attemptPanel) attemptPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2772,7 +2763,6 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.add('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (attemptPanel) attemptPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2785,24 +2775,10 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.add('active');
-        if (attemptPanel) attemptPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 6) {
-        if (titleEl) titleEl.innerText = 'Nhân vật thử làm gì?';
-        if (subtitleEl) subtitleEl.innerText = 'Nhân vật lựa chọn cách nào để vượt qua trở ngại?';
-        
-        charPanel.classList.remove('active');
-        if (contextPanel) contextPanel.classList.remove('active');
-        if (openingPanel) openingPanel.classList.remove('active');
-        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
-        if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (attemptPanel) attemptPanel.classList.add('active');
-        if (insightPanel) insightPanel.classList.remove('active');
-        if (ideaGrid) ideaGrid.style.display = 'none';
-        if (customBox) customBox.style.display = 'none';
-      } else if (stepNumber === 7) {
         if (titleEl) titleEl.innerText = 'Nhân vật nhận ra điều gì?';
         if (subtitleEl) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
         
@@ -2811,7 +2787,6 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (attemptPanel) attemptPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.add('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2820,8 +2795,8 @@
         if (titleEl) titleEl.innerText = stepName;
         
         if (subtitleEl) {
-          if (stepNumber === 8) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
-          else if (stepNumber === 9) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
+          if (stepNumber === 7) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
+          else if (stepNumber === 8) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
         }
         
         charPanel.classList.remove('active');
@@ -2829,7 +2804,6 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (attemptPanel) attemptPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'grid';
         if (customBox) customBox.style.display = 'flex';
@@ -2858,7 +2832,7 @@
         emotion: emotionVal || selectedOpeningEmotion
       };
       
-      // Save current Idea Step (Steps 4-9)
+      // Save current Idea Step
       const customInput = document.getElementById('custom-idea-text');
       const customVal = customInput ? customInput.value.trim() : '';
       const currentIdeaData = {
@@ -2945,22 +2919,23 @@
       } else if (currentStepIndex === 5) {
         const obstacleInput = document.getElementById('custom-obstacle-text');
         const obstacleVal = obstacleInput ? obstacleInput.value.trim() : '';
-        if (!obstacleVal && !selectedObstacle) {
+        const attemptInput = document.getElementById('custom-attempt-text');
+        const attemptVal = attemptInput ? attemptInput.value.trim() : '';
+
+        const finalObstacle = obstacleVal || selectedObstacle;
+        const finalAttempt = attemptVal || selectedAttempt;
+
+        if (!finalObstacle) {
           showComingSoon('Vui lòng chọn hoặc tự viết một trở ngại!');
           return;
         }
-        selectedIdeaText = obstacleVal || selectedObstacle;
-        isValid = true;
-      } else if (currentStepIndex === 6) {
-        const attemptInput = document.getElementById('custom-attempt-text');
-        const attemptVal = attemptInput ? attemptInput.value.trim() : '';
-        if (!attemptVal && !selectedAttempt) {
+        if (!finalAttempt) {
           showComingSoon('Vui lòng chọn hoặc tự viết cách nhân vật thử làm!');
           return;
         }
-        selectedIdeaText = attemptVal || selectedAttempt;
+        selectedIdeaText = `${finalObstacle} | ${finalAttempt}`;
         isValid = true;
-      } else if (currentStepIndex === 7) {
+      } else if (currentStepIndex === 6) {
         const insightInput = document.getElementById('custom-insight-text');
         const insightVal = insightInput ? insightInput.value.trim() : '';
         if (!insightVal && !selectedInsight) {
@@ -2983,10 +2958,10 @@
         completedSteps.add(currentStepIndex);
         updateProgressUI();
         
-        if (currentStepIndex < 9) {
+        if (currentStepIndex < 8) {
           selectStep(currentStepIndex + 1);
         } else {
-          if (completedSteps.size < 9) {
+          if (completedSteps.size < 8) {
             showComingSoon('Vui lòng hoàn thành tất cả các mục!');
           } else {
             playPopAndNavigate('/character/generate/feature.html');
