@@ -2750,7 +2750,235 @@
     let currentStepIndex = 1;
     let completedSteps = new Set();
 
+    function saveCurrentStepState(stepIdx) {
+      if (!stepIdx) stepIdx = currentStepIndex;
+
+      if (stepIdx === 1) {
+        checkStep1Completion();
+      } else if (stepIdx === 2) {
+        const customSpace = document.getElementById('custom-space-input')?.value.trim() || '';
+        const spaceVal = customSpace || selectedSpace;
+        if (selectedTime && spaceVal) {
+          completedSteps.add(2);
+        } else {
+          completedSteps.delete(2);
+        }
+      } else if (stepIdx === 3) {
+        const actVal = document.getElementById('custom-opening-action')?.value.trim() || selectedOpeningAction;
+        const emoVal = document.getElementById('custom-opening-emotion')?.value.trim() || selectedOpeningEmotion;
+        if (actVal && emoVal) {
+          completedSteps.add(3);
+        } else {
+          completedSteps.delete(3);
+        }
+      } else if (stepIdx === 4) {
+        const evtVal = document.getElementById('custom-unexpected-event')?.value.trim() || selectedUnexpectedEvent;
+        const emoVal = document.getElementById('custom-unexpected-emotion')?.value.trim() || selectedUnexpectedEmotion;
+        if (evtVal && emoVal) {
+          completedSteps.add(4);
+        } else {
+          completedSteps.delete(4);
+        }
+      } else if (stepIdx === 5) {
+        const obsVal = document.getElementById('custom-obstacle-text')?.value.trim() || selectedObstacle;
+        const attVal = document.getElementById('custom-attempt-text')?.value.trim() || selectedAttempt;
+        if (obsVal && attVal) {
+          completedSteps.add(5);
+        } else {
+          completedSteps.delete(5);
+        }
+      } else if (stepIdx === 6) {
+        const customVal = document.getElementById('custom-idea-text')?.value.trim() || selectedIdeaText;
+        if (customVal) {
+          completedSteps.add(6);
+        } else {
+          completedSteps.delete(6);
+        }
+      } else if (stepIdx === 7) {
+        const endVal = document.getElementById('custom-ending-text')?.value.trim() || selectedEnding;
+        if (endVal) {
+          completedSteps.add(7);
+        } else {
+          completedSteps.delete(7);
+        }
+      } else if (stepIdx === 8) {
+        const insVal = document.getElementById('custom-insight-text')?.value.trim() || selectedInsight;
+        if (insVal) {
+          completedSteps.add(8);
+        } else {
+          completedSteps.delete(8);
+        }
+      }
+    }
+
+    function restoreStepStateUI(stepIdx) {
+      if (stepIdx === 2) {
+        if (selectedTime) {
+          document.querySelectorAll('.time-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedTime.toLowerCase()) {
+              c.classList.add('selected');
+            }
+          });
+        }
+        if (selectedSpace) {
+          let matched = false;
+          document.querySelectorAll('.space-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedSpace.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          const spaceInput = document.getElementById('custom-space-input');
+          if (spaceInput && !matched) {
+            spaceInput.value = selectedSpace;
+            updateSpaceCharCounter(spaceInput);
+          }
+        }
+      } else if (stepIdx === 3) {
+        const actInput = document.getElementById('custom-opening-action');
+        if (selectedOpeningAction) {
+          let matched = false;
+          document.querySelectorAll('.opening-action-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedOpeningAction.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (actInput && (!matched || actInput.value)) {
+            if (!matched) actInput.value = selectedOpeningAction;
+            updateActionCharCounter(actInput);
+          }
+        }
+        const emoInput = document.getElementById('custom-opening-emotion');
+        if (selectedOpeningEmotion) {
+          let matched = false;
+          document.querySelectorAll('.opening-emotion-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedOpeningEmotion.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (emoInput && (!matched || emoInput.value)) {
+            if (!matched) emoInput.value = selectedOpeningEmotion;
+            updateEmotionCharCounter(emoInput);
+          }
+        }
+      } else if (stepIdx === 4) {
+        const evtInput = document.getElementById('custom-unexpected-event');
+        if (selectedUnexpectedEvent) {
+          let matched = false;
+          document.querySelectorAll('.unexpected-event-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedUnexpectedEvent.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (evtInput && (!matched || evtInput.value)) {
+            if (!matched) evtInput.value = selectedUnexpectedEvent;
+            const counter = document.getElementById('unexpected-event-counter');
+            if (counter) counter.innerText = `${evtInput.value.length} / 60`;
+          }
+        }
+        const emoInput = document.getElementById('custom-unexpected-emotion');
+        if (selectedUnexpectedEmotion) {
+          let matched = false;
+          document.querySelectorAll('.unexpected-emotion-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedUnexpectedEmotion.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (emoInput && (!matched || emoInput.value)) {
+            if (!matched) emoInput.value = selectedUnexpectedEmotion;
+            const counter = document.getElementById('unexpected-emotion-counter');
+            if (counter) counter.innerText = `${emoInput.value.length} / 50`;
+          }
+        }
+      } else if (stepIdx === 5) {
+        const obsInput = document.getElementById('custom-obstacle-text');
+        if (selectedObstacle) {
+          let matched = false;
+          document.querySelectorAll('.obstacle-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedObstacle.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (obsInput && (!matched || obsInput.value)) {
+            if (!matched) obsInput.value = selectedObstacle;
+            const counter = document.getElementById('obstacle-char-counter');
+            if (counter) counter.innerText = `${obsInput.value.length} / 60`;
+          }
+        }
+        const attInput = document.getElementById('custom-attempt-text');
+        if (selectedAttempt) {
+          let matched = false;
+          document.querySelectorAll('.attempt-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedAttempt.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (attInput && (!matched || attInput.value)) {
+            if (!matched) attInput.value = selectedAttempt;
+            const counter = document.getElementById('attempt-char-counter');
+            if (counter) counter.innerText = `${attInput.value.length} / 60`;
+          }
+        }
+      } else if (stepIdx === 6) {
+        const customInput = document.getElementById('custom-idea-text');
+        if (selectedIdeaText) {
+          let matched = false;
+          document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedIdeaText.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (customInput) {
+            customInput.value = selectedIdeaText;
+            updateCharCounter(customInput);
+          }
+        }
+      } else if (stepIdx === 7) {
+        const endInput = document.getElementById('custom-ending-text');
+        if (selectedEnding) {
+          let matched = false;
+          document.querySelectorAll('.ending-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedEnding.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (endInput && (!matched || endInput.value)) {
+            if (!matched) endInput.value = selectedEnding;
+            const counter = document.getElementById('ending-char-counter');
+            if (counter) counter.innerText = `${endInput.value.length} / 60`;
+          }
+        }
+      } else if (stepIdx === 8) {
+        const insInput = document.getElementById('custom-insight-text');
+        if (selectedInsight) {
+          let matched = false;
+          document.querySelectorAll('.insight-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedInsight.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (insInput && (!matched || insInput.value)) {
+            if (!matched) insInput.value = selectedInsight;
+            const counter = document.getElementById('insight-char-counter');
+            if (counter) counter.innerText = `${insInput.value.length} / 60`;
+          }
+        }
+      }
+    }
+
     function updateProgressUI() {
+      for (let i = 1; i <= 8; i++) {
+        saveCurrentStepState(i);
+      }
       const pct = Math.round((completedSteps.size / 8) * 100);
       const fill = document.getElementById('progress-fill-bar');
       const label = document.getElementById('progress-step-label');
@@ -2760,6 +2988,12 @@
 
     function selectStep(stepNumber) {
       playPopSound();
+
+      // Save previous step state before leaving
+      if (currentStepIndex && currentStepIndex !== stepNumber) {
+        saveCurrentStepState(currentStepIndex);
+      }
+
       currentStepIndex = stepNumber;
       const items = document.querySelectorAll('.step-item');
       items.forEach((item, index) => {
@@ -2770,6 +3004,11 @@
         }
       });
       
+      // Restore UI elements for newly selected step
+      restoreStepStateUI(stepNumber);
+
+      // Save current step & update progress UI
+      saveCurrentStepState(stepNumber);
       updateProgressUI();
 
       // Update title and subtitle
