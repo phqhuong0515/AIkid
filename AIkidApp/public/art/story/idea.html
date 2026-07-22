@@ -628,10 +628,87 @@
       box-shadow: 0 0 0 3px rgba(255, 117, 151, 0.15);
     }
 
+    /* Character Action Row & Buttons Spacing */
+    .char-action-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .char-create-plus-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      border: 2px dashed #D1D5DB;
+      background: #FFFFFF;
+      color: #6B7280;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .char-create-plus-btn:hover {
+      border-color: #FF7597;
+      color: #FF7597;
+      background: #FFF5F8;
+      transform: scale(1.05);
+    }
+
+    .char-storage-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 48px;
+      padding: 0 20px;
+      border-radius: 9999px;
+      border: 2px solid #FF7597;
+      background: #FFFFFF;
+      color: #FF7597;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(255, 117, 151, 0.12);
+      flex-shrink: 0;
+    }
+
+    .char-storage-btn:hover {
+      background: #FF7597;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
+    }
+
+    .char-selected-avatar-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      border: 2px solid #FF7597;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
+      flex-shrink: 0;
+    }
+
+    .char-selected-avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     .char-section-divider {
       border: none;
       border-top: 2px dashed #EADED5;
-      margin: 20px 0;
+      margin: 24px 0;
       width: 100%;
     }
 
