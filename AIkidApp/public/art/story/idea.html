@@ -1889,99 +1889,106 @@
           </div>
         </div>
 
-        <!-- ===== STEP 5: OBSTACLE PANEL ===== -->
+        <!-- ===== STEP 5: OBSTACLE PANEL (Multi-section) ===== -->
         <div class="obstacle-step-panel" id="obstacle-step-panel">
-          <div class="idea-cards-grid">
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải vượt qua nỗi sợ')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-ghost"></i></div>
-              <div class="idea-card-text">Phải vượt qua nỗi sợ</div>
+          <!-- Section 1: Trở ngại là gì? -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-triangle-exclamation" style="color: #FF7597;"></i> Trở ngại là gì?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải vượt qua nỗi sợ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-ghost"></i></div>
+                <div class="idea-card-text">Phải vượt qua nỗi sợ</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không biết bắt đầu từ đâu')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-question"></i></div>
+                <div class="idea-card-text">Không biết bắt đầu từ đâu</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Bị người khác ngăn cản')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-hand"></i></div>
+                <div class="idea-card-text">Bị người khác ngăn cản</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không ai tin lời')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-comment-slash"></i></div>
+                <div class="idea-card-text">Không ai tin lời</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải giữ bí mật')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-lock"></i></div>
+                <div class="idea-card-text">Phải giữ bí mật</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải lựa chọn giữa hai điều quan trọng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div class="idea-card-text">Phải lựa chọn giữa hai điều quan trọng</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Mọi thứ không giống như tưởng tượng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-cloud-rain"></i></div>
+                <div class="idea-card-text">Mọi thứ không giống như tưởng tượng</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Càng cố giải quyết, rắc rối càng lớn hơn')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="idea-card-text">Càng cố giải quyết, rắc rối càng lớn hơn</div>
+              </div>
             </div>
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không biết bắt đầu từ đâu')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-question"></i></div>
-              <div class="idea-card-text">Không biết bắt đầu từ đâu</div>
-            </div>
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Bị người khác ngăn cản')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-hand"></i></div>
-              <div class="idea-card-text">Bị người khác ngăn cản</div>
-            </div>
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không ai tin lời')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-comment-slash"></i></div>
-              <div class="idea-card-text">Không ai tin lời</div>
-            </div>
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải giữ bí mật')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-lock"></i></div>
-              <div class="idea-card-text">Phải giữ bí mật</div>
-            </div>
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải lựa chọn giữa hai điều quan trọng')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-scale-balanced"></i></div>
-              <div class="idea-card-text">Phải lựa chọn giữa hai điều quan trọng</div>
-            </div>
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Mọi thứ không giống như tưởng tượng')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-cloud-rain"></i></div>
-              <div class="idea-card-text">Mọi thứ không giống như tưởng tượng</div>
-            </div>
-            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Càng cố giải quyết, rắc rối càng lớn hơn')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-triangle-exclamation"></i></div>
-              <div class="idea-card-text">Càng cố giải quyết, rắc rối càng lớn hơn</div>
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-obstacle-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('obstacle-char-counter').innerText = this.value.length + ' / 60'; selectedObstacle = this.value.trim(); document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected'));">
+              </div>
+              <div class="custom-space-counter" id="obstacle-char-counter">0 / 60</div>
             </div>
           </div>
 
-          <div class="custom-space-box" style="margin-top: 16px;">
-            <div class="custom-space-icon">
-              <i class="fa-solid fa-pen-fancy"></i>
-            </div>
-            <div class="custom-space-input-wrapper" style="justify-content: center;">
-              <input type="text" id="custom-obstacle-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('obstacle-char-counter').innerText = this.value.length + ' / 60'; selectedObstacle = this.value.trim(); document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected'));">
-            </div>
-            <div class="custom-space-counter" id="obstacle-char-counter">0 / 60</div>
-          </div>
-        </div>
+          <hr class="char-section-divider">
 
-        <!-- ===== STEP 6: ATTEMPT PANEL ===== -->
-        <div class="attempt-step-panel" id="attempt-step-panel">
-          <div class="idea-cards-grid">
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Tự tìm cách giải quyết')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-user-gear"></i></div>
-              <div class="idea-card-text">Tự tìm cách giải quyết</div>
+          <!-- Section 2: Nhân vật thử làm gì? -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-lightbulb" style="color: #F59E0B;"></i> Nhân vật thử làm gì?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Tự tìm cách giải quyết')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-user-gear"></i></div>
+                <div class="idea-card-text">Tự tìm cách giải quyết</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nhờ người khác giúp')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-user-group"></i></div>
+                <div class="idea-card-text">Nhờ người khác giúp</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Thử lại theo cách khác')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-arrows-rotate"></i></div>
+                <div class="idea-card-text">Thử lại theo cách khác</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Dùng một món đồ đặc biệt')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="idea-card-text">Dùng một món đồ đặc biệt</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nghĩ ra một kế hoạch')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-lightbulb"></i></div>
+                <div class="idea-card-text">Nghĩ ra một kế hoạch</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Quan sát và tìm manh mối')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <div class="idea-card-text">Quan sát và tìm manh mối</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nói chuyện để thuyết phục')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-comments"></i></div>
+                <div class="idea-card-text">Nói chuyện để thuyết phục</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Làm liều một phen')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-bolt-lightning"></i></div>
+                <div class="idea-card-text">Làm liều một phen</div>
+              </div>
             </div>
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nhờ người khác giúp')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-user-group"></i></div>
-              <div class="idea-card-text">Nhờ người khác giúp</div>
-            </div>
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Thử lại theo cách khác')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-arrows-rotate"></i></div>
-              <div class="idea-card-text">Thử lại theo cách khác</div>
-            </div>
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Dùng một món đồ đặc biệt')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-              <div class="idea-card-text">Dùng một món đồ đặc biệt</div>
-            </div>
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nghĩ ra một kế hoạch')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-lightbulb"></i></div>
-              <div class="idea-card-text">Nghĩ ra một kế hoạch</div>
-            </div>
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Quan sát và tìm manh mối')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-magnifying-glass"></i></div>
-              <div class="idea-card-text">Quan sát và tìm manh mối</div>
-            </div>
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nói chuyện để thuyết phục')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-comments"></i></div>
-              <div class="idea-card-text">Nói chuyện để thuyết phục</div>
-            </div>
-            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Làm liều một phen')">
-              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-bolt-lightning"></i></div>
-              <div class="idea-card-text">Làm liều một phen</div>
-            </div>
-          </div>
 
-          <div class="custom-space-box" style="margin-top: 16px;">
-            <div class="custom-space-icon">
-              <i class="fa-solid fa-pen-fancy"></i>
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-attempt-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('attempt-char-counter').innerText = this.value.length + ' / 60'; selectedAttempt = this.value.trim(); document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected'));">
+              </div>
+              <div class="custom-space-counter" id="attempt-char-counter">0 / 60</div>
             </div>
-            <div class="custom-space-input-wrapper" style="justify-content: center;">
-              <input type="text" id="custom-attempt-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('attempt-char-counter').innerText = this.value.length + ' / 60'; selectedAttempt = this.value.trim(); document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected'));">
-            </div>
-            <div class="custom-space-counter" id="attempt-char-counter">0 / 60</div>
           </div>
         </div>
 
@@ -2770,7 +2777,7 @@
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 5) {
         if (titleEl) titleEl.innerText = 'Trở ngại';
-        if (subtitleEl) subtitleEl.innerText = 'Điều gì khiến nhân vật chưa thể đạt mục tiêu?';
+        if (subtitleEl) subtitleEl.innerText = 'Trở ngại nào xảy ra và nhân vật lựa chọn cách nào để thử vượt qua?';
         
         charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.remove('active');
