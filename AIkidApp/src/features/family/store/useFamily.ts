@@ -21,6 +21,8 @@ type FamilyState = {
   isHydrated: boolean;
   error: string | null;
   loadFamily: () => Promise<void>;
+  applyChildSession: (child: ChildProfile) => Promise<void>;
+  replaceChild: (child: ChildProfile) => void;
   setActiveChild: (childId: string | null) => Promise<void>;
   createChildProfile: (input: {
     name: string;
@@ -96,6 +98,12 @@ export const useFamily = create<FamilyState>((set, get) => ({
       });
     }
   },
+
+  applyChildSession: async (child) => {
+    await AsyncStorage.setItem(ACTIVE_CHILD_KEY, child.id);
+    set({ children: [child], activeChildId: child.id, isHydrated: true, isLoading: false, error: null });
+  },
+  replaceChild: (child) => set({ children: get().children.map((item) => item.id === child.id ? child : item) }),
 
   setActiveChild: async (childId) => {
     if (childId) {

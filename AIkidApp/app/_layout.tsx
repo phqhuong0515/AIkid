@@ -6,13 +6,11 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, type ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
-import { GATEWAY_BASE_URL } from '@/core/api/config';
 import { setChildProfileIdResolver } from '@/core/api/client';
 import { onSessionInvalidated } from '@/core/auth/sessionEvents';
 import { useAuth } from '@/core/auth/useAuth';
 import { queryClient } from '@/core/query/queryClient';
 import { useFamily } from '@/features/family/store/useFamily';
-import { Platform } from 'react-native';
 
 /**
  * Auth gate: hydrate JWT, redirect login ↔ lobby.
@@ -32,16 +30,6 @@ function AuthCheck({ children }: { children: ReactNode }) {
     setChildProfileIdResolver(
       () => useFamily.getState().activeChildId,
     );
-  }, []);
-
-  /** Expose Gateway base for HTML embeds (art canvas gen script) */
-  useEffect(() => {
-    if (Platform.OS !== 'web') return;
-    try {
-      globalThis.localStorage?.setItem('aikid.api_url', GATEWAY_BASE_URL);
-    } catch {
-      // ignore
-    }
   }, []);
 
   useEffect(() => {
@@ -98,6 +86,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="(auth)/login" />
           <Stack.Screen name="(auth)/register" />
+          <Stack.Screen name="(auth)/forgot-password" />
           <Stack.Screen name="(app)" />
         </Stack>
       </AuthCheck>

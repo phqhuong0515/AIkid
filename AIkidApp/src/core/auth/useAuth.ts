@@ -2,6 +2,8 @@ import { create } from 'zustand';
 
 import { useFamily } from '@/features/family/store/useFamily';
 import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
+import { authApi, familyApi } from '@/core/storymee';
+import { isFirebaseAuthEnabled, loginChildWithFirebase, logoutFirebaseBestEffort } from '@/core/firebase/auth';
 
 import { apiClient } from '../api/client';
 import { extractErrorMessage } from '../api/unwrap';
@@ -10,17 +12,22 @@ import { clearAccessToken, getAccessToken, setAccessToken } from './token';
 
 export type AuthUser = {
   id?: string;
-  email?: string;
-  name?: string;
+  email?: string | null;
+  name?: string | null;
   [key: string]: unknown;
 };
 
+export type AuthActor = 'parent' | 'child';
+
 type LoginPayload = {
-  email: string;
+  login: string;
   password: string;
+  actorHint?: AuthActor;
 };
 
-type RegisterPayload = LoginPayload & {
+type RegisterPayload = {
+  email: string;
+  password: string;
   name?: string;
   asParent?: boolean;
   parentalConsentAccepted?: boolean;
@@ -29,39 +36,51 @@ type RegisterPayload = LoginPayload & {
 type AuthState = {
   token: string | null;
   user: AuthUser | null;
+  actor: AuthActor;
   isHydrated: boolean;
   isLoading: boolean;
   error: string | null;
   hydrate: () => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
+  loginWithFirebaseIdToken: (idToken: string) => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: (password: string) => Promise<void>;
   resetSessionLocal: () => void;
   clearError: () => void;
 };
 
-type LoginResponse = {
-  token?: string;
-  accessToken?: string;
-  access_token?: string;
-  user?: AuthUser;
-  data?: {
-    token?: string;
-    accessToken?: string;
-    user?: AuthUser;
-  };
-};
+function peekJwtActor(token: string): AuthActor | null {
+  try {
+    const part = token.split('.')[1];
+    if (!part) return null;
+    const normalized = part.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized + '='.repeat((4 - (normalized.length % 4)) % 4);
+    const payload = JSON.parse(atob(padded)) as { actor?: string; role?: string };
+    return payload.actor === 'child' || payload.role === 'child' ? 'child' : 'parent';
+  } catch {
+    return null;
+  }
+}
 
-function extractToken(body: LoginResponse): string | null {
-  return (
-    body.token ??
-    body.accessToken ??
-    body.access_token ??
-    body.data?.token ??
-    body.data?.accessToken ??
-    null
-  );
+async function hydrateChildSession(token: string): Promise<AuthUser> {
+  const { data } = await apiClient.get<unknown>('/api/v1/account/family/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const body = data as {
+    data?: { child?: Record<string, unknown>; parentId?: string };
+  };
+  if (!body.data?.child) throw new Error('Child session response missing child');
+  const child = familyApi.normalizeChild(body.data.child);
+  await useFamily.getState().applyChildSession(child as never);
+  return {
+    id: child.id,
+    name: child.name,
+    actor: 'child',
+    role: 'child',
+    childId: child.id,
+    parentId: body.data.parentId,
+  };
 }
 
 /**
@@ -72,6 +91,7 @@ function extractToken(body: LoginResponse): string | null {
 export const useAuth = create<AuthState>((set) => ({
   token: null,
   user: null,
+  actor: 'parent',
   isHydrated: false,
   isLoading: false,
   error: null,
@@ -80,19 +100,27 @@ export const useAuth = create<AuthState>((set) => ({
     try {
       const token = await getAccessToken();
       if (!token) {
-        set({ token: null, user: null, isHydrated: true });
+        set({ token: null, user: null, actor: 'parent', isHydrated: true });
         return;
       }
 
+      const jwtActor = peekJwtActor(token);
       try {
-        const { data } = await apiClient.get('/internal/v1/account/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const user =
-          (data as { user?: AuthUser })?.user ??
-          (data as { data?: AuthUser })?.data ??
-          null;
-        set({ token, user, isHydrated: true });
+        if (jwtActor === 'child') {
+          const user = await hydrateChildSession(token);
+          set({ token, user, actor: 'child', isHydrated: true });
+          await useWorkspace.getState().loadWorkspaces({ token });
+          return;
+        }
+        const user = await authApi.me();
+        const actor: AuthActor = user.actor === 'child' ? 'child' : 'parent';
+        if (actor === 'child') {
+          const childUser = await hydrateChildSession(token);
+          set({ token, user: childUser, actor, isHydrated: true });
+          await useWorkspace.getState().loadWorkspaces({ token });
+          return;
+        }
+        set({ token, user, actor, isHydrated: true });
         await useWorkspace.getState().loadWorkspaces({ token });
       } catch (e: unknown) {
         const status = (e as { response?: { status?: number } })?.response
@@ -104,7 +132,7 @@ export const useAuth = create<AuthState>((set) => ({
           return;
         }
         console.warn('[useAuth] hydrate /me failed, keeping token', e);
-        set({ token, isHydrated: true });
+        set({ token, actor: jwtActor ?? 'parent', isHydrated: true });
         await useWorkspace.getState().loadWorkspaces({ token });
       }
     } catch {
@@ -112,28 +140,35 @@ export const useAuth = create<AuthState>((set) => ({
     }
   },
 
-  login: async ({ email, password }) => {
+  login: async ({ login, password, actorHint }) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await apiClient.post<LoginResponse>(
-        '/internal/v1/account/login',
-        { email: email.trim(), password },
-      );
-
-      const token = extractToken(data);
-      if (!token) {
-        throw new Error('Phản hồi đăng nhập không có token');
-      }
+      // Match MobileApp downgrade policy: when Firebase is enabled, failures are
+      // surfaced instead of silently replaying classroom credentials.
+      const result = actorHint === 'child' && isFirebaseAuthEnabled()
+        ? await loginChildWithFirebase(login, password)
+        : await authApi.login({ login: login.trim(), password });
+      const token = result.token;
+      const actor: AuthActor = result.actor === 'child' ||
+        result.user?.actor === 'child' || result.user?.role === 'child' ||
+        (actorHint === 'child' && !!result.child)
+        ? 'child'
+        : 'parent';
 
       await setAccessToken(token);
       set({
         token,
-        user: data.user ?? data.data?.user ?? { email: email.trim() },
+        user: result.user ?? { email: login.trim() },
+        actor,
         isLoading: false,
         error: null,
       });
       await useWorkspace.getState().loadWorkspaces({ token });
-      await useFamily.getState().loadFamily();
+      if (actor === 'parent') {
+        await useFamily.getState().loadFamily();
+      } else if (result.child && typeof result.child === 'object') {
+        await useFamily.getState().applyChildSession(result.child as never);
+      }
     } catch (err: unknown) {
       set({
         isLoading: false,
@@ -152,41 +187,18 @@ export const useAuth = create<AuthState>((set) => ({
   }) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await apiClient.post<LoginResponse>(
-        '/internal/v1/account/register',
-        {
-          email: email.trim(),
-          password,
-          name: name?.trim(),
-          asParent,
-          parentalConsentAccepted,
-        },
-      );
-
-      let token = extractToken(data);
-      let user = data.user ?? data.data?.user ?? null;
-
-      if (!token) {
-        const loginRes = await apiClient.post<LoginResponse>(
-          '/internal/v1/account/login',
-          { email: email.trim(), password },
-        );
-        token = extractToken(loginRes.data);
-        user =
-          loginRes.data.user ??
-          loginRes.data.data?.user ??
-          user ??
-          { email: email.trim() };
-      }
-
-      if (!token) {
-        throw new Error('Phản hồi đăng ký không có token');
-      }
+      const result = await authApi.register({
+        email: email.trim(), password, name: name?.trim(), asParent,
+        parentalConsentAccepted,
+      });
+      const token = result.token;
+      const user = result.user;
 
       await setAccessToken(token);
       set({
         token,
         user: user ?? { email: email.trim(), name: name?.trim() },
+        actor: 'parent',
         isLoading: false,
         error: null,
       });
@@ -201,23 +213,37 @@ export const useAuth = create<AuthState>((set) => ({
     }
   },
 
+  loginWithFirebaseIdToken: async (idToken) => {
+    set({ isLoading: true, error: null });
+    try {
+      const result = await authApi.exchangeFirebaseToken({ idToken });
+      const actor: AuthActor = result.actor === 'child' ? 'child' : 'parent';
+      await setAccessToken(result.token);
+      set({ token: result.token, user: result.user, actor, isLoading: false });
+      await useWorkspace.getState().loadWorkspaces({ token: result.token });
+      if (actor === 'parent') await useFamily.getState().loadFamily();
+      else if (result.child && typeof result.child === 'object') {
+        await useFamily.getState().applyChildSession(result.child as never);
+      }
+    } catch (err) {
+      set({ isLoading: false, error: extractErrorMessage(err, 'Firebase login thất bại') });
+      throw err;
+    }
+  },
+
   logout: async () => {
+    await logoutFirebaseBestEffort();
     await clearAccessToken();
     await useWorkspace.getState().reset();
     await useFamily.getState().reset();
     await useRecentAiImages.getState().clearAllScopes();
-    set({ token: null, user: null, error: null, isLoading: false });
+    set({ token: null, user: null, actor: 'parent', error: null, isLoading: false });
   },
 
   deleteAccount: async (password: string) => {
     set({ isLoading: true, error: null });
     try {
-      await apiClient.delete('/internal/v1/account/me', {
-        data: { password },
-      } as Parameters<typeof apiClient.delete>[1] & {
-        _skipAuthLogout?: boolean;
-        data?: { password: string };
-      });
+      await authApi.deleteAccount(password);
       await clearAccessToken();
       await useWorkspace.getState().reset();
       await useFamily.getState().reset();
@@ -236,7 +262,7 @@ export const useAuth = create<AuthState>((set) => ({
     void useWorkspace.getState().reset();
     void useFamily.getState().reset();
     void useRecentAiImages.getState().clearAllScopes();
-    set({ token: null, user: null, error: null });
+    set({ token: null, user: null, actor: 'parent', error: null });
   },
 
   clearError: () => set({ error: null }),

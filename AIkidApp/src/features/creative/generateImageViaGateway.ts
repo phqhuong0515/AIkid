@@ -1,8 +1,8 @@
 /**
  * Shared creative image gen — same stack as StoryMeeMobileApp:
- * 1) optional ref → POST /internal/v1/media/upload (core-media-api)
- * 2) POST /internal/v1/jobs jobType=image (core-job-api)
- * 3) poll GET /internal/v1/jobs/:id
+ * 1) optional ref → SDK media upload through `/api/v1`
+ * 2) SDK create image job through `/api/v1`
+ * 3) SDK polls the job through `/api/v1`
  */
 
 import {

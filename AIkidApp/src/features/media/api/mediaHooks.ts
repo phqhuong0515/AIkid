@@ -74,7 +74,7 @@ export const galleryQueryKey = (filters?: GalleryFilters) =>
 
 /**
  * Chuyển `sb://content-media/...` hoặc path tương đối → URL hiển thị được.
- * Upload media-api trả `/internal/v1/media/public/uploads/...` → prefix Gateway.
+ * Upload media-api may return a relative public upload path → prefix Gateway.
  */
 export function resolveMediaUri(raw?: string | null): string | null {
   if (!raw) return null;
@@ -193,7 +193,7 @@ async function fetchGalleryPage(
   const limit = GALLERY_PAGE_SIZE;
   const ipId = resolveIpId(filters?.ipId);
 
-  const { data } = await apiClient.get<unknown>('/internal/v1/media/gallery', {
+  const { data } = await apiClient.get<unknown>('/api/v1/media/gallery', {
     params: {
       ipId,
       // Backend gallery: ipId / tag / isUsed / limit / offset
@@ -295,7 +295,7 @@ export function pickUploadPublicUrl(
 
 async function postMultipartUpload(formData: FormData): Promise<UploadMediaResult> {
   const { data } = await apiClient.post<unknown>(
-    '/internal/v1/media/upload',
+    '/api/v1/media/upload',
     formData,
     {
       headers: {
@@ -337,8 +337,8 @@ export async function uploadMedia(input: UploadMediaInput): Promise<UploadMediaR
 }
 
 /**
- * Web / HTML path: upload real Blob|File to core-media-api via Gateway.
- * Prefer this for canvas dataURLs and browser files.
+ * Web path: upload real Blob|File to core-media-api via Gateway.
+ * Prefer this for data URLs and browser files.
  */
 export async function uploadMediaBlob(input: {
   blob: Blob;
@@ -433,7 +433,7 @@ async function fetchAiImagesPage(offset: number): Promise<GalleryPage> {
   const page = Math.floor(offset / limit) + 1;
 
   try {
-    const { data } = await apiClient.get<unknown>('/internal/v1/jobs', {
+    const { data } = await apiClient.get<unknown>('/api/v1/jobs', {
       params: { limit, page },
     });
 
@@ -513,9 +513,13 @@ async function fetchAiImagesPage(offset: number): Promise<GalleryPage> {
   }
 }
 
-export function useAiImages(options?: { enabled?: boolean }) {
+export function useAiImages(options?: {
+  enabled?: boolean;
+  childId?: string | null;
+  ipId?: string | null;
+}) {
   return useInfiniteQuery({
-    queryKey: ['media', 'ai-images'],
+    queryKey: ['media', 'ai-images', options?.childId ?? null, options?.ipId ?? null],
     queryFn: ({ pageParam }) => fetchAiImagesPage(pageParam as number),
     initialPageParam: 0,
     getNextPageParam: (lastPage) =>

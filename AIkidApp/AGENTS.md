@@ -1,59 +1,32 @@
-# AIkidApp — Agent / Dev Guide
+# AIkidApp — agent entry
 
-Expo SDK **54** · Xưởng Sáng Tạo (kids creative) · Auth = **core-account-api via Gateway** (same as StoryMeeMobileApp)
+Expo SDK 54 client. Mobile capability source of truth is
+`../../../StoryMeeMobileApp`; shared network/domain source of truth is
+`../../../../0-Shared-Libs/sdk`.
 
-## Stack
-- Routing: expo-router (`app/`)
-- Style: NativeWind v4
-- Auth: Zustand + SecureStore / localStorage web (JWT parent)
-- Data: TanStack Query + Axios → `EXPO_PUBLIC_API_URL` (Gateway only)
-- Structure: `src/core` + `src/features/*` (mirror MobileApp)
+## Non-negotiable boundaries
 
-## Auth (Class A)
-| Call | Path |
-|------|------|
-| Login | `POST /internal/v1/account/login` |
-| Register | `POST /internal/v1/account/register` (`asParent`, `parentalConsentAccepted`) |
-| Me | `GET /internal/v1/account/me` |
-| Workspaces | `GET /internal/v1/account/workspaces` |
-| Select IP | `POST /internal/v1/account/workspaces/:ipId/select` |
-| Delete me | `DELETE /internal/v1/account/me` |
+1. Import StoryMee domains from `src/core/storymee.ts` / `@storymee/sdk`.
+2. Client traffic uses Gateway `EXPO_PUBLIC_API_URL` and `/api/v1/*` only.
+3. Never call `/internal/v1`, `/worker/v1`, microservice ports, or ship provider keys.
+4. Parent and child share the auth store. Child username/password remains
+   canonical even when Firebase opt-in is enabled; Firebase failure falls back to it.
+5. AI jobs require a hydrated workspace `ipId`; family media/jobs require the
+   verified active-child header.
+6. Plans replace monthly allowance; credit packs/vouchers add bonus credits.
+   Display monthly and bonus buckets separately.
+7. Gallery queries include `childId` and `ipId` in the cache key and refetch on focus.
+8. Camera/library selections uploaded to a profile use `media` with a
+   `child:<id>` tag. Avatar changes use profile/family ownership APIs.
 
-## Image gen (Class A — same as MobileApp)
-| Step | Path |
-|------|------|
-| Upload ref | `POST /internal/v1/media/upload` (multipart `ipId` + `file`) |
-| Create job | `POST /internal/v1/jobs` `{ jobType: 'image', ipId, inputParams: { prompt, provider, reference_image_urls? } }` |
-| Poll | `GET /internal/v1/jobs/:id` |
-| Provider default | `google-native` |
+## Migration direction
 
-- RN: `src/features/creative/generateImageViaGateway.ts`
-- HTML art canvas: `public/aikid-gateway-gen.js` (JWT + ipId từ localStorage)
+All product screens are React Native/Expo. Browser-prototype runtime files have
+been removed from `public/`; their design history remains recoverable from Git.
+Keep only reusable image, SVG, font and audio assets there. Build new features
+headlessly in the SDK so AIKid routes can later move into StoryMeeMobileApp
+without backend forks. Do not introduce iframe/WebView-based product routes.
 
-Never call microservice ports. Never put provider API keys in Expo public env.
+## Quality gate
 
-## Option C roadmap (current)
-1. ✅ Auth parent (Gateway → account-api)
-2. ✅ **Family** (MobileApp model): `src/features/family` + `/family` · `/family/create-child`  
-   - Age 9–12 / 13–15 · consent allowAiCreate/allowPhoto  
-   - Header `X-Child-Profile-Id` on API when child selected  
-3. ✅ Account: profile · children · workspace · logout · delete account  
-4. ✅ Creative hub + HTML embeds (Mee/Art/Comic) · Character RN + Gateway gen  
-5. ❌ No `/internal/v1/creative` BFF unless jobs proven insufficient
-
-### Mee design source of truth
-- HTML/CSS/JS: `../AIkid/SVG/` (`index.html`, `styles.css`, `app.js`, `assets.js`, packs)
-- Expo only hosts + embeds; do not replace with NativeWind “shell” without product OK
-
-## Commands
-```bash
-cp .env.example .env
-npm install
-npm run web   # primary for creative UI
-npx tsc --noEmit
-```
-
-## Related
-- Design: `../docs/DESIGN_AIKID_FEATURE_REFACTOR.md`
-- Mobile SSOT: `../../StoryMeeMobileApp/docs/APP_ARCHITECTURE.md`
-- Gateway: `00-Ecosystem-Docs/01-architecture/gateway/gateway-and-clients.md`
+Run `npm run typecheck` and at least one `expo export` after source changes.

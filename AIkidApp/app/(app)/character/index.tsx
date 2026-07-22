@@ -29,7 +29,7 @@ const ACTIONS = [
 
 /**
  * Character hub — product UI (no engineering banners).
- * Flow inspired by HTML character lobby cards.
+ * Flow preserves the original character lobby intent in native UI.
  */
 export default function CharacterHubScreen() {
   const router = useRouter();

@@ -26,6 +26,8 @@ export type MeeDraft = {
   backgroundColor: string;
   backgroundType: 'light' | 'dark' | 'grid' | 'gingham' | 'upload';
   backgroundImageUrl?: string;
+  savedMediaUrl?: string;
+  aiResultUrl?: string;
   packVersion: string;
 };
 

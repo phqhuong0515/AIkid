@@ -69,7 +69,7 @@ export const useWorkspace = create<WorkspaceState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const { data } = await apiClient.get<unknown>(
-        '/internal/v1/account/workspaces',
+        '/api/v1/account/workspaces',
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -123,7 +123,7 @@ export const useWorkspace = create<WorkspaceState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await apiClient.post(
-        `/internal/v1/account/workspaces/${ipId}/select`,
+        `/api/v1/account/workspaces/${ipId}/select`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );

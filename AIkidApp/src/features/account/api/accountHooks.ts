@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import apiClient from '@/core/api/client';
-import { unwrapData } from '@/core/api/unwrap';
+import { profileApi } from '@/core/storymee';
 
 export interface Profile {
   id?: string;
@@ -41,37 +40,30 @@ function normalizeStats(raw: unknown): Stats {
 }
 
 /**
- * GET /internal/v1/account/profile
+ * GET `/api/v1/account/me` through the shared SDK.
  * Backend: `{ data: { profile, stats } }`
  */
-export function useProfile() {
+export function useProfile(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['account', 'profile'],
     queryFn: async (): Promise<ProfilePayload> => {
-      const { data } = await apiClient.get<unknown>(
-        'internal/v1/account/profile',
-      );
-      const inner = unwrapData<{
-        profile?: Profile;
-        stats?: unknown;
-      }>(data);
-
-      if (!inner?.profile?.email && !inner?.profile?.name) {
+      const profile = await profileApi.getProfile();
+      if (!profile?.email && !profile?.name) {
         throw new Error('Profile response thiếu dữ liệu user');
       }
 
       return {
         profile: {
-          id: inner.profile.id,
-          name: inner.profile.name || 'User',
-          email: inner.profile.email || '',
-          role: inner.profile.role,
-          isGuest: inner.profile.isGuest,
-          createdAt: inner.profile.createdAt,
-          avatarUrl: inner.profile.avatarUrl,
+          id: profile.id,
+          name: profile.name || 'User',
+          email: profile.email || '',
+          role: profile.role,
+          createdAt: profile.createdAt,
+          avatarUrl: profile.avatarUrl || undefined,
         },
-        stats: normalizeStats(inner.stats),
+        stats: normalizeStats(profile.stats),
       };
     },
+    enabled: options?.enabled ?? true,
   });
 }

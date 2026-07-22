@@ -14,9 +14,13 @@ export type ChildProfile = {
   ageBand: AgeBand | string;
   language: string;
   avatarColor: string;
+  avatarUrl?: string | null;
   level: number;
   xp: number;
   createdAt?: string;
+  loginEnabled?: boolean;
+  loginUsername?: string | null;
+  loginEmail?: string | null;
   consent: ChildConsent;
 };
 

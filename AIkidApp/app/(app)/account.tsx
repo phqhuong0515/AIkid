@@ -1,4 +1,6 @@
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -25,6 +27,7 @@ import {
 import { queryClient } from '@/core/query/queryClient';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { useProfile } from '@/features/account/api/accountHooks';
+import { familyApi, mediaApi, profileApi } from '@/core/storymee';
 import { ageBandLabel } from '@/features/family/types';
 import { useFamily } from '@/features/family/store/useFamily';
 import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
@@ -34,7 +37,7 @@ import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
  */
 export default function AccountScreen() {
   const router = useRouter();
-  const { user, logout, deleteAccount, isLoading: authBusy } = useAuth();
+  const { user, actor, logout, deleteAccount, isLoading: authBusy } = useAuth();
   const {
     workspaces,
     activeIpId,
@@ -49,13 +52,14 @@ export default function AccountScreen() {
     isLoading: profileLoading,
     isError: profileError,
     refetch: refetchProfile,
-  } = useProfile();
+  } = useProfile({ enabled: actor === 'parent' });
 
   const {
     children,
     activeChildId,
     loadFamily,
     setActiveChild,
+    replaceChild,
   } = useFamily();
   const setRecentScope = useRecentAiImages((s) => s.setScope);
 
@@ -63,6 +67,28 @@ export default function AccountScreen() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const activeChild = children.find((child) => child.id === activeChildId);
+
+  const changeAvatar = useCallback(async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return Alert.alert('Cần quyền truy cập thư viện');
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.85 });
+    const asset = result.canceled ? null : result.assets[0];
+    if (!asset) return;
+    setAvatarBusy(true);
+    try {
+      const form = new FormData();
+      form.append('file', { uri: asset.uri, name: asset.fileName || 'avatar.jpg', type: asset.mimeType || 'image/jpeg' } as unknown as Blob);
+      const upload = await mediaApi.upload(form, { ipId: activeIpId || undefined, assetType: 'avatar', permanent: 'true', tags: actor === 'child' && activeChildId ? `child:${activeChildId}` : undefined });
+      const avatarUrl = String(upload.url || upload.imageUrl || upload.urls?.[0] || '');
+      if (!avatarUrl) throw new Error('Upload không trả URL ảnh');
+      if (actor === 'child') replaceChild(await familyApi.updateMyAvatar(avatarUrl) as never);
+      else await profileApi.updateProfile({ avatarUrl });
+      if (actor === 'parent') await refetchProfile();
+    } catch (error) { Alert.alert('Không đổi được avatar', error instanceof Error ? error.message : 'Thử lại sau'); }
+    finally { setAvatarBusy(false); }
+  }, [activeChildId, activeIpId, actor, refetchProfile, replaceChild]);
 
   const displayName =
     profileData?.profile?.name || user?.name || user?.email || 'Phụ huynh';
@@ -70,8 +96,8 @@ export default function AccountScreen() {
     profileData?.profile?.email || (user?.email as string | undefined) || '—';
 
   useEffect(() => {
-    void loadFamily();
-  }, [loadFamily]);
+    if (actor === 'parent') void loadFamily();
+  }, [actor, loadFamily]);
 
   const handleLogout = useCallback(() => {
     Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất khỏi thiết bị này?', [
@@ -162,7 +188,7 @@ export default function AccountScreen() {
         {/* Identity */}
         <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
           <Text className="text-[12px] font-bold uppercase tracking-wide text-slate-400">
-            Phụ huynh
+            {actor === 'child' ? 'Tài khoản bé' : 'Phụ huynh'}
           </Text>
           {profileLoading ? (
             <ActivityIndicator className="mt-3" color="#FF6B6B" />
@@ -181,10 +207,14 @@ export default function AccountScreen() {
               ) : null}
             </>
           )}
+          <Pressable onPress={() => void changeAvatar()} disabled={avatarBusy} className="mt-4 flex-row items-center gap-3 rounded-xl bg-orange-50 p-3">
+            {(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) ? <Image source={{ uri: String(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) }} style={{ width: 48, height: 48, borderRadius: 24 }} /> : <View className="h-12 w-12 rounded-full bg-orange-200" />}
+            <Text className="font-bold text-brand">{avatarBusy ? 'Đang tải…' : 'Đổi ảnh đại diện'}</Text>
+          </Pressable>
         </View>
 
         {/* Family children */}
-        <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
+        {actor === 'parent' ? <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="text-[12px] font-bold uppercase tracking-wide text-slate-400">
               Hồ sơ con
@@ -237,7 +267,7 @@ export default function AccountScreen() {
               );
             })
           )}
-        </View>
+        </View> : null}
 
         {/* Workspace */}
         <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
@@ -320,14 +350,14 @@ export default function AccountScreen() {
           <Text className="text-[15px] font-bold text-slate-800">Đăng xuất</Text>
         </Pressable>
 
-        <Pressable
+        {actor === 'parent' ? <Pressable
           onPress={openDeleteFlow}
           className="h-12 items-center justify-center rounded-2xl bg-red-50"
         >
           <Text className="text-[15px] font-bold text-red-600">
             Xóa tài khoản
           </Text>
-        </Pressable>
+        </Pressable> : null}
       </ScrollView>
 
       {/* Delete confirm modal */}
@@ -339,7 +369,7 @@ export default function AccountScreen() {
             </Text>
             <Text className="mt-2 text-[13px] leading-5 text-slate-600">
               Nhập mật khẩu tài khoản phụ huynh để xóa vĩnh viễn (DELETE
-              /internal/v1/account/me).
+              /api/v1/account/me).
             </Text>
             <TextInput
               className="mt-4 h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 text-base text-slate-900"

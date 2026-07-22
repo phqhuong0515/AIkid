@@ -18,26 +18,26 @@ const CARDS = [
   {
     href: '/(app)/mee' as const,
     title: 'Tạo Mee',
-    desc: 'Người bạn đại diện · tùy chỉnh layer',
-    image: '/lobby-assets/images/card_mee.jpeg',
+    desc: 'Người bạn đại diện · bản nháp native',
+    image: '/hub-images/card_mee.jpeg',
   },
   {
     href: '/(app)/character' as const,
     title: 'Nhân vật AI',
     desc: 'Form chi tiết · gen ảnh Gateway',
-    image: '/lobby-assets/images/home-character.jpeg',
+    image: '/hub-images/home-character.jpeg',
   },
   {
     href: '/(app)/art' as const,
     title: 'Xưởng vẽ',
-    desc: 'Chọn style · canvas · AI vẽ lại',
-    image: '/lobby-assets/images/card_art.jpeg',
+    desc: 'Camera · thư viện · AI vẽ lại',
+    image: '/hub-images/card_art.jpeg',
   },
   {
     href: '/(app)/comic' as const,
     title: 'Sáng tác truyện',
-    desc: 'Truyện chữ & truyện tranh',
-    image: '/lobby-assets/images/art-image.jpeg',
+    desc: 'Ý tưởng · nhân vật · kho truyện',
+    image: '/hub-images/art-image.jpeg',
   },
 ];
 
@@ -99,6 +99,8 @@ export default function LobbyScreen() {
           </View>
 
           <View className="flex-row flex-wrap items-center justify-end gap-2">
+            <Pressable onPress={() => router.push('/(app)/gallery')} className="rounded-full border border-orange-100 bg-white px-4 py-2.5"><Text className="text-[13px] font-bold text-slate-700">Gallery</Text></Pressable>
+            <Pressable onPress={() => router.push('/(app)/plans')} className="rounded-full border border-orange-100 bg-white px-4 py-2.5"><Text className="text-[13px] font-bold text-slate-700">Gói AI</Text></Pressable>
             <Pressable
               onPress={() => router.push('/(app)/family')}
               className="rounded-full border border-orange-100 bg-white px-4 py-2.5"

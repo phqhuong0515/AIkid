@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-query';
 
 import { apiClient } from '@/core/api/client';
+import { generateApi } from '@/core/storymee';
 import { unwrapData } from '@/core/api/unwrap';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { resolveMediaUri } from '@/features/media/api/mediaHooks';
@@ -105,30 +106,18 @@ export async function createImageJob(input: CreateImageJobInput): Promise<string
     inputParams.child_profile_id = input.childProfileId;
   }
 
-  const { data } = await apiClient.post<unknown>(
-    '/internal/v1/jobs',
-    {
-      jobType: 'image',
-      ipId,
-      inputParams,
-    },
-    input.childProfileId
-      ? { headers: { 'X-Child-Profile-Id': input.childProfileId } }
-      : undefined,
-  );
-
-  const job =
-    unwrapData<JobRecord>(data) ?? (data as JobRecord);
-  const jobId = pickJobId(job);
-  if (!jobId) {
-    throw new Error('Không nhận được Job ID từ server');
-  }
-  return jobId;
+  return generateApi.createImageJob({
+    prompt: input.prompt,
+    provider,
+    ipId,
+    referenceImageUrls: refUrls,
+    childProfileId: input.childProfileId,
+    extraInputParams: inputParams,
+  });
 }
 
 export async function fetchJob(jobId: string): Promise<JobRecord> {
-  const { data } = await apiClient.get<unknown>(`/internal/v1/jobs/${jobId}`);
-  const job = unwrapData<JobRecord>(data) ?? (data as JobRecord);
+  const job = await generateApi.getJob(jobId) as JobRecord;
   if (!job?.status && !job?.id) {
     throw new Error('Phản hồi job không hợp lệ');
   }

@@ -5,7 +5,7 @@ import type {
   CharacterDraft,
 } from './types';
 
-/** Fixed catalog — ported from AIkid generate.html categoryQuestions */
+/** Fixed catalog migrated from the original AIkid question set. */
 export const CATEGORY_QUESTIONS: Record<
   CharacterCategoryId,
   CategoryQuestionDef[]

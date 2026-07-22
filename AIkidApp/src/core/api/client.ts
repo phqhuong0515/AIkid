@@ -20,7 +20,7 @@ export function setChildProfileIdResolver(fn: () => string | null): void {
   childProfileIdResolver = fn;
 }
 
-/** Axios instance chuẩn StoryMee — prefix API: `internal/v1/*` */
+/** Axios transport for the SDK. Consumer traffic is always `/api/v1/*`. */
 export const apiClient = axios.create({
   baseURL: GATEWAY_BASE_URL,
   timeout: 30_000,

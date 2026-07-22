@@ -31,6 +31,7 @@ export default function LoginScreen() {
   const { login, isLoading, error, clearError } = useAuth();
 
   const [email, setEmail] = useState('');
+  const [mode, setMode] = useState<'parent' | 'child'>('parent');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -42,14 +43,16 @@ export default function LoginScreen() {
     setLocalError(null);
     clearError();
 
-    const validation = validateLoginInput(email, password);
+    const validation = mode === 'parent'
+      ? validateLoginInput(email, password)
+      : (!email.trim() || !password ? 'Nhập username và mật khẩu của bé' : null);
     if (validation) {
       setLocalError(validation);
       return;
     }
 
     try {
-      await login({ email: email.trim(), password });
+      await login({ login: email.trim(), password, actorHint: mode });
       router.replace('/(app)/lobby');
     } catch {
       // error in useAuth
@@ -71,14 +74,26 @@ export default function LoginScreen() {
               AIkid
             </Text>
             <Text className="mt-2 text-center text-[15px] leading-5 text-slate-500">
-              Đăng nhập tài khoản phụ huynh StoryMee{'\n'}
-              (cùng hệ thống app Family · Gateway)
+              Đăng nhập StoryMee cho phụ huynh hoặc bé
             </Text>
           </View>
 
           <View className="rounded-[20px] border border-orange-100 bg-white p-5 shadow-md shadow-slate-900/5">
+            <View className="mb-4 flex-row rounded-xl bg-orange-50 p-1">
+              {(['parent', 'child'] as const).map((item) => (
+                <Pressable
+                  key={item}
+                  onPress={() => { setMode(item); setLocalError(null); }}
+                  className={`flex-1 items-center rounded-lg py-2 ${mode === item ? 'bg-white' : ''}`}
+                >
+                  <Text className="font-bold text-slate-700">
+                    {item === 'parent' ? 'Phụ huynh' : 'Tài khoản bé'}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
             <Text className="mb-2 text-[13px] font-semibold text-slate-700">
-              Email
+              {mode === 'parent' ? 'Email' : 'Username'}
             </Text>
             <TextInput
               className="h-[52px] rounded-xl border border-slate-200 bg-slate-50 px-4 text-base text-slate-900"
@@ -87,11 +102,11 @@ export default function LoginScreen() {
                 setEmail(v);
                 setLocalError(null);
               }}
-              placeholder="ban@storymee.com"
+              placeholder={mode === 'parent' ? 'ban@storymee.com' : 'be_min_family'}
               placeholderTextColor="#94A3B8"
               autoCapitalize="none"
               autoCorrect={false}
-              keyboardType="email-address"
+              keyboardType={mode === 'parent' ? 'email-address' : 'default'}
               textContentType="emailAddress"
               autoComplete="email"
               returnKeyType="next"
@@ -164,6 +179,11 @@ export default function LoginScreen() {
                 </Text>
               </Pressable>
             </View>
+            {mode === 'parent' ? (
+              <Pressable onPress={() => router.push('/(auth)/forgot-password')} className="mt-4 items-center">
+                <Text className="text-[13px] font-semibold text-brand">Quên mật khẩu?</Text>
+              </Pressable>
+            ) : null}
           </View>
 
           <View className="mt-6 flex-row flex-wrap items-center justify-center gap-x-3 gap-y-1">

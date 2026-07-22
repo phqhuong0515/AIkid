@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-/** Authenticated shell — Option C: parent_only + creative offline routes */
+/** Authenticated native shell — every product route runs on Expo. */
 export default function AppLayout() {
   return (
     <Stack
@@ -13,11 +13,13 @@ export default function AppLayout() {
       <Stack.Screen name="lobby" />
       <Stack.Screen name="account" />
       <Stack.Screen name="family" />
+      <Stack.Screen name="plans" />
+      <Stack.Screen name="gallery" />
+      <Stack.Screen name="capture" />
       <Stack.Screen name="character/index" />
       <Stack.Screen name="character/feature" />
       <Stack.Screen name="character/generate" />
       <Stack.Screen name="character/storage" />
-      {/* Full-viewport iframe for original Mee HTML — no padding */}
       <Stack.Screen
         name="mee/index"
         options={{ contentStyle: { backgroundColor: '#e8f4fa', flex: 1 } }}
