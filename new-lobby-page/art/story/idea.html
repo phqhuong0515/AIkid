@@ -1471,13 +1471,13 @@
         </div>
 
         <div class="step-item" onclick="selectStep(7)">
-          <i class="fa-solid fa-fire step-icon" style="color: #F97316;"></i>
-          <span>Cao trào</span>
+          <i class="fa-solid fa-flag-checkered step-icon" style="color: #9333EA;"></i>
+          <span>Kết thúc</span>
         </div>
 
         <div class="step-item" onclick="selectStep(8)">
-          <i class="fa-solid fa-flag-checkered step-icon" style="color: #9333EA;"></i>
-          <span>Kết thúc</span>
+          <i class="fa-solid fa-fire step-icon" style="color: #F97316;"></i>
+          <span>Cao trào</span>
         </div>
       </div>
 
@@ -2807,8 +2807,8 @@
         if (titleEl) titleEl.innerText = stepName;
         
         if (subtitleEl) {
-          if (stepNumber === 7) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
-          else if (stepNumber === 8) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
+          if (stepNumber === 7) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
+          else if (stepNumber === 8) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
         }
         
         charPanel.classList.remove('active');
