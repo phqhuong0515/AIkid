@@ -741,6 +741,7 @@
     .unexpected-step-panel,
     .obstacle-step-panel,
     .attempt-step-panel,
+    .ending-step-panel,
     .insight-step-panel {
       display: none;
       flex-direction: column;
@@ -758,6 +759,7 @@
     .unexpected-step-panel.active,
     .obstacle-step-panel.active,
     .attempt-step-panel.active,
+    .ending-step-panel.active,
     .insight-step-panel.active {
       display: flex;
     }
@@ -1999,7 +2001,47 @@
           </div>
         </div>
 
-        <!-- ===== STEP 7: INSIGHT PANEL ===== -->
+        <!-- ===== STEP 7: ENDING PANEL ===== -->
+        <div class="ending-step-panel" id="ending-step-panel">
+          <div class="idea-cards-grid">
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc có hậu')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #EAB308); color: #FFFFFF;">
+                <i class="fa-solid fa-face-laugh-beam"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc có hậu</div>
+            </div>
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc mở')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+                <i class="fa-solid fa-door-open"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc mở</div>
+            </div>
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc buồn')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #94A3B8, #475569); color: #FFFFFF;">
+                <i class="fa-solid fa-cloud-rain"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc buồn</div>
+            </div>
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc cảm động')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                <i class="fa-solid fa-heart"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc cảm động</div>
+            </div>
+          </div>
+
+          <div class="custom-space-box" style="margin-top: 16px;">
+            <div class="custom-space-icon">
+              <i class="fa-solid fa-pen-fancy"></i>
+            </div>
+            <div class="custom-space-input-wrapper" style="justify-content: center;">
+              <input type="text" id="custom-ending-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('ending-char-counter').innerText = this.value.length + ' / 60'; selectedEnding = this.value.trim(); selectedIdeaText = this.value.trim(); document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('selected'));">
+            </div>
+            <div class="custom-space-counter" id="ending-char-counter">0 / 60</div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 8: INSIGHT PANEL ===== -->
         <div class="insight-step-panel" id="insight-step-panel">
           <div class="idea-cards-grid">
             <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Không thể làm mọi thứ một mình')">
@@ -2246,7 +2288,22 @@
     let selectedUnexpectedEmotion = '';
     let selectedObstacle = '';
     let selectedAttempt = '';
+    let selectedEnding = '';
     let selectedInsight = '';
+
+    function selectEndingCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedEnding = text;
+      selectedIdeaText = text;
+      const input = document.getElementById('custom-ending-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('ending-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+    }
 
     function selectInsightCard(card, text) {
       playPopSound();
@@ -2725,6 +2782,7 @@
       const openingPanel = document.getElementById('opening-step-panel');
       const unexpectedPanel = document.getElementById('unexpected-step-panel');
       const obstaclePanel = document.getElementById('obstacle-step-panel');
+      const endingPanel = document.getElementById('ending-step-panel');
       const insightPanel = document.getElementById('insight-step-panel');
       const ideaGrid = document.getElementById('idea-cards-grid');
       const customBox = document.getElementById('generic-custom-idea-box');
@@ -2738,6 +2796,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2750,6 +2809,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2763,6 +2823,7 @@
         if (openingPanel) openingPanel.classList.add('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2775,6 +2836,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.add('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2787,6 +2849,20 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.add('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 7) {
+        if (titleEl) titleEl.innerText = 'Kết thúc';
+        if (subtitleEl) subtitleEl.innerText = 'Chọn loại kết thúc hoặc tự viết kết thúc cho câu chuyện của bạn.';
+        
+        charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.add('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2799,6 +2875,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.add('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
@@ -2808,7 +2885,6 @@
         
         if (subtitleEl) {
           if (stepNumber === 6) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
-          else if (stepNumber === 7) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
         }
         
         charPanel.classList.remove('active');
@@ -2816,6 +2892,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'grid';
         if (customBox) customBox.style.display = 'flex';
@@ -2946,6 +3023,15 @@
           return;
         }
         selectedIdeaText = `${finalObstacle} | ${finalAttempt}`;
+        isValid = true;
+      } else if (currentStepIndex === 7) {
+        const endingInput = document.getElementById('custom-ending-text');
+        const endingVal = endingInput ? endingInput.value.trim() : '';
+        if (!endingVal && !selectedEnding) {
+          showComingSoon('Vui lòng chọn hoặc tự viết kết thúc!');
+          return;
+        }
+        selectedIdeaText = endingVal || selectedEnding;
         isValid = true;
       } else if (currentStepIndex === 8) {
         const insightInput = document.getElementById('custom-insight-text');
