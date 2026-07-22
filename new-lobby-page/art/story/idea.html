@@ -2724,30 +2724,46 @@
             <button class="sub-char-remove-btn" onclick="removeSubCharBlock(${idx})" title="Xóa nhân vật phụ này">
               <i class="fa-solid fa-xmark"></i>
             </button>
-      const slot = document.getElementById(`sub-char-slot-${subCharCount}`);
-      if (slot) {
-        slot.style.display = 'flex';
-      }
-      const addBtn = document.getElementById('add-more-sub-btn');
-      if (addBtn && subCharCount >= 3) {
-        addBtn.style.display = 'none';
+            <div class="char-slot-avatar" id="sub-char-avatar-${idx}">
+              <i class="fa-solid fa-user" style="color: #A5B4FC;"></i>
+            </div>
+            <div class="char-slot-info">
+              <p class="char-slot-name" id="sub-char-name-${idx}">Chưa chọn</p>
+              <p class="char-slot-desc">Bấm vào Kho nhân vật bên dưới để chọn</p>
+            </div>
+          </div>
+          <div class="char-questions-box" id="sub-char-questions-${idx}">
+            <div class="char-question-item">
+              <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện?</label>
+              <input type="text" class="char-question-input" placeholder="Ví dụ: Người đồng hành, trợ thủ...">
+            </div>
+          </div>
+          <div class="char-action-row">
+            <button class="char-create-plus-btn" onclick="playPopAndNavigate('/character/generate?new=1')" title="Tạo nhân vật mới">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+            <button class="char-storage-btn" onclick="openCharAlbumModal('sub-${idx}')">
+              <i class="fa-solid fa-box-archive"></i>
+              <span>Kho nhân vật</span>
+            </button>
+            <div class="char-selected-avatar-box" id="sub-selected-ava-box-${idx}" style="display: none;">
+              <img id="sub-selected-ava-img-${idx}" src="" alt="Avatar">
+            </div>
+          </div>
+        </div>`;
+      if (container) container.insertAdjacentHTML('beforeend', html);
+      if (subCharCount >= 3) {
+        const btn = document.getElementById('add-more-sub-btn');
+        if (btn) btn.style.display = 'none';
       }
     }
 
-    function removeSubCharSlot(index) {
+    function removeSubCharBlock(idx) {
       playPopSound();
-      const slot = document.getElementById(`sub-char-slot-${index}`);
-      if (slot) {
-        slot.classList.remove('filled');
-        slot.style.display = 'none';
-        const nameEl = document.getElementById(`sub-char-name-${index}`);
-        if (nameEl) nameEl.innerText = `Nhân vật phụ ${index}`;
-        const avatarEl = document.getElementById(`sub-char-avatar-${index}`);
-        if (avatarEl) avatarEl.innerHTML = `<i class="fa-solid fa-user-group" style="color: #A78BFA;"></i>`;
-        const qBox = document.getElementById(`sub-char-questions-${index}`);
-        if (qBox) qBox.classList.remove('active');
+      const block = document.getElementById(`sub-char-block-${idx}`);
+      if (block) {
+        block.remove();
       }
-
       subCharCount = Math.max(0, subCharCount - 1);
       const addBtn = document.getElementById('add-more-sub-btn');
       if (addBtn && subCharCount < 3) addBtn.style.display = 'inline-flex';
