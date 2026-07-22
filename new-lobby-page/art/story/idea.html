@@ -2804,7 +2804,7 @@
       const container = document.getElementById('extra-sub-chars-container');
       const labelText = nextSubCharId === 1 ? 'Nhân vật phụ' : `Nhân vật phụ ${nextSubCharId}`;
       const html = `
-        <div id="sub-char-block-${idx}" style="margin-top: 16px;">
+        <div id="sub-char-block-${idx}" style="margin-top: 32px; padding-top: 24px; border-top: 2px dashed #EADED5;">
           <p class="char-section-label">
             <i class="fa-solid fa-users"></i> ${labelText} 
           </p>
@@ -2824,6 +2824,10 @@
             <div class="char-question-item">
               <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện?</label>
               <input type="text" class="char-question-input" placeholder="Ví dụ: Người đồng hành, trợ thủ...">
+            </div>
+            <div class="char-question-item">
+              <label class="char-question-label">Mục đích của nhân vật trong câu chuyện này là gì?</label>
+              <input type="text" class="char-question-input" placeholder="Ví dụ: Giúp đỡ bạn bè, bảo vệ rừng...">
             </div>
           </div>
           <div class="char-action-row">

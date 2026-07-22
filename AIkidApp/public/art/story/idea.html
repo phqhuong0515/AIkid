@@ -2794,7 +2794,7 @@
       const container = document.getElementById('extra-sub-chars-container');
       const labelText = nextSubCharId === 1 ? 'Nhân vật phụ' : `Nhân vật phụ ${nextSubCharId}`;
       const html = `
-        <div id="sub-char-block-${idx}" style="margin-top: 16px;">
+        <div id="sub-char-block-${idx}" style="margin-top: 32px; padding-top: 24px; border-top: 2px dashed #EADED5;">
           <p class="char-section-label">
             <i class="fa-solid fa-users"></i> ${labelText} 
           </p>
@@ -2833,9 +2833,10 @@
             </div>
           </div>
         </div>`;
-      container.insertAdjacentHTML('beforeend', html);
+      if (container) container.insertAdjacentHTML('beforeend', html);
       if (subCharCount >= 3) {
-        document.getElementById('add-more-sub-btn').style.display = 'none';
+        const btn = document.getElementById('add-more-sub-btn');
+        if (btn) btn.style.display = 'none';
       }
     }
 
