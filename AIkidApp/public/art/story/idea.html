@@ -282,20 +282,21 @@
       width: 320px;
       background: #FDFBF7;
       border-right: 2px dashed #EADED5;
-      padding: 20px 14px;
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      justify-content: space-between;
+      gap: 10px;
       box-sizing: border-box;
-      overflow-y: auto;
     }
 
     .step-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 9px 12px;
-      border-radius: 18px;
+      padding: 0 18px;
+      flex: 1;
+      border-radius: 9999px;
       cursor: pointer;
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       color: #8A7463;
@@ -303,6 +304,8 @@
       font-size: 1.1rem;
       white-space: nowrap;
       user-select: none;
+      border: 2px solid transparent;
+      box-sizing: border-box;
     }
 
     .step-item:hover {
@@ -315,7 +318,7 @@
       color: #704E48 !important;
       font-weight: 700;
       border-radius: 9999px;
-      border: 2px solid #FF7597;
+      border: 2px solid #FF7597 !important;
       box-shadow: 0 4px 14px rgba(255, 182, 193, 0.4);
     }
 
