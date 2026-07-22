@@ -18,26 +18,26 @@ const CARDS = [
   {
     href: '/(app)/mee' as const,
     title: 'Tạo Mee',
-    desc: 'Người bạn đại diện · bản nháp native',
-    image: '/hub-images/card_mee.jpeg',
+    desc: 'Tạo người bạn đại diện của bé',
+    image: require('../../public/hub-images/card_mee.jpeg'),
   },
   {
     href: '/(app)/character' as const,
     title: 'Nhân vật AI',
-    desc: 'Form chi tiết · gen ảnh Gateway',
-    image: '/hub-images/home-character.jpeg',
+    desc: 'Biến ý tưởng thành nhân vật',
+    image: require('../../public/hub-images/home-character.jpeg'),
   },
   {
     href: '/(app)/art' as const,
     title: 'Xưởng vẽ',
-    desc: 'Camera · thư viện · AI vẽ lại',
-    image: '/hub-images/card_art.jpeg',
+    desc: 'Vẽ, chụp và sáng tạo cùng AI',
+    image: require('../../public/hub-images/card_art.jpeg'),
   },
   {
     href: '/(app)/comic' as const,
     title: 'Sáng tác truyện',
-    desc: 'Ý tưởng · nhân vật · kho truyện',
-    image: '/hub-images/art-image.jpeg',
+    desc: 'Kể câu chuyện của riêng mình',
+    image: require('../../public/hub-images/art-comic.jpeg'),
   },
 ];
 
@@ -77,7 +77,7 @@ export default function LobbyScreen() {
           alignSelf: 'center',
         }}
       >
-        <View className="mb-6 flex-row items-start justify-between gap-3">
+        <View className={`mb-4 ${wide ? 'flex-row items-start justify-between gap-6' : ''}`}>
           <View className="min-w-0 flex-1">
             <Text className="text-[12px] font-extrabold uppercase tracking-widest text-brand">
               AIkid Universe
@@ -98,38 +98,31 @@ export default function LobbyScreen() {
             ) : null}
           </View>
 
-          <View className="flex-row flex-wrap items-center justify-end gap-2">
-            <Pressable onPress={() => router.push('/(app)/gallery')} className="rounded-full border border-orange-100 bg-white px-4 py-2.5"><Text className="text-[13px] font-bold text-slate-700">Gallery</Text></Pressable>
-            <Pressable onPress={() => router.push('/(app)/plans')} className="rounded-full border border-orange-100 bg-white px-4 py-2.5"><Text className="text-[13px] font-bold text-slate-700">Gói AI</Text></Pressable>
+          <View className={`${wide ? 'max-w-[560px] justify-end' : 'mt-4'} flex-row flex-wrap items-center gap-2`}>
+            <Pressable onPress={() => router.push('/(app)/gallery')} className={`${wide ? '' : 'basis-[47%]'} flex-1 rounded-full border border-orange-100 bg-white px-3 py-2.5`} accessibilityRole="button"><Text className="text-center text-[13px] font-bold text-slate-700">🖼️ Gallery</Text></Pressable>
+            <Pressable onPress={() => router.push('/(app)/plans')} className={`${wide ? '' : 'basis-[47%]'} flex-1 rounded-full border border-orange-100 bg-white px-3 py-2.5`} accessibilityRole="button"><Text className="text-center text-[13px] font-bold text-slate-700">✨ Gói AI</Text></Pressable>
             <Pressable
               onPress={() => router.push('/(app)/family')}
-              className="rounded-full border border-orange-100 bg-white px-4 py-2.5"
+              className={`${wide ? '' : 'basis-[47%]'} flex-1 rounded-full border border-orange-100 bg-white px-3 py-2.5`}
               accessibilityRole="button"
               accessibilityLabel="Hồ sơ con"
             >
-              <Text className="text-[13px] font-bold text-slate-700">
-                {activeChild ? activeChild.name : 'Hồ sơ con'}
+              <Text className="text-center text-[13px] font-bold text-slate-700" numberOfLines={1}>
+                👧 {activeChild ? activeChild.name : 'Hồ sơ bé'}
               </Text>
             </Pressable>
             <Pressable
               onPress={() => router.push('/(app)/account')}
-              className="rounded-full border border-orange-100 bg-white px-4 py-2.5"
+              className={`${wide ? '' : 'basis-[47%]'} flex-1 rounded-full border border-orange-100 bg-white px-3 py-2.5`}
               accessibilityRole="button"
               accessibilityLabel="Tài khoản"
             >
-              <Text className="text-[13px] font-bold text-slate-700">
-                Tài khoản
+              <Text className="text-center text-[13px] font-bold text-slate-700">
+                ⚙️ Tài khoản
               </Text>
             </Pressable>
-            <Pressable
-              onPress={() => void handleLogout()}
-              className="rounded-full bg-orange-50 px-4 py-2.5"
-              accessibilityRole="button"
-              accessibilityLabel="Đăng xuất"
-            >
-              <Text className="text-[13px] font-bold text-brand">Đăng xuất</Text>
-            </Pressable>
           </View>
+          <Pressable onPress={() => void handleLogout()} className={`${wide ? 'mt-2 self-end' : 'mt-3 self-start'} px-2 py-1`} accessibilityRole="button" accessibilityLabel="Đăng xuất"><Text className="text-[12px] font-bold text-brand">Đăng xuất</Text></Pressable>
         </View>
 
         {!activeChild ? (
@@ -172,9 +165,9 @@ export default function LobbyScreen() {
               accessibilityRole="button"
               accessibilityLabel={card.title}
             >
-              <View style={{ height: wide ? 176 : 156, width: '100%' }}>
+              <View style={{ height: wide ? 176 : 128, width: '100%' }}>
                 <Image
-                  source={{ uri: card.image }}
+                  source={card.image}
                   style={{ width: '100%', height: '100%' }}
                   contentFit="cover"
                   contentPosition="top"
@@ -188,9 +181,9 @@ export default function LobbyScreen() {
                     right: 0,
                     bottom: 0,
                     paddingHorizontal: 16,
-                    paddingBottom: 14,
-                    paddingTop: 48,
-                    backgroundColor: 'rgba(15, 23, 42, 0.42)',
+                    paddingBottom: 12,
+                    paddingTop: wide ? 48 : 30,
+                    backgroundColor: 'rgba(15, 23, 42, 0.48)',
                   }}
                 >
                   <Text className="text-[17px] font-extrabold text-white">

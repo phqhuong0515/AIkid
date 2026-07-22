@@ -1,10 +1,13 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -12,6 +15,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/core/auth/useAuth';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
@@ -19,6 +23,7 @@ import { ART_STYLES, type ArtStyle } from '@/features/art/constants';
 import {
   DrawingCanvas,
   type DrawingCanvasHandle,
+  type DrawingStroke,
 } from '@/features/art/canvas/DrawingCanvas';
 import { useArtDraft } from '@/features/art/store/useArtDraft';
 import {
@@ -91,12 +96,33 @@ export default function ArtScreen() {
   const [referenceMode, setReferenceMode] = useState<ReferenceMode>('photo');
   const [hasCanvasDrawing, setHasCanvasDrawing] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [canvasModalVisible, setCanvasModalVisible] = useState(false);
+  const [canvasSaving, setCanvasSaving] = useState(false);
+  const [canvasStrokes, setCanvasStrokes] = useState<DrawingStroke[]>([]);
+  const [canvasRevision, setCanvasRevision] = useState(0);
+  const [confirmedCanvasRevision, setConfirmedCanvasRevision] = useState(0);
+  const [drawingPreviewUri, setDrawingPreviewUri] = useState<string | null>(null);
   const drawingCanvasRef = useRef<DrawingCanvasHandle>(null);
   const generateLock = useRef(false);
+  const previousOrientationLock = useRef<ScreenOrientation.OrientationLock | null>(null);
+  const orientationWasManaged = useRef(false);
+  const orientationRequest = useRef(0);
+  const canvasOpenLock = useRef(false);
 
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
+
+  useEffect(() => () => {
+    orientationRequest.current += 1;
+    if (orientationWasManaged.current) {
+      const previous = previousOrientationLock.current;
+      void (previous == null
+        ? ScreenOrientation.unlockAsync()
+        : ScreenOrientation.lockAsync(previous)
+      ).catch(() => undefined);
+    }
+  }, []);
 
   const selectedStyle = useMemo(
     () => ART_STYLES.find((style) => style.id === draft.styleId) ?? ART_STYLES[0],
@@ -104,6 +130,109 @@ export default function ArtScreen() {
   );
   const useGrid = width >= 760;
   const cardWidth = useGrid ? Math.min(220, (width - 84) / 4) : 172;
+  const canvasHasUnconfirmedChanges = canvasRevision !== confirmedCanvasRevision;
+
+  async function openCanvas() {
+    if (canvasOpenLock.current) return;
+    canvasOpenLock.current = true;
+    const request = ++orientationRequest.current;
+    let shouldOpen = true;
+    setReferenceMode('drawing');
+    const isPhone = (Platform.OS === 'ios' || Platform.OS === 'android') && width < 760;
+    if (isPhone) {
+      try {
+        const previous = await ScreenOrientation.getOrientationLockAsync();
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+        if (orientationRequest.current !== request) {
+          shouldOpen = false;
+          try {
+            await (previous === ScreenOrientation.OrientationLock.DEFAULT
+              ? ScreenOrientation.unlockAsync()
+              : ScreenOrientation.lockAsync(previous));
+          } catch { /* best-effort restore after unmount */ }
+        } else {
+          previousOrientationLock.current = previous;
+          orientationWasManaged.current = true;
+        }
+      } catch (error) {
+        console.warn('[ArtCanvas] landscape lock unavailable', error);
+        shouldOpen = orientationRequest.current === request;
+      }
+    }
+    // Show only after the orientation request settles. This prevents a close
+    // racing a late lockAsync completion and leaving the whole app landscape.
+    canvasOpenLock.current = false;
+    if (shouldOpen) setCanvasModalVisible(true);
+  }
+
+  async function restoreOrientation() {
+    if (!orientationWasManaged.current) return;
+    try {
+      const previous = previousOrientationLock.current;
+      previousOrientationLock.current = null;
+      if (previous == null || previous === ScreenOrientation.OrientationLock.DEFAULT) {
+        await ScreenOrientation.unlockAsync();
+      } else {
+        await ScreenOrientation.lockAsync(previous);
+      }
+    } catch (error) {
+      console.warn('[ArtCanvas] orientation restore unavailable', error);
+    } finally {
+      orientationWasManaged.current = false;
+    }
+  }
+
+  function closeCanvasKeepingWork() {
+    setCanvasModalVisible(false);
+    setIsDrawing(false);
+    void restoreOrientation();
+  }
+
+  async function confirmCanvas() {
+    if (isDrawing || drawingCanvasRef.current?.hasActiveStroke()) {
+      Alert.alert('Nét vẽ chưa xong', 'Nhấc bút khỏi bảng rồi bấm Xong nhé.');
+      return;
+    }
+    if (!drawingCanvasRef.current?.hasDrawing()) {
+      Alert.alert('Bảng vẽ đang trống', 'Bé hãy vẽ ít nhất một nét trước.');
+      return;
+    }
+    setCanvasSaving(true);
+    try {
+      const preview = await drawingCanvasRef.current.exportPngDataUrl();
+      setDrawingPreviewUri(preview);
+      setConfirmedCanvasRevision(canvasRevision);
+      setHasCanvasDrawing(true);
+      setReferenceMode('drawing');
+      patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null });
+      closeCanvasKeepingWork();
+    } catch (error) {
+      Alert.alert('Không lưu được bảng vẽ', error instanceof Error ? error.message : 'Thử lại sau');
+    } finally {
+      setCanvasSaving(false);
+    }
+  }
+
+  function requestCloseCanvas() {
+    if (canvasSaving) return;
+    if (isDrawing || drawingCanvasRef.current?.hasActiveStroke()) {
+      Alert.alert('Bé vẫn đang vẽ', 'Nhấc bút khỏi bảng trước khi thoát.');
+      return;
+    }
+    if (!canvasHasUnconfirmedChanges) {
+      closeCanvasKeepingWork();
+      return;
+    }
+    Alert.alert(
+      'Bảng vẽ chưa bấm Xong',
+      'Các nét vẫn được giữ khi đóng. Bấm Xong để cập nhật ảnh xem trước.',
+      [
+        { text: 'Vẽ tiếp', style: 'cancel' },
+        { text: 'Đóng, vẫn giữ nét', onPress: closeCanvasKeepingWork },
+        { text: 'Xong', onPress: () => void confirmCanvas() },
+      ],
+    );
+  }
 
   async function choose(camera: boolean) {
     const permission = camera
@@ -147,7 +276,13 @@ export default function ArtScreen() {
       return;
     }
     if (referenceMode === 'drawing' && !drawingCanvasRef.current?.hasDrawing()) {
-      Alert.alert('Bảng vẽ đang trống', 'Bé hãy vẽ ít nhất một nét trước.');
+      if (!hasCanvasDrawing) {
+        Alert.alert('Bảng vẽ đang trống', 'Bé hãy vẽ ít nhất một nét trước.', [{ text: 'Mở bảng vẽ', onPress: () => void openCanvas() }]);
+        return;
+      }
+    }
+    if (referenceMode === 'drawing' && (canvasHasUnconfirmedChanges || !drawingPreviewUri)) {
+      Alert.alert('Cần xác nhận bảng vẽ', 'Mở bảng vẽ và bấm Xong trước khi tạo ảnh AI.', [{ text: 'Mở bảng vẽ', onPress: () => void openCanvas() }]);
       return;
     }
     if (generateLock.current) return;
@@ -160,8 +295,7 @@ export default function ArtScreen() {
         let fileName = draft.referenceFileName;
         let mimeType = draft.referenceMimeType;
         if (referenceMode === 'drawing') {
-          setBusyStage('preparing');
-          localReferenceUri = await drawingCanvasRef.current!.exportPngDataUrl();
+          localReferenceUri = drawingPreviewUri;
           fileName = `aikid-drawing-${Date.now()}.png`;
           mimeType = 'image/png';
         }
@@ -222,9 +356,9 @@ export default function ArtScreen() {
     );
   }
 
-  return (
+  return <>
     <ScreenChrome title="Xưởng vẽ AI" subtitle="Ảnh mẫu → chọn phong cách → AI vẽ lại" backHref="/(app)/lobby">
-      <ScrollView scrollEnabled={!isDrawing && !busyStage} contentContainerStyle={{ padding: 16, paddingBottom: 64 }}>
+      <ScrollView scrollEnabled={!busyStage} contentContainerStyle={{ padding: 16, paddingBottom: 64 }}>
         <SectionCard title="1. Tạo hoặc chọn tranh mẫu" hint="Bé có thể tự vẽ, chụp tranh giấy hoặc chọn ảnh. Tranh được lưu vào Gallery trước khi gửi AI.">
           <View className="mb-3 flex-row rounded-2xl bg-orange-50 p-1">
             <Pressable
@@ -243,18 +377,24 @@ export default function ArtScreen() {
             </Pressable>
           </View>
 
-          <View style={{ display: referenceMode === 'drawing' ? 'flex' : 'none' }}>
-            <DrawingCanvas
-              ref={drawingCanvasRef}
-              disabled={!!busyStage}
-              onInteractionChange={setIsDrawing}
-              onDrawingChange={(hasDrawing) => {
-                setHasCanvasDrawing(hasDrawing);
-                setReferenceMode('drawing');
-                patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null });
-              }}
-            />
-          </View>
+          {referenceMode === 'drawing' ? (
+            <View className="overflow-hidden rounded-2xl border border-orange-100 bg-orange-50 p-3">
+              {drawingPreviewUri ? (
+                <Image source={{ uri: drawingPreviewUri }} style={{ width: '100%', height: 220, borderRadius: 14, backgroundColor: '#FFFFFF' }} contentFit="contain" />
+              ) : (
+                <View className="h-40 items-center justify-center rounded-2xl border border-dashed border-orange-200 bg-white">
+                  <Text className="text-4xl">🎨</Text>
+                  <Text className="mt-2 font-bold text-slate-400">Bảng vẽ đang chờ bé</Text>
+                </View>
+              )}
+              <Text className={`mt-3 text-center text-xs font-bold ${canvasHasUnconfirmedChanges ? 'text-amber-600' : hasCanvasDrawing ? 'text-emerald-600' : 'text-slate-500'}`}>
+                {canvasHasUnconfirmedChanges ? 'Có nét mới chưa bấm Xong — nét vẫn đang được giữ' : hasCanvasDrawing ? '✓ Bảng vẽ đã sẵn sàng cho AI' : 'Mở toàn màn hình để bắt đầu vẽ'}
+              </Text>
+              <Pressable accessibilityRole="button" accessibilityLabel="Mở bảng vẽ toàn màn hình" disabled={!!busyStage} onPress={() => void openCanvas()} className="mt-3 rounded-2xl bg-brand py-4 disabled:opacity-50">
+                <Text className="text-center text-base font-extrabold text-white">{hasCanvasDrawing ? '🎨 Mở lại bảng vẽ' : '🎨 Mở bảng vẽ'}</Text>
+              </Pressable>
+            </View>
+          ) : null}
 
           {referenceMode === 'photo' ? <View>
             <View className="flex-row gap-2">
@@ -354,5 +494,29 @@ export default function ArtScreen() {
         ) : null}
       </ScrollView>
     </ScreenChrome>
-  );
+    <Modal visible={canvasModalVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={requestCloseCanvas} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
+      <SafeAreaView className="flex-1 bg-orange-50" edges={['top', 'right', 'bottom', 'left']}>
+        <View className="flex-1 p-1">
+          <DrawingCanvas
+            ref={drawingCanvasRef}
+            fullscreen
+            disabled={canvasSaving}
+            saving={canvasSaving}
+            doneDisabled={isDrawing || !hasCanvasDrawing}
+            onClose={requestCloseCanvas}
+            onDone={() => void confirmCanvas()}
+            initialStrokes={canvasStrokes}
+            onInteractionChange={setIsDrawing}
+            onStrokesChange={(next) => {
+              setCanvasStrokes(next);
+              setHasCanvasDrawing(next.length > 0);
+              setCanvasRevision((revision) => revision + 1);
+              setReferenceMode('drawing');
+              patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null });
+            }}
+          />
+        </View>
+      </SafeAreaView>
+    </Modal>
+  </>;
 }

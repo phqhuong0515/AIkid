@@ -1,3 +1,5 @@
+import { File, Paths } from 'expo-file-system';
+import { Platform } from 'react-native';
 import {
   useMutation,
   useInfiniteQuery,
@@ -404,32 +406,50 @@ export async function uploadPickedImageAsPublicRef(input: {
   const mimeType = input.mimeType || 'image/jpeg';
   const fileName = input.fileName || guessFileName(input.uri, mimeType);
   const form = new FormData();
+  let cacheFile: File | null = null;
 
-  if (input.uri.startsWith('data:') || input.uri.startsWith('blob:')) {
-    const response = await fetch(input.uri);
-    if (!response.ok) throw new Error('Không đọc được ảnh đã chọn');
-    const blob = await response.blob();
-    form.append('file', blob, fileName);
-  } else {
-    form.append('file', {
-      uri: input.uri,
-      name: fileName,
-      type: mimeType,
-    } as unknown as Blob);
-  }
-  form.append('ipId', input.ipId);
+  try {
+    if (input.uri.startsWith('data:') && Platform.OS !== 'web') {
+      const encoded = input.uri.match(/^data:[^;]+;base64,(.+)$/)?.[1];
+      if (!encoded) throw new Error('Không đọc được dữ liệu bảng vẽ');
+      cacheFile = new File(Paths.cache, fileName);
+      cacheFile.create({ overwrite: true, intermediates: true });
+      cacheFile.write(encoded, { encoding: 'base64' });
+      form.append('file', { uri: cacheFile.uri, name: fileName, type: mimeType } as unknown as Blob);
+    } else if (input.uri.startsWith('data:') || input.uri.startsWith('blob:')) {
+      const response = await fetch(input.uri);
+      if (!response.ok) throw new Error('Không đọc được ảnh đã chọn');
+      const blob = await response.blob();
+      form.append('file', blob, fileName);
+    } else {
+      form.append('file', {
+        uri: input.uri,
+        name: fileName,
+        type: mimeType,
+      } as unknown as Blob);
+    }
+    form.append('ipId', input.ipId);
 
-  const uploaded = await mediaApi.upload(form, {
-    ipId: input.ipId,
-    assetType: input.assetType ?? 'uploaded',
-    tags: `child:${input.childId},art-reference`,
-    permanent: 'true',
-  });
-  const publicUrl = pickUploadPublicUrl(uploaded);
-  if (!publicUrl?.startsWith('http')) {
-    throw new Error('Đã tải ảnh nhưng không nhận được URL công khai');
+    const uploaded = await mediaApi.upload(form, {
+      ipId: input.ipId,
+      assetType: input.assetType ?? 'uploaded',
+      tags: `child:${input.childId},art-reference`,
+      permanent: 'true',
+    });
+    const publicUrl = pickUploadPublicUrl(uploaded);
+    if (!publicUrl?.startsWith('http')) {
+      throw new Error('Đã tải ảnh nhưng không nhận được URL công khai');
+    }
+    return publicUrl;
+  } finally {
+    try {
+      if (cacheFile?.exists) cacheFile.delete();
+    } catch (error) {
+      // Cache cleanup must never turn a successful upload into a failure or
+      // hide the original network error.
+      console.warn('[media] could not remove temporary drawing file', error);
+    }
   }
-  return publicUrl;
 }
 
 /**
