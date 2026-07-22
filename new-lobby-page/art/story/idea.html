@@ -1829,9 +1829,9 @@
           </div>
           <div class="custom-space-input-wrapper" style="justify-content: center;">
             <input type="text" id="custom-idea-text" class="custom-space-input"
-              placeholder="Viết ý tưởng của em vào đây..." maxlength="200" oninput="updateCharCounter(this)">
+              placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="updateCharCounter(this)">
           </div>
-          <div class="custom-space-counter" id="char-counter">0 / 200</div>
+          <div class="custom-space-counter" id="char-counter">0 / 60</div>
         </div>
 
         <!-- Wizard Action Buttons -->
@@ -2064,8 +2064,9 @@
 
     function updateCharCounter(input) {
       const counter = document.getElementById('char-counter');
+      const maxLen = input.getAttribute('maxlength') || 60;
       if (counter) {
-        counter.innerText = `${input.value.length} / 200`;
+        counter.innerText = `${input.value.length} / ${maxLen}`;
       }
     }
 
@@ -2399,6 +2400,14 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'grid';
         if (customBox) customBox.style.display = 'flex';
+
+        let maxLen = 60;
+        if (stepNumber === 4) maxLen = 60;
+        const customInput = document.getElementById('custom-idea-text');
+        if (customInput) {
+          customInput.setAttribute('maxlength', maxLen);
+          updateCharCounter(customInput);
+        }
       }
     }
 
