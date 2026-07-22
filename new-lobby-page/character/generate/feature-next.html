@@ -1141,7 +1141,29 @@ TECHNICAL REQUIREMENTS
 - Use only the 4 selected key colors as the base identity of the template
 
 AVOID / NEGATIVE PROMPT:
-vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy, irregular grid, poor spacing, cropped body, cropped hair, cropped feet, inconsistent character design, different outfits, different hairstyles, different accessories, different face design, duplicate poses, repeated expressions, extra limbs, missing limbs, malformed hands, distorted fingers, distorted face, random text, broken text, misspelled Vietnamese, missing Vietnamese accents, unreadable typography, text under turnaround, text under expressions, text under actions, text under color palette, too many colors, unrelated colors, fixed lavender theme, excessive decoration, dark background, harsh shadows, flat vector art, rough sketch, low detail, blurry render, watermark, logo`;
+vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy, irregular grid, poor spacing, cropped body, cropped hair, cropped feet, inconsistent character design, different outfits, different hairstyles, different accessories, different face design, duplicate poses, repeated expressions, extra limbs, missing limbs, malformed hands, distorted fingers, distorted face, random text, broken text, misspelled Vietnamese, missing Vietnamese accents, unreadable typography, text under turnaround, text under expressions, text under actions, text under color palette, too many colors, unrelated colors, fixed lavender theme, excessive decoration, dark background, harsh shadows, flat vector art, rough sketch, low detail, blurry render, watermark, logo
+
+CRITICAL RULE — CHARACTER APPEARANCE PRESERVATION:
+
+A reference character image is provided. You must treat this reference image as the single source of truth for the character's appearance.
+
+You must strictly preserve and replicate every aspect of the provided reference image:
+- Face shape, facial features, skin tone, eye color, eye shape
+- Hair color, hair length, hair style, hair accessories
+- Outfit: every piece of clothing, color, pattern, material, and layering
+- All accessories: jewelry, bags, hats, glasses, footwear, or any other items
+- Body proportions and character silhouette
+- Overall color palette of the character
+
+You must NOT:
+- Change any color of the hair, eyes, skin, or outfit
+- Add or remove any accessories or clothing items
+- Alter the face shape or facial features
+- Modify the body proportions
+- Introduce new design elements not present in the reference image
+- Reinvent or reinterpret the character design
+
+All character instances on the sheet (large portrait, turnaround views, expressions, action poses) must faithfully reproduce the reference character's exact visual design.`;
 
       try {
         const response = await fetch('/api/generate-image', {
@@ -1183,8 +1205,10 @@ vertical poster, non-16:9 layout, crowded layout, tiny portrait, weak hierarchy,
           saveBtn.style.opacity = '1';
           saveBtn.style.pointerEvents = 'auto';
         }
+        hidePageLoader();
       } catch (err) {
         console.error("Failed to generate character profile sheet:", err);
+        hidePageLoader();
         const overlayEl = document.getElementById('generating-overlay');
         if (overlayEl) {
           overlayEl.innerHTML = `

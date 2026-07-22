@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cốt Truyện - AIkid</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@400;500;600;700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;600;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Common universe styles -->
+  <link rel="stylesheet" href="/mee/styles.css">
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('/assets/images/bg-art.png') !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+      background-size: cover !important;
+      background-attachment: fixed !important;
+      background-color: #FED7D7 !important;
+      font-family: 'Mali', sans-serif;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .scaler-wrapper {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1927.63px;
+      height: 930px;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(1);
+      background: transparent !important;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .scaler-wrapper>* {
+      pointer-events: auto;
+    }
+
+    /* ======== PAGE LOADER ======== */
+    #page-loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+      background-image:
+        radial-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1) 2px, transparent 40px),
+        radial-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05) 1px, transparent 30px),
+        linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+      background-size: 550px 550px, 350px 350px, 100% 100%;
+      background-position: 0 0, 40px 60px, 0 0;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+      pointer-events: all;
+      overflow: hidden;
+    }
+
+    @keyframes meteorFlight {
+      0% {
+        transform: translate(60vw, -60vh) rotate(150deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-60vw, 60vh) rotate(150deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes miniFlight {
+      0% {
+        transform: translate(60vw, -60vh) rotate(150deg);
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 0.6;
+      }
+
+      85% {
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: translate(-60vw, 60vh) rotate(150deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes loadingDots {
+
+      0%,
+      20% {
+        content: ".";
+      }
+
+      40% {
+        content: "..";
+      }
+
+      60%,
+      100% {
+        content: "...";
+      }
+    }
+
+    .loading-dots::after {
+      content: "";
+      animation: loadingDots 1.5s infinite steps(1);
+      display: inline-block;
+      width: 24px;
+      text-align: left;
+    }
+
+    .meteor-container {
+      position: relative;
+      width: 320px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+      z-index: 10;
+    }
+
+    .meteor-head {
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at 35% 35%, #FFF0F5 0%, #FFB6C1 25%, #FF5E97 60%, #9D1C7F 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(255, 94, 151, 0.9), 0 0 60px rgba(157, 28, 127, 0.6), 0 0 120px rgba(157, 28, 127, 0.4);
+      flex-shrink: 0;
+    }
+
+    .meteor-trail {
+      width: 600px;
+      height: 70px;
+      background: linear-gradient(to right, rgba(157, 28, 127, 0) 0%, rgba(157, 28, 127, 0.25) 35%, rgba(255, 94, 151, 0.75) 75%, rgba(255, 240, 245, 0.95) 100%);
+      border-radius: 40px 0 0 40px;
+      margin-right: -40px;
+      filter: blur(2px);
+    }
+
+    .mini-meteor {
+      position: absolute;
+      width: 160px;
+      height: 5px;
+      background: linear-gradient(to right, rgba(255, 182, 193, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
+      border-radius: 9999px;
+      opacity: 0;
+      filter: blur(1.5px);
+      transform: rotate(150deg);
+    }
+
+    .mini-1 {
+      top: 25%;
+      left: 15%;
+      animation: miniFlight 1.6s linear infinite;
+      animation-delay: 0.4s;
+    }
+
+    .mini-2 {
+      top: 75%;
+      left: 5%;
+      animation: miniFlight 1.9s linear infinite;
+      animation-delay: 0.9s;
+    }
+
+    .mini-3 {
+      top: 85%;
+      left: 50%;
+      animation: miniFlight 1.4s linear infinite;
+      animation-delay: 0.1s;
+    }
+
+    /* ======== TOAST ======== */
+    .toast-message {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(71, 52, 99, 0.92);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-family: 'Mali', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 99999;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .toast-message.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ======== MAIN CARD ======== */
+    .plot-card {
+      position: absolute;
+      top: calc(52% + 40px);
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1100px;
+      height: 660px;
+      background: #FDFAF4;
+      border: 8px solid #FFFFFF;
+      border-radius: 40px;
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.08), 0 5px 18px rgba(138, 116, 99, 0.04);
+      box-sizing: border-box;
+      padding: 36px 50px 32px 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .plot-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .plot-card-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 2rem;
+      color: #475569;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Editable title input */
+    .plot-title-input {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 1.8rem;
+      line-height: 1.6;
+      color: #475569;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      border-bottom: 2.5px dashed #EBDCD0;
+      background: transparent;
+      outline: none;
+      padding: 18px 4px 4px 0;
+      width: 480px;
+      height: 72px;
+      resize: none;
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      transition: border-color 0.25s ease;
+    }
+
+    .plot-title-input::placeholder {
+      color: #c4b5a8;
+      font-style: italic;
+      font-size: 1.4rem;
+      text-transform: none;
+    }
+
+    .plot-title-input:focus {
+      border-bottom-color: #FF7597;
+    }
+
+    .plot-card-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .plot-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      border-radius: 9999px;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .plot-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .plot-btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-edit {
+      background: #FFFFFF;
+      border: 2.5px solid #EBDCD0;
+      color: #3D2B1F;
+      box-shadow: 0 4px 12px rgba(138, 116, 99, 0.08);
+    }
+    .btn-edit:hover {
+      border-color: #FF7597;
+      color: #FF7597;
+    }
+
+    .btn-save {
+      background: linear-gradient(135deg, #FF7597, #FF5C8A);
+      color: white;
+      box-shadow: 0 4px 14px rgba(255, 117, 151, 0.4);
+    }
+
+    .plot-textarea-wrapper {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+    }
+
+    .plot-textarea {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      resize: none;
+      border: 3px solid #EBDCD0;
+      border-radius: 20px;
+      background: #FFFFFE;
+      font-family: 'Mali', sans-serif;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #3D2B1F;
+      padding: 22px 26px;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .plot-textarea:focus {
+      border-color: #FF7597;
+      box-shadow: 0 0 0 4px rgba(255, 117, 151, 0.12);
+    }
+
+    .plot-textarea[readonly] {
+      background: #FFFFFF;
+      cursor: default;
+      border-color: #EBDCD0;
+      box-shadow: none;
+    }
+
+    .edit-status {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.85rem;
+      color: #8A7463;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .edit-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      display: inline-block;
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+
+    .edit-dot.readonly {
+      background: #cbd5e1;
+      animation: none;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(1.3);
+      }
+    }
+
+    /* Word counter */
+    .word-counter {
+      text-align: right;
+      font-family: 'Mali', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #8A7463;
+      padding: 4px 6px 0 0;
+      flex-shrink: 0;
+      transition: color 0.25s ease;
+      letter-spacing: 0.02em;
+    }
+
+    .word-counter.at-limit {
+      color: #E11D48;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Page Loader -->
+  <div id="page-loader-overlay">
+    <div style="position:relative;width:100%;height:100%;overflow:hidden;">
+      <div class="mini-meteor mini-1"></div>
+      <div class="mini-meteor mini-2"></div>
+      <div class="mini-meteor mini-3"></div>
+    </div>
+    <div class="meteor-container">
+      <div class="meteor-trail"></div>
+      <div class="meteor-head"></div>
+    </div>
+    <p
+      style="font-family:'Chiron GoRound TC',sans-serif;color:white;font-size:1.4rem;margin-top:40px;letter-spacing:1px;text-shadow:0 2px 8px rgba(0,0,0,0.15);">
+      Đang tải<span class="loading-dots"></span></p>
+  </div>
+
+  <div class="scaler-wrapper">
+
+    <!-- Navigation Header -->
+    <header class="universe-header">
+      <div class="universe-header-left">
+        <div class="universe-logo" onclick="playPopAndNavigate('/')">
+          <img src="/mee/logo.svg" alt="StoryMee Logo" class="logo-image">
+        </div>
+      </div>
+      <div class="universe-header-right">
+        <button class="universe-signup-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+      </div>
+    </header>
+
+    <!-- Back Button -->
+    <div style="position:absolute;left:38px;top:131px;z-index:1000;transform:scale(1.1);transform-origin:left top;">
+      <button onclick="playPopAndNavigate('/art/story/idea')" style="
+        background: linear-gradient(135deg, #ff9eb5, #ff7597);
+        border: none;
+        border-radius: 9999px;
+        color: white;
+        font-family: 'Mali', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 10px 25px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(255,117,151,0.3);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      ">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Trở Về</span>
+      </button>
+    </div>
+
+    <!-- Main Card -->
+    <div class="plot-card">
+
+      <!-- Header -->
+      <div class="plot-card-header">
+        <textarea class="plot-title-input" id="plot-title" rows="1" maxlength="25" placeholder="Đặt tên cốt truyện..."
+          spellcheck="false" onkeydown="if(event.key==='Enter') event.preventDefault();"></textarea>
+        <div style="display:flex;align-items:center;gap:18px;">
+          <div class="edit-status">
+            <span class="edit-dot readonly" id="edit-dot"></span>
+            <span id="edit-status-text">Chế độ xem</span>
+          </div>
+          <div class="plot-card-actions">
+            <button class="plot-btn btn-edit" id="btn-edit" onclick="toggleEdit()">
+              <i class="fa-solid fa-pen" id="edit-icon"></i>
+              <span id="edit-btn-text">Sửa lại</span>
+            </button>
+            <button class="plot-btn btn-save" id="btn-save" onclick="savePlot(event)">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Lưu cốt truyện</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Area -->
+      <div class="plot-textarea-wrapper">
+        <textarea class="plot-textarea" id="plot-textarea" oninput="updateWordCount()"
+          readonly>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
+
+Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui.</textarea>
+      </div>
+      <div class="word-counter" id="word-counter">0 / 200 chữ</div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast-message"></div>
+
+  <script>
+    function playPopSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch (e) { }
+    }
+
+    function playPopAndNavigate(url) {
+      playPopSound();
+      const loader = document.getElementById('page-loader-overlay');
+      if (loader) {
+        loader.style.display = 'flex';
+        loader.offsetHeight;
+        loader.style.opacity = '1';
+      }
+      setTimeout(() => { window.location.href = url; }, 350);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    /* ---- Word counter ---- */
+    function countWords(text) {
+      return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    }
+    function updateWordCount() {
+      const textarea = document.getElementById('plot-textarea');
+      const counter = document.getElementById('word-counter');
+      if (!textarea || !counter) return;
+      const count = countWords(textarea.value);
+      counter.innerText = count + ' / 250 chữ';
+      counter.classList.toggle('at-limit', count >= 250);
+    }
+
+    /* ---- Edit toggle ---- */
+    let isEditing = false;
+    function toggleEdit() {
+      isEditing = !isEditing;
+      const textarea = document.getElementById('plot-textarea');
+      const editIcon = document.getElementById('edit-icon');
+      const editBtnText = document.getElementById('edit-btn-text');
+      const editDot = document.getElementById('edit-dot');
+      const statusText = document.getElementById('edit-status-text');
+
+      if (isEditing) {
+        textarea.removeAttribute('readonly');
+        textarea.focus();
+        editIcon.className = 'fa-solid fa-xmark';
+        editBtnText.innerText = 'Huỷ sửa';
+        editDot.classList.remove('readonly');
+        statusText.innerText = 'Đang chỉnh sửa';
+      } else {
+        textarea.setAttribute('readonly', true);
+        editIcon.className = 'fa-solid fa-pen';
+        editBtnText.innerText = 'Sửa lại';
+        editDot.classList.add('readonly');
+        statusText.innerText = 'Chế độ xem';
+      }
+      playPopSound();
+    }
+
+    /* ---- Save ---- */
+    function savePlot(e) {
+      playPopSound();
+      const content = document.getElementById('plot-textarea').value.trim();
+      if (!content) { showToast('Cốt truyện đang trống, không thể lưu!'); return; }
+
+      const title = document.getElementById('plot-title').value.trim() || 'Cốt truyện của tôi';
+
+      sessionStorage.setItem('savedPlotContent', content);
+      sessionStorage.setItem('savedPlotTitle', title);
+      try {
+        localStorage.setItem('aikid_savedPlot', content);
+        localStorage.setItem('aikid_savedPlotTitle', title);
+
+        // Get story metadata
+        const rawData = sessionStorage.getItem('storyPlotData');
+        let parsedData = {};
+        try { if (rawData) parsedData = JSON.parse(rawData); } catch (_) {}
+
+        // Manage storymee_saved_plots array
+        let savedPlots = [];
+        const rawPlots = localStorage.getItem('storymee_saved_plots');
+        if (rawPlots) {
+          try {
+            savedPlots = JSON.parse(rawPlots);
+            if (!Array.isArray(savedPlots)) savedPlots = [];
+          } catch (_) { savedPlots = []; }
+        }
+
+        // Check if updating existing or adding new
+        const existingIndex = savedPlots.findIndex(p => p.title === title || p.content === content);
+        if (existingIndex >= 0) {
+          savedPlots[existingIndex] = {
+            ...savedPlots[existingIndex],
+            title: title,
+            content: content,
+            updatedAt: new Date().toISOString()
+          };
+        } else {
+          const newPlot = {
+            id: 'plot_' + Date.now(),
+            title: title,
+            content: content,
+            genre: parsedData.genre || 'Sáng tạo',
+            character: parsedData.character || 'Nhân vật chính',
+            createdAt: new Date().toISOString()
+          };
+          savedPlots.unshift(newPlot);
+        }
+
+        localStorage.setItem('storymee_saved_plots', JSON.stringify(savedPlots));
+      } catch (err) {
+        console.warn('Error saving plot to localStorage:', err);
+      }
+
+      const btn = e.currentTarget;
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-check"></i><span>Đã lưu vào kho!</span>';
+      btn.style.background = 'linear-gradient(135deg, #10b981, #065f46)';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+
+      showToast('Đã lưu cốt truyện vào kho thành công!');
+      if (isEditing) toggleEdit();
+    }
+
+    const GEMINI_API_KEY = 'AIzaSyC7lBGGw_c2sM6RHif2k32E6mAiZBzCUyY';
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY;
+
+    /* ---- Helper to guarantee story does not exceed max limit ---- */
+    function limitStoryWords(text, maxWords = 245) {
+      const words = text.trim().split(/\s+/);
+      if (words.length <= maxWords) return text;
+      
+      const truncatedWords = words.slice(0, maxWords);
+      let truncatedText = truncatedWords.join(' ');
+      
+      // Find the last complete sentence within truncatedText
+      const lastPeriod = Math.max(truncatedText.lastIndexOf('.'), truncatedText.lastIndexOf('!'), truncatedText.lastIndexOf('?'));
+      if (lastPeriod > truncatedText.length * 0.7) {
+        truncatedText = truncatedText.substring(0, lastPeriod + 1);
+      } else {
+        truncatedText += '...';
+      }
+      return truncatedText;
+    }
+
+    /* ---- Build AI prompt from story data ---- */
+    function buildPrompt(d) {
+      const boiCanh = [d.time, d.space].filter(Boolean).join(', ') || '';
+      return `Bạn là AI hỗ trợ trẻ em từ 6–11 tuổi sáng tạo cốt truyện. Dựa trên toàn bộ lựa chọn mà người dùng đã cung cấp, hãy viết một cốt truyện hoàn toàn mới bằng tiếng Việt.
+
+DỮ LIỆU NGƯỜI DÙNG
+
+- Thể loại: ${d.genre || ''}
+- Nhân vật chính: ${d.character || ''}
+- Tính cách nhân vật chính: ${d.role || ''}
+- Nhân vật phụ nếu có: ${d.secondaryChars || ''}
+- Bối cảnh: ${boiCanh}
+- Khởi đầu – nhân vật đang làm gì: ${d.openingAction || ''}
+- Cảm xúc ban đầu: ${d.openingEmotion || ''}
+- Điều bất ngờ xảy ra: ${d.unexpectedEvent || ''}
+- Mục tiêu của nhân vật: ${d.purpose || ''}
+- Trở ngại: ${d.obstacle || ''}
+- Cách nhân vật thử giải quyết: ${d.attempt || ''}
+- Điều nhân vật nhận ra: 
+- Cao trào: 
+- Kiểu kết thúc: ${d.ending || ''}
+- Bài học nếu có: ${d.insight || ''}
+
+YÊU CẦU CẤU TRÚC
+
+Câu chuyện phải có đầy đủ ba phần: Mở đầu, Thân truyện, Kết thúc.
+
+VĂN PHONG THEO THỂ LOẠI
+
+Tự động điều chỉnh giọng kể theo thể loại người dùng đã chọn:
+
+- VIỄN TƯỞNG: hiện đại, kỳ diệu, giàu trí tưởng tượng; có công nghệ, robot, AI, không gian hoặc phát minh mới lạ.
+- PHIÊU LƯU: nhịp nhanh, nhiều khám phá, hành động và thử thách.
+- ĐỜI THƯỜNG: gần gũi, tự nhiên, ấm áp, tập trung vào gia đình, trường học hoặc bạn bè.
+- HÀI HƯỚC: vui nhộn, dí dỏm, có tình huống trớ trêu hoặc hiểu lầm.
+- TRINH THÁM: bí ẩn, có manh mối, suy luận và tiết lộ sự thật ở cao trào.
+- CỔ TÍCH: trong trẻo, kỳ diệu, giàu hình ảnh; có thể có phép thuật hoặc đồ vật biết nói.
+- KINH DỊ NHẸ: bí ẩn và hồi hộp vừa phải, tuyệt đối không có máu me, chết chóc hoặc hình ảnh gây ám ảnh.
+- SIÊU ANH HÙNG: mạnh mẽ, giàu hành động, nhấn vào năng lực, trách nhiệm và bảo vệ người khác.
+- TÌNH CẢM: nhẹ nhàng, chân thành, tập trung vào tình bạn, gia đình, sự quan tâm, tha thứ và thấu hiểu.
+
+NGUYÊN TẮC BẮT BUỘC VỀ ĐỘ DÀI VÀ TÍNH LOGIC
+
+- Viết bằng tiếng Việt tự nhiên, đúng chính tả và đầy đủ dấu.
+- Nội dung phù hợp với trẻ em từ 6–11 tuổi.
+- BẮT BUỘC VỀ NHÂN VẬT PHỤ: Nếu người dùng có cung cấp thông tin "Nhân vật phụ nếu có", câu chuyện BẮT BUỘC phải xuất hiện và giới thiệu nhân vật phụ đó, miêu tả vai trò/hành động của nhân vật phụ lồng ghép tự nhiên vào diễn biến câu chuyện cùng với nhân vật chính.
+- BẮT BUỘC VỀ TÍNH LOGIC: Cốt truyện phải có tính logic chặt chẽ, các sự việc nối tiếp nhau theo quan hệ nguyên nhân – kết quả tự nhiên. Dù là thể loại giả tưởng, viễn tưởng hay cổ tích, các chi tiết và hành động của nhân vật vẫn phải hoàn toàn hợp lý, có tính logic nội tại và thuyết phục, tuyệt đối không được vô lý hay khiên cưỡng.
+- QUAN TRỌNG VỀ ĐỘ DÀI: Tổng số từ của toàn bộ câu chuyện phải nằm trong khoảng từ 200 đến 230 từ. TUYỆT ĐỐI KHÔNG VIẾT DÀI QUÁ 240 TỪ.
+- Không trình bày cốt truyện dưới dạng danh sách hoặc gạch đầu dòng.
+- Không tự ý thay đổi tên, tính cách, bối cảnh hoặc kiểu kết thúc.
+- Tuyệt đối không mô tả, thêm hoặc thay đổi ngoại hình của nhân vật (màu tóc, màu mắt, trang phục, vóc dáng, v.v.).
+- Nhân vật chính phải chủ động giải quyết vấn đề.
+- Cao trào phải là khoảnh khắc căng thẳng hoặc quyết định nhất.
+- Bài học phải được thể hiện tự nhiên qua hành động và kết quả.
+
+ĐỊNH DẠNG KẾT QUẢ BẮT BUỘC
+
+Chỉ viết đúng 3 đoạn văn xuôi (Mở đầu, Thân truyện, Kết thúc) cách nhau bởi 1 dòng trống.
+LƯU Ý QUAN TRỌNG: TUYỆT ĐỐI KHÔNG đặt tên hay tiêu đề câu chuyện. TUYỆT ĐỐI KHÔNG ghi các chữ nhãn như "TÊN TRUYỆN", "MỞ ĐẦU", "THÂN TRUYỆN", "KẾT THÚC", "TỔNG SỐ TỪ". KHÔNG dùng đánh số thứ tự hay gạch đầu dòng.`;
+    }
+
+    /* ---- Fallback: show raw data ---- */
+    function buildRawText(d) {
+      const lines = [];
+      if (d.genre) lines.push('Thể loại: ' + d.genre);
+      if (d.character) lines.push('Nhân vật chính: ' + d.character);
+      if (d.role) lines.push('Vai trò: ' + d.role);
+      if (d.secondaryChars) lines.push('Nhân vật phụ: ' + d.secondaryChars);
+      if (d.time || d.space) lines.push('Bối cảnh: ' + [d.time, d.space].filter(Boolean).join(', '));
+      if (d.openingAction) lines.push('Hành động mở đầu: ' + d.openingAction);
+      if (d.openingEmotion) lines.push('Cảm xúc mở đầu: ' + d.openingEmotion);
+      if (d.unexpectedEvent) lines.push('Điều bất ngờ: ' + d.unexpectedEvent);
+      if (d.unexpectedEmotion) lines.push('Cảm xúc khi gặp bất ngờ: ' + d.unexpectedEmotion);
+      if (d.purpose) lines.push('Mục đích: ' + d.purpose);
+      if (d.obstacle) lines.push('Trở ngại: ' + d.obstacle);
+      if (d.attempt) lines.push('Cách thử: ' + d.attempt);
+      if (d.ending) lines.push('Kết thúc: ' + d.ending);
+      if (d.insight) lines.push('Bài học: ' + d.insight);
+      return lines.join('\n');
+    }
+
+    /* ---- Show / hide generating state ---- */
+    function setGeneratingState(isGenerating) {
+      const textarea = document.getElementById('plot-textarea');
+      const btnEdit = document.getElementById('btn-edit');
+      const btnSave = document.getElementById('btn-save');
+      if (isGenerating) {
+        textarea.value = '';
+        textarea.placeholder = 'Đang tạo cốt truyện…';
+        textarea.setAttribute('readonly', true);
+        if (btnEdit) btnEdit.disabled = true;
+        if (btnSave) btnSave.disabled = true;
+      } else {
+        textarea.placeholder = '';
+        textarea.setAttribute('readonly', true);
+        if (btnEdit) btnEdit.disabled = false;
+        if (btnSave) btnSave.disabled = false;
+      }
+    }
+
+    /* ---- Call Gemini API ---- */
+    async function generateStoryWithAI(data) {
+      setGeneratingState(true);
+      const prompt = buildPrompt(data);
+      try {
+        const res = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 8192
+            }
+          })
+        });
+
+        if (!res.ok) throw new Error('API error ' + res.status);
+        const json = await res.json();
+        const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!rawText) throw new Error('Empty response');
+
+        // Clean up any remaining section label tags
+        let body = rawText.replace(/^(?:TÊN TRUYỆN|Tiêu đề|Title|MỞ ĐẦU|THÂN TRUYỆN|KẾT THÚC|TỔNG SỐ TỪ|1\.\s*MỞ ĐẦU|2\.\s*THÂN TRUYỆN|3\.\s*KẾT THÚC)[:\s]*/gim, '')
+                           .replace(/[*#]/g, '')
+                           .trim();
+
+        // Enforce strict max 245 words cutoff
+        body = limitStoryWords(body, 245);
+
+        document.getElementById('plot-textarea').value = body;
+      } catch (err) {
+        console.warn('Gemini API error, falling back to raw data:', err);
+        const fallback = buildRawText(data);
+        document.getElementById('plot-textarea').value = fallback;
+        showToast('Không thể kết nối AI, hiển thị dữ liệu thô.');
+      } finally {
+        setGeneratingState(false);
+        updateWordCount();
+      }
+    }
+
+    /* ---- Load story data on page load ---- */
+    window.addEventListener('DOMContentLoaded', () => {
+      const raw = sessionStorage.getItem('storyPlotData');
+      if (raw) {
+        try {
+          const data = JSON.parse(raw);
+          generateStoryWithAI(data);
+        } catch (e) {
+          console.warn('storyPlotData parse error:', e);
+          updateWordCount();
+        }
+      } else {
+        updateWordCount();
+      }
+    });
+
+    /* ---- Scale & Loader ---- */
+    function adjustScale() {
+      const wrapper = document.querySelector('.scaler-wrapper');
+      if (!wrapper) return;
+      const scale = Math.min(window.innerWidth / 1927.63, window.innerHeight / 930);
+      wrapper.style.transform = 'translateX(-50%) scale(' + scale + ')';
+    }
+    window.addEventListener('resize', adjustScale);
+    adjustScale();
+
+    let pageLoaded = false;
+    function hidePageLoader() {
+      if (pageLoaded) return;
+      pageLoaded = true;
+      adjustScale();
+      const loader = document.getElementById('page-loader-overlay');
+      if (!loader) return;
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.display = 'none'; }, 400);
+      }, 150);
+    }
+    window.addEventListener('load', hidePageLoader);
+    setTimeout(hidePageLoader, 500);
+    window.addEventListener('pageshow', (e) => { if (e.persisted) { pageLoaded = false; hidePageLoader(); } });
+  </script>
+  <script src="/aikid-nav-bridge.js"></script>
+</body>
+
+</html>

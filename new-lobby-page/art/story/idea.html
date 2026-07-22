@@ -3491,14 +3491,52 @@
         completedSteps.add(currentStepIndex);
         updateProgressUI();
         
-        if (currentStepIndex < 8) {
+        if (currentStepIndex < 9) {
           selectStep(currentStepIndex + 1);
         } else {
-          if (completedSteps.size < 8) {
-            showComingSoon('Vui lòng hoàn thành tất cả các mục!');
-          } else {
-            playPopAndNavigate('/character/generate/feature.html');
-          }
+          // Collect all story data and save to sessionStorage before navigating
+          const mainCharName = document.getElementById('main-char-name')?.innerText?.trim() || '';
+          const mainCharRole = document.getElementById('main-char-role-input')?.value?.trim() || '';
+          const mainCharPurpose = document.getElementById('main-char-purpose-input')?.value?.trim() || '';
+          const customSpace = document.getElementById('custom-space-input')?.value?.trim() || '';
+          const finalSpace = customSpace || selectedSpace;
+          const openingAction = document.getElementById('custom-opening-action')?.value?.trim() || selectedOpeningAction;
+          const openingEmotion = document.getElementById('custom-opening-emotion')?.value?.trim() || selectedOpeningEmotion;
+          const unexpectedEvent = document.getElementById('custom-unexpected-event')?.value?.trim() || selectedUnexpectedEvent;
+          const unexpectedEmotion = document.getElementById('custom-unexpected-emotion')?.value?.trim() || selectedUnexpectedEmotion;
+          const obstacleText = document.getElementById('custom-obstacle-text')?.value?.trim() || selectedObstacle;
+          const attemptText = document.getElementById('custom-attempt-text')?.value?.trim() || selectedAttempt;
+          const endingText = document.getElementById('custom-ending-text')?.value?.trim() || selectedEnding;
+          const insightText = document.getElementById('custom-insight-text')?.value?.trim() || selectedInsight;
+
+          // Collect supporting characters names
+          let secondaryChars = '';
+          try {
+            const charData = JSON.parse(localStorage.getItem('storymee_current_story_characters') || '{}');
+            if (charData.supportingCharacters && charData.supportingCharacters.length) {
+              secondaryChars = charData.supportingCharacters.map(c => c.name).filter(Boolean).join(', ');
+            }
+          } catch(e) {}
+
+          const storyData = {
+            genre: sessionStorage.getItem('selectedGenre') || '',
+            character: mainCharName,
+            role: mainCharRole,
+            purpose: mainCharPurpose,
+            secondaryChars,
+            time: selectedTime,
+            space: finalSpace,
+            openingAction,
+            openingEmotion,
+            unexpectedEvent,
+            unexpectedEmotion,
+            obstacle: obstacleText,
+            attempt: attemptText,
+            ending: endingText,
+            insight: insightText,
+          };
+          sessionStorage.setItem('storyPlotData', JSON.stringify(storyData));
+          playPopAndNavigate('/art/story/plot');
         }
       }
     }

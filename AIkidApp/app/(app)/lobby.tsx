@@ -29,7 +29,7 @@ const CARDS = [
   },
   {
     href: '/(app)/art' as const,
-    title: 'Xưởng vẽ',
+    title: 'Xưởng Sáng Tạo',
     desc: 'Chọn style · canvas · AI vẽ lại',
     image: '/lobby-assets/images/card_art.jpeg',
   },

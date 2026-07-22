@@ -754,6 +754,7 @@
         showToast('Vui lòng chọn thể loại truyện!');
         return;
       }
+      sessionStorage.setItem('selectedGenre', selectedGenre);
       playPopAndNavigate('/art/story/idea');
     }
 

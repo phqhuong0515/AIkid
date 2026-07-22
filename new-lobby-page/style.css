@@ -350,13 +350,23 @@ html::-webkit-scrollbar {
     color: #FFFFFF;
     font-family: 'Chiron GoRound TC', 'Fredoka', sans-serif;
     font-weight: 950;
-    font-size: 4.2rem;
-    text-transform: capitalize;
+    font-size: 3.3rem;
+    text-transform: uppercase;
     letter-spacing: 0.7px;
     text-align: left;
     text-shadow: none;
     margin: 0;
-    line-height: 1;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.card-art .card-label h2 {
+    white-space: normal;
+}
+
+.card-art .card-label h2 span {
+    display: inline-block;
+    transform: translateY(-2px);
 }
 
 /* Start Button */

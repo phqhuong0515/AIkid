@@ -460,7 +460,7 @@
     .grid-container {
       flex: 1;
       overflow-y: auto;
-      padding-right: 6px;
+      padding: 10px 6px 10px 2px;
       margin-top: 5px;
     }
 
@@ -477,10 +477,68 @@
 
     .story-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-auto-rows: max-content;
+      align-items: start;
       gap: 20px;
-      height: 100%;
-      min-height: 400px;
+      width: 100%;
+    }
+
+    /* Modal Popup Styles */
+    .create-modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .create-modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .create-modal-card {
+      background: #FFFFFF;
+      width: 90%;
+      max-width: 680px;
+      border-radius: 36px;
+      padding: 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+      transform: translateY(30px) scale(0.95);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+    .create-modal-overlay.show .create-modal-card {
+      transform: translateY(0) scale(1);
+    }
+    .create-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .create-modal-close-btn {
+      background: #F1F5F9;
+      border: none;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      color: #64748B;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .create-modal-close-btn:hover {
+      background: #E2E8F0;
+      color: #0F172A;
+      transform: rotate(90deg);
     }
   </style>
 </head>
@@ -605,6 +663,41 @@
     </div>
   </div>
 
+  <!-- Plot Detail Modal -->
+  <div id="plot-detail-modal" class="create-modal-overlay">
+    <div class="create-modal-card">
+      <div class="create-modal-header" style="border-bottom: 2px dashed #EBDCD0; padding-bottom: 16px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+          <h3 id="modal-plot-title" style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.5rem; font-weight: 900; color: #334155; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            Tiêu đề cốt truyện
+          </h3>
+          <button id="modal-edit-btn" onclick="editPlotFromModal()" title="Chỉnh sửa cốt truyện" style="background: #FFFFFF; border: 2.5px solid #EBDCD0; border-radius: 50%; width: 38px; height: 38px; min-width: 38px; display: flex; align-items: center; justify-content: center; color: #704E48; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05);" onmouseover="this.style.borderColor='#FF7597'; this.style.color='#FF7597'" onmouseout="this.style.borderColor='#EBDCD0'; this.style.color='#704E48'">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+        </div>
+        <button class="create-modal-close-btn" onclick="closePlotDetailModal()" style="margin-left: 12px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div id="modal-plot-content" style="font-family: 'Mali', sans-serif; font-size: 1.05rem; color: #475569; line-height: 1.7; max-height: 360px; overflow-y: auto; white-space: pre-wrap; padding-right: 8px; margin-bottom: 24px;">
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; justify-content: flex-end; gap: 14px; border-top: 2px dashed #EBDCD0; padding-top: 18px;">
+        <button onclick="handleCreateFromModal('comic')" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: none; border-radius: 9999px; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1rem; padding: 12px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <i class="fa-solid fa-images"></i>
+          <span>Tạo truyện tranh</span>
+        </button>
+        <button onclick="handleCreateFromModal('text')" style="background: linear-gradient(135deg, #3B82F6, #2563EB); color: white; border: none; border-radius: 9999px; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 1rem; padding: 12px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(59,130,246,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <i class="fa-solid fa-file-lines"></i>
+          <span>Tạo truyện chữ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast-message"></div>
 
@@ -642,27 +735,176 @@
       }, 350);
     }
 
+    let currentTab = 'plot';
+
     function switchTab(tabId) {
       playPopSound();
+      currentTab = tabId;
       const tabs = document.querySelectorAll('.tab-btn');
       tabs.forEach(tab => tab.classList.remove('active'));
-      event.target.classList.add('active');
+      if (event && event.target) event.target.classList.add('active');
       
-      // Update empty state text based on tab
-      const emptyMsg = document.querySelector('#story-grid h3');
-      if(emptyMsg) {
-        if(tabId === 'plot') emptyMsg.innerText = "Chưa có cốt truyện nào";
-        if(tabId === 'comic') emptyMsg.innerText = "Chưa có truyện tranh nào";
-        if(tabId === 'text') emptyMsg.innerText = "Chưa có truyện chữ nào";
+      renderCurrentTab();
+    }
+
+    function renderCurrentTab() {
+      if (currentTab === 'plot') {
+        renderSavedPlots();
+      } else {
+        const grid = document.getElementById('story-grid');
+        if (!grid) return;
+        const emptyMsg = currentTab === 'comic' ? 'Chưa có truyện tranh nào' : 'Chưa có truyện chữ nào';
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #C8B5A7; font-family: 'Mali', sans-serif;">
+            <i class="fa-solid fa-box-open" style="font-size: 4.5rem; margin-bottom: 20px; color: #C8B5A7;"></i>
+            <h3 style="font-size: 1.5rem; margin: 0; font-weight: 600;">${emptyMsg}</h3>
+          </div>
+        `;
       }
     }
 
-    function handleSortChange(val) {
-      // Logic for sorting
+    function renderSavedPlots() {
+      const grid = document.getElementById('story-grid');
+      if (!grid) return;
+
+      let savedPlots = [];
+      try {
+        const raw = localStorage.getItem('storymee_saved_plots');
+        if (raw) savedPlots = JSON.parse(raw);
+      } catch (_) {}
+
+      if (!Array.isArray(savedPlots) || savedPlots.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #C8B5A7; font-family: 'Mali', sans-serif;">
+            <i class="fa-solid fa-box-open" style="font-size: 4.5rem; margin-bottom: 20px; color: #C8B5A7;"></i>
+            <h3 style="font-size: 1.5rem; margin: 0; font-weight: 600;">Chưa có cốt truyện nào</h3>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = '';
+      savedPlots.forEach((item) => {
+        const card = document.createElement('div');
+        card.style = `
+          background: #FFFFFF;
+          border: 3px dashed #EBDCD0;
+          border-radius: 24px;
+          padding: 18px 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+          position: relative;
+          height: auto;
+          box-sizing: border-box;
+        `;
+        card.onmouseover = () => {
+          card.style.borderColor = '#FF7597';
+          card.style.boxShadow = '0 8px 20px rgba(255, 117, 151, 0.15)';
+        };
+        card.onmouseout = () => {
+          card.style.borderColor = '#EBDCD0';
+          card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03)';
+        };
+
+        const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '';
+        const preview = item.content ? (item.content.substring(0, 90) + '...') : '';
+
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="background: #FFF0F3; color: #FF5E97; font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 9999px;">
+              <i class="fa-solid fa-book-bookmark" style="margin-right: 4px;"></i> ${item.genre || 'Cốt truyện'}
+            </span>
+            <button class="delete-plot-btn" title="Xoá cốt truyện" style="background: none; border: none; color: #CBD5E1; cursor: pointer; font-size: 1.1rem; transition: color 0.2s;" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='#CBD5E1'">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+          <h4 style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1.25rem; font-weight: 900; color: #334155; margin: 4px 0 0 0; text-transform: uppercase;">
+            ${item.title || 'Cốt truyện của tôi'}
+          </h4>
+          <p style="font-family: 'Mali', sans-serif; font-size: 0.95rem; color: #64748B; margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+            ${preview}
+          </p>
+          <div style="margin-top: 6px; padding-top: 10px; border-top: 1.5px dashed #F1F5F9; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #94A3B8;">
+            <span><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+            <span style="color: #FF7597; font-weight: 700;">Xem chi tiết <i class="fa-solid fa-chevron-right"></i></span>
+          </div>
+        `;
+
+        const delBtn = card.querySelector('.delete-plot-btn');
+        if (delBtn) {
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deletePlot(item.id);
+          };
+        }
+
+        card.onclick = (e) => {
+          if (e.target.closest('.delete-plot-btn')) return;
+          viewPlotDetail(item);
+        };
+
+        grid.appendChild(card);
+      });
     }
 
-    function handleSearch() {
-      // Logic for searching
+    function deletePlot(id) {
+      playPopSound();
+      let savedPlots = [];
+      try {
+        const raw = localStorage.getItem('storymee_saved_plots');
+        if (raw) savedPlots = JSON.parse(raw);
+      } catch (_) {}
+
+      savedPlots = savedPlots.filter(p => p.id !== id);
+      localStorage.setItem('storymee_saved_plots', JSON.stringify(savedPlots));
+      showToast('Đã xoá cốt truyện!');
+      renderSavedPlots();
+    }
+
+    let currentViewingPlot = null;
+
+    function viewPlotDetail(item) {
+      playPopSound();
+      currentViewingPlot = item;
+      const modal = document.getElementById('plot-detail-modal');
+      const titleEl = document.getElementById('modal-plot-title');
+      const contentEl = document.getElementById('modal-plot-content');
+
+      if (titleEl) titleEl.innerText = item.title || 'CỐT TRUYỆN CỦA TÔI';
+      if (contentEl) contentEl.innerText = item.content || '';
+
+      if (modal) modal.classList.add('show');
+    }
+
+    function closePlotDetailModal() {
+      playPopSound();
+      const modal = document.getElementById('plot-detail-modal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function editPlotFromModal() {
+      if (!currentViewingPlot) return;
+      playPopSound();
+      sessionStorage.setItem('savedPlotContent', currentViewingPlot.content || '');
+      sessionStorage.setItem('savedPlotTitle', currentViewingPlot.title || '');
+      window.location.href = '/art/story/plot';
+    }
+
+    function handleCreateFromModal(type) {
+      playPopSound();
+      showToast(`Tính năng tạo ${type === 'comic' ? 'Truyện tranh' : 'Truyện chữ'} từ cốt truyện - Đang được phát triển!`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
     function showComingSoon(featureName) {
@@ -826,7 +1068,10 @@
       showComingSoon(`Đang khởi tạo truyện tranh với ${selectedChar.name}...`);
     }
 
-    window.addEventListener('DOMContentLoaded', initCharacterSelection);
+    window.addEventListener('DOMContentLoaded', () => {
+      initCharacterSelection();
+      renderCurrentTab();
+    });
 
     function adjustScale() {
       const wrapper = document.querySelector('.scaler-wrapper');
