@@ -723,56 +723,58 @@
       display: flex;
     }
 
-    /* ========== CONTEXT & OPENING STEP PANEL ========== */
+    /* ========== CONTEXT, OPENING & UNEXPECTED STEP PANEL ========== */
     .context-step-panel,
-    .opening-step-panel {
+    .opening-step-panel,
+    .unexpected-step-panel {
       display: none;
       flex-direction: column;
-      gap: 24px;
-      flex: 1;
+      height: auto;
+      max-height: 480px;
       overflow-y: auto;
-      padding-top: 8px;
-      padding-bottom: 60px;
-      padding-left: 16px;
-      padding-right: 16px;
-      margin-top: -8px;
-      margin-bottom: 0;
+      padding-right: 8px;
       margin-left: -16px;
       margin-right: -16px;
     }
 
     .context-step-panel.active,
-    .opening-step-panel.active {
+    .opening-step-panel.active,
+    .unexpected-step-panel.active {
       display: flex;
     }
 
     /* Custom scrollbars for step panels to indicate scrolling */
     .char-step-panel::-webkit-scrollbar,
     .context-step-panel::-webkit-scrollbar,
-    .opening-step-panel::-webkit-scrollbar {
+    .opening-step-panel::-webkit-scrollbar,
+    .unexpected-step-panel::-webkit-scrollbar {
       width: 8px;
     }
     .char-step-panel::-webkit-scrollbar-track,
     .context-step-panel::-webkit-scrollbar-track,
-    .opening-step-panel::-webkit-scrollbar-track {
+    .opening-step-panel::-webkit-scrollbar-track,
+    .unexpected-step-panel::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.02);
       border-radius: 10px;
     }
     .char-step-panel::-webkit-scrollbar-thumb,
     .context-step-panel::-webkit-scrollbar-thumb,
-    .opening-step-panel::-webkit-scrollbar-thumb {
+    .opening-step-panel::-webkit-scrollbar-thumb,
+    .unexpected-step-panel::-webkit-scrollbar-thumb {
       background-color: rgba(255, 117, 151, 0.5);
       border-radius: 10px;
       border: 2px solid #FFFFFF;
     }
     .char-step-panel::-webkit-scrollbar-thumb:hover,
     .context-step-panel::-webkit-scrollbar-thumb:hover,
-    .opening-step-panel::-webkit-scrollbar-thumb:hover {
+    .opening-step-panel::-webkit-scrollbar-thumb:hover,
+    .unexpected-step-panel::-webkit-scrollbar-thumb:hover {
       background-color: rgba(255, 117, 151, 0.8);
     }
     .char-step-panel,
     .context-step-panel,
-    .opening-step-panel {
+    .opening-step-panel,
+    .unexpected-step-panel {
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 117, 151, 0.5) rgba(0, 0, 0, 0.02);
     }
@@ -1745,6 +1747,124 @@
           </div>
         </div>
 
+        <!-- ===== STEP 4: UNEXPECTED EVENT PANEL ===== -->
+        <div class="unexpected-step-panel" id="unexpected-step-panel">
+          <!-- Section 1: Điều bất ngờ xảy ra -->
+          <div style="margin-bottom: 24px;">
+            <p class="context-section-label"><i class="fa-solid fa-wand-magic-sparkles" style="color: #FF7597;"></i> Điều bất ngờ nào xảy ra?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Món đồ quan trọng bỗng biến mất')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
+                  <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div class="idea-card-text">Món đồ quan trọng bỗng biến mất</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Tìm thấy một vật lạ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div class="idea-card-text">Tìm thấy một vật lạ</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Người bạn bất ngờ xuất hiện')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="idea-card-text">Người bạn bất ngờ xuất hiện</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Có tiếng động kỳ lạ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
+                  <i class="fa-solid fa-volume-high"></i>
+                </div>
+                <div class="idea-card-text">Có tiếng động kỳ lạ</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Một cánh cửa bí mật mở ra')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;">
+                  <i class="fa-solid fa-door-open"></i>
+                </div>
+                <div class="idea-card-text">Một cánh cửa bí mật mở ra</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Một món đồ bỗng biết nói')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                  <i class="fa-solid fa-comment-dots"></i>
+                </div>
+                <div class="idea-card-text">Một món đồ bỗng biết nói</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Vô tình làm hỏng đồ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;">
+                  <i class="fa-solid fa-burst"></i>
+                </div>
+                <div class="idea-card-text">Vô tình làm hỏng đồ</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Bị đưa đến một nơi khác')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #818CF8, #4F46E5); color: #FFFFFF;">
+                  <i class="fa-solid fa-dharmachakra"></i>
+                </div>
+                <div class="idea-card-text">Bị đưa đến một nơi khác</div>
+              </div>
+            </div>
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-unexpected-event" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('unexpected-event-counter').innerText = this.value.length + ' / 60'; selectedUnexpectedEvent = this.value.trim(); document.querySelectorAll('.unexpected-event-card').forEach(c => c.classList.remove('selected'));">
+              </div>
+              <div class="custom-space-counter" id="unexpected-event-counter">0 / 60</div>
+            </div>
+          </div>
+
+          <hr class="char-section-divider">
+
+          <!-- Section 2: Cảm xúc với điều bất ngờ -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-face-smile-beam"></i> Nhân vật cảm thấy như thế nào với điều bất ngờ ấy?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Vui vẻ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-face-laugh-beam"></i></div>
+                <div class="idea-card-text">Vui vẻ</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Háo hức')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-face-grin-stars"></i></div>
+                <div class="idea-card-text">Háo hức</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Sợ hãi')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-face-grimace"></i></div>
+                <div class="idea-card-text">Sợ hãi</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Tức giận')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-face-angry"></i></div>
+                <div class="idea-card-text">Tức giận</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Buồn bã')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #3B82F6); color: #FFFFFF;"><i class="fa-solid fa-face-sad-tear"></i></div>
+                <div class="idea-card-text">Buồn bã</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Tò mò')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-face-flushed"></i></div>
+                <div class="idea-card-text">Tò mò</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Ngạc nhiên')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-face-surprise"></i></div>
+                <div class="idea-card-text">Ngạc nhiên</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Lo lắng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF;"><i class="fa-solid fa-face-frown-open"></i></div>
+                <div class="idea-card-text">Lo lắng</div>
+              </div>
+            </div>
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-unexpected-emotion" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('unexpected-emotion-counter').innerText = this.value.length + ' / 50'; selectedUnexpectedEmotion = this.value.trim(); document.querySelectorAll('.unexpected-emotion-card').forEach(c => c.classList.remove('selected'));">
+              </div>
+              <div class="custom-space-counter" id="unexpected-emotion-counter">0 / 50</div>
+            </div>
+          </div>
+        </div>
+
         <!-- 8 Option Cards Grid -->
         <div class="idea-cards-grid" id="idea-cards-grid">
 
@@ -1940,6 +2060,34 @@
     let selectedSpace = '';
     let selectedOpeningAction = '';
     let selectedOpeningEmotion = '';
+    let selectedUnexpectedEvent = '';
+    let selectedUnexpectedEmotion = '';
+
+    function selectUnexpectedEventCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.unexpected-event-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedUnexpectedEvent = text;
+      const input = document.getElementById('custom-unexpected-event');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('unexpected-event-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+    }
+
+    function selectUnexpectedEmotionCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.unexpected-emotion-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedUnexpectedEmotion = text;
+      const input = document.getElementById('custom-unexpected-emotion');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('unexpected-emotion-counter');
+        if (counter) counter.innerText = `${input.value.length} / 50`;
+      }
+    }
 
     function selectOpeningActionCard(card, actionText) {
       playPopSound();
@@ -2351,6 +2499,7 @@
       const charPanel = document.getElementById('char-step-panel');
       const contextPanel = document.getElementById('context-step-panel');
       const openingPanel = document.getElementById('opening-step-panel');
+      const unexpectedPanel = document.getElementById('unexpected-step-panel');
       const ideaGrid = document.getElementById('idea-cards-grid');
       const customBox = document.getElementById('generic-custom-idea-box');
       
@@ -2361,6 +2510,7 @@
         charPanel.classList.add('active');
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 2) {
@@ -2370,6 +2520,7 @@
         charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.add('active');
         if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 3) {
@@ -2380,6 +2531,17 @@
         charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.add('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 4) {
+        if (titleEl) titleEl.innerText = 'Điều bất ngờ xảy ra';
+        if (subtitleEl) subtitleEl.innerText = 'Sự việc nào làm thay đổi nhân vật và nhân vật cảm thấy như thế nào với điều bất ngờ ấy?';
+        
+        charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.add('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else {
@@ -2387,8 +2549,7 @@
         if (titleEl) titleEl.innerText = stepName;
         
         if (subtitleEl) {
-          if (stepNumber === 4) subtitleEl.innerText = 'Sự việc nào làm thay đổi nhân vật và khiến nhân vật có mục tiêu?';
-          else if (stepNumber === 5) subtitleEl.innerText = 'Điều gì khiến nhân vật chưa thể đạt mục tiêu?';
+          if (stepNumber === 5) subtitleEl.innerText = 'Điều gì khiến nhân vật chưa thể đạt mục tiêu?';
           else if (stepNumber === 6) subtitleEl.innerText = 'Nhân vật lựa chọn cách nào để vượt qua trở ngại?';
           else if (stepNumber === 7) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
           else if (stepNumber === 8) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
@@ -2498,6 +2659,21 @@
           return;
         }
         if (!emotionVal && !selectedOpeningEmotion) {
+          showComingSoon('Vui lòng chọn hoặc viết cảm xúc của nhân vật!');
+          return;
+        }
+        isValid = true;
+      } else if (currentStepIndex === 4) {
+        const eventInput = document.getElementById('custom-unexpected-event');
+        const eventVal = eventInput ? eventInput.value.trim() : '';
+        const emotionInput = document.getElementById('custom-unexpected-emotion');
+        const emotionVal = emotionInput ? emotionInput.value.trim() : '';
+        
+        if (!eventVal && !selectedUnexpectedEvent) {
+          showComingSoon('Vui lòng chọn hoặc viết điều bất ngờ xảy ra!');
+          return;
+        }
+        if (!emotionVal && !selectedUnexpectedEmotion) {
           showComingSoon('Vui lòng chọn hoặc viết cảm xúc của nhân vật!');
           return;
         }
