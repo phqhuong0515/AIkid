@@ -739,6 +739,7 @@
     .context-step-panel,
     .opening-step-panel,
     .unexpected-step-panel,
+    .purpose-step-panel,
     .obstacle-step-panel,
     .attempt-step-panel,
     .ending-step-panel,
@@ -757,6 +758,7 @@
     .context-step-panel.active,
     .opening-step-panel.active,
     .unexpected-step-panel.active,
+    .purpose-step-panel.active,
     .obstacle-step-panel.active,
     .attempt-step-panel.active,
     .ending-step-panel.active,
@@ -1441,7 +1443,6 @@
 
       <!-- Left Sidebar Step List -->
       <div class="plot-sidebar">
-
         <div class="step-item" onclick="selectStep(1)">
           <i class="fa-solid fa-user step-icon" style="color: #8B5CF6;"></i>
           <span>Nhân vật</span>
@@ -1457,27 +1458,32 @@
           <span>Khởi đầu</span>
         </div>
 
-        <div class="step-item active" onclick="selectStep(4)">
+        <div class="step-item" onclick="selectStep(4)">
           <i class="fa-solid fa-wand-magic-sparkles step-icon" style="color: #FF7597;"></i>
           <span>Điều bất ngờ</span>
         </div>
 
         <div class="step-item" onclick="selectStep(5)">
+          <i class="fa-solid fa-bullseye step-icon" style="color: #EC4899;"></i>
+          <span>Mục đích</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(6)">
           <i class="fa-solid fa-hill-rockslide step-icon" style="color: #64748B;"></i>
           <span>Trở ngại</span>
         </div>
 
-        <div class="step-item" onclick="selectStep(6)">
+        <div class="step-item" onclick="selectStep(7)">
           <i class="fa-solid fa-fire step-icon" style="color: #F97316;"></i>
           <span>Cao trào</span>
         </div>
 
-        <div class="step-item" onclick="selectStep(7)">
+        <div class="step-item" onclick="selectStep(8)">
           <i class="fa-solid fa-flag-checkered step-icon" style="color: #9333EA;"></i>
           <span>Kết thúc</span>
         </div>
 
-        <div class="step-item" onclick="selectStep(8)">
+        <div class="step-item" onclick="selectStep(9)">
           <i class="fa-solid fa-cloud step-icon" style="color: #38BDF8;"></i>
           <span>Bài học</span>
         </div>
@@ -1527,10 +1533,6 @@
               <div class="char-question-item">
                 <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện? <span style="color: #E11D48;">*</span></label>
                 <input type="text" id="main-char-role-input" class="char-question-input" placeholder="Ví dụ: Anh hùng, người dẫn đường..." oninput="checkStep1Completion()">
-              </div>
-              <div class="char-question-item">
-                <label class="char-question-label">Mục đích của nhân vật trong câu chuyện này là gì? <span style="color: #E11D48;">*</span></label>
-                <input type="text" id="main-char-purpose-input" class="char-question-input" placeholder="Ví dụ: Tìm kho báu, giải cứu bạn bè..." oninput="checkStep1Completion()">
               </div>
             </div>
 
@@ -1898,7 +1900,26 @@
           </div>
         </div>
 
-        <!-- ===== STEP 5: OBSTACLE PANEL (Multi-section) ===== -->
+        <!-- ===== STEP 5: PURPOSE PANEL ===== -->
+        <div class="purpose-step-panel" id="purpose-step-panel">
+          <div class="custom-space-box" style="margin-top: 10px; padding: 18px;">
+            <div class="custom-space-icon" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+              <i class="fa-solid fa-bullseye"></i>
+            </div>
+            <div class="custom-space-input-wrapper" style="justify-content: center; flex: 1;">
+              <label style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1rem; font-weight: 700; color: #8A7463; margin-bottom: 8px; display: block;">
+                Mục đích của nhân vật trong câu chuyện này là gì? <span style="color: #E11D48;">*</span>
+              </label>
+              <input type="text" id="main-char-purpose-input" class="custom-space-input"
+                placeholder="Ví dụ: Tìm kho báu, giải cứu bạn bè..." maxlength="80"
+                style="width: 100%; border: 2px solid #EADED5; border-radius: 12px; padding: 12px 16px; font-family: 'Mali', sans-serif; font-size: 1rem; background: #FFFFFF;"
+                oninput="document.getElementById('purpose-char-counter').innerText = this.value.length + ' / 80'; saveCurrentStepState(5); updateProgressUI();">
+            </div>
+            <div class="custom-space-counter" id="purpose-char-counter" style="align-self: flex-end;">0 / 80</div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 6: OBSTACLE PANEL (Multi-section) ===== -->
         <div class="obstacle-step-panel" id="obstacle-step-panel">
           <!-- Section 1: Trở ngại là gì? -->
           <div>
@@ -2645,11 +2666,9 @@
       const isMainFilled = mainSlot && mainSlot.classList.contains('filled');
       
       const roleInput = document.getElementById('main-char-role-input');
-      const purposeInput = document.getElementById('main-char-purpose-input');
       const roleVal = roleInput ? roleInput.value.trim() : '';
-      const purposeVal = purposeInput ? purposeInput.value.trim() : '';
 
-      if (isMainFilled && roleVal && purposeVal) {
+      if (isMainFilled && roleVal) {
         completedSteps.add(1);
       } else {
         completedSteps.delete(1);
@@ -2678,20 +2697,15 @@
         }
       }
 
-      const characterData = {
-        mainCharacter: {
-          name: mainName,
-          avatar: mainAvaImg,
-          role: mainRole,
-          purpose: mainPurpose
-        },
-        supportingCharacters: subChars
+      const charData = {
+        mainChar: { name: mainName, avatar: mainAvaImg, role: mainRole, purpose: mainPurpose },
+        subChars: subChars
       };
 
       try {
-        localStorage.setItem('storymee_current_story_characters', JSON.stringify(characterData));
+        localStorage.setItem('story_draft_characters', JSON.stringify(charData));
       } catch (e) {
-        console.warn('Cannot save character data to localStorage', e);
+        console.error('Error saving character step data:', e);
       }
     }
 
@@ -2792,11 +2806,16 @@
           completedSteps.delete(4);
         }
       } else if (stepIdx === 5) {
+        const purposeVal = document.getElementById('main-char-purpose-input')?.value.trim() || '';
+        if (purposeVal) {
+          completedSteps.add(5);
+        } else {
+          completedSteps.delete(5);
+        }
+      } else if (stepIdx === 6) {
         const obsVal = document.getElementById('custom-obstacle-text')?.value.trim() || selectedObstacle;
         const attVal = document.getElementById('custom-attempt-text')?.value.trim() || selectedAttempt;
         if (obsVal && attVal) {
-          completedSteps.add(5);
-        } else {
           completedSteps.delete(5);
         }
       } else if (stepIdx === 6) {
@@ -2908,7 +2927,14 @@
           }
         }
       } else if (stepIdx === 5) {
+        const purposeInput = document.getElementById('main-char-purpose-input');
+        if (purposeInput) {
+          const counter = document.getElementById('purpose-char-counter');
+          if (counter) counter.innerText = `${purposeInput.value.length} / 80`;
+        }
+      } else if (stepIdx === 6) {
         const obsInput = document.getElementById('custom-obstacle-text');
+        const attInput = document.getElementById('custom-attempt-text');
         if (selectedObstacle) {
           let matched = false;
           document.querySelectorAll('.obstacle-card').forEach(c => {
@@ -2923,7 +2949,6 @@
             if (counter) counter.innerText = `${obsInput.value.length} / 60`;
           }
         }
-        const attInput = document.getElementById('custom-attempt-text');
         if (selectedAttempt) {
           let matched = false;
           document.querySelectorAll('.attempt-card').forEach(c => {
@@ -2938,7 +2963,7 @@
             if (counter) counter.innerText = `${attInput.value.length} / 60`;
           }
         }
-      } else if (stepIdx === 6) {
+      } else if (stepIdx === 7) {
         const customInput = document.getElementById('custom-idea-text');
         if (selectedClimax) {
           let matched = false;
@@ -2953,7 +2978,7 @@
             updateCharCounter(customInput);
           }
         }
-      } else if (stepIdx === 7) {
+      } else if (stepIdx === 8) {
         const endInput = document.getElementById('custom-ending-text');
         if (selectedEnding) {
           let matched = false;
@@ -2969,7 +2994,7 @@
             if (counter) counter.innerText = `${endInput.value.length} / 60`;
           }
         }
-      } else if (stepIdx === 8) {
+      } else if (stepIdx === 9) {
         const insInput = document.getElementById('custom-insight-text');
         if (selectedInsight) {
           let matched = false;
@@ -2989,14 +3014,14 @@
     }
 
     function updateProgressUI() {
-      for (let i = 1; i <= 8; i++) {
+      for (let i = 1; i <= 9; i++) {
         saveCurrentStepState(i);
       }
-      const pct = Math.round((completedSteps.size / 8) * 100);
+      const pct = Math.round((completedSteps.size / 9) * 100);
       const fill = document.getElementById('progress-fill-bar');
       const label = document.getElementById('progress-step-label');
       if (fill) fill.style.width = `${pct}%`;
-      if (label) label.innerText = `${completedSteps.size}/8`;
+      if (label) label.innerText = `${completedSteps.size}/9`;
     }
 
     function selectStep(stepNumber) {
@@ -3028,11 +3053,12 @@
       const titleEl = document.querySelector('.plot-question-title');
       const subtitleEl = document.querySelector('.plot-question-subtitle');
       
-      // Toggle between character panel, context panel, and idea cards
+      // Toggle between character panel, context panel, idea cards, etc.
       const charPanel = document.getElementById('char-step-panel');
       const contextPanel = document.getElementById('context-step-panel');
       const openingPanel = document.getElementById('opening-step-panel');
       const unexpectedPanel = document.getElementById('unexpected-step-panel');
+      const purposePanel = document.getElementById('purpose-step-panel');
       const obstaclePanel = document.getElementById('obstacle-step-panel');
       const endingPanel = document.getElementById('ending-step-panel');
       const insightPanel = document.getElementById('insight-step-panel');
@@ -3043,10 +3069,11 @@
         if (titleEl) titleEl.innerText = 'Nhân vật';
         if (subtitleEl) subtitleEl.innerText = 'Chọn nhân vật chính và các nhân vật phụ đồng hành.';
         
-        charPanel.classList.add('active');
+        if (charPanel) charPanel.classList.add('active');
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
@@ -3056,24 +3083,25 @@
         if (titleEl) titleEl.innerText = 'Bối cảnh';
         if (subtitleEl) subtitleEl.innerText = 'Chọn thời gian và không gian cho câu chuyện của bạn.';
         
-        charPanel.classList.remove('active');
+        if (charPanel) charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.add('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 3) {
-        const stepName = document.querySelectorAll('.step-item span')[stepNumber - 1].innerText;
-        if (titleEl) titleEl.innerText = stepName;
+        if (titleEl) titleEl.innerText = 'Khởi đầu';
         if (subtitleEl) subtitleEl.innerText = 'Nhân vật đang làm gì và cảm thấy như thế nào?';
         
-        charPanel.classList.remove('active');
+        if (charPanel) charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.add('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
@@ -3083,71 +3111,86 @@
         if (titleEl) titleEl.innerText = 'Điều bất ngờ';
         if (subtitleEl) subtitleEl.innerText = 'Sự việc nào làm thay đổi nhân vật và nhân vật phản ứng như thế nào với điều bất ngờ ấy?';
         
-        charPanel.classList.remove('active');
+        if (charPanel) charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.add('active');
+        if (purposePanel) purposePanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 5) {
-        if (titleEl) titleEl.innerText = 'Trở ngại';
-        if (subtitleEl) subtitleEl.innerText = 'Trở ngại nào xảy ra và nhân vật lựa chọn cách nào để thử vượt qua?';
+        if (titleEl) titleEl.innerText = 'Mục đích';
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật muốn đạt được điều gì hay giải quyết câu chuyện ra sao?';
         
-        charPanel.classList.remove('active');
+        if (charPanel) charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.add('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 6) {
+        if (titleEl) titleEl.innerText = 'Trở ngại';
+        if (subtitleEl) subtitleEl.innerText = 'Trở ngại nào xảy ra và nhân vật lựa chọn cách nào để thử vượt qua?';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.add('active');
         if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 7) {
-        if (titleEl) titleEl.innerText = 'Kết thúc';
-        if (subtitleEl) subtitleEl.innerText = 'Chọn loại kết thúc hoặc tự viết kết thúc cho câu chuyện của bạn.';
+        if (titleEl) titleEl.innerText = 'Cao trào';
+        if (subtitleEl) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
         
-        charPanel.classList.remove('active');
+        if (charPanel) charPanel.classList.remove('active');
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
-        if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (endingPanel) endingPanel.classList.add('active');
-        if (insightPanel) insightPanel.classList.remove('active');
-        if (ideaGrid) ideaGrid.style.display = 'none';
-        if (customBox) customBox.style.display = 'none';
-      } else if (stepNumber === 8) {
-        if (titleEl) titleEl.innerText = 'Bài học';
-        if (subtitleEl) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
-        
-        charPanel.classList.remove('active');
-        if (contextPanel) contextPanel.classList.remove('active');
-        if (openingPanel) openingPanel.classList.remove('active');
-        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
-        if (obstaclePanel) obstaclePanel.classList.remove('active');
-        if (endingPanel) endingPanel.classList.remove('active');
-        if (insightPanel) insightPanel.classList.add('active');
-        if (ideaGrid) ideaGrid.style.display = 'none';
-        if (customBox) customBox.style.display = 'none';
-      } else {
-        const stepName = document.querySelectorAll('.step-item span')[stepNumber - 1].innerText;
-        if (titleEl) titleEl.innerText = stepName;
-        
-        if (subtitleEl) {
-          if (stepNumber === 6) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
-        }
-        
-        charPanel.classList.remove('active');
-        if (contextPanel) contextPanel.classList.remove('active');
-        if (openingPanel) openingPanel.classList.remove('active');
-        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (endingPanel) endingPanel.classList.remove('active');
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'grid';
         if (customBox) customBox.style.display = 'flex';
+      } else if (stepNumber === 8) {
+        if (titleEl) titleEl.innerText = 'Kết thúc';
+        if (subtitleEl) subtitleEl.innerText = 'Chọn loại kết thúc hoặc tự viết kết thúc cho câu chuyện của bạn.';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.add('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 9) {
+        if (titleEl) titleEl.innerText = 'Bài học';
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.add('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
       }
     }
 
@@ -3201,7 +3244,9 @@
 
     function confirmIdeaNext() {
       playPopSound();
+
       let isValid = false;
+
       if (currentStepIndex === 1) {
         const mainSlot = document.getElementById('main-char-slot');
         if (!mainSlot || !mainSlot.classList.contains('filled')) {
@@ -3210,12 +3255,10 @@
         }
 
         const roleInput = document.getElementById('main-char-role-input');
-        const purposeInput = document.getElementById('main-char-purpose-input');
         const roleVal = roleInput ? roleInput.value.trim() : '';
-        const purposeVal = purposeInput ? purposeInput.value.trim() : '';
 
-        if (!roleVal || !purposeVal) {
-          showComingSoon('Vui lòng điền vai trò và mục đích của nhân vật chính!');
+        if (!roleVal) {
+          showComingSoon('Vui lòng điền vai trò của nhân vật chính!');
           return;
         }
 
@@ -3260,6 +3303,15 @@
         }
         isValid = true;
       } else if (currentStepIndex === 5) {
+        const purposeInput = document.getElementById('main-char-purpose-input');
+        const purposeVal = purposeInput ? purposeInput.value.trim() : '';
+        if (!purposeVal) {
+          showComingSoon('Vui lòng điền mục đích của nhân vật!');
+          return;
+        }
+        saveCharacterStepData();
+        isValid = true;
+      } else if (currentStepIndex === 6) {
         const obstacleInput = document.getElementById('custom-obstacle-text');
         const obstacleVal = obstacleInput ? obstacleInput.value.trim() : '';
         const attemptInput = document.getElementById('custom-attempt-text');
@@ -3279,6 +3331,14 @@
         selectedIdeaText = `${finalObstacle} | ${finalAttempt}`;
         isValid = true;
       } else if (currentStepIndex === 7) {
+        const customInput = document.getElementById('custom-idea-text');
+        const customVal = customInput ? customInput.value.trim() : '';
+        if (!customVal && !selectedIdeaText) {
+          showComingSoon('Vui lòng chọn hoặc tự viết một ý tưởng!');
+          return;
+        }
+        isValid = true;
+      } else if (currentStepIndex === 8) {
         const endingInput = document.getElementById('custom-ending-text');
         const endingVal = endingInput ? endingInput.value.trim() : '';
         if (!endingVal && !selectedEnding) {
@@ -3287,7 +3347,7 @@
         }
         selectedIdeaText = endingVal || selectedEnding;
         isValid = true;
-      } else if (currentStepIndex === 8) {
+      } else if (currentStepIndex === 9) {
         const insightInput = document.getElementById('custom-insight-text');
         const insightVal = insightInput ? insightInput.value.trim() : '';
         if (!insightVal && !selectedInsight) {
@@ -3310,10 +3370,10 @@
         completedSteps.add(currentStepIndex);
         updateProgressUI();
         
-        if (currentStepIndex < 8) {
+        if (currentStepIndex < 9) {
           selectStep(currentStepIndex + 1);
         } else {
-          if (completedSteps.size < 8) {
+          if (completedSteps.size < 9) {
             showComingSoon('Vui lòng hoàn thành tất cả các mục!');
           } else {
             playPopAndNavigate('/character/generate/feature.html');
