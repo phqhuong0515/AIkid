@@ -633,8 +633,8 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      margin-top: 16px;
-      margin-bottom: 16px;
+      margin-top: 12px;
+      margin-bottom: 12px;
     }
 
     .char-create-plus-btn {
@@ -708,8 +708,20 @@
     .char-section-divider {
       border: none;
       border-top: 2px dashed #EADED5;
-      margin: 24px 0;
+      margin: 16px 0;
       width: 100%;
+    }
+
+    .sub-char-block {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px dashed #EADED5;
+    }
+
+    .sub-char-block:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
     }
 
     /* Bottom Wizard Actions */
@@ -2804,7 +2816,7 @@
       const container = document.getElementById('extra-sub-chars-container');
       const labelText = nextSubCharId === 1 ? 'Nhân vật phụ' : `Nhân vật phụ ${nextSubCharId}`;
       const html = `
-        <div id="sub-char-block-${idx}" style="margin-top: 32px; padding-top: 24px; border-top: 2px dashed #EADED5;">
+        <div id="sub-char-block-${idx}" class="sub-char-block">
           <p class="char-section-label">
             <i class="fa-solid fa-users"></i> ${labelText} 
           </p>
