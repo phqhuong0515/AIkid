@@ -2426,6 +2426,8 @@
       card.classList.add('selected');
       selectedTime = text;
       updateContextIdeaText();
+      saveCurrentStepState(2);
+      updateProgressUI();
     }
 
     function selectSpaceCard(card, text) {
@@ -2436,6 +2438,8 @@
       const customInput = document.getElementById('custom-space-input');
       if(customInput) customInput.value = '';
       updateContextIdeaText();
+      saveCurrentStepState(2);
+      updateProgressUI();
     }
     
     function onCustomSpaceFocus() {
@@ -2444,6 +2448,8 @@
       if(customInput) {
         selectedSpace = customInput.value.trim();
         updateContextIdeaText();
+        saveCurrentStepState(2);
+        updateProgressUI();
       }
     }
 
@@ -2453,6 +2459,8 @@
         document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
         selectedSpace = customInput.value.trim();
         updateContextIdeaText();
+        saveCurrentStepState(2);
+        updateProgressUI();
       }
     }
 
@@ -3211,8 +3219,10 @@
         saveCharacterStepData();
         isValid = true;
       } else if (currentStepIndex === 2) {
-        if (!selectedTime || !selectedSpace) {
-          showComingSoon('Vui lòng chọn cả thời gian và không gian!');
+        const customSpace = document.getElementById('custom-space-input')?.value.trim() || '';
+        const spaceVal = customSpace || selectedSpace;
+        if (!selectedTime || !spaceVal) {
+          showComingSoon('Vui lòng chọn hoặc nhập cả thời gian và không gian!');
           return;
         }
         isValid = true;
