@@ -462,9 +462,9 @@
     }
 
     .idea-card {
-      background: #FDFAF4;
-      border: 2.5px solid #F5D5DD;
-      border-radius: 22px;
+      background: #FFFFFF;
+      border: 3px solid #F8F4F0;
+      border-radius: 20px;
       padding: 14px 10px;
       display: flex;
       flex-direction: column;
@@ -473,23 +473,25 @@
       gap: 10px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.2s ease;
       user-select: none;
       min-height: 125px;
       box-sizing: border-box;
       position: relative;
+      box-shadow: 0 4px 12px rgba(138, 116, 99, 0.05);
     }
 
     .idea-card:hover {
-      border-color: #FF7597 !important;
-      box-shadow: 0 6px 16px rgba(255, 117, 151, 0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(138, 116, 99, 0.12);
+      border-color: #FFD2DF !important;
     }
 
     .idea-card.selected {
       border: 3px solid #FF7597 !important;
-      background: #FFEAEF !important;
+      background: #FFF5F8 !important;
       color: #704E48 !important;
-      box-shadow: 0 6px 16px rgba(255, 117, 151, 0.25) !important;
+      box-shadow: 0 8px 24px rgba(255, 117, 151, 0.2) !important;
     }
 
     .opening-action-card, .opening-emotion-card {
@@ -844,21 +846,22 @@
 
     .custom-space-box {
       background: #FFFFFF;
-      border: 2.5px solid #F5D5DD;
-      border-radius: 22px;
+      border: 3px solid #F8F4F0;
+      border-radius: 20px;
       padding: 10px 18px;
       display: flex;
       align-items: center;
       gap: 14px;
       transition: all 0.2s ease;
       margin-top: 24px;
+      box-shadow: 0 4px 12px rgba(138, 116, 99, 0.05);
     }
 
     .custom-space-box:focus-within {
       border-color: #FF7597;
       border-style: solid;
-      background: #FFFFFF;
-      box-shadow: 0 0 0 4px rgba(255, 117, 151, 0.18);
+      background: #FFF5F8;
+      box-shadow: 0 8px 24px rgba(255, 117, 151, 0.2);
     }
 
     .custom-space-icon {
@@ -1627,49 +1630,49 @@
           <div style="margin-bottom: 24px;">
             <p class="context-section-label"><i class="fa-solid fa-person-running"></i> Nhân vật đang làm gì?</p>
             <div class="idea-cards-grid">
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Ăn uống')" style="background: #FFF7ED; border-color: #FFEDD5;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Ăn uống')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
                   <i class="fa-solid fa-utensils"></i>
                 </div>
                 <div class="idea-card-text">Ăn uống</div>
               </div>
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nằm ngủ')" style="background: #F5F3FF; border-color: #DDD6FE;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nằm ngủ')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #A78BFA, #7C3AED); color: #FFFFFF;">
                   <i class="fa-solid fa-bed"></i>
                 </div>
                 <div class="idea-card-text">Nằm ngủ</div>
               </div>
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Đi trên đường')" style="background: #EEF9F6; border-color: #A7F3D0;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Đi trên đường')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;">
                   <i class="fa-solid fa-person-walking"></i>
                 </div>
                 <div class="idea-card-text">Đi trên đường</div>
               </div>
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nói chuyện')" style="background: #EFF6FF; border-color: #BFDBFE;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nói chuyện')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
                   <i class="fa-solid fa-comments"></i>
                 </div>
                 <div class="idea-card-text">Nói chuyện</div>
               </div>
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Chơi đồ chơi')" style="background: #FEFCE8; border-color: #FEF08A;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Chơi đồ chơi')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
                   <i class="fa-solid fa-puzzle-piece"></i>
                 </div>
                 <div class="idea-card-text">Chơi đồ chơi</div>
               </div>
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Đọc sách')" style="background: #FDF2F8; border-color: #FBCFE8;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Đọc sách')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
                   <i class="fa-solid fa-book-open"></i>
                 </div>
                 <div class="idea-card-text">Đọc sách</div>
               </div>
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Dọn dẹp')" style="background: #ECFEFF; border-color: #A5F3FC;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Dọn dẹp')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #38BDF8, #0284C7); color: #FFFFFF;">
                   <i class="fa-solid fa-broom"></i>
                 </div>
                 <div class="idea-card-text">Dọn dẹp</div>
               </div>
-              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Chờ ai đó')" style="background: #FFF7ED; border-color: #FED7AA;">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Chờ ai đó')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FB923C, #D97706); color: #FFFFFF;">
                   <i class="fa-solid fa-hourglass-half"></i>
                 </div>
@@ -1694,35 +1697,35 @@
           <div>
             <p class="context-section-label"><i class="fa-solid fa-face-smile-beam"></i> Cảm xúc của nhân vật</p>
             <div class="idea-cards-grid">
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Vui vẻ')" style="background: #FEFCE8; border-color: #FEF08A;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Vui vẻ')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-face-laugh-beam"></i></div>
                 <div class="idea-card-text">Vui vẻ</div>
               </div>
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Háo hức')" style="background: #FFF7ED; border-color: #FFEDD5;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Háo hức')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-face-grin-stars"></i></div>
                 <div class="idea-card-text">Háo hức</div>
               </div>
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Sợ hãi')" style="background: #F5F3FF; border-color: #DDD6FE;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Sợ hãi')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-face-grimace"></i></div>
                 <div class="idea-card-text">Sợ hãi</div>
               </div>
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tức giận')" style="background: #FEF2F2; border-color: #FECACA;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tức giận')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-face-angry"></i></div>
                 <div class="idea-card-text">Tức giận</div>
               </div>
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Buồn bã')" style="background: #EFF6FF; border-color: #BFDBFE;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Buồn bã')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #3B82F6); color: #FFFFFF;"><i class="fa-solid fa-face-sad-tear"></i></div>
                 <div class="idea-card-text">Buồn bã</div>
               </div>
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tò mò')" style="background: #ECFEFF; border-color: #A5F3FC;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tò mò')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-face-flushed"></i></div>
                 <div class="idea-card-text">Tò mò</div>
               </div>
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Ngạc nhiên')" style="background: #FDF2F8; border-color: #FBCFE8;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Ngạc nhiên')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-face-surprise"></i></div>
                 <div class="idea-card-text">Ngạc nhiên</div>
               </div>
-              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Lo lắng')" style="background: #F0FDF4; border-color: #BBF7D0;">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Lo lắng')">
                 <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF;"><i class="fa-solid fa-face-frown-open"></i></div>
                 <div class="idea-card-text">Lo lắng</div>
               </div>
@@ -1743,8 +1746,7 @@
         <div class="idea-cards-grid" id="idea-cards-grid">
 
           <!-- Card 1 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Nhân vật tìm thấy một vật lạ')"
-            style="background: #EEF9F6; border-color: #A7F3D0;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Nhân vật tìm thấy một vật lạ')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #6EE7B7, #3B82F6); color: #FFFFFF;">
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -1753,8 +1755,7 @@
           </div>
 
           <!-- Card 2 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Một cánh cửa bí mật xuất hiện')"
-            style="background: #F5F3FF; border-color: #DDD6FE;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Một cánh cửa bí mật xuất hiện')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;">
               <i class="fa-solid fa-door-closed"></i>
@@ -1763,8 +1764,7 @@
           </div>
 
           <!-- Card 3 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Có tiếng động kỳ lạ')"
-            style="background: #FFF7ED; border-color: #FFEDD5;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Có tiếng động kỳ lạ')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
               <i class="fa-solid fa-waveform"></i>
@@ -1773,8 +1773,7 @@
           </div>
 
           <!-- Card 4 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Một món đồ quan trọng biến mất')"
-            style="background: #FEFCE8; border-color: #FEF08A;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Một món đồ quan trọng biến mất')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
               <i class="fa-solid fa-bag-shopping"></i>
@@ -1783,8 +1782,7 @@
           </div>
 
           <!-- Card 5 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Một người bạn bị mắc kẹt')"
-            style="background: #EFF6FF; border-color: #BFDBFE;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Một người bạn bị mắc kẹt')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #93C5FD, #2563EB); color: #FFFFFF;">
               <i class="fa-solid fa-paw"></i>
@@ -1793,8 +1791,7 @@
           </div>
 
           <!-- Card 6 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Một món đồ bỗng biết nói')"
-            style="background: #FDF2F8; border-color: #FBCFE8;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Một món đồ bỗng biết nói')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
               <i class="fa-solid fa-book-open-reader"></i>
@@ -1803,8 +1800,7 @@
           </div>
 
           <!-- Card 7 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Nhân vật bị đưa đến nơi khác')"
-            style="background: #F0F3FF; border-color: #C7D2FE;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Nhân vật bị đưa đến nơi khác')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #818CF8, #4F46E5); color: #FFFFFF;">
               <i class="fa-solid fa-dharmachakra"></i>
@@ -1813,8 +1809,7 @@
           </div>
 
           <!-- Card 8 -->
-          <div class="idea-card" onclick="selectIdeaCard(this, 'Tự viết ý tưởng của em')"
-            style="background: #F0FDF4; border-color: #BBF7D0;">
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Tự viết ý tưởng của em')">
             <div class="idea-card-icon-box"
               style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF;">
               <i class="fa-solid fa-pen-fancy"></i>
