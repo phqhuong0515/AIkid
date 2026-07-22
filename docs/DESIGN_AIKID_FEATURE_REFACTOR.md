@@ -234,7 +234,7 @@ flowchart LR
 | **mee** | B | Pack load, draft, compose, export | AI jobs |
 | **character** | B | Category form, generate UX, saved list, **prompt builder** | Class A job client |
 | **art** | B | Style catalog, canvas, redraw UX | Class A upload/job |
-| **comic** | B | Hub only | Full editor |
+| **comic** | B | Story/cast editor, 2/4/6 panel batch progress, per-panel retry, final composed page | Worker/provider internals |
 | **jobs** | A | create/poll image jobs, recent AI | Creative prompts |
 | **media** | A | upload, resolveMediaUri, ensurePublicImageUrls | Canvas UI |
 
@@ -254,10 +254,22 @@ sequenceDiagram
   Media-->>UI: https public URLs only
   UI->>Jobs: createImageJob(prompt, refs, child?)
   Note over Jobs,GW: Server merges STYLE template if PR-00 says so
-  Jobs->>GW: POST /internal/v1/jobs
+  Jobs->>GW: POST /api/v1/jobs (consumer JWT)
   Jobs-->>UI: poll status → output URLs
   UI->>Jobs: recentAiImages.add (KD-18)
 ```
+
+#### Comic batch contract
+
+The app uses the consumer Gateway namespace; `/internal/v1/*` remains service-mesh/worker-only.
+
+| Operation | Consumer route | Required identity |
+|---|---|---|
+| Create a page batch | `POST /api/v1/jobs/comic-batches` | JWT; active child is sent as `X-Child-Profile-Id` |
+| Poll batch | `GET /api/v1/jobs/comic-batches/:batchId` | Same owner/child identity |
+| Retry one panel | `POST /api/v1/jobs/comic-batches/:batchId/panels/:panelId/retry` | Same owner/child identity |
+
+Create payload contains `projectId`, `pageId`, `title`, `idea`, `panelCount`, `style`/`artStyle`, and exactly 2/4/6 panel objects with `{ id, order, action, speaker, dialogue }`. Backend states map to the UI as `processing → working`, `failed/cancelled → error`, while compositor `processing → composing`. Each image worker receives no dialogue; the backend raster compositor writes the final Vietnamese dialogue into the PNG.
 
 ### 5. Route map (HTML → expo-router)
 

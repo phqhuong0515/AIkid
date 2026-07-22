@@ -36,12 +36,32 @@ const ROOT = 'api/v1/jobs/comic-batches';
 function normalizeBatch(raw: unknown): ComicBatch {
   const value = unwrapData<Record<string, unknown>>(raw);
   const rawPanels = Array.isArray(value.panels) ? value.panels : [];
+  const compose = value.compose && typeof value.compose === 'object'
+    ? value.compose as Record<string, unknown>
+    : {};
+  const status: ComicBatch['status'] = value.status === 'done'
+    ? 'done'
+    : value.status === 'failed' || value.status === 'cancelled' || compose.status === 'failed'
+      ? 'error'
+      : compose.status === 'processing'
+        ? 'composing'
+        : value.status === 'processing'
+          ? 'working'
+          : 'queued';
   return {
     batchId: String(value.batchId || value.id || ''),
-    status: value.status === 'done' || value.status === 'error' || value.status === 'composing' || value.status === 'working' ? value.status : 'queued',
+    status,
     panels: rawPanels.map((entry, index) => {
       const panel = entry && typeof entry === 'object' ? entry as Record<string, unknown> : {};
-      const status = panel.status === 'done' || panel.status === 'error' || panel.status === 'working' ? panel.status : panel.status === 'queued' ? 'queued' : 'draft';
+      const status = panel.status === 'done'
+        ? 'done'
+        : panel.status === 'failed' || panel.status === 'error'
+          ? 'error'
+          : panel.status === 'processing' || panel.status === 'working'
+            ? 'working'
+            : panel.status === 'queued' || panel.status === 'waiting'
+              ? 'queued'
+              : 'draft';
       return {
         panelId: String(panel.panelId || panel.id || ''),
         order: Number(panel.order) || index + 1,
@@ -53,7 +73,7 @@ function normalizeBatch(raw: unknown): ComicBatch {
     }),
     finalImageUrl: typeof value.finalImageUrl === 'string' ? value.finalImageUrl : typeof value.imageUrl === 'string' ? value.imageUrl : null,
     composeJobId: typeof value.composeJobId === 'string' ? value.composeJobId : null,
-    error: typeof value.error === 'string' ? value.error : null,
+    error: typeof value.error === 'string' ? value.error : typeof compose.error === 'string' ? compose.error : null,
   };
 }
 
@@ -62,12 +82,14 @@ export async function createComicBatch(input: BatchPayload): Promise<ComicBatch>
   const { data } = await apiClient.post(ROOT, {
     projectId: input.projectId,
     pageId: page.id,
+    title: page.title || page.idea.slice(0, 240) || 'Trang truyện',
+    idea: page.idea,
     panelCount: page.panelCount,
     genre: input.genre,
     artStyle: input.artStyle,
     childProfileId: input.childProfileId,
     ipId: input.ipId,
-    panels: page.panels.map(({ id, order, action, speaker, dialogue }) => ({ panelId: id, order, action, speaker, dialogue })),
+    panels: page.panels.map(({ id, order, action, speaker, dialogue }) => ({ id, order, action, speaker, dialogue })),
     cast: input.cast.map(({ id, name, role, personality, appearancePrompt, referenceImageUrl }) => ({ id, name, role, personality, appearancePrompt, referenceImageUrl })),
     referenceImageUrls: input.cast.map((item) => item.referenceImageUrl).filter((url): url is string => Boolean(url?.startsWith('http'))),
   });
