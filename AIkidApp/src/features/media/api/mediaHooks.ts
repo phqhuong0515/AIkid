@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query';
 
 import { apiClient } from '@/core/api/client';
+import { mediaApi } from '@/core/storymee';
 import { unwrapData } from '@/core/api/unwrap';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 
@@ -384,6 +385,49 @@ export async function uploadDataUrlAsPublicRef(
   const publicUrl = pickUploadPublicUrl(uploaded);
   if (!publicUrl || !publicUrl.startsWith('http')) {
     throw new Error('Upload media thành công nhưng không lấy được URL công khai');
+  }
+  return publicUrl;
+}
+
+/**
+ * Camera/library URI -> permanent media asset -> public HTTPS job reference.
+ * Native pickers normally return file:// without base64; web normally returns blob:.
+ */
+export async function uploadPickedImageAsPublicRef(input: {
+  uri: string;
+  fileName?: string | null;
+  mimeType?: string | null;
+  childId: string;
+  ipId: string;
+  assetType?: string;
+}): Promise<string> {
+  const mimeType = input.mimeType || 'image/jpeg';
+  const fileName = input.fileName || guessFileName(input.uri, mimeType);
+  const form = new FormData();
+
+  if (input.uri.startsWith('data:') || input.uri.startsWith('blob:')) {
+    const response = await fetch(input.uri);
+    if (!response.ok) throw new Error('Không đọc được ảnh đã chọn');
+    const blob = await response.blob();
+    form.append('file', blob, fileName);
+  } else {
+    form.append('file', {
+      uri: input.uri,
+      name: fileName,
+      type: mimeType,
+    } as unknown as Blob);
+  }
+  form.append('ipId', input.ipId);
+
+  const uploaded = await mediaApi.upload(form, {
+    ipId: input.ipId,
+    assetType: input.assetType ?? 'uploaded',
+    tags: `child:${input.childId},art-reference`,
+    permanent: 'true',
+  });
+  const publicUrl = pickUploadPublicUrl(uploaded);
+  if (!publicUrl?.startsWith('http')) {
+    throw new Error('Đã tải ảnh nhưng không nhận được URL công khai');
   }
   return publicUrl;
 }
