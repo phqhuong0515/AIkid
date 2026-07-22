@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -16,6 +16,10 @@ import {
 import { useAuth } from '@/core/auth/useAuth';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { ART_STYLES, type ArtStyle } from '@/features/art/constants';
+import {
+  DrawingCanvas,
+  type DrawingCanvasHandle,
+} from '@/features/art/canvas/DrawingCanvas';
 import { useArtDraft } from '@/features/art/store/useArtDraft';
 import {
   buildArtRedrawPrompt,
@@ -28,7 +32,8 @@ import { PrimaryButton, SectionCard } from '@/features/kids-ui/CreativeKit';
 import { ScreenChrome } from '@/features/kids-ui/ScreenChrome';
 import { uploadPickedImageAsPublicRef } from '@/features/media/api/mediaHooks';
 
-type BusyStage = 'uploading' | 'generating' | null;
+type BusyStage = 'preparing' | 'uploading' | 'generating' | null;
+type ReferenceMode = 'photo' | 'drawing';
 
 function StyleCard({
   item,
@@ -83,6 +88,10 @@ export default function ArtScreen() {
   const { draft, hydrated, hydrate, patch } = useArtDraft();
   const invalidateMedia = useInvalidateMediaAfterJob();
   const [busyStage, setBusyStage] = useState<BusyStage>(null);
+  const [referenceMode, setReferenceMode] = useState<ReferenceMode>('photo');
+  const [hasCanvasDrawing, setHasCanvasDrawing] = useState(false);
+  const drawingCanvasRef = useRef<DrawingCanvasHandle>(null);
+  const generateLock = useRef(false);
 
   useEffect(() => {
     void hydrate();
@@ -108,6 +117,7 @@ export default function ArtScreen() {
       : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.9 });
     const asset = result.canceled ? null : result.assets[0];
     if (!asset) return;
+    setReferenceMode('photo');
     patch({
       referenceUri: asset.uri,
       referenceFileName: asset.fileName ?? null,
@@ -131,20 +141,35 @@ export default function ArtScreen() {
       Alert.alert('Thiếu workspace', 'Không tìm thấy workspace để lưu tác phẩm.');
       return;
     }
-    if (!draft.referenceUri && !draft.uploadedReferenceUrl) {
+    if (referenceMode === 'photo' && !draft.referenceUri && !draft.uploadedReferenceUrl) {
       Alert.alert('Thiếu ảnh mẫu', 'Chụp hoặc chọn một bức tranh trước.');
       return;
     }
+    if (referenceMode === 'drawing' && !drawingCanvasRef.current?.hasDrawing()) {
+      Alert.alert('Bảng vẽ đang trống', 'Bé hãy vẽ ít nhất một nét trước.');
+      return;
+    }
+    if (generateLock.current) return;
+    generateLock.current = true;
 
     try {
       let referenceUrl = draft.uploadedReferenceUrl;
       if (!referenceUrl) {
-        if (!draft.referenceUri) throw new Error('Không đọc được ảnh mẫu');
+        let localReferenceUri = draft.referenceUri;
+        let fileName = draft.referenceFileName;
+        let mimeType = draft.referenceMimeType;
+        if (referenceMode === 'drawing') {
+          setBusyStage('preparing');
+          localReferenceUri = await drawingCanvasRef.current!.exportPngDataUrl();
+          fileName = `aikid-drawing-${Date.now()}.png`;
+          mimeType = 'image/png';
+        }
+        if (!localReferenceUri) throw new Error('Không đọc được ảnh mẫu');
         setBusyStage('uploading');
         referenceUrl = await uploadPickedImageAsPublicRef({
-          uri: draft.referenceUri,
-          fileName: draft.referenceFileName,
-          mimeType: draft.referenceMimeType,
+          uri: localReferenceUri,
+          fileName,
+          mimeType,
           childId: child.id,
           ipId,
           assetType: 'uploaded',
@@ -180,6 +205,7 @@ export default function ArtScreen() {
     } catch (error) {
       Alert.alert('Không tạo được ảnh', error instanceof Error ? error.message : 'Thử lại sau');
     } finally {
+      generateLock.current = false;
       setBusyStage(null);
     }
   }
@@ -198,15 +224,45 @@ export default function ArtScreen() {
   return (
     <ScreenChrome title="Xưởng vẽ AI" subtitle="Ảnh mẫu → chọn phong cách → AI vẽ lại" backHref="/(app)/lobby">
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 64 }}>
-        <SectionCard title="1. Chọn tranh mẫu" hint="Ảnh được lưu vào Gallery của bé trước khi gửi sang AI.">
-          <View className="flex-row gap-2">
-            <Pressable onPress={() => void choose(true)} disabled={!!busyStage} className="flex-1 rounded-2xl bg-orange-50 py-4">
-              <Text className="text-center font-extrabold text-orange-900">📷 Chụp ảnh</Text>
+        <SectionCard title="1. Tạo hoặc chọn tranh mẫu" hint="Bé có thể tự vẽ, chụp tranh giấy hoặc chọn ảnh. Tranh được lưu vào Gallery trước khi gửi AI.">
+          <View className="mb-3 flex-row rounded-2xl bg-orange-50 p-1">
+            <Pressable
+              disabled={!!busyStage}
+              onPress={() => { setReferenceMode('drawing'); patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null }); }}
+              className={`flex-1 rounded-xl py-3 ${referenceMode === 'drawing' ? 'bg-brand' : ''}`}
+            >
+              <Text className={`text-center font-extrabold ${referenceMode === 'drawing' ? 'text-white' : 'text-orange-900'}`}>🎨 Bé tự vẽ</Text>
             </Pressable>
-            <Pressable onPress={() => void choose(false)} disabled={!!busyStage} className="flex-1 rounded-2xl bg-orange-50 py-4">
-              <Text className="text-center font-extrabold text-orange-900">🖼️ Thư viện</Text>
+            <Pressable
+              disabled={!!busyStage}
+              onPress={() => { setReferenceMode('photo'); patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null }); }}
+              className={`flex-1 rounded-xl py-3 ${referenceMode === 'photo' ? 'bg-brand' : ''}`}
+            >
+              <Text className={`text-center font-extrabold ${referenceMode === 'photo' ? 'text-white' : 'text-orange-900'}`}>📷 Ảnh có sẵn</Text>
             </Pressable>
           </View>
+
+          <View style={{ display: referenceMode === 'drawing' ? 'flex' : 'none' }}>
+            <DrawingCanvas
+              ref={drawingCanvasRef}
+              disabled={!!busyStage}
+              onDrawingChange={(hasDrawing) => {
+                setHasCanvasDrawing(hasDrawing);
+                setReferenceMode('drawing');
+                patch({ uploadedReferenceUrl: null, resultUri: null, resultJobId: null });
+              }}
+            />
+          </View>
+
+          {referenceMode === 'photo' ? <View>
+            <View className="flex-row gap-2">
+              <Pressable onPress={() => void choose(true)} disabled={!!busyStage} className="flex-1 rounded-2xl bg-orange-50 py-4">
+                <Text className="text-center font-extrabold text-orange-900">📷 Chụp ảnh</Text>
+              </Pressable>
+              <Pressable onPress={() => void choose(false)} disabled={!!busyStage} className="flex-1 rounded-2xl bg-orange-50 py-4">
+                <Text className="text-center font-extrabold text-orange-900">🖼️ Thư viện</Text>
+              </Pressable>
+            </View>
           {draft.referenceUri || draft.uploadedReferenceUrl ? (
             <View className="mt-3 overflow-hidden rounded-2xl bg-orange-50">
               <Image source={{ uri: draft.referenceUri ?? draft.uploadedReferenceUrl! }} style={{ width: '100%', height: 260 }} contentFit="contain" />
@@ -224,7 +280,7 @@ export default function ArtScreen() {
               <Text className="text-4xl">🖍️</Text>
               <Text className="mt-2 text-slate-400">Chọn bức vẽ bé muốn AI vẽ lại</Text>
             </View>
-          )}
+          )}</View> : null}
         </SectionCard>
 
         <SectionCard title="2. Bé thích phong cách nào?" hint="Chạm vào ảnh mẫu để xem và chọn phong cách.">
@@ -263,17 +319,17 @@ export default function ArtScreen() {
           <View className="mb-4 items-center rounded-[24px] border border-orange-100 bg-white px-5 py-8">
             <ActivityIndicator size="large" color="#FF6670" />
             <Text className="mt-4 text-lg font-extrabold text-slate-900">
-              {busyStage === 'uploading' ? 'Đang lưu tranh mẫu…' : `AI đang vẽ kiểu ${selectedStyle.labelVi}…`}
+              {busyStage === 'preparing' ? 'Đang đóng khung nét vẽ…' : busyStage === 'uploading' ? 'Đang lưu tranh mẫu…' : `AI đang vẽ kiểu ${selectedStyle.labelVi}…`}
             </Text>
             <Text className="mt-2 text-center text-sm text-slate-500">
-              {busyStage === 'uploading' ? 'Ảnh sẽ xuất hiện trong Gallery của bé.' : 'Bức tranh có thể cần vài phút để hoàn thành.'}
+              {busyStage === 'preparing' ? 'Xưởng đang biến bảng vẽ thành ảnh PNG.' : busyStage === 'uploading' ? 'Ảnh sẽ xuất hiện trong Gallery của bé.' : 'Bức tranh có thể cần vài phút để hoàn thành.'}
             </Text>
             <View className="mt-5 h-3 w-full overflow-hidden rounded-full bg-orange-100">
-              <View className={`h-full rounded-full bg-brand ${busyStage === 'uploading' ? 'w-1/3' : 'w-2/3'}`} />
+              <View className={`h-full rounded-full bg-brand ${busyStage === 'preparing' ? 'w-1/4' : busyStage === 'uploading' ? 'w-1/2' : 'w-3/4'}`} />
             </View>
           </View>
         ) : (
-          <PrimaryButton label="✨ AI vẽ lại bức tranh" disabled={!draft.referenceUri && !draft.uploadedReferenceUrl} onPress={() => void generate()} />
+          <PrimaryButton label="✨ AI vẽ lại bức tranh" disabled={referenceMode === 'drawing' ? !hasCanvasDrawing : !draft.referenceUri && !draft.uploadedReferenceUrl} onPress={() => void generate()} />
         )}
 
         {draft.resultUri ? (
