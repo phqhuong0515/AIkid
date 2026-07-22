@@ -1466,8 +1466,8 @@
         </div>
 
         <div class="step-item" onclick="selectStep(6)">
-          <i class="fa-solid fa-cloud step-icon" style="color: #38BDF8;"></i>
-          <span>Bài học</span>
+          <i class="fa-solid fa-fire step-icon" style="color: #F97316;"></i>
+          <span>Cao trào</span>
         </div>
 
         <div class="step-item" onclick="selectStep(7)">
@@ -1476,8 +1476,8 @@
         </div>
 
         <div class="step-item" onclick="selectStep(8)">
-          <i class="fa-solid fa-fire step-icon" style="color: #F97316;"></i>
-          <span>Cao trào</span>
+          <i class="fa-solid fa-cloud step-icon" style="color: #38BDF8;"></i>
+          <span>Bài học</span>
         </div>
       </div>
 
@@ -2790,7 +2790,7 @@
         if (insightPanel) insightPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
-      } else if (stepNumber === 6) {
+      } else if (stepNumber === 8) {
         if (titleEl) titleEl.innerText = 'Bài học';
         if (subtitleEl) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
         
@@ -2807,8 +2807,8 @@
         if (titleEl) titleEl.innerText = stepName;
         
         if (subtitleEl) {
-          if (stepNumber === 7) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
-          else if (stepNumber === 8) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
+          if (stepNumber === 6) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
+          else if (stepNumber === 7) subtitleEl.innerText = 'Kết quả ra sao và nhân vật cảm thấy thế nào?';
         }
         
         charPanel.classList.remove('active');
@@ -2947,11 +2947,11 @@
         }
         selectedIdeaText = `${finalObstacle} | ${finalAttempt}`;
         isValid = true;
-      } else if (currentStepIndex === 6) {
+      } else if (currentStepIndex === 8) {
         const insightInput = document.getElementById('custom-insight-text');
         const insightVal = insightInput ? insightInput.value.trim() : '';
         if (!insightVal && !selectedInsight) {
-          showComingSoon('Vui lòng chọn hoặc tự viết điều nhân vật nhận ra!');
+          showComingSoon('Vui lòng chọn hoặc tự viết bài học!');
           return;
         }
         selectedIdeaText = insightVal || selectedInsight;
