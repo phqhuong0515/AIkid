@@ -723,11 +723,12 @@
       display: flex;
     }
 
-    /* ========== CONTEXT, OPENING, UNEXPECTED & OBSTACLE STEP PANEL ========== */
+    /* ========== CONTEXT, OPENING, UNEXPECTED, OBSTACLE & ATTEMPT STEP PANEL ========== */
     .context-step-panel,
     .opening-step-panel,
     .unexpected-step-panel,
-    .obstacle-step-panel {
+    .obstacle-step-panel,
+    .attempt-step-panel {
       display: none;
       flex-direction: column;
       height: auto;
@@ -742,7 +743,8 @@
     .context-step-panel.active,
     .opening-step-panel.active,
     .unexpected-step-panel.active,
-    .obstacle-step-panel.active {
+    .obstacle-step-panel.active,
+    .attempt-step-panel.active {
       display: flex;
     }
 
@@ -751,14 +753,16 @@
     .context-step-panel::-webkit-scrollbar,
     .opening-step-panel::-webkit-scrollbar,
     .unexpected-step-panel::-webkit-scrollbar,
-    .obstacle-step-panel::-webkit-scrollbar {
+    .obstacle-step-panel::-webkit-scrollbar,
+    .attempt-step-panel::-webkit-scrollbar {
       width: 8px;
     }
     .char-step-panel::-webkit-scrollbar-track,
     .context-step-panel::-webkit-scrollbar-track,
     .opening-step-panel::-webkit-scrollbar-track,
     .unexpected-step-panel::-webkit-scrollbar-track,
-    .obstacle-step-panel::-webkit-scrollbar-track {
+    .obstacle-step-panel::-webkit-scrollbar-track,
+    .attempt-step-panel::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.02);
       border-radius: 10px;
     }
@@ -766,7 +770,8 @@
     .context-step-panel::-webkit-scrollbar-thumb,
     .opening-step-panel::-webkit-scrollbar-thumb,
     .unexpected-step-panel::-webkit-scrollbar-thumb,
-    .obstacle-step-panel::-webkit-scrollbar-thumb {
+    .obstacle-step-panel::-webkit-scrollbar-thumb,
+    .attempt-step-panel::-webkit-scrollbar-thumb {
       background-color: rgba(255, 117, 151, 0.5);
       border-radius: 10px;
       border: 2px solid #FFFFFF;
@@ -775,14 +780,16 @@
     .context-step-panel::-webkit-scrollbar-thumb:hover,
     .opening-step-panel::-webkit-scrollbar-thumb:hover,
     .unexpected-step-panel::-webkit-scrollbar-thumb:hover,
-    .obstacle-step-panel::-webkit-scrollbar-thumb:hover {
+    .obstacle-step-panel::-webkit-scrollbar-thumb:hover,
+    .attempt-step-panel::-webkit-scrollbar-thumb:hover {
       background-color: rgba(255, 117, 151, 0.8);
     }
     .char-step-panel,
     .context-step-panel,
     .opening-step-panel,
     .unexpected-step-panel,
-    .obstacle-step-panel {
+    .obstacle-step-panel,
+    .attempt-step-panel {
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 117, 151, 0.5) rgba(0, 0, 0, 0.02);
     }
@@ -1921,6 +1928,54 @@
           </div>
         </div>
 
+        <!-- ===== STEP 6: ATTEMPT PANEL ===== -->
+        <div class="attempt-step-panel" id="attempt-step-panel">
+          <div class="idea-cards-grid">
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Tự tìm cách giải quyết')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-user-gear"></i></div>
+              <div class="idea-card-text">Tự tìm cách giải quyết</div>
+            </div>
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nhờ người khác giúp')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-user-group"></i></div>
+              <div class="idea-card-text">Nhờ người khác giúp</div>
+            </div>
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Thử lại theo cách khác')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-arrows-rotate"></i></div>
+              <div class="idea-card-text">Thử lại theo cách khác</div>
+            </div>
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Dùng một món đồ đặc biệt')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+              <div class="idea-card-text">Dùng một món đồ đặc biệt</div>
+            </div>
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nghĩ ra một kế hoạch')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-lightbulb"></i></div>
+              <div class="idea-card-text">Nghĩ ra một kế hoạch</div>
+            </div>
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Quan sát và tìm manh mối')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-magnifying-glass"></i></div>
+              <div class="idea-card-text">Quan sát và tìm manh mối</div>
+            </div>
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nói chuyện để thuyết phục')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-comments"></i></div>
+              <div class="idea-card-text">Nói chuyện để thuyết phục</div>
+            </div>
+            <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Làm liều một phen')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-bolt-lightning"></i></div>
+              <div class="idea-card-text">Làm liều một phen</div>
+            </div>
+          </div>
+
+          <div class="custom-space-box" style="margin-top: 16px;">
+            <div class="custom-space-icon">
+              <i class="fa-solid fa-pen-fancy"></i>
+            </div>
+            <div class="custom-space-input-wrapper" style="justify-content: center;">
+              <input type="text" id="custom-attempt-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('attempt-char-counter').innerText = this.value.length + ' / 60'; selectedAttempt = this.value.trim(); document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected'));">
+            </div>
+            <div class="custom-space-counter" id="attempt-char-counter">0 / 60</div>
+          </div>
+        </div>
+
         <!-- 8 Option Cards Grid -->
         <div class="idea-cards-grid" id="idea-cards-grid">
 
@@ -2119,6 +2174,20 @@
     let selectedUnexpectedEvent = '';
     let selectedUnexpectedEmotion = '';
     let selectedObstacle = '';
+    let selectedAttempt = '';
+
+    function selectAttemptCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedAttempt = text;
+      const input = document.getElementById('custom-attempt-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('attempt-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+    }
 
     function selectObstacleCard(card, text) {
       playPopSound();
@@ -2570,6 +2639,7 @@
       const openingPanel = document.getElementById('opening-step-panel');
       const unexpectedPanel = document.getElementById('unexpected-step-panel');
       const obstaclePanel = document.getElementById('obstacle-step-panel');
+      const attemptPanel = document.getElementById('attempt-step-panel');
       const ideaGrid = document.getElementById('idea-cards-grid');
       const customBox = document.getElementById('generic-custom-idea-box');
       
@@ -2582,6 +2652,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (attemptPanel) attemptPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 2) {
@@ -2593,6 +2664,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (attemptPanel) attemptPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 3) {
@@ -2605,6 +2677,7 @@
         if (openingPanel) openingPanel.classList.add('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (attemptPanel) attemptPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 4) {
@@ -2616,6 +2689,7 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.add('active');
         if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (attemptPanel) attemptPanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 5) {
@@ -2627,6 +2701,19 @@
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
         if (obstaclePanel) obstaclePanel.classList.add('active');
+        if (attemptPanel) attemptPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 6) {
+        if (titleEl) titleEl.innerText = 'Nhân vật thử làm gì?';
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật lựa chọn cách nào để vượt qua trở ngại?';
+        
+        charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (attemptPanel) attemptPanel.classList.add('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else {
@@ -2771,6 +2858,15 @@
           return;
         }
         selectedIdeaText = obstacleVal || selectedObstacle;
+        isValid = true;
+      } else if (currentStepIndex === 6) {
+        const attemptInput = document.getElementById('custom-attempt-text');
+        const attemptVal = attemptInput ? attemptInput.value.trim() : '';
+        if (!attemptVal && !selectedAttempt) {
+          showComingSoon('Vui lòng chọn hoặc tự viết cách nhân vật thử làm!');
+          return;
+        }
+        selectedIdeaText = attemptVal || selectedAttempt;
         isValid = true;
       } else {
         const customInput = document.getElementById('custom-idea-text');
