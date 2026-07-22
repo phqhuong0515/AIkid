@@ -1991,20 +1991,67 @@
 
         <!-- ===== STEP 5: PURPOSE PANEL ===== -->
         <div class="purpose-step-panel" id="purpose-step-panel">
-          <div class="custom-space-box" style="margin-top: 10px; padding: 18px;">
-            <div class="custom-space-icon" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
-              <i class="fa-solid fa-bullseye"></i>
+          <div>
+            <div class="idea-cards-grid">
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Tìm lại thứ đã mất')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
+                  <i class="fa-solid fa-magnifying-glass-location"></i>
+                </div>
+                <div class="idea-card-text">Tìm lại thứ đã mất</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Giúp đỡ một người')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                  <i class="fa-solid fa-hand-holding-heart"></i>
+                </div>
+                <div class="idea-card-text">Giúp đỡ một người</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Khám phá một bí mật')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;">
+                  <i class="fa-solid fa-key"></i>
+                </div>
+                <div class="idea-card-text">Khám phá một bí mật</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Hoàn thành nhiệm vụ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;">
+                  <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="idea-card-text">Hoàn thành nhiệm vụ</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Sửa chữa sai lầm')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </div>
+                <div class="idea-card-text">Sửa chữa sai lầm</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Trở về nơi an toàn')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #38BDF8, #0284C7); color: #FFFFFF;">
+                  <i class="fa-solid fa-house-chimney-heart"></i>
+                </div>
+                <div class="idea-card-text">Trở về nơi an toàn</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Chứng minh bản thân')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FACC15, #EAB308); color: #FFFFFF;">
+                  <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="idea-card-text">Chứng minh bản thân</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Bảo vệ điều quan trọng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="idea-card-text">Bảo vệ điều quan trọng</div>
+              </div>
             </div>
-            <div class="custom-space-input-wrapper" style="justify-content: center; flex: 1;">
-              <label style="font-family: 'Chiron GoRound TC', sans-serif; font-size: 1rem; font-weight: 700; color: #8A7463; margin-bottom: 8px; display: block;">
-                Mục đích của nhân vật trong câu chuyện này là gì?
-              </label>
-              <input type="text" id="main-char-purpose-input" class="custom-space-input"
-                placeholder="Ví dụ: Tìm kho báu, giải cứu bạn bè..." maxlength="80"
-                style="width: 100%; border: 2px solid #EADED5; border-radius: 12px; padding: 12px 16px; font-family: 'Mali', sans-serif; font-size: 1rem; background: #FFFFFF;"
-                oninput="document.getElementById('purpose-char-counter').innerText = this.value.length + ' / 80'; saveCurrentStepState(5); updateProgressUI();">
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="main-char-purpose-input" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="80" oninput="document.getElementById('purpose-char-counter').innerText = this.value.length + ' / 80'; document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="purpose-char-counter">0 / 80</div>
             </div>
-            <div class="custom-space-counter" id="purpose-char-counter" style="align-self: flex-end;">0 / 80</div>
           </div>
         </div>
 
@@ -2566,6 +2613,20 @@
       saveCurrentStepState(2);
       updateProgressUI();
     }
+
+    function selectPurposeCard(card, textVal) {
+      playPopSound();
+      document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      const input = document.getElementById('main-char-purpose-input');
+      if (input) {
+        input.value = textVal;
+        const counter = document.getElementById('purpose-char-counter');
+        if (counter) counter.innerText = `${textVal.length} / 80`;
+      }
+      saveCurrentStepState(5);
+      updateProgressUI();
+    }
     
     function onCustomSpaceFocus() {
       document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
@@ -3030,7 +3091,13 @@
         }
       } else if (stepIdx === 5) {
         const purposeInput = document.getElementById('main-char-purpose-input');
-        if (purposeInput) {
+        if (purposeInput && purposeInput.value.trim()) {
+          const val = purposeInput.value.trim().toLowerCase();
+          document.querySelectorAll('.purpose-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === val) {
+              c.classList.add('selected');
+            }
+          });
           const counter = document.getElementById('purpose-char-counter');
           if (counter) counter.innerText = `${purposeInput.value.length} / 80`;
         }
