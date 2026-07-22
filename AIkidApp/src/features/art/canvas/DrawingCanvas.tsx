@@ -25,6 +25,7 @@ export type DrawingCanvasHandle = {
 export type DrawingCanvasProps = {
   disabled?: boolean;
   onDrawingChange?: (hasDrawing: boolean) => void;
+  onInteractionChange?: (isDrawing: boolean) => void;
 };
 
 function point(event: GestureResponderEvent, layout: { width: number; height: number }) {
@@ -34,7 +35,7 @@ function point(event: GestureResponderEvent, layout: { width: number; height: nu
 }
 
 export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
-  function DrawingCanvas({ disabled = false, onDrawingChange }, ref) {
+  function DrawingCanvas({ disabled = false, onDrawingChange, onInteractionChange }, ref) {
     const svgRef = useRef<Svg>(null);
     const [layout, setLayout] = useState({ width: 1, height: 1 });
     const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -67,6 +68,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
       };
       activeRef.current = next;
       setActive(next);
+      onInteractionChange?.(true);
       setNotice(tool === 'eraser' ? 'Đang tẩy…' : 'Đang vẽ…');
     }
 
@@ -84,6 +86,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
       applyStrokes([...strokesRef.current, completed].slice(-80));
       activeRef.current = null;
       setActive(null);
+      onInteractionChange?.(false);
       setNotice('✓ Đã lưu nét vẽ');
     }
 
@@ -163,6 +166,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
           onResponderMove={move}
           onResponderRelease={finish}
           onResponderTerminate={finish}
+          onResponderTerminationRequest={() => false}
           style={{ width: '100%', aspectRatio: VIEWBOX_WIDTH / VIEWBOX_HEIGHT, borderRadius: 20, overflow: 'hidden', borderWidth: 2, borderColor: '#FED7AA', backgroundColor: '#FFFFFF', touchAction: 'none', userSelect: 'none' }}
         >
           <Svg

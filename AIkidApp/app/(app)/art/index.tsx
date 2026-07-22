@@ -90,6 +90,7 @@ export default function ArtScreen() {
   const [busyStage, setBusyStage] = useState<BusyStage>(null);
   const [referenceMode, setReferenceMode] = useState<ReferenceMode>('photo');
   const [hasCanvasDrawing, setHasCanvasDrawing] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
   const drawingCanvasRef = useRef<DrawingCanvasHandle>(null);
   const generateLock = useRef(false);
 
@@ -223,7 +224,7 @@ export default function ArtScreen() {
 
   return (
     <ScreenChrome title="Xưởng vẽ AI" subtitle="Ảnh mẫu → chọn phong cách → AI vẽ lại" backHref="/(app)/lobby">
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 64 }}>
+      <ScrollView scrollEnabled={!isDrawing && !busyStage} contentContainerStyle={{ padding: 16, paddingBottom: 64 }}>
         <SectionCard title="1. Tạo hoặc chọn tranh mẫu" hint="Bé có thể tự vẽ, chụp tranh giấy hoặc chọn ảnh. Tranh được lưu vào Gallery trước khi gửi AI.">
           <View className="mb-3 flex-row rounded-2xl bg-orange-50 p-1">
             <Pressable
@@ -246,6 +247,7 @@ export default function ArtScreen() {
             <DrawingCanvas
               ref={drawingCanvasRef}
               disabled={!!busyStage}
+              onInteractionChange={setIsDrawing}
               onDrawingChange={(hasDrawing) => {
                 setHasCanvasDrawing(hasDrawing);
                 setReferenceMode('drawing');

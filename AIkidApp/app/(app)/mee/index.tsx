@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { familyApi } from '@/core/storymee';
+import { extractErrorMessage } from '@/core/api/unwrap';
 import { useAuth } from '@/core/auth/useAuth';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { generateImageViaGateway } from '@/features/creative/generateImageViaGateway';
@@ -63,12 +64,22 @@ export default function MeeScreen() {
     try {
       // Always snapshot the current draft. A previously saved URL may point to
       // an older appearance after the child changes hair, face or clothes.
-      const referenceUrl = await uploadMeePreview(draft, { childId: child.id, ipId });
+      let referenceUrl: string;
+      try {
+        referenceUrl = await uploadMeePreview(draft, { childId: child.id, ipId });
+      } catch (error) {
+        throw new Error(`Không tải được ảnh Mee: ${extractErrorMessage(error, 'Kiểm tra mạng và thử lại.')}`);
+      }
       setField('savedMediaUrl', referenceUrl);
       // The permanent preview must appear even when the subsequent AI job
       // fails, times out or is cancelled.
       invalidateMedia();
-      const result = await generateImageViaGateway({ userPrompt: 'Turn this simple Mee avatar into a polished kid-friendly 3D cartoon profile portrait. Preserve skin, hair, clothing and background colors. Single centered character, head and shoulders, no text, no watermark.', referenceHttpsUrl: referenceUrl, childProfileId: child.id, ipId });
+      let result: Awaited<ReturnType<typeof generateImageViaGateway>>;
+      try {
+        result = await generateImageViaGateway({ userPrompt: 'Turn this simple Mee avatar into a polished kid-friendly 3D cartoon profile portrait. Preserve skin, hair, clothing and background colors. Single centered character, head and shoulders, no text, no watermark.', referenceHttpsUrl: referenceUrl, childProfileId: child.id, ipId });
+      } catch (error) {
+        throw new Error(`Dịch vụ tạo Mee AI chưa phản hồi: ${extractErrorMessage(error, 'Thử lại sau.')}`);
+      }
       setField('aiResultUrl', result.imageUrl);
       await useRecentAiImages.getState().setScope(child.id);
       useRecentAiImages.getState().add({
