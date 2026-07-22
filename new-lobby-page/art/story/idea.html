@@ -2630,7 +2630,7 @@
       checkStep1Completion();
     }
 
-    function checkStep1Completion() {
+    function checkStep1Completion(skipProgressUpdate = false) {
       const mainSlot = document.getElementById('main-char-slot');
       const isMainFilled = mainSlot && mainSlot.classList.contains('filled');
       
@@ -2644,7 +2644,9 @@
       } else {
         completedSteps.delete(1);
       }
-      updateProgressUI();
+      if (!skipProgressUpdate) {
+        updateProgressUI();
+      }
     }
 
     function saveCharacterStepData() {
@@ -2754,7 +2756,7 @@
       if (!stepIdx) stepIdx = currentStepIndex;
 
       if (stepIdx === 1) {
-        checkStep1Completion();
+        checkStep1Completion(true);
       } else if (stepIdx === 2) {
         const customSpace = document.getElementById('custom-space-input')?.value.trim() || '';
         const spaceVal = customSpace || selectedSpace;
