@@ -628,6 +628,13 @@
       box-shadow: 0 0 0 3px rgba(255, 117, 151, 0.15);
     }
 
+    .char-section-divider {
+      border: none;
+      border-top: 2px dashed #EADED5;
+      margin: 20px 0;
+      width: 100%;
+    }
+
     /* Bottom Wizard Actions */
     .wizard-actions-bar {
       display: flex;
@@ -1774,7 +1781,7 @@
         <!-- ===== STEP 4: UNEXPECTED EVENT PANEL ===== -->
         <div class="unexpected-step-panel" id="unexpected-step-panel">
           <!-- Section 1: Điều bất ngờ xảy ra -->
-          <div style="margin-bottom: 24px;">
+          <div>
             <p class="context-section-label"><i class="fa-solid fa-wand-magic-sparkles" style="color: #FF7597;"></i> Điều bất ngờ nào xảy ra?</p>
             <div class="idea-cards-grid">
               <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Món đồ quan trọng bỗng biến mất')">
