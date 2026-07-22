@@ -1621,7 +1621,7 @@
             <div class="char-questions-box" id="main-char-questions">
               <div class="char-question-item">
                 <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện?</label>
-                <input type="text" id="main-char-role-input" class="char-question-input" placeholder="Ví dụ: Anh hùng, người dẫn đường..." oninput="checkStep1Completion()">
+                <input type="text" id="main-char-role-input" class="char-question-input" placeholder="Ví dụ: Anh hùng, người dẫn đường..." maxlength="50" oninput="checkStep1Completion()">
               </div>
             </div>
 
@@ -1932,9 +1932,9 @@
                 <i class="fa-solid fa-pen-fancy"></i>
               </div>
               <div class="custom-space-input-wrapper" style="justify-content: center;">
-                <input type="text" id="custom-unexpected-event" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('unexpected-event-counter').innerText = this.value.length + ' / 60'; selectedUnexpectedEvent = this.value.trim(); document.querySelectorAll('.unexpected-event-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(4); updateProgressUI();">
+                <input type="text" id="custom-unexpected-event" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('unexpected-event-counter').innerText = this.value.length + ' / 50'; selectedUnexpectedEvent = this.value.trim(); document.querySelectorAll('.unexpected-event-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(4); updateProgressUI();">
               </div>
-              <div class="custom-space-counter" id="unexpected-event-counter">0 / 60</div>
+              <div class="custom-space-counter" id="unexpected-event-counter">0 / 50</div>
             </div>
           </div>
 
@@ -2048,9 +2048,9 @@
                 <i class="fa-solid fa-pen-fancy"></i>
               </div>
               <div class="custom-space-input-wrapper" style="justify-content: center;">
-                <input type="text" id="main-char-purpose-input" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="80" oninput="document.getElementById('purpose-char-counter').innerText = this.value.length + ' / 80'; document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
+                <input type="text" id="main-char-purpose-input" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('purpose-char-counter').innerText = this.value.length + ' / 50'; document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
               </div>
-              <div class="custom-space-counter" id="purpose-char-counter">0 / 80</div>
+              <div class="custom-space-counter" id="purpose-char-counter">0 / 50</div>
             </div>
           </div>
         </div>
@@ -2100,9 +2100,9 @@
                 <i class="fa-solid fa-pen-fancy"></i>
               </div>
               <div class="custom-space-input-wrapper" style="justify-content: center;">
-                <input type="text" id="custom-obstacle-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('obstacle-char-counter').innerText = this.value.length + ' / 60'; selectedObstacle = this.value.trim(); document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
+                <input type="text" id="custom-obstacle-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('obstacle-char-counter').innerText = this.value.length + ' / 50'; selectedObstacle = this.value.trim(); document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
               </div>
-              <div class="custom-space-counter" id="obstacle-char-counter">0 / 60</div>
+              <div class="custom-space-counter" id="obstacle-char-counter">0 / 50</div>
             </div>
           </div>
 
@@ -2151,9 +2151,9 @@
                 <i class="fa-solid fa-pen-fancy"></i>
               </div>
               <div class="custom-space-input-wrapper" style="justify-content: center;">
-                <input type="text" id="custom-attempt-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('attempt-char-counter').innerText = this.value.length + ' / 60'; selectedAttempt = this.value.trim(); document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
+                <input type="text" id="custom-attempt-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('attempt-char-counter').innerText = this.value.length + ' / 50'; selectedAttempt = this.value.trim(); document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
               </div>
-              <div class="custom-space-counter" id="attempt-char-counter">0 / 60</div>
+              <div class="custom-space-counter" id="attempt-char-counter">0 / 50</div>
             </div>
           </div>
         </div>
@@ -2192,9 +2192,9 @@
               <i class="fa-solid fa-pen-fancy"></i>
             </div>
             <div class="custom-space-input-wrapper" style="justify-content: center;">
-              <input type="text" id="custom-ending-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('ending-char-counter').innerText = this.value.length + ' / 60'; selectedEnding = this.value.trim(); selectedIdeaText = this.value.trim(); document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(7); updateProgressUI();">
+              <input type="text" id="custom-ending-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('ending-char-counter').innerText = this.value.length + ' / 50'; selectedEnding = this.value.trim(); selectedIdeaText = this.value.trim(); document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(7); updateProgressUI();">
             </div>
-            <div class="custom-space-counter" id="ending-char-counter">0 / 60</div>
+            <div class="custom-space-counter" id="ending-char-counter">0 / 50</div>
           </div>
         </div>
 
@@ -2240,9 +2240,9 @@
               <i class="fa-solid fa-pen-fancy"></i>
             </div>
             <div class="custom-space-input-wrapper" style="justify-content: center;">
-              <input type="text" id="custom-insight-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('insight-char-counter').innerText = this.value.length + ' / 60'; selectedInsight = this.value.trim(); document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));">
+              <input type="text" id="custom-insight-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('insight-char-counter').innerText = this.value.length + ' / 50'; selectedInsight = this.value.trim(); document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));">
             </div>
-            <div class="custom-space-counter" id="insight-char-counter">0 / 60</div>
+            <div class="custom-space-counter" id="insight-char-counter">0 / 50</div>
           </div>
         </div>
 
@@ -2330,9 +2330,9 @@
           </div>
           <div class="custom-space-input-wrapper" style="justify-content: center;">
             <input type="text" id="custom-idea-text" class="custom-space-input"
-              placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="updateCharCounter(this); selectedClimax = this.value.trim(); document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(6); updateProgressUI();">
+              placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="updateCharCounter(this); selectedClimax = this.value.trim(); document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(6); updateProgressUI();">
           </div>
-          <div class="custom-space-counter" id="char-counter">0 / 60</div>
+          <div class="custom-space-counter" id="char-counter">0 / 50</div>
         </div>
 
         <!-- Wizard Action Buttons -->
@@ -2622,7 +2622,7 @@
       if (input) {
         input.value = textVal;
         const counter = document.getElementById('purpose-char-counter');
-        if (counter) counter.innerText = `${textVal.length} / 80`;
+        if (counter) counter.innerText = `${textVal.length} / 50`;
       }
       saveCurrentStepState(5);
       updateProgressUI();
@@ -2677,7 +2677,7 @@
 
     function updateCharCounter(input) {
       const counter = document.getElementById('char-counter');
-      const maxLen = input.getAttribute('maxlength') || 60;
+      const maxLen = input.getAttribute('maxlength') || 50;
       if (counter) {
         counter.innerText = `${input.value.length} / ${maxLen}`;
       }
@@ -3072,7 +3072,7 @@
           if (evtInput && (!matched || evtInput.value)) {
             if (!matched) evtInput.value = selectedUnexpectedEvent;
             const counter = document.getElementById('unexpected-event-counter');
-            if (counter) counter.innerText = `${evtInput.value.length} / 60`;
+            if (counter) counter.innerText = `${evtInput.value.length} / 50`;
           }
         }
         if (selectedUnexpectedEmotion) {
@@ -3099,7 +3099,7 @@
             }
           });
           const counter = document.getElementById('purpose-char-counter');
-          if (counter) counter.innerText = `${purposeInput.value.length} / 80`;
+          if (counter) counter.innerText = `${purposeInput.value.length} / 50`;
         }
       } else if (stepIdx === 6) {
         const obsInput = document.getElementById('custom-obstacle-text');
@@ -3115,7 +3115,7 @@
           if (obsInput && (!matched || obsInput.value)) {
             if (!matched) obsInput.value = selectedObstacle;
             const counter = document.getElementById('obstacle-char-counter');
-            if (counter) counter.innerText = `${obsInput.value.length} / 60`;
+            if (counter) counter.innerText = `${obsInput.value.length} / 50`;
           }
         }
         if (selectedAttempt) {
@@ -3129,7 +3129,7 @@
           if (attInput && (!matched || attInput.value)) {
             if (!matched) attInput.value = selectedAttempt;
             const counter = document.getElementById('attempt-char-counter');
-            if (counter) counter.innerText = `${attInput.value.length} / 60`;
+            if (counter) counter.innerText = `${attInput.value.length} / 50`;
           }
         }
       } else if (stepIdx === 7) {
@@ -3160,7 +3160,7 @@
           if (endInput && (!matched || endInput.value)) {
             if (!matched) endInput.value = selectedEnding;
             const counter = document.getElementById('ending-char-counter');
-            if (counter) counter.innerText = `${endInput.value.length} / 60`;
+            if (counter) counter.innerText = `${endInput.value.length} / 50`;
           }
         }
       } else if (stepIdx === 9) {
@@ -3176,7 +3176,7 @@
           if (insInput && (!matched || insInput.value)) {
             if (!matched) insInput.value = selectedInsight;
             const counter = document.getElementById('insight-char-counter');
-            if (counter) counter.innerText = `${insInput.value.length} / 60`;
+            if (counter) counter.innerText = `${insInput.value.length} / 50`;
           }
         }
       }
