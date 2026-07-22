@@ -723,10 +723,11 @@
       display: flex;
     }
 
-    /* ========== CONTEXT, OPENING & UNEXPECTED STEP PANEL ========== */
+    /* ========== CONTEXT, OPENING, UNEXPECTED & OBSTACLE STEP PANEL ========== */
     .context-step-panel,
     .opening-step-panel,
-    .unexpected-step-panel {
+    .unexpected-step-panel,
+    .obstacle-step-panel {
       display: none;
       flex-direction: column;
       height: auto;
@@ -740,7 +741,8 @@
 
     .context-step-panel.active,
     .opening-step-panel.active,
-    .unexpected-step-panel.active {
+    .unexpected-step-panel.active,
+    .obstacle-step-panel.active {
       display: flex;
     }
 
@@ -748,20 +750,23 @@
     .char-step-panel::-webkit-scrollbar,
     .context-step-panel::-webkit-scrollbar,
     .opening-step-panel::-webkit-scrollbar,
-    .unexpected-step-panel::-webkit-scrollbar {
+    .unexpected-step-panel::-webkit-scrollbar,
+    .obstacle-step-panel::-webkit-scrollbar {
       width: 8px;
     }
     .char-step-panel::-webkit-scrollbar-track,
     .context-step-panel::-webkit-scrollbar-track,
     .opening-step-panel::-webkit-scrollbar-track,
-    .unexpected-step-panel::-webkit-scrollbar-track {
+    .unexpected-step-panel::-webkit-scrollbar-track,
+    .obstacle-step-panel::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.02);
       border-radius: 10px;
     }
     .char-step-panel::-webkit-scrollbar-thumb,
     .context-step-panel::-webkit-scrollbar-thumb,
     .opening-step-panel::-webkit-scrollbar-thumb,
-    .unexpected-step-panel::-webkit-scrollbar-thumb {
+    .unexpected-step-panel::-webkit-scrollbar-thumb,
+    .obstacle-step-panel::-webkit-scrollbar-thumb {
       background-color: rgba(255, 117, 151, 0.5);
       border-radius: 10px;
       border: 2px solid #FFFFFF;
@@ -769,13 +774,15 @@
     .char-step-panel::-webkit-scrollbar-thumb:hover,
     .context-step-panel::-webkit-scrollbar-thumb:hover,
     .opening-step-panel::-webkit-scrollbar-thumb:hover,
-    .unexpected-step-panel::-webkit-scrollbar-thumb:hover {
+    .unexpected-step-panel::-webkit-scrollbar-thumb:hover,
+    .obstacle-step-panel::-webkit-scrollbar-thumb:hover {
       background-color: rgba(255, 117, 151, 0.8);
     }
     .char-step-panel,
     .context-step-panel,
     .opening-step-panel,
-    .unexpected-step-panel {
+    .unexpected-step-panel,
+    .obstacle-step-panel {
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 117, 151, 0.5) rgba(0, 0, 0, 0.02);
     }
@@ -1866,6 +1873,54 @@
           </div>
         </div>
 
+        <!-- ===== STEP 5: OBSTACLE PANEL ===== -->
+        <div class="obstacle-step-panel" id="obstacle-step-panel">
+          <div class="idea-cards-grid">
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải vượt qua nỗi sợ')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-ghost"></i></div>
+              <div class="idea-card-text">Phải vượt qua nỗi sợ</div>
+            </div>
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không biết bắt đầu từ đâu')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-compass"></i></div>
+              <div class="idea-card-text">Không biết bắt đầu từ đâu</div>
+            </div>
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Bị người khác ngăn cản')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-hand"></i></div>
+              <div class="idea-card-text">Bị người khác ngăn cản</div>
+            </div>
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không ai tin lời')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-comment-slash"></i></div>
+              <div class="idea-card-text">Không ai tin lời</div>
+            </div>
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải giữ bí mật')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-user-secret"></i></div>
+              <div class="idea-card-text">Phải giữ bí mật</div>
+            </div>
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải lựa chọn giữa hai điều quan trọng')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-scale-balanced"></i></div>
+              <div class="idea-card-text">Phải lựa chọn giữa hai điều quan trọng</div>
+            </div>
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Mọi thứ không giống như tưởng tượng')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-cloud-rain"></i></div>
+              <div class="idea-card-text">Mọi thứ không giống như tưởng tượng</div>
+            </div>
+            <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Càng cố giải quyết, rắc rối càng lớn hơn')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="idea-card-text">Càng cố giải quyết, rắc rối càng lớn hơn</div>
+            </div>
+          </div>
+
+          <div class="custom-space-box" style="margin-top: 16px;">
+            <div class="custom-space-icon">
+              <i class="fa-solid fa-pen-fancy"></i>
+            </div>
+            <div class="custom-space-input-wrapper" style="justify-content: center;">
+              <input type="text" id="custom-obstacle-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="60" oninput="document.getElementById('obstacle-char-counter').innerText = this.value.length + ' / 60'; selectedObstacle = this.value.trim(); document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected'));">
+            </div>
+            <div class="custom-space-counter" id="obstacle-char-counter">0 / 60</div>
+          </div>
+        </div>
+
         <!-- 8 Option Cards Grid -->
         <div class="idea-cards-grid" id="idea-cards-grid">
 
@@ -2063,6 +2118,20 @@
     let selectedOpeningEmotion = '';
     let selectedUnexpectedEvent = '';
     let selectedUnexpectedEmotion = '';
+    let selectedObstacle = '';
+
+    function selectObstacleCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedObstacle = text;
+      const input = document.getElementById('custom-obstacle-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('obstacle-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+    }
 
     function selectUnexpectedEventCard(card, text) {
       playPopSound();
@@ -2496,11 +2565,11 @@
       const titleEl = document.querySelector('.plot-question-title');
       const subtitleEl = document.querySelector('.plot-question-subtitle');
       
-      // Toggle between character panel, context panel, and idea cards
       const charPanel = document.getElementById('char-step-panel');
       const contextPanel = document.getElementById('context-step-panel');
       const openingPanel = document.getElementById('opening-step-panel');
       const unexpectedPanel = document.getElementById('unexpected-step-panel');
+      const obstaclePanel = document.getElementById('obstacle-step-panel');
       const ideaGrid = document.getElementById('idea-cards-grid');
       const customBox = document.getElementById('generic-custom-idea-box');
       
@@ -2512,6 +2581,7 @@
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 2) {
@@ -2522,6 +2592,7 @@
         if (contextPanel) contextPanel.classList.add('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 3) {
@@ -2533,6 +2604,7 @@
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.add('active');
         if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else if (stepNumber === 4) {
@@ -2543,6 +2615,18 @@
         if (contextPanel) contextPanel.classList.remove('active');
         if (openingPanel) openingPanel.classList.remove('active');
         if (unexpectedPanel) unexpectedPanel.classList.add('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 5) {
+        if (titleEl) titleEl.innerText = 'Trở ngại';
+        if (subtitleEl) subtitleEl.innerText = 'Điều gì khiến nhân vật chưa thể đạt mục tiêu?';
+        
+        charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.add('active');
         if (ideaGrid) ideaGrid.style.display = 'none';
         if (customBox) customBox.style.display = 'none';
       } else {
@@ -2678,6 +2762,15 @@
           showComingSoon('Vui lòng chọn hoặc viết cảm xúc của nhân vật!');
           return;
         }
+        isValid = true;
+      } else if (currentStepIndex === 5) {
+        const obstacleInput = document.getElementById('custom-obstacle-text');
+        const obstacleVal = obstacleInput ? obstacleInput.value.trim() : '';
+        if (!obstacleVal && !selectedObstacle) {
+          showComingSoon('Vui lòng chọn hoặc tự viết một trở ngại!');
+          return;
+        }
+        selectedIdeaText = obstacleVal || selectedObstacle;
         isValid = true;
       } else {
         const customInput = document.getElementById('custom-idea-text');
