@@ -3,15 +3,12 @@ import { join } from 'node:path';
 
 const dist = new URL('../dist/', import.meta.url);
 
-// Expo copies public/ wholesale. These folders are prototype/reference packs;
-// the Expo app uses the bundled Mee catalog plus public/mee/PNG thumbnails.
+// Expo copies public/ wholesale. Only runtime assets remain in the standalone
+// app; trim large source-only image packs from the Pages artifact.
 await Promise.all([
-  rm(new URL('mee/', dist), { recursive: true, force: true }),
-  rm(new URL('mee-html/', dist), { recursive: true, force: true }),
   rm(new URL('lobby-assets/', dist), { recursive: true, force: true }),
   rm(new URL('hub-images/', dist), { recursive: true, force: true }),
-  rm(new URL('art/', dist), { recursive: true, force: true }),
-  rm(new URL('character/', dist), { recursive: true, force: true }),
+  rm(new URL('art-styles/', dist), { recursive: true, force: true }),
 ]);
 
 await mkdir(dist, { recursive: true });

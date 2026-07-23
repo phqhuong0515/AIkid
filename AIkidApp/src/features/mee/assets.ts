@@ -22,10 +22,10 @@ type MeeAssetCatalog = {
   };
 };
 
-// The source catalog is generated from the original Illustrator exports. It is
-// deliberately loaded lazily by Metro instead of duplicating 4.7 MB in app code.
+// The catalog is generated from the original Illustrator exports and vendored
+// with this standalone app. Do not point this import back into the monorepo.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-export const MEE_ASSETS = require('../../../../SVG/assets.js') as MeeAssetCatalog;
+export const MEE_ASSETS = require('./vendor/generatedMeeAssets.js') as MeeAssetCatalog;
 
 export const MEE_OPTIONS = {
   faces: [1, 2, 3, 4, 5, 6],

@@ -6,14 +6,18 @@ import {
   useRef,
   useState,
 } from 'react';
-import type { GestureResponderEvent } from 'react-native';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import type { GestureResponderEvent, ViewStyle } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 
 const VIEWBOX_WIDTH = 1000;
 const VIEWBOX_HEIGHT = 700;
 const COLORS = ['#111827', '#EF4444', '#F97316', '#22C55E', '#3B82F6', '#8B5CF6'];
 const SIZES = [6, 14, 28] as const;
+const webCanvasInteractionStyle: ViewStyle & {
+  touchAction?: 'none';
+  userSelect?: 'none';
+} = Platform.OS === 'web' ? { touchAction: 'none', userSelect: 'none' } : {};
 
 type Tool = 'pen' | 'eraser';
 export type DrawingStroke = { id: string; d: string; color: string; width: number };
@@ -225,7 +229,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
           onResponderTerminationRequest={() => false}
           accessibilityRole="image"
           accessibilityLabel="Bảng vẽ của bé"
-          style={{ width: '100%', ...(fullscreen ? { flex: 1 } : { aspectRatio: VIEWBOX_WIDTH / VIEWBOX_HEIGHT }), borderRadius: fullscreen ? 14 : 20, overflow: 'hidden', borderWidth: 2, borderColor: '#FED7AA', backgroundColor: '#FFFFFF', touchAction: 'none', userSelect: 'none' }}
+          style={{ width: '100%', ...(fullscreen ? { flex: 1 } : { aspectRatio: VIEWBOX_WIDTH / VIEWBOX_HEIGHT }), borderRadius: fullscreen ? 14 : 20, overflow: 'hidden', borderWidth: 2, borderColor: '#FED7AA', backgroundColor: '#FFFFFF', ...webCanvasInteractionStyle }}
         >
           <Svg
             ref={svgRef}

@@ -1,12 +1,12 @@
 # AIkidApp — agent entry
 
-Expo SDK 54 client. Mobile capability source of truth is
-`../../../StoryMeeMobileApp`; shared network/domain source of truth is
-`../../../../0-Shared-Libs/sdk`.
+Expo SDK 54 standalone client. Shared network/domain contracts are vendored in
+`vendor/storymee-sdk`; this repository must not depend on private monorepo paths.
 
 ## Non-negotiable boundaries
 
-1. Import StoryMee domains from `src/core/storymee.ts` / `@storymee/sdk`.
+1. Import StoryMee domains from `src/core/storymee.ts` / the vendored
+   `@storymee/sdk`; do not add a dependency on a path outside `AIkidApp`.
 2. Client traffic uses Gateway `EXPO_PUBLIC_API_URL` and `/api/v1/*` only.
 3. Never call `/internal/v1`, `/worker/v1`, microservice ports, or ship provider keys.
 4. Parent and child share the auth store. Child username/password remains

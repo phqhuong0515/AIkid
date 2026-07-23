@@ -6,7 +6,8 @@ is to merge these routes into MobileApp without rewriting domain calls.
 
 ## Runtime contract
 
-- Package: local `@storymee/sdk` (`../../../../0-Shared-Libs/sdk`)
+- Package: vendored `@storymee/sdk` (`vendor/storymee-sdk`) so this public
+  repository installs and builds without the private monorepo.
 - Network: public Gateway only, `EXPO_PUBLIC_API_URL`
 - Consumer routes: `/api/v1/*`; never `/internal/v1`, `/worker/v1` or service ports
 - Identity: parent email/password or child username/password
@@ -55,4 +56,6 @@ npm run typecheck
 npx expo export --platform web --output-dir /tmp/aikid-export
 ```
 
-See `AGENTS.md` and `../../StoryMeeMobileApp/docs/APP_ARCHITECTURE.md`.
+See `AGENTS.md` for the standalone project boundary. The canonical SDK source
+continues to live in the private StoryMee monorepo; refresh the vendored copy
+deliberately whenever its public client contract changes.
