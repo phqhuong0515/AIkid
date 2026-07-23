@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiết Kế Khung Truyện - AIkid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Chiron+GoRound+TC:wght@900&family=Fredoka:wght@300..700&family=Mali:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Outfit:wght@300..800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/mee/styles.css?v=202607101658">
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('/mee/PNG/bg-art.png');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+      background-color: #FED7D7;
+      font-family: 'Mali', sans-serif;
+      box-sizing: border-box;
+    }
+
+    /* --- Scaler: identical pattern to comic.html / novel.html --- */
+    .scaler-wrapper {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1927.63px;
+      height: 930px;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(1);
+      background: transparent;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .scaler-wrapper>* {
+      pointer-events: auto;
+    }
+
+    /* --- Scrollable inner layer (Fixed layout, no page scroll) --- */
+    .scroll-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .scroll-layer::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .scroll-layer::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .scroll-layer::-webkit-scrollbar-thumb {
+      background: rgba(255, 117, 151, 0.35);
+      border-radius: 999px;
+    }
+
+    /* --- Header --- */
+    .art-header {
+      position: sticky;
+      top: 35px;
+      left: 38px;
+      width: 1844.3px;
+      height: 76.17px;
+      background: rgba(253, 250, 244, 0.85);
+      border-radius: 24px;
+      padding: 0 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+      z-index: 100;
+      margin-left: 38px;
+      margin-top: 35px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+      flex-shrink: 0;
+    }
+
+    .art-logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-left: -10px;
+    }
+
+    .art-logo img {
+      height: 58px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .auth-btn {
+      font-family: 'Mali', sans-serif;
+      font-weight: 800;
+      font-size: 1.52rem;
+      color: #FFF;
+      background: linear-gradient(135deg, #FF5C8A, #FF8E53);
+      border: none;
+      padding: 11px 40px;
+      height: 55px;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 92, 138, 0.2);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(255, 92, 138, 0.35);
+      background: linear-gradient(135deg, #FF7096, #FFA072);
+    }
+
+    /* --- Back Button (sticky) --- */
+    .back-btn-wrap {
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 200;
+      padding: 18px 0 12px 42px;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .back-btn {
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+      border: none;
+      border-radius: 9999px;
+      color: white;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 10px 25px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: auto;
+      transform: scale(1.1);
+      transform-origin: left center;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1) translateY(-2px);
+      box-shadow: 0 12px 25px rgba(255, 117, 151, 0.45);
+      background: linear-gradient(135deg, #ff5780, #ff7597);
+    }
+
+    /* --- Main content area --- */
+    .panel-content {
+      margin: 44px 38px 20px 42px;
+      box-sizing: border-box;
+    }
+
+    /* --- Plot Preview (compact, lives in left column) --- */
+    .plot-preview-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 22px;
+      padding: 18px 20px 16px;
+      margin-bottom: 16px;
+      border: 3px solid rgba(255, 117, 151, 0.25);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07);
+    }
+
+    .plot-preview-label {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .plot-preview-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.15rem;
+      color: #334155;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .plot-preview-content-short {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.88rem;
+      color: #64748B;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .plot-preview-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .plot-style-badge {
+      background: linear-gradient(135deg, #FF5C8A, #FF8E53);
+      color: white;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .plot-detail-btn {
+      background: none;
+      border: 2px solid #FF9EB5;
+      border-radius: 9999px;
+      color: #FF5C8A;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 4px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .plot-detail-btn:hover {
+      background: #FFF0F5;
+      border-color: #FF5C8A;
+    }
+
+    .plot-change-btn {
+      background: none;
+      border: 2px solid #E8DDD5;
+      border-radius: 9999px;
+      color: #704E48;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 4px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .plot-change-btn:hover {
+      background: #FAF7F5;
+      border-color: #9B6B5E;
+    }
+
+    .restyle-btn {
+      background: rgba(253, 250, 244, 0.95);
+      border: 2px solid #E8DDD5;
+      border-radius: 9999px;
+      color: #704E48;
+      font-family: 'Mali', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 11px 26px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .restyle-btn:hover {
+      background: #FFF8F4;
+      border-color: #FFBFAA;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* --- Plot Detail Modal --- */
+    .plot-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .plot-modal-overlay.open {
+      display: flex;
+    }
+
+    .plot-modal {
+      background: #fff;
+      border-radius: 28px;
+      padding: 36px 36px 28px;
+      width: 640px;
+      max-width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+      animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .plot-modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .plot-modal-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #334155;
+      text-transform: uppercase;
+    }
+
+    .plot-modal-close {
+      background: #F1F5F9;
+      border: none;
+      border-radius: 9999px;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .plot-modal-close:hover {
+      background: #FFE4EC;
+      color: #FF5C8A;
+    }
+
+    .plot-modal-body {
+      font-family: 'Mali', sans-serif;
+      font-size: 1rem;
+      color: #475569;
+      line-height: 1.75;
+      white-space: pre-wrap;
+    }
+
+    /* --- Layout: 2 columns --- */
+    .panel-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* --- Scrollable Right Panel Column --- */
+    .panel-right-scroll {
+      max-height: 590px;
+      overflow-y: auto;
+      padding-right: 14px;
+      padding-bottom: 24px;
+      box-sizing: border-box;
+    }
+
+    .panel-right-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .panel-right-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 10px;
+    }
+
+    .panel-right-scroll::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+      border-radius: 10px;
+    }
+
+    .panel-right-scroll::-webkit-scrollbar-thumb:hover {
+      background: #ff5780;
+    }
+
+    /* --- Count card --- */
+    .count-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 28px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      border: 3px solid rgba(112, 78, 72, 0.12);
+    }
+
+    .count-card-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: #334155;
+      text-transform: uppercase;
+      margin: 0 0 18px 0;
+      letter-spacing: 0.5px;
+    }
+
+    .count-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .count-btn {
+      background: #FAF7F5;
+      border: 2.5px dashed #E8DDD5;
+      border-radius: 18px;
+      color: #704E48;
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.9rem;
+      padding: 18px 0;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+    }
+
+    .count-btn span {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #B8A09A;
+    }
+
+    .count-btn:hover {
+      border-color: #9B6B5E;
+      background: #FFF8F4;
+      color: #704E48;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(112, 78, 72, 0.15);
+    }
+
+    .count-btn:hover span {
+      color: #9B6B5E;
+    }
+
+    .count-btn.active {
+      border: 2.5px dashed #FF5C8A;
+      background: linear-gradient(135deg, #FFF0F5, #FFF5EC);
+      color: #FF5C8A;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 92, 138, 0.22);
+    }
+
+    .count-btn.active span {
+      color: #FF9EB5;
+    }
+
+    .count-mini-preview {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .mini-panel-thumb {
+      background: linear-gradient(135deg, #FFE4EC, #FFE9DA);
+      border: 2px solid #FFB7CC;
+      border-radius: 8px;
+      width: 42px;
+      height: 42px;
+      transition: all 0.3s ease;
+    }
+
+    /* --- Panel Inputs --- */
+    .panels-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .panel-item {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 24px 28px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+      border: 3px solid rgba(255, 117, 151, 0.12);
+      transition: all 0.3s ease;
+      animation: panelIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+
+    .panel-item:hover {
+      border-color: rgba(255, 117, 151, 0.35);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes panelIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .panel-item-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .panel-number-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #FF8E53, #FF5C8A);
+      color: white;
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(255, 92, 138, 0.25);
+    }
+
+    .panel-item-header-info h4 {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: #334155;
+      margin: 0 0 2px 0;
+      text-transform: uppercase;
+    }
+
+    .panel-item-header-info p {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.85rem;
+      color: #94A3B8;
+      margin: 0;
+    }
+
+    .panel-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-label {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .field-label i {
+      color: #FF5C8A;
+    }
+
+    .field-textarea {
+      width: 100%;
+      background: #FAF7F5;
+      border: 2px solid #E8DDD5;
+      border-radius: 14px;
+      font-family: 'Mali', sans-serif;
+      font-size: 1rem;
+      color: #1E293B;
+      padding: 12px 16px;
+      box-sizing: border-box;
+      resize: none;
+      outline: none;
+      transition: all 0.2s ease;
+      min-height: 95px;
+      overflow-y: auto;
+    }
+
+    .field-textarea::-webkit-resizer {
+      display: none;
+    }
+
+    .field-textarea::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .field-textarea::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .field-textarea::-webkit-scrollbar-thumb {
+      background: rgba(112, 78, 72, 0.2);
+      border-radius: 10px;
+    }
+
+    .field-textarea::-webkit-scrollbar-thumb:hover {
+      background: rgba(112, 78, 72, 0.4);
+    }
+
+    .field-textarea:focus {
+      border-color: #FF5C8A;
+      background: #FFF7F9;
+      box-shadow: 0 0 0 3.5px rgba(255, 92, 138, 0.15);
+      caret-color: #FF5C8A;
+    }
+
+    .field-textarea::placeholder {
+      color: #C4B5B0;
+    }
+
+    .char-counter {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.75rem;
+      color: #94A3B8;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    /* --- Bottom Actions --- */
+    .bottom-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 8px;
+      padding-top: 24px;
+      border-top: 2px dashed rgba(255, 117, 151, 0.2);
+    }
+
+    .btn-secondary {
+      background: #F1F5F9;
+      color: #64748B;
+      border: none;
+      border-radius: 9999px;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary:hover {
+      background: #E2E8F0;
+      color: #1E293B;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B95, #FFA3B5);
+      color: white;
+      border: none;
+      border-radius: 9999px;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      padding: 18px 45px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(255, 107, 149, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 107, 149, 0.45);
+      background: linear-gradient(135deg, #FF5785, #FF94A8);
+    }
+
+    /* --- Loader --- */
+    .loading-dots::after {
+      content: '.';
+      animation: dotsDance 1.4s infinite;
+    }
+
+    @keyframes dotsDance {
+
+      0%,
+      100% {
+        content: '.'
+      }
+
+      33% {
+        content: '..'
+      }
+
+      66% {
+        content: '...'
+      }
+    }
+
+    @keyframes meteorDrift {
+      0% {
+        transform: translateX(-60px) translateY(-30px) rotate(-25deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateX(60px) translateY(30px) rotate(-25deg);
+        opacity: 0;
+      }
+    }
+
+    .mini-meteor {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #FFF;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+      animation: meteorDrift 3s ease-in-out infinite;
+    }
+
+    .mini-1 {
+      top: 20%;
+      left: 15%;
+      animation-delay: 0s;
+    }
+
+    .mini-2 {
+      top: 60%;
+      left: 75%;
+      animation-delay: 1.1s;
+    }
+
+    .mini-3 {
+      top: 80%;
+      left: 35%;
+      animation-delay: 2s;
+    }
+
+    /* --- Toast --- */
+    .panel-toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      width: max-content;
+      max-width: 90vw;
+      background: #FF5C8A;
+      border: 4px solid #FFF;
+      color: #FFF;
+      font-family: 'Mali', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 35px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100000;
+      pointer-events: none;
+    }
+
+    .panel-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .tip-box {
+      margin-top: 22px;
+      padding: 14px 18px;
+      background: #FFF8FA;
+      border-radius: 14px;
+      border: 1.5px dashed #FFB7CC;
+    }
+
+    .tip-box p {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.88rem;
+      color: #64748B;
+      margin: 0;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="page-loader-overlay"
+    style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg,#FF6B6B 0%,#FF8E53 55%,#FCE082 100%);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity 0.4s ease;pointer-events:all;overflow:hidden;">
+    <div class="mini-meteor mini-1"></div>
+    <div class="mini-meteor mini-2"></div>
+    <div class="mini-meteor mini-3"></div>
+    <div style="text-align:center;z-index:20;margin-top:50px;">
+      <h2
+        style="font-size:2.2rem;font-weight:900;color:#FFF;font-family:'Chiron GoRound TC',sans-serif;margin:0;letter-spacing:1px;text-shadow:0 0 15px rgba(255,94,151,0.9);">
+        Bé đợi chút nhé<span class="loading-dots"></span></h2>
+    </div>
+  </div>
+
+  <div id="panel-toast" class="panel-toast"></div>
+
+  <!-- Scaler (same pattern as comic.html / novel.html) -->
+  <div class="scaler-wrapper">
+
+    <!-- Scrollable inner layer -->
+    <div class="scroll-layer">
+
+      <!-- Header -->
+      <header class="art-header">
+        <div class="art-logo" onclick="playPopAndNavigate('/')">
+          <img src="/assets/images/logo.svg" alt="AIkid Logo" class="logo-image">
+        </div>
+        <button class="auth-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+      </header>
+
+      <!-- Back Button -->
+      <div class="back-btn-wrap">
+        <button class="back-btn" onclick="playPopAndNavigate('/art/comic-style')">
+          <i class="fa-solid fa-arrow-left"></i> <span>Trở Về</span>
+        </button>
+      </div>
+
+      <!-- Main Content -->
+      <div class="panel-content">
+
+        <!-- Layout -->
+        <div class="panel-layout">
+
+          <!-- LEFT: Plot Preview (compact) + Count selector -->
+          <div>
+            <!-- Restyle button -->
+            <button class="restyle-btn" onclick="playPopAndNavigate('/art/comic-style')">
+              <i class="fa-solid fa-palette"></i> Chọn lại phong cách vẽ
+            </button>
+
+            <!-- Compact Plot Preview -->
+            <div class="plot-preview-card">
+              <div class="plot-preview-label"><i class="fa-solid fa-scroll"></i> Cốt truyện đã chọn</div>
+              <div class="plot-preview-title" id="preview-title">—</div>
+              <div class="plot-preview-content-short" id="preview-content">Đang tải cốt truyện...</div>
+              <div class="plot-preview-footer">
+                <button class="plot-change-btn" onclick="localStorage.setItem('storymee_change_plot_mode','true'); playPopAndNavigate('/art/comic?from=change_plot')"><i class="fa-solid fa-rotate-left"></i> Đổi cốt truyện</button>
+                <button class="plot-detail-btn" onclick="openPlotModal()"><i class="fa-solid fa-eye"></i> Xem chi tiết</button>
+              </div>
+            </div>
+
+            <!-- Count selector -->
+            <div class="count-card">
+              <div class="count-card-title"><i class="fa-solid fa-grip" style="color:#704E48;margin-right:8px;"></i>Số
+                Khung Truyện</div>
+              <div class="count-grid">
+                <button class="count-btn" id="btn-3" onclick="selectPanelCount(3)">3<span>khung</span></button>
+                <button class="count-btn active" id="btn-4" onclick="selectPanelCount(4)">4<span>khung</span></button>
+                <button class="count-btn" id="btn-5" onclick="selectPanelCount(5)">5<span>khung</span></button>
+                <button class="count-btn" id="btn-6" onclick="selectPanelCount(6)">6<span>khung</span></button>
+              </div>
+
+            </div>
+
+            <!-- Create button -->
+            <div style="display:flex; justify-content:center; margin-top:24px;">
+              <button class="btn-primary" onclick="submitPanels()"><i class="fa-solid fa-wand-magic-sparkles"></i> Tạo Truyện Tranh</button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Panel inputs (only this column scrolls) -->
+          <div class="panel-right-scroll">
+            <div class="panels-area" id="panels-area"></div>
+          </div>
+
+        </div>
+      </div><!-- /panel-content -->
+
+    </div><!-- /scroll-layer -->
+  </div><!-- /scaler-wrapper -->
+
+  <!-- Plot Detail Modal (outside scaler-wrapper to fill full screen 100vw 100vh) -->
+  <div class="plot-modal-overlay" id="plot-modal" onclick="if(event.target===this)closePlotModal()">
+    <div class="plot-modal">
+      <div class="plot-modal-header">
+        <div class="plot-modal-title" id="modal-plot-title">—</div>
+        <button class="plot-modal-close" onclick="closePlotModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="plot-modal-body" id="modal-plot-body"></div>
+    </div>
+  </div>
+
+  <script>
+    /* Sound & Nav */
+    function playPopSound() { try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.connect(g); g.connect(c.destination); o.type = 'sine'; o.frequency.setValueAtTime(150, c.currentTime); o.frequency.exponentialRampToValueAtTime(600, c.currentTime + 0.1); g.gain.setValueAtTime(0.3, c.currentTime); g.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.12); o.start(); o.stop(c.currentTime + 0.12); } catch (e) { } }
+    function playPopAndNavigate(url) { playPopSound(); const l = document.getElementById('page-loader-overlay'); if (l) { l.style.display = 'flex'; l.offsetHeight; l.style.opacity = '1'; } setTimeout(() => { window.location.href = url; }, 320); }
+    function showToast(msg) { const t = document.getElementById('panel-toast'); t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2800); }
+
+    let selectedCount = 4;
+
+    let currentPlot = null;
+
+    function loadSavedData() {
+      const plotId = localStorage.getItem('storymee_selected_plot_id');
+      const plotsRaw = localStorage.getItem('storymee_saved_plots');
+      let plot = null;
+      if (plotsRaw) { try { const plots = JSON.parse(plotsRaw); if (plotId) plot = plots.find(p => p.id === plotId); if (!plot && plots.length > 0) plot = plots[0]; } catch (e) { } }
+      if (!plot) plot = { title: 'Hành Trình Khám Phá Vũ Trụ', content: 'Bé Mây và chú robot Bíp cùng nhau chế tạo một con tàu vũ trụ nhỏ từ hộp giấy và chai nhựa cũ. Tối đó, một luồng sáng kỳ lạ biến chiếc tàu thành thật!' };
+      currentPlot = plot;
+      const style = localStorage.getItem('storymee_selected_style') || 'Comic Màu';
+      document.getElementById('preview-title').innerText = plot.title || 'Cốt truyện của tôi';
+      document.getElementById('preview-content').innerText = plot.content || plot.description || '';
+      // Populate modal fields too
+      document.getElementById('modal-plot-title').innerText = plot.title || 'Cốt truyện của tôi';
+      document.getElementById('modal-plot-body').innerText = plot.content || plot.description || '';
+    }
+
+    function openPlotModal() {
+      document.getElementById('plot-modal').classList.add('open');
+    }
+    function closePlotModal() {
+      document.getElementById('plot-modal').classList.remove('open');
+    }
+
+    function selectPanelCount(n) {
+      playPopSound();
+      selectedCount = n;
+      [3, 4, 5, 6].forEach(i => { const b = document.getElementById('btn-' + i); if (b) b.classList.toggle('active', i === n); });
+      renderPanelInputs(n);
+    }
+
+
+    function renderPanelInputs(n) {
+      const area = document.getElementById('panels-area');
+      const saved = [];
+      area.querySelectorAll('.panel-item').forEach(item => saved.push({ scene: item.querySelector('.scene-input')?.value || '', dialogue: item.querySelector('.dialogue-input')?.value || '' }));
+      area.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const div = document.createElement('div');
+        div.className = 'panel-item';
+        div.style.animationDelay = (i * 0.07) + 's';
+        div.innerHTML = `
+          <div class="panel-item-header">
+            <div class="panel-number-badge">${i + 1}</div>
+            <div class="panel-item-header-info"><h4>Khung ${i + 1}</h4></div>
+          </div>
+          <div class="panel-fields">
+            <div class="field-group">
+              <label class="field-label">Nội dung khung tranh</label>
+              <textarea class="field-textarea scene-input" placeholder="VD: Bé Mây đang nhìn lên bầu trời đầy sao, ánh mắt tò mò và đầy hy vọng..." oninput="updateCounter(this)">${saved[i]?.scene || ''}</textarea>
+              <div class="char-counter"><span class="char-count">${(saved[i]?.scene || '').trim() ? (saved[i]?.scene || '').trim().split(/\s+/).length : 0}</span>/50 từ</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Lời thoại / Chú thích</label>
+              <textarea class="field-textarea dialogue-input" placeholder='VD: "Bíp ơi, chúng mình có thể bay lên đó không?" – Mây thì thầm...' oninput="updateCounter(this)">${saved[i]?.dialogue || ''}</textarea>
+              <div class="char-counter"><span class="char-count">${(saved[i]?.dialogue || '').trim() ? (saved[i]?.dialogue || '').trim().split(/\s+/).length : 0}</span>/50 từ</div>
+            </div>
+          </div>`;
+        area.appendChild(div);
+      }
+    }
+
+    function updateCounter(el) {
+      const words = el.value.trim() ? el.value.trim().split(/\s+/) : [];
+      if (words.length > 50) {
+        el.value = words.slice(0, 50).join(' ');
+      }
+      const currentWords = el.value.trim() ? el.value.trim().split(/\s+/).length : 0;
+      const c = el.parentElement.querySelector('.char-count');
+      if (c) c.textContent = currentWords;
+    }
+
+    function submitPanels() {
+      const panels = []; let hasEmpty = false;
+      document.querySelectorAll('.panel-item').forEach((item, i) => {
+        const scene = item.querySelector('.scene-input')?.value?.trim() || '';
+        const dialogue = item.querySelector('.dialogue-input')?.value?.trim() || '';
+        if (!scene) hasEmpty = true;
+        panels.push({ panelIndex: i + 1, scene, dialogue });
+      });
+      if (hasEmpty) { showToast('⚠️ Vui lòng điền nội dung cho tất cả các khung tranh!'); return; }
+      localStorage.setItem('storymee_comic_panels', JSON.stringify(panels));
+      localStorage.setItem('storymee_panel_count', String(selectedCount));
+      playPopAndNavigate('/art/comic/comic-generate');
+    }
+
+    /* Scale identical to comic.html pattern */
+    function adjustScale() {
+      const wrapper = document.querySelector('.scaler-wrapper');
+      if (!wrapper) return;
+      const targetWidth = 1927.63;
+      const targetHeight = 930;
+      const scale = Math.min(window.innerWidth / targetWidth, window.innerHeight / targetHeight);
+      wrapper.style.transform = 'translateX(-50%) scale(' + scale + ')';
+    }
+    window.addEventListener('resize', adjustScale);
+
+    function hideLoader() {
+      const l = document.getElementById('page-loader-overlay');
+      if (l) { l.style.opacity = '0'; setTimeout(() => { l.style.display = 'none'; }, 400); }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      adjustScale();
+      loadSavedData();
+      renderPanelInputs(selectedCount);
+      setTimeout(hideLoader, 200);
+    });
+    window.addEventListener('load', () => { setTimeout(hideLoader, 100); });
+  </script>
+</body>
+
+</html>

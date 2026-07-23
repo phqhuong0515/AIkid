@@ -81,9 +81,10 @@
       position: absolute;
       left: 50%;
       top: 50px;
-      margin-left: -160px;
-      width: 320px;
-      height: 380px;
+      margin-left: -170px;
+      width: 340px;
+      height: 340px;
+      aspect-ratio: 1 / 1;
       cursor: pointer;
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
         opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
@@ -228,7 +229,8 @@
       top: 190px;
       left: 50%;
       transform: translateX(-50%) translateY(-20px);
-      width: 420px;
+      width: max-content;
+      max-width: 90vw;
       white-space: nowrap;
       box-sizing: border-box;
       background: #FF5C8A;
@@ -237,7 +239,7 @@
       font-family: 'Mali', sans-serif;
       font-size: 1.3rem;
       font-weight: 700;
-      padding: 16px 24px;
+      padding: 14px 32px;
       border-radius: 35px;
       box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
       opacity: 0;
@@ -342,20 +344,26 @@
     .auth-btn {
       font-family: 'Mali', sans-serif;
       font-weight: 800;
-      font-size: 2rem;
-      color: #1E293B;
-      background: #FFFFFF;
-      border: 3px solid #CBD5E0;
-      padding: 11px 44px;
+      font-size: 1.52rem;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #FF5C8A, #FF8E53);
+      border: none;
+      padding: 11px 40px;
+      height: 55px;
       border-radius: 9999px;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 92, 138, 0.2);
       transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .auth-btn:hover {
       transform: translateY(-2px);
-      border-color: #CBD5E1;
-      background: #F8FAFC;
+      box-shadow: 0 6px 18px rgba(255, 92, 138, 0.35);
+      background: linear-gradient(135deg, #FF7096, #FFA072);
+      color: #FFFFFF;
     }
   </style>
 </head>
@@ -402,13 +410,13 @@
     <div style="margin-top: 50px; text-align: center; z-index: 20;">
       <h2 style="
         font-size: 2.2rem;
-        font-weight: 700;
+        font-weight: 900;
         color: #FFFFFF;
-        font-family: 'Mali', 'Fredoka', sans-serif;
+        font-family: 'Chiron GoRound TC', sans-serif;
         margin: 0;
         letter-spacing: 1px;
-        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      ">Bé đợi chút nhé<span class="loading-dots"></span></h2>
+        text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
+      ">Bé <span class="custom-đ">d</span>ợi chút nhé<span class="loading-dots"></span></h2>
     </div>
   </div>
 
@@ -451,12 +459,12 @@
     <!-- Style Selection Content (All Art Styles) -->
     <div class="style-selection-wrapper">
       <div class="style-grid">
-        <!-- Card 1: Hoạt Hình -->
-        <div class="style-card card-cartoon active" onclick="selectStyle(this, 'Hoạt Hình', 0)">
+        <!-- Card 1: Comic Màu -->
+        <div class="style-card card-comic-mau active" onclick="selectStyle(this, 'Comic Màu', 0)">
           <div class="card-inner">
-            <div class="card-tag has-diacritics">Hoạt Hình</div>
+            <div class="card-tag has-diacritics">Comic Màu</div>
             <div class="card-image-container">
-              <img src="/mee/PNG/art-style-cartoon.jpeg" alt="Hoạt Hình" class="style-img">
+              <img src="/mee/PNG/Comic-màu.jpeg" alt="Comic Màu" class="style-img">
             </div>
           </div>
         </div>
@@ -466,77 +474,27 @@
           <div class="card-inner">
             <div class="card-tag has-diacritics">Bút Sáp</div>
             <div class="card-image-container">
-              <img src="/mee/PNG/art-style-crayon.jpeg" alt="Bút Sáp" class="style-img">
+              <img src="/mee/PNG/Comic-Bút sáp.jpeg" alt="Bút Sáp" class="style-img">
             </div>
           </div>
         </div>
 
-        <!-- Card 3: Anime -->
-        <div class="style-card card-anime" onclick="selectStyle(this, 'Anime', 2)">
+        <!-- Card 3: Pop Art -->
+        <div class="style-card card-popart" onclick="selectStyle(this, 'Pop Art', 2)">
           <div class="card-inner">
-            <div class="card-tag">Anime</div>
+            <div class="card-tag">Pop Art</div>
             <div class="card-image-container">
-              <img src="/mee/PNG/art-style-anime.jpeg" alt="Anime" class="style-img">
+              <img src="/mee/PNG/comic-popart.jpeg" alt="Pop Art" class="style-img">
             </div>
           </div>
         </div>
 
-        <!-- Card 4: Manga -->
-        <div class="style-card card-manga" onclick="selectStyle(this, 'Manga', 3)">
+        <!-- Card 4: Trắng Đen -->
+        <div class="style-card card-mono" onclick="selectStyle(this, 'Trắng Đen', 3)">
           <div class="card-inner">
-            <div class="card-tag">Manga</div>
+            <div class="card-tag has-diacritics">Trắng Đen</div>
             <div class="card-image-container">
-              <img src="/mee/PNG/art-style-manga.jpeg" alt="Manga" class="style-img">
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 5: Truyện Tranh -->
-        <div class="style-card card-comic" onclick="selectStyle(this, 'Truyện Tranh', 4)">
-          <div class="card-inner">
-            <div class="card-tag has-diacritics">Truyện Tranh</div>
-            <div class="card-image-container">
-              <img src="/mee/PNG/art-style-comic.jpeg" alt="Truyện Tranh" class="style-img">
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 6: 3D -->
-        <div class="style-card card-3d" onclick="selectStyle(this, '3D', 5)">
-          <div class="card-inner">
-            <div class="card-tag">3D</div>
-            <div class="card-image-container">
-              <img src="/mee/PNG/art-style-3D.jpeg" alt="3D" class="style-img">
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 7: Chibi -->
-        <div class="style-card card-chibi" onclick="selectStyle(this, 'Chibi', 6)">
-          <div class="card-inner">
-            <div class="card-tag">Chibi</div>
-            <div class="card-image-container">
-              <img src="/mee/PNG/art-style-chibi.jpeg" alt="Chibi" class="style-img">
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 8: Manhwa -->
-        <div class="style-card card-manhwa" onclick="selectStyle(this, 'Manhwa', 7)">
-          <div class="card-inner">
-            <div class="card-tag">Manhwa</div>
-            <div class="card-image-container">
-              <img src="/mee/PNG/art-style-manhwa.jpeg" alt="Manhwa" class="style-img">
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 9: Bán Tả Thực -->
-        <div class="style-card card-semirealistic" onclick="selectStyle(this, 'Bán Tả Thực', 8)">
-          <div class="card-inner">
-            <div class="card-tag has-diacritics">Bán Tả Thực</div>
-            <div class="card-image-container">
-              <img src="/mee/PNG/art-style-semirealistic.jpeg" alt="Bán Tả Thực" class="style-img">
+              <img src="/mee/PNG/Comic-trắng đen.jpeg" alt="Trắng Đen" class="style-img">
             </div>
           </div>
         </div>
@@ -544,7 +502,7 @@
     </div>
 
     <!-- Selection Toast Notification -->
-    <div id="toast" class="selection-toast">Đã chọn phong cách Hoạt Hình!</div>
+    <div id="toast" class="selection-toast">Đã chọn phong cách Comic Màu!</div>
 
     <!-- Centered Continue Button -->
     <div class="continue-btn-container">
@@ -605,7 +563,7 @@
       }, 180);
     }
 
-    const baseWidth = 320;
+    const baseWidth = 340;
     const activeScale = 1.10;
     const d1Scale = 0.9;
     const d2Scale = 0.8;
@@ -665,7 +623,7 @@
     }
 
     let toastTimeout = null;
-    let selectedStyleName = 'Hoạt Hình';
+    let selectedStyleName = 'Comic Màu';
 
     function selectStyle(element, styleName, index) {
       playPopSound();
@@ -690,13 +648,8 @@
     }
 
     function submitStyleSelection() {
-      playPopSound();
-      const toast = document.getElementById('toast');
-      toast.innerText = `Đã chọn phong cách ${selectedStyleName} - Đang tạo truyện tranh...`;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
+      localStorage.setItem('storymee_selected_style', selectedStyleName);
+      playPopAndNavigate('/art/comic/panel');
     }
 
     function init() {

@@ -37,13 +37,25 @@ body.mee-embed .scaler-wrapper {
 /* Smaller catalog tiles — modal-like density, less inner scroll */
 html.mee-embed .cards-grid,
 body.mee-embed .cards-grid {
-  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)) !important;
-  gap: 5px !important;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)) !important;
+  gap: 6px !important;
 }
 
 html.mee-embed .selector-card,
 body.mee-embed .selector-card {
-  padding: 4px !important;
+  padding: 3px !important;
+  max-width: 65px !important;
+}
+
+html.mee-embed .selector-card svg,
+body.mee-embed .selector-card svg,
+html.mee-embed .selector-card img,
+body.mee-embed .selector-card img {
+  max-width: 62% !important;
+  max-height: 62% !important;
+  width: auto !important;
+  height: auto !important;
+  transform: scale(0.88) !important;
 }
 
 html.mee-embed .options-panel .options-card,
@@ -547,8 +559,7 @@ body {
   /* Prevent horizontal overflow and left-side cutoff */
   width: 100%;
   box-sizing: border-box;
-  padding: 4px 8px 4px 4px;
-  /* Left padding of 4px prevents clipping on hover/active states */
+  padding: 8px 10px 8px 10px;
 }
 
 /* Custom premium scrollbar for option content */
@@ -636,8 +647,8 @@ body {
 /* Option Cards Grid */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
 }
 
 .selector-card {
@@ -645,6 +656,8 @@ body {
   border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
   aspect-ratio: 1;
+  max-width: 88px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -668,10 +681,16 @@ body {
   box-shadow: 0 4px 12px rgba(255, 117, 151, 0.15);
 }
 
-.selector-card svg {
-  width: 78%;
-  height: 78%;
+.selector-card svg,
+.selector-card img {
+  max-width: 85% !important;
+  max-height: 85% !important;
+  width: auto !important;
+  height: auto !important;
   display: block;
+  margin: auto;
+  object-fit: contain;
+  transform: none !important;
 }
 
 /* Special stroke adjustments for line art cards */
@@ -787,10 +806,20 @@ body {
 }
 
 .hair-colors-grid,
+.skin-tone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 12px;
+  padding: 6px 4px;
+  box-sizing: border-box;
+}
+
 .eyebrows-colors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
   gap: 8px;
+  padding: 6px 4px;
+  box-sizing: border-box;
 }
 
 .color-swatch {

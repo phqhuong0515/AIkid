@@ -402,7 +402,7 @@
       padding-top: 10px;
       border-top: 1.5px dashed #F1F5F9;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       font-size: 0.85rem;
       color: #94A3B8;
@@ -465,6 +465,107 @@
     .toast-message.show {
       bottom: 40px;
     }
+
+    /* Plot Detail Modal Styles */
+    .plot-detail-modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .plot-detail-modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .plot-detail-modal-card {
+      background: #FFFFFF;
+      width: 90%;
+      max-width: 650px;
+      border-radius: 32px;
+      padding: 28px 32px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+      transform: translateY(20px) scale(0.96);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      border: 4px solid #FFF0F3;
+      box-sizing: border-box;
+    }
+    .plot-detail-modal-overlay.show .plot-detail-modal-card {
+      transform: translateY(0) scale(1);
+    }
+    .plot-detail-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #EBDCD0;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+    }
+    .plot-detail-modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+    .plot-detail-modal-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #334155;
+      margin: 0;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .plot-detail-modal-close-btn {
+      background: #F1F5F9;
+      border: none;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      color: #64748B;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .plot-detail-modal-close-btn:hover {
+      background: #E2E8F0;
+      color: #0F172A;
+      transform: rotate(90deg);
+    }
+    .plot-detail-btn {
+      background: #FFF0F3;
+      border: 1.5px solid #FFD1DC;
+      color: #FF5E97;
+      border-radius: 9999px;
+      padding: 4px 12px;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+    .plot-detail-btn:hover {
+      background: #FF7597;
+      color: #FFFFFF;
+      border-color: #FF7597;
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 
@@ -487,13 +588,13 @@
     <div style="margin-top: 50px; text-align: center; z-index: 20;">
       <h2 style="
         font-size: 2.2rem;
-        font-weight: 700;
+        font-weight: 900;
         color: #FFFFFF;
-        font-family: 'Mali', 'Fredoka', sans-serif;
+        font-family: 'Chiron GoRound TC', sans-serif;
         margin: 0;
         letter-spacing: 1px;
-        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      ">Bé đợi chút nhé<span class="loading-dots"></span></h2>
+        text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
+      ">Bé <span class="custom-đ">d</span>ợi chút nhé<span class="loading-dots"></span></h2>
     </div>
   </div>
 
@@ -586,6 +687,40 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast-message"></div>
 
+  <!-- Plot Detail Modal -->
+  <div id="plot-detail-modal" class="plot-detail-modal-overlay" onclick="if(event.target===this) closePlotDetailModal()">
+    <div class="plot-detail-modal-card">
+      <div class="plot-detail-modal-header">
+        <div class="plot-detail-modal-title-group">
+          <span id="modal-genre-badge" class="plot-genre-badge">
+            <i class="fa-solid fa-book-bookmark"></i> Cốt truyện
+          </span>
+          <h3 id="modal-plot-title" class="plot-detail-modal-title">
+            Tiêu đề cốt truyện
+          </h3>
+        </div>
+        <button class="plot-detail-modal-close-btn" onclick="closePlotDetailModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div id="modal-plot-content" style="font-family: 'Mali', sans-serif; font-size: 1.05rem; color: #475569; line-height: 1.7; max-height: 320px; overflow-y: auto; white-space: pre-wrap; padding-right: 8px; margin-bottom: 24px; background: #FAF5F0; padding: 16px; border-radius: 18px; border: 1.5px dashed #EBDCD0;">
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 2px dashed #EBDCD0; padding-top: 16px;">
+        <button onclick="closePlotDetailModal()" style="background: #F1F5F9; color: #64748B; border: none; border-radius: 9999px; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 0.95rem; padding: 10px 22px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">
+          Đóng
+        </button>
+        <button id="modal-select-btn" onclick="selectPlotFromModal()" style="background: linear-gradient(135deg, #ff9eb5, #ff7597); color: white; border: none; border-radius: 9999px; font-family: 'Mali', sans-serif; font-weight: 700; font-size: 0.95rem; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(255,117,151,0.35); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <i class="fa-solid fa-check"></i>
+          <span>Chọn cốt truyện này</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     function playPopSound() {
       try {
@@ -624,7 +759,32 @@
     }
 
     let selectedPlotId = null;
+    let modalPlotId = null;
     let allPlots = [];
+
+    const defaultSamplePlots = [
+      {
+        id: 'sample-1',
+        title: 'Hành Trình Khám Phá Vũ Trụ',
+        genre: 'Viễn Tưởng',
+        content: 'Bé Mây và chú robot Bíp cùng nhau chế tạo một con tàu vũ trụ nhỏ từ hộp giấy và chai nhựa cũ. Tối đó, một luồng sáng kỳ lạ biến chiếc tàu thành thật! Cả hai bắt đầu chuyến phiêu lưu kỳ thú đến các hành tinh kẹo bông và dải ngân hà ngập tràn sắc màu.',
+        createdAt: Date.now() - 86400000 * 2
+      },
+      {
+        id: 'sample-2',
+        title: 'Bí Mật Rừng Xanh Phép Thuật',
+        genre: 'Cổ Tích',
+        content: 'Trong một khu rừng ngập tràn hoa dạ quang, chú thỏ Bông vô tình nhặt được một vương miện nhỏ lấp lánh. Vương miện có thể lắng nghe ước mơ của mọi loài sinh vật và giúp muông thú hòa thuận vui vẻ bên nhau.',
+        createdAt: Date.now() - 86400000 * 5
+      },
+      {
+        id: 'sample-3',
+        title: 'Chú Khủng Long Thích Ăn Rau',
+        genre: 'Hài Hước',
+        content: 'Khủng long Tí Hòn khác biệt hoàn toàn với đồng loại vì chú chỉ thích ăn cà rốt và bông cải xanh. Nhờ chế độ ăn lành mạnh, Tí Hòn có sức mạnh siêu đặc biệt và nụ cười rạng rỡ nhất vùng đất tiền sử!',
+        createdAt: Date.now() - 86400000 * 7
+      }
+    ];
 
     function renderPlots(plotsToRender) {
       const grid = document.getElementById('story-grid');
@@ -656,7 +816,7 @@
         div.className = 'plot-card' + (selectedPlotId === item.id ? ' selected' : '');
         div.dataset.id = item.id;
         const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '';
-        const preview = item.content ? (item.content.substring(0, 90) + '...') : '';
+        const preview = item.content ? (item.content.substring(0, 85) + '...') : '';
         div.innerHTML = `
           <div class="plot-card-header">
             <span class="plot-genre-badge">
@@ -671,7 +831,9 @@
             ${preview}
           </p>
           <div class="plot-card-footer">
-            <span><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+            <button class="plot-detail-btn" onclick="openPlotDetailModal(event, '${item.id}')" title="Xem chi tiết">
+              <i class="fa-solid fa-eye"></i> Xem chi tiết
+            </button>
           </div>
         `;
         div.addEventListener('click', () => {
@@ -685,11 +847,63 @@
       });
     }
 
+    function openPlotDetailModal(event, id) {
+      if (event) event.stopPropagation();
+      playPopSound();
+      const item = allPlots.find(p => p.id === id);
+      if (!item) return;
+
+      modalPlotId = item.id;
+      const titleEl = document.getElementById('modal-plot-title');
+      const genreEl = document.getElementById('modal-genre-badge');
+      const contentEl = document.getElementById('modal-plot-content');
+      const dateEl = document.getElementById('modal-plot-date');
+
+      if (titleEl) titleEl.innerText = item.title || 'Cốt truyện của tôi';
+      if (genreEl) genreEl.innerHTML = `<i class="fa-solid fa-book-bookmark" style="margin-right: 4px;"></i> ${item.genre || 'Cốt truyện'}`;
+      if (contentEl) contentEl.innerText = item.content || item.description || 'Chưa có nội dung chi tiết.';
+      if (dateEl) dateEl.innerText = item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '';
+
+      const modal = document.getElementById('plot-detail-modal');
+      if (modal) modal.classList.add('show');
+    }
+
+    function closePlotDetailModal() {
+      const modal = document.getElementById('plot-detail-modal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function selectPlotFromModal() {
+      if (!modalPlotId) return;
+      selectedPlotId = modalPlotId;
+      document.querySelectorAll('.plot-card').forEach(el => {
+        if (el.dataset.id === selectedPlotId) {
+          el.classList.add('selected');
+        } else {
+          el.classList.remove('selected');
+        }
+      });
+      const startBtn = document.getElementById('start-btn');
+      if (startBtn) startBtn.disabled = false;
+      closePlotDetailModal();
+    }
+
     function loadPlots() {
       try {
         const raw = localStorage.getItem('storymee_saved_plots');
-        if (raw) allPlots = JSON.parse(raw);
-      } catch (_) {}
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            allPlots = parsed;
+          } else {
+            allPlots = [...defaultSamplePlots];
+          }
+        } else {
+          allPlots = [...defaultSamplePlots];
+        }
+      } catch (_) {
+        allPlots = [...defaultSamplePlots];
+      }
       renderPlots(allPlots);
     }
 

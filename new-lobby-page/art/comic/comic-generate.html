@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tao Truyen Tranh - AIkid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&family=Mali:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/mee/styles.css?v=202607101658">
+  <style>
+    html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background-image:url('/mee/PNG/bg-art.png');background-repeat:no-repeat;background-position:center center;background-size:cover;background-attachment:fixed;background-color:#FED7D7;font-family:'Mali',sans-serif;box-sizing:border-box;}
+    .scaler-wrapper{position:absolute;top:0;left:50%;width:1927.63px;height:930px;transform-origin:top center;transform:translateX(-50%) scale(1);background:transparent;overflow:hidden;pointer-events:none;}
+    .scaler-wrapper>*{pointer-events:auto;}
+    .scroll-layer{position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;}
+    .scroll-layer::-webkit-scrollbar{width:8px;}.scroll-layer::-webkit-scrollbar-track{background:transparent;}.scroll-layer::-webkit-scrollbar-thumb{background:rgba(255,117,151,0.35);border-radius:999px;}
+    .art-header{position:sticky;top:35px;left:38px;width:1844.3px;height:76.17px;background:rgba(253,250,244,0.85);border-radius:24px;padding:0 50px;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;z-index:100;margin-left:38px;margin-top:35px;backdrop-filter:blur(8px);box-shadow:0 4px 24px rgba(0,0,0,0.07);flex-shrink:0;}
+    .art-logo{display:flex;align-items:center;cursor:pointer;margin-left:-10px;}.art-logo img{height:58px;width:auto;object-fit:contain;display:block;}
+    .auth-btn{font-family:'Mali',sans-serif;font-weight:800;font-size:1.52rem;color:#FFF;background:linear-gradient(135deg,#FF5C8A,#FF8E53);border:none;padding:11px 40px;height:55px;border-radius:9999px;cursor:pointer;box-shadow:0 4px 12px rgba(255,92,138,0.2);transition:all 0.2s ease;display:inline-flex;align-items:center;justify-content:center;}
+    .auth-btn:hover{transform:translateY(-2px);}
+    .back-btn-wrap{position:sticky;top:0;left:0;z-index:200;padding:18px 0 12px 42px;display:flex;align-items:center;pointer-events:none;}
+    .back-btn{background:linear-gradient(135deg,#ff9eb5,#ff7597);border:none;border-radius:9999px;color:white;font-family:'Mali',sans-serif;font-weight:700;font-size:1rem;padding:10px 25px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(255,117,151,0.3);transition:all 0.25s cubic-bezier(0.4,0,0.2,1);pointer-events:auto;transform:scale(1.1);transform-origin:left center;}
+    .back-btn:hover{transform:scale(1.1) translateY(-2px);background:linear-gradient(135deg,#ff5780,#ff7597);}
+    .gen-layout{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:16px 60px 32px;}
+    .comic-image-card{width:400px;aspect-ratio:9/16;background:#FFF;border-radius:24px;border:3px solid #EBDCD0;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .comic-image-placeholder{width:100%;height:100%;background:linear-gradient(160deg,#FFF0F5 0%,#FFE4EC 50%,#FFD6E7 100%);}
+    .comic-image-placeholder i{font-size:3.5rem;}
+    .comic-image-placeholder p{font-family:'Mali',sans-serif;font-size:0.88rem;font-weight:600;color:#C8A0B0;text-align:center;line-height:1.5;padding:0 24px;margin:0;}
+    #comic-generated-img{width:100%;height:100%;object-fit:cover;display:none;}
+    .comic-info-col{flex:1;display:flex;flex-direction:column;gap:18px;min-width:0;}
+    .comic-main-title{font-family:'Chiron GoRound TC',sans-serif;font-size:1.65rem;font-weight:900;color:#334155;text-transform:uppercase;display:flex;align-items:center;gap:12px;}
+    .plot-badge{background:rgba(255,117,151,0.1);border:2px solid #FF9EB5;border-radius:9999px;font-family:'Mali',sans-serif;font-size:0.88rem;font-weight:700;color:#FF5C8A;padding:5px 18px;display:inline-flex;align-items:center;gap:6px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:flex-start;}
+    .panels-summary{background:rgba(255,255,255,0.88);border-radius:20px;border:2px solid #F0E8E0;padding:14px 18px;display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.05);}
+    .panels-summary::-webkit-scrollbar{width:5px;}.panels-summary::-webkit-scrollbar-track{background:transparent;}.panels-summary::-webkit-scrollbar-thumb{background:#F0D8E0;border-radius:999px;}
+    .panel-summary-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:#FDFAF4;border-radius:14px;border:2px solid #EBDCD0;}
+    .panel-summary-badge{background:linear-gradient(135deg,#FF5C8A,#FF9EB5);color:white;font-family:'Chiron GoRound TC',sans-serif;font-weight:900;font-size:0.8rem;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+    .panel-summary-text{flex:1;min-width:0;}
+    .panel-summary-scene{font-family:'Mali',sans-serif;font-size:0.82rem;color:#475569;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:3px;}
+    .panel-summary-dialogue{font-family:'Mali',sans-serif;font-size:0.75rem;color:#94A3B8;font-style:italic;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+    .save-btn{background:linear-gradient(135deg,#FF5C8A,#FF9EB5);border:none;border-radius:9999px;color:white;font-family:'Mali',sans-serif;font-weight:800;font-size:1.1rem;padding:15px 44px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(255,92,138,0.35);transition:all 0.25s ease;align-self:flex-start;}
+    .save-btn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(255,92,138,0.45);}
+    .save-btn:active{transform:translateY(-1px);}
+    .gen-toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E293B;color:white;font-family:'Mali',sans-serif;font-weight:700;font-size:1.05rem;padding:14px 32px;border-radius:9999px;box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:9999999;transition:transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.35s ease;opacity:0;pointer-events:none;white-space:nowrap;}
+    .gen-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    @keyframes miniFlight{0%{transform:translate(60vw,-60vh) rotate(150deg);opacity:0;}15%{opacity:0.6;}85%{opacity:0.6;}100%{transform:translate(-60vw,60vh) rotate(150deg);opacity:0;}}
+    @keyframes loadingDots{0%,20%{content:"."}40%{content:".."}60%,100%{content:"..."}}
+    .loading-dots::after{content:"";animation:loadingDots 1.5s infinite steps(1);display:inline-block;width:24px;text-align:left;}
+    .mini-meteor{position:absolute;width:160px;height:5px;background:linear-gradient(to right,rgba(255,182,193,0) 0%,rgba(255,255,255,0.9) 100%);border-radius:9999px;opacity:0;filter:blur(1.5px);transform:rotate(150deg);}
+    .mini-1{top:15%;left:10%;animation:miniFlight 1.6s linear infinite;animation-delay:.4s}
+    .mini-2{top:75%;left:5%;animation:miniFlight 1.9s linear infinite;animation-delay:.9s}
+    .mini-3{top:85%;left:50%;animation:miniFlight 1.4s linear infinite;animation-delay:.1s}
+  </style>
+</head>
+<body>
+  <div id="page-loader-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg,#FF6B6B 0%,#FF8E53 55%,#FCE082 100%);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:1;transition:opacity 0.4s ease;pointer-events:all;overflow:hidden;">
+    <div class="mini-meteor mini-1"></div><div class="mini-meteor mini-2"></div><div class="mini-meteor mini-3"></div>
+    <div style="text-align:center;z-index:20;margin-top:50px;"><h2 style="font-size:2.2rem;font-weight:900;color:#FFF;font-family:'Chiron GoRound TC',sans-serif;margin:0;letter-spacing:1px;text-shadow:0 0 15px rgba(255,94,151,0.9);">Bé đợi chút nhé<span class="loading-dots"></span></h2></div>
+  </div>
+  <div id="gen-toast" class="gen-toast"></div>
+  <div class="scaler-wrapper">
+    <div class="scroll-layer">
+      <header class="art-header">
+        <div class="art-logo" onclick="playPopAndNavigate('/')"><img src="/mee/logo.svg" alt="AIkid Logo"></div>
+        <button class="auth-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+      </header>
+      <div class="back-btn-wrap">
+        <button class="back-btn" onclick="playPopAndNavigate('/art/comic/panel')"><i class="fa-solid fa-arrow-left"></i> <span>Trở Về</span></button>
+      </div>
+      <div class="gen-layout">
+        <div class="comic-image-card">
+          <div class="comic-image-placeholder" id="comic-placeholder"></div>
+          <img id="comic-generated-img" src="" alt="Ảnh truyện tranh">
+        </div>
+        <button class="save-btn" onclick="saveComic()"><i class="fa-solid fa-floppy-disk"></i> Lưu Truyện Tranh</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    function playPopSound(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(150,c.currentTime);o.frequency.exponentialRampToValueAtTime(600,c.currentTime+0.1);g.gain.setValueAtTime(0.3,c.currentTime);g.gain.exponentialRampToValueAtTime(0.01,c.currentTime+0.12);o.start();o.stop(c.currentTime+0.12);}catch(e){}}
+    function playPopAndNavigate(url){playPopSound();const l=document.getElementById('page-loader-overlay');if(l){l.style.display='flex';l.offsetHeight;l.style.opacity='1';}setTimeout(()=>{window.location.href=url;},320);}
+    function showToast(msg){const t=document.getElementById('gen-toast');t.innerText=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+    let loadedPanels=[],currentPlot=null;
+    function loadData(){
+      const plotId=localStorage.getItem('storymee_selected_plot_id');
+      const plotsRaw=localStorage.getItem('storymee_saved_plots');
+      if(plotsRaw){try{const plots=JSON.parse(plotsRaw);if(plotId)currentPlot=plots.find(p=>p.id===plotId);if(!currentPlot&&plots.length>0)currentPlot=plots[0];}catch(e){}}
+      if(!currentPlot)currentPlot={title:'Truyện Tranh Của Tôi',content:''};
+      document.getElementById('plot-title-display').innerText=currentPlot.title||'Truyện Tranh Của Tôi';
+      const panelsRaw=localStorage.getItem('storymee_comic_panels');
+      if(panelsRaw){try{loadedPanels=JSON.parse(panelsRaw);}catch(e){}}
+      if(!Array.isArray(loadedPanels)||loadedPanels.length===0)loadedPanels=[{panelIndex:1,scene:'',dialogue:''}];
+    }
+    function saveComic(){
+      playPopSound();
+      const generatedImg=document.getElementById('comic-generated-img');
+      const imageUrl=(generatedImg&&generatedImg.style.display!=='none')?generatedImg.src:'';
+      const comicEntry={id:'comic_'+Date.now(),title:currentPlot&&currentPlot.title||'Truyện Tranh Của Tôi',plotId:localStorage.getItem('storymee_selected_plot_id')||'',style:localStorage.getItem('storymee_selected_style')||'Comic Màu',panelCount:loadedPanels.length,imageUrl:imageUrl,panels:loadedPanels.map(function(p,i){return{panelIndex:p.panelIndex||(i+1),scene:p.scene,dialogue:p.dialogue};}),createdAt:Date.now()};
+      var comics=[];try{var raw=localStorage.getItem('storymee_saved_comics');if(raw)comics=JSON.parse(raw);if(!Array.isArray(comics))comics=[];}catch(_){comics=[];}
+      comics.unshift(comicEntry);localStorage.setItem('storymee_saved_comics',JSON.stringify(comics));
+      showToast('✅ Đã lưu truyện tranh vào kho!');
+      setTimeout(function(){playPopAndNavigate('/art/story/library');},1500);
+    }
+    function adjustScale(){var wrapper=document.querySelector('.scaler-wrapper');if(!wrapper)return;var scale=Math.min(window.innerWidth/1927.63,window.innerHeight/930);wrapper.style.transform='translateX(-50%) scale('+scale+')';}
+    window.addEventListener('resize',adjustScale);
+    function hideLoader(){var l=document.getElementById('page-loader-overlay');if(l){l.style.opacity='0';setTimeout(function(){l.style.display='none';},400);}}
+    window.addEventListener('DOMContentLoaded',function(){adjustScale();loadData();setTimeout(hideLoader,200);});
+    window.addEventListener('load',function(){setTimeout(hideLoader,100);});
+  </script>
+</body>
+</html>
