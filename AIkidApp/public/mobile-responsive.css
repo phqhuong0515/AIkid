@@ -1,0 +1,269 @@
+/* Global Mobile Responsive Overrides */
+@media (max-width: 850px), (max-height: 850px) and (orientation: portrait) {
+    /* 1. Disable the hardcoded 1927px scaler wrapper */
+    .scaler-wrapper {
+        width: 100vw !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        position: relative !important;
+        left: 0 !important;
+        transform: none !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    /* 2.5 Fix Workspace Layout (Draw & AI Panels) */
+    .workspace-container {
+        flex-direction: column !important;
+        gap: 20px !important;
+        width: 100% !important;
+        padding: 0 10px !important;
+    }
+    .workspace-panel {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 500px !important;
+        margin-bottom: 20px !important;
+    }
+    .panel-header {
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        justify-content: center !important;
+    }
+    .header-actions, .history-actions {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+    
+    /* Allow canvas to shrink if needed */
+    .draw-workspace-body {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    .draw-toolbar {
+        flex-direction: row !important;
+        width: 100% !important;
+        justify-content: center !important;
+        margin-bottom: 15px !important;
+        padding: 10px !important;
+    }
+    .toolbar-left {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 15px !important;
+    }
+    .color-size-control {
+        flex-direction: row !important;
+        width: auto !important;
+        gap: 15px !important;
+        align-items: center !important;
+    }
+    .color-picker-wrapper {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    .color-picker-wrapper input[type="color"] {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    .size-slider-container {
+        flex-direction: row !important;
+        padding: 4px 12px !important;
+        align-items: center !important;
+        height: 40px !important;
+        box-sizing: border-box !important;
+    }
+    .size-slider {
+        writing-mode: horizontal-tb !important;
+        direction: rtl !important; /* Keep rtl so large is on right if dot is on left, wait! The dots are in HTML order: large dot, then slider, then small dot. So rtl means right is small, left is large? Wait, in vertical, large dot is top, small is bottom. rtl vertical means bottom is low value. Let's use ltr! */
+        direction: ltr !important;
+        width: 100px !important;
+        height: 16px !important;
+    }
+    .size-slider::-webkit-slider-runnable-track {
+        width: 100% !important;
+        height: 6px !important;
+    }
+    .size-slider::-webkit-slider-thumb {
+        margin-left: 0 !important;
+        margin-top: -6px !important;
+    }
+    .action-btn {
+        font-size: 0.75rem !important;
+        padding: 6px 10px !important;
+        gap: 4px !important;
+        height: 32px !important;
+    }
+    .action-btn i {
+        font-size: 0.85rem !important;
+    }
+    .tool-buttons-group {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 8px !important;
+    }
+    .tool-btn {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 0 !important;
+    }
+    .tool-btn img, .tool-btn i {
+        font-size: 1.1rem !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
+    .viewport-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 400px !important;
+        flex: none !important;
+        border-radius: 16px !important;
+    }
+    .viewport-box canvas {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+    }
+
+
+    /* 2. Allow body to scroll if needed */
+    html, body {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+
+    /* 3. Fix universally centered absolute boxes (like genre.html or art/index.html) */
+    .centered-absolute-box {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        width: 90% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        margin: 80px auto 40px auto !important;
+        padding: 20px !important;
+    }
+
+    /* 4. Fix universal hardcoded grids (e.g. genre.html 3 columns) */
+    .genre-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    div[style*="grid-template-columns: repeat(4, 1fr)"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    /* 5. Fix absolute back button */
+    .back-btn-container {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        margin: 20px 20px 0 20px !important;
+        transform: none !important;
+        z-index: 9999 !important;
+    }
+
+    /* 6. Fix header sizes and art header absolute positioning */
+    .art-header, .universe-header {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: calc(100% - 40px) !important;
+        margin: 20px auto !important;
+        height: auto !important;
+        padding: 10px 20px !important;
+    }
+    h2[style*="font-size: 2.2rem"] {
+        font-size: 1.5rem !important;
+    }
+
+    /* 7. Lobby Cards (art/index.html) */
+    .lobby-cards-container {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        flex-direction: column !important;
+        width: 90% !important;
+        margin: 80px auto !important;
+        gap: 20px !important;
+    }
+    .lobby-card-item {
+        height: auto !important;
+        padding: 20px !important;
+        border-width: 4px !important;
+        border-radius: 24px !important;
+    }
+    .lobby-card-icon {
+        font-size: 3.5rem !important;
+    }
+    .lobby-card-title {
+        font-size: 1.2rem !important;
+    }
+
+    /* 8. Mee Layout (mee/index.html) */
+    .app-container {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        width: 100% !important;
+        margin: 20px 0 !important;
+        transform: none !important;
+        padding: 0 10px !important;
+        box-sizing: border-box !important;
+    }
+    .main-content {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+    .preview-panel {
+        width: 100% !important;
+        height: 50vh !important;
+        min-height: 400px !important;
+        flex: none !important;
+    }
+    .options-container {
+        flex-direction: column !important;
+        width: 100% !important;
+        flex: 1 !important;
+        height: auto !important;
+    }
+    .app-header {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        gap: 10px !important;
+    }
+    .header-center {
+        order: -1 !important;
+        width: 100% !important;
+        text-align: center !important;
+    }
+    .left-sidebar {
+        flex-direction: row !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow-x: auto !important;
+        padding: 10px !important;
+        border-radius: 16px 16px 0 0 !important;
+    }
+    .sidebar-btn {
+        width: 50px !important;
+        height: 50px !important;
+        flex-shrink: 0 !important;
+    }
+    .options-panel {
+        width: 100% !important;
+        border-radius: 0 0 16px 16px !important;
+    }
+    .cards-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}

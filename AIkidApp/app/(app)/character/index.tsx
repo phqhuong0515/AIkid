@@ -1,114 +1,154 @@
+import React from 'react';
+import { View, Text, ImageBackground, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { GlobalHeader } from '@/components/GlobalHeader';
+import { usePopSound } from '@/hooks/usePopSound';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useFamily } from '@/features/family/store/useFamily';
-import { useCharacterDraft } from '@/features/character';
-import { ScreenChrome } from '@/features/kids-ui/ScreenChrome';
-
-const ACTIONS = [
-  {
-    href: '/(app)/character/feature',
-    title: 'Hồ sơ nhân vật',
-    desc: 'Tên, tuổi, giới tính, mô tả',
-    emoji: '🪪',
-  },
-  {
-    href: '/(app)/character/generate',
-    title: 'Tạo dáng & gen AI',
-    desc: 'Hình dáng · mặt · tóc · trang phục · Gateway',
-    emoji: '✨',
-  },
-  {
-    href: '/(app)/gallery',
-    title: 'Gallery nhân vật',
-    desc: 'Ảnh AI · ảnh tải lên · hồ sơ và prompt',
-    emoji: '🖼️',
-  },
-] as const;
-
-/**
- * Character hub — product UI (no engineering banners).
- * Flow preserves the original character lobby intent in native UI.
- */
-export default function CharacterHubScreen() {
+export default function CharacterLobby() {
   const router = useRouter();
-  const { hydrate, isHydrated, draft, getUserPrompt } = useCharacterDraft();
-  const activeChild = useFamily((s) => s.getActiveChild());
+  const { playPop } = usePopSound();
+  const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    void hydrate();
-  }, [hydrate]);
-
-  const promptPreview = isHydrated ? getUserPrompt() : '';
-  const childLabel = activeChild
-    ? `${activeChild.name} · AI ${activeChild.consent.allowAiCreate ? 'bật' : 'tắt'}`
-    : 'Chưa chọn hồ sơ con';
+  const handlePress = (route: string) => {
+    playPop();
+    router.push(route as any);
+  };
 
   return (
-    <ScreenChrome
-      title="Nhân vật AI"
-      subtitle={childLabel}
-      backHref="/(app)/lobby"
+    <ImageBackground
+      source={require('../../../public/lobby-assets/images/bg-character-feature.png')}
+      style={styles.background}
+      resizeMode="cover"
     >
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
-        {!activeChild ? (
-          <Pressable
-            onPress={() => router.push('/(app)/family')}
-            className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4"
+      <View style={{ paddingTop: insets.top }}>
+        <GlobalHeader />
+      </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <View style={styles.cardsWrapper}>
+          
+          {/* Bản Mới */}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.8}
+            onPress={() => handlePress('/(app)/character/generate-v2')}
           >
-            <Text className="text-[14px] font-extrabold text-amber-900">
-              Chọn hồ sơ con
-            </Text>
-            <Text className="mt-1 text-[13px] leading-5 text-amber-800">
-              Gen AI gắn với hồ sơ con (parent quản lý). Bấm để tạo / chọn con.
-            </Text>
-          </Pressable>
-        ) : null}
+            <View style={styles.iconContainer}>
+              <Text style={styles.icon}>✨</Text>
+            </View>
+            <Text style={styles.cardTitle}>Tạo nhân vật</Text>
+            <Text style={styles.cardBadge}>Bản Mới</Text>
+          </TouchableOpacity>
 
-        <View className="gap-3">
-          {ACTIONS.map((a) => (
-            <Pressable
-              key={a.href}
-              onPress={() => router.push(a.href as never)}
-              className="flex-row items-center rounded-2xl border border-orange-100 bg-white p-4 active:opacity-90"
-              style={{
-                shadowColor: '#FB923C',
-                shadowOpacity: 0.08,
-                shadowRadius: 10,
-                shadowOffset: { width: 0, height: 4 },
-              }}
-            >
-              <View className="mr-3 h-12 w-12 items-center justify-center rounded-2xl bg-orange-50">
-                <Text className="text-2xl">{a.emoji}</Text>
-              </View>
-              <View className="min-w-0 flex-1">
-                <Text className="text-base font-extrabold text-slate-900">
-                  {a.title}
-                </Text>
-                <Text className="mt-0.5 text-[13px] text-slate-500">{a.desc}</Text>
-              </View>
-              <Text className="ml-2 text-lg text-slate-300">›</Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <View className="mt-5 rounded-2xl border border-slate-100 bg-white p-4">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
-            Draft hiện tại
-          </Text>
-          <Text className="mt-2 text-[15px] font-extrabold text-slate-800">
-            {draft.name.trim() || 'Chưa đặt tên'}
-          </Text>
-          <Text
-            className="mt-1 text-[12px] leading-5 text-slate-500"
-            numberOfLines={4}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.8}
+            onPress={() => handlePress('/(app)/character/storage-v2')}
           >
-            {promptPreview ||
-              'Điền hồ sơ và chi tiết để xem tóm tắt prompt.'}
-          </Text>
+            <View style={styles.iconContainer}>
+              <Text style={styles.icon}>📚</Text>
+            </View>
+            <Text style={styles.cardTitle}>Kho nhân vật</Text>
+            <Text style={styles.cardBadge}>Bản Mới</Text>
+          </TouchableOpacity>
+
+          {/* Bản Cũ (Legacy) */}
+          <TouchableOpacity
+            style={[styles.card, styles.cardLegacy]}
+            activeOpacity={0.8}
+            onPress={() => handlePress('/(app)/character/legacy-hub')}
+          >
+            <View style={styles.iconContainer}>
+              <Text style={styles.icon}>🪄</Text>
+            </View>
+            <Text style={styles.cardTitle}>Tạo nhân vật</Text>
+            <Text style={[styles.cardBadge, styles.badgeLegacy]}>Bản Cũ</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.card, styles.cardLegacy]}
+            activeOpacity={0.8}
+            onPress={() => handlePress('/(app)/gallery')}
+          >
+            <View style={styles.iconContainer}>
+              <Text style={styles.icon}>📦</Text>
+            </View>
+            <Text style={styles.cardTitle}>Kho nhân vật</Text>
+            <Text style={[styles.cardBadge, styles.badgeLegacy]}>Bản Cũ</Text>
+          </TouchableOpacity>
+          
         </View>
       </ScrollView>
-    </ScreenChrome>
+    </ImageBackground>
   );
 }
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: '#fad698',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  cardsWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 24,
+    width: '100%',
+    maxWidth: 960,
+  },
+  card: {
+    width: 210,
+    height: 270,
+    backgroundColor: '#FDFAF4',
+    borderWidth: 6,
+    borderColor: '#FFFFFF',
+    borderRadius: 36,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    position: 'relative',
+  },
+  cardLegacy: {
+    opacity: 0.9,
+    borderColor: '#F3E8DE',
+  },
+  iconContainer: {
+    marginBottom: 12,
+  },
+  icon: {
+    fontSize: 56,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#475569',
+    textAlign: 'center',
+  },
+  cardBadge: {
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FF7597',
+    backgroundColor: '#FFF0F3',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  badgeLegacy: {
+    color: '#8A7463',
+    backgroundColor: '#EBDCD0',
+  },
+});

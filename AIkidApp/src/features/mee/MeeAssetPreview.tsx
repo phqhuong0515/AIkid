@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { parse, SvgXml } from 'react-native-svg';
 
 import { meeAssetFor } from './assets';
@@ -20,7 +20,7 @@ export const MeeAssetPreview = forwardRef<MeeAssetPreviewHandle, { draft: MeeDra
       }, { width: 768, height: 768 });
     }),
   }), []);
-  return <View className={`w-full overflow-hidden rounded-[28px] border border-orange-100 ${compact ? 'h-[290px]' : 'h-[500px]'}`} style={{ backgroundColor: draft.backgroundColor }}>
+  return <View className={`w-full overflow-hidden rounded-[28px] border border-orange-100 flex-1 ${compact ? 'min-h-[200px]' : ''}`} style={{ backgroundColor: draft.backgroundColor }}>
     {ast ? <Svg ref={svgRef} {...ast.props} width="100%" height="100%">{ast.children}</Svg> : null}
   </View>;
 });
@@ -35,16 +35,30 @@ type AssetPickerProps = {
 };
 
 export function MeeAssetPicker({ title, kind, options, value, draft, onChange }: AssetPickerProps) {
-  return <View className="mb-4">
-    <Text className="mb-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">{title}</Text>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingRight: 12 }}>
-      {options.map((option) => {
-        const xml = meeAssetFor(kind, option, draft);
-        const selected = option === value;
-        return <Pressable accessibilityRole="button" accessibilityLabel={`${title} ${option === 0 ? 'không dùng' : option}`} accessibilityState={{ selected }} key={`${kind}-${option}`} onPress={() => onChange(option)} className="h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl bg-orange-50" style={{ borderWidth: selected ? 3 : 1, borderColor: selected ? '#FB7185' : '#FED7AA' }}>
-          {option === 0 ? <Text className="text-xs font-bold text-slate-400">Không</Text> : <SvgXml xml={xml} width="60" height="54" />}
-        </Pressable>;
-      })}
-    </ScrollView>
-  </View>;
+  return (
+    <View className="mb-4">
+      <View className="flex-row items-center justify-between mb-2">
+        <Text className="text-sm font-extrabold text-[#4a3728]">{title}:</Text>
+      </View>
+      <View className="flex-row flex-wrap gap-2.5">
+        {options.map((option) => {
+          const xml = meeAssetFor(kind, option, draft);
+          const selected = option === value;
+          return (
+            <Pressable 
+              accessibilityRole="button" 
+              accessibilityLabel={`${title} ${option === 0 ? 'không dùng' : option}`} 
+              accessibilityState={{ selected }} 
+              key={`${kind}-${option}`} 
+              onPress={() => onChange(option)} 
+              className="h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl bg-[#fdfaf4]" 
+              style={{ borderWidth: 2, borderColor: selected ? '#ff7597' : '#ebdcd0' }}
+            >
+              {option === 0 ? <Text className="text-xs font-bold text-slate-400">Không</Text> : <SvgXml xml={xml} width="60" height="54" />}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
 }

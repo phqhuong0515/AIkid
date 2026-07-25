@@ -42,6 +42,7 @@ type AuthState = {
   error: string | null;
   hydrate: () => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
+  loginStudent: (payload: { nickname: string, pin: string }) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   loginWithFirebaseIdToken: (idToken: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -143,8 +144,6 @@ export const useAuth = create<AuthState>((set) => ({
   login: async ({ login, password, actorHint }) => {
     set({ isLoading: true, error: null });
     try {
-      // Match MobileApp downgrade policy: when Firebase is enabled, failures are
-      // surfaced instead of silently replaying classroom credentials.
       const result = actorHint === 'child' && isFirebaseAuthEnabled()
         ? await loginChildWithFirebase(login, password)
         : await authApi.login({ login: login.trim(), password });
@@ -173,6 +172,44 @@ export const useAuth = create<AuthState>((set) => ({
       set({
         isLoading: false,
         error: extractErrorMessage(err, 'Đăng nhập thất bại'),
+      });
+      throw err;
+    }
+  },
+
+  loginStudent: async ({ nickname, pin }) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await apiClient.post<any>('/api/v1/account/family/child-login', {
+        nickname: nickname.trim(),
+        pin
+      });
+      
+      if (data.status === 'error' || data.error) {
+        throw new Error(data.message || data.error || 'Đăng nhập thất bại');
+      }
+
+      const responseData = data.data || data;
+      const token = responseData.token ?? responseData.accessToken;
+      const user = responseData.child || responseData.user;
+      
+      if (!token) {
+        throw new Error('Đăng nhập thành công nhưng không lấy được phiên làm việc.');
+      }
+      
+      await setAccessToken(token);
+      set({
+        token,
+        user: user ?? { name: nickname.trim() },
+        actor: 'child',
+        isLoading: false,
+        error: null,
+      });
+      await useWorkspace.getState().loadWorkspaces({ token });
+    } catch (err: unknown) {
+      set({
+        isLoading: false,
+        error: extractErrorMessage(err, 'Đăng nhập học sinh thất bại'),
       });
       throw err;
     }

@@ -1,0 +1,3591 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo Cốt Truyện - AIkid</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Fredoka:wght@400;500;600;700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;600;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@900&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Link to common universe styles -->
+  <link rel="stylesheet" href="/mee/styles.css">
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('/assets/images/bg-art.png') !important;
+      background-repeat: no-repeat !important;
+      background-position: center center !important;
+      background-size: cover !important;
+      background-attachment: fixed !important;
+      background-color: #FED7D7 !important;
+      font-family: 'Mali', sans-serif;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .scaler-wrapper {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1927.63px;
+      height: 930px;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(1);
+      background: transparent !important;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .scaler-wrapper>* {
+      pointer-events: auto;
+    }
+
+    .custom-đ {
+      position: relative;
+      display: inline-block;
+      font-family: 'Chiron GoRound TC', sans-serif !important;
+    }
+
+    .custom-đ::after {
+      content: "";
+      position: absolute;
+      width: 0.46em;
+      height: 0.12em;
+      background: currentColor;
+      border-radius: 9999px;
+      top: 0.32em;
+      left: 0.27em;
+    }
+
+    #page-loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+      background-image:
+        radial-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1) 2px, transparent 40px),
+        radial-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05) 1px, transparent 30px),
+        linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+      background-size: 550px 550px, 350px 350px, 100% 100%;
+      background-position: 0 0, 40px 60px, 0 0;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+      pointer-events: all;
+      overflow: hidden;
+    }
+
+    @keyframes meteorFlight {
+      0% {
+        transform: translate(60vw, -60vh) rotate(150deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-60vw, 60vh) rotate(150deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes miniFlight {
+      0% {
+        transform: translate(60vw, -60vh) rotate(150deg);
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 0.6;
+      }
+
+      85% {
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: translate(-60vw, 60vh) rotate(150deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes loadingDots {
+
+      0%,
+      20% {
+        content: ".";
+      }
+
+      40% {
+        content: "..";
+      }
+
+      60%,
+      100% {
+        content: "...";
+      }
+    }
+
+    .loading-dots::after {
+      content: "";
+      animation: loadingDots 1.5s infinite steps(1);
+      display: inline-block;
+      width: 24px;
+      text-align: left;
+    }
+
+    .meteor-container {
+      position: relative;
+      width: 320px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      animation: meteorFlight 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+      z-index: 10;
+    }
+
+    .meteor-head {
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle at 35% 35%, #FFF0F5 0%, #FFB6C1 25%, #FF5E97 60%, #9D1C7F 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(255, 94, 151, 0.9), 0 0 60px rgba(157, 28, 127, 0.6), 0 0 120px rgba(157, 28, 127, 0.4);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .meteor-crater {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.08);
+      border-radius: 50%;
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .meteor-crater-1 {
+      width: 14px;
+      height: 14px;
+      top: 22px;
+      left: 18px;
+    }
+
+    .meteor-crater-2 {
+      width: 20px;
+      height: 20px;
+      top: 32px;
+      left: 32px;
+    }
+
+    .meteor-crater-3 {
+      width: 12px;
+      height: 12px;
+      top: 18px;
+      left: 45px;
+    }
+
+    .meteor-crater-4 {
+      width: 10px;
+      height: 10px;
+      top: 48px;
+      left: 20px;
+    }
+
+    .meteor-trail {
+      width: 600px;
+      height: 70px;
+      background: linear-gradient(to right, rgba(157, 28, 127, 0) 0%, rgba(157, 28, 127, 0.25) 35%, rgba(255, 94, 151, 0.75) 75%, rgba(255, 240, 245, 0.95) 100%);
+      border-radius: 40px 0 0 40px;
+      margin-right: -40px;
+      filter: blur(2px);
+    }
+
+    .mini-meteor {
+      position: absolute;
+      width: 160px;
+      height: 5px;
+      background: linear-gradient(to right, rgba(255, 182, 193, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
+      border-radius: 9999px;
+      opacity: 0;
+      filter: blur(1.5px);
+      transform: rotate(150deg);
+    }
+
+    .mini-1 {
+      top: 25%;
+      left: 15%;
+      animation: miniFlight 1.6s linear infinite;
+      animation-delay: 0.4s;
+    }
+
+    .mini-2 {
+      top: 75%;
+      left: 5%;
+      animation: miniFlight 1.9s linear infinite;
+      animation-delay: 0.9s;
+    }
+
+    .mini-3 {
+      top: 85%;
+      left: 50%;
+      animation: miniFlight 1.4s linear infinite;
+      animation-delay: 0.1s;
+    }
+
+    /* Main Container for Idea Plot Wizard */
+    .plot-wizard-card {
+      position: absolute;
+      top: calc(52% + 65px);
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1440px;
+      height: 670px;
+      background: #FFFFFF;
+      border: 8px solid #FFFFFF;
+      border-radius: 40px;
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12), 0 5px 18px rgba(138, 116, 99, 0.06);
+      box-sizing: border-box;
+      display: flex;
+      overflow: hidden;
+      font-family: 'Mali', sans-serif;
+    }
+
+    /* Left Sidebar */
+    .plot-sidebar {
+      width: 320px;
+      background: #FDFBF7;
+      border-right: 2px dashed #EADED5;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      box-sizing: border-box;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+      flex: 1;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      color: #8A7463;
+      font-weight: 700;
+      font-size: 1.1rem;
+      white-space: nowrap;
+      user-select: none;
+      border: 2px solid transparent;
+      box-sizing: border-box;
+    }
+
+    .step-item:hover {
+      background: #F3ECE2;
+      color: #704E48;
+    }
+
+    .step-item.active {
+      background: #FFEAEF !important;
+      color: #704E48 !important;
+      font-weight: 700;
+      border-radius: 9999px;
+      border: 2px solid #FF7597 !important;
+      box-shadow: 0 4px 14px rgba(255, 182, 193, 0.4);
+    }
+
+    .step-num-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #EAE3D9;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .step-item.active .step-num-badge {
+      background: #FFFFFF;
+      color: #2563EB;
+    }
+
+    .step-icon {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* Right Content Panel */
+    .plot-main-panel {
+      flex: 1;
+      background: #FFFFFF;
+      padding: 22px 35px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    .plot-header-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Top Progress Bar Area */
+    .progress-bar-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto 21px auto;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .progress-info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .progress-step-text {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: #2563EB;
+    }
+
+    .progress-mode-badge {
+      background: #DCFCE7;
+      color: #15803D;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 14px;
+      background: #E2E8F0;
+      border-radius: 9999px;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, #FDBA74, #F97316);
+      border-radius: 9999px;
+      position: relative;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .progress-star-handle {
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FDE047, #EAB308);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 8px rgba(234, 179, 8, 0.4);
+      z-index: 2;
+    }
+
+    .plot-question-title {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: #475569;
+      margin: 0 0 4px 0;
+      letter-spacing: 0.5px;
+    }
+
+    .plot-question-subtitle {
+      color: #64748B;
+      font-size: 0.92rem;
+      font-weight: 500;
+      margin: 0 0 21px 0;
+    }
+
+    /* 4x2 Grid of Option Cards */
+    .idea-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 12px 0;
+    }
+
+    .idea-card {
+      background: #FFFFFF;
+      border: 3px solid #F8F4F0;
+      border-radius: 20px;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      min-height: 125px;
+      box-sizing: border-box;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(138, 116, 99, 0.05);
+    }
+
+    .idea-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(138, 116, 99, 0.12);
+      border-color: #FFD2DF !important;
+    }
+
+    .idea-card.selected {
+      border: 3px solid #FF7597 !important;
+      background: #FFF5F8 !important;
+      color: #704E48 !important;
+      box-shadow: 0 8px 24px rgba(255, 117, 151, 0.2) !important;
+    }
+
+    .opening-action-card, .opening-emotion-card {
+      border-style: solid !important;
+    }
+
+    .idea-card-icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+
+    .idea-card-text {
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #704E48 !important;
+      line-height: 1.3;
+      text-wrap: balance;
+    }
+
+    /* Custom Input Section */
+    .custom-idea-box {
+      background: #F8FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 22px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color 0.2s ease;
+    }
+
+    .custom-idea-box:focus-within {
+      border-color: #3B82F6;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .custom-idea-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #C084FC, #9333EA);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .custom-idea-input-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .custom-idea-label {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #475569;
+      margin-bottom: 2px;
+    }
+
+    .custom-idea-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Mali', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1E293B;
+      width: 100%;
+    }
+
+    .custom-idea-counter {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      font-weight: 600;
+    }
+
+    /* Character Questions Box */
+    .char-questions-box {
+      background: #FDFAF4;
+      border: 2px dashed #EADED5;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .char-questions-box.active {
+      display: flex;
+    }
+
+    .char-question-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .char-question-label {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #8A7463;
+    }
+
+    .char-question-input {
+      border: 2px solid #EADED5;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: 'Mali', sans-serif;
+      font-size: 0.95rem;
+      color: #704E48;
+      outline: none;
+      background: #FFFFFF;
+      transition: all 0.2s ease;
+    }
+
+    .char-question-input:focus {
+      border-color: #FF7597;
+      box-shadow: 0 0 0 3px rgba(255, 117, 151, 0.15);
+    }
+
+    /* Character Action Row & Buttons Spacing */
+    .char-action-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    .char-create-plus-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      border: 2px dashed #D1D5DB;
+      background: #FFFFFF;
+      color: #6B7280;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .char-create-plus-btn:hover {
+      border-color: #FF7597;
+      color: #FF7597;
+      background: #FFF5F8;
+      transform: scale(1.05);
+    }
+
+    .char-storage-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 48px;
+      padding: 0 20px;
+      border-radius: 9999px;
+      border: 2px solid #FF7597;
+      background: #FFFFFF;
+      color: #FF7597;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(255, 117, 151, 0.12);
+      flex-shrink: 0;
+    }
+
+    .char-storage-btn:hover {
+      background: #FF7597;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
+    }
+
+    .char-selected-avatar-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      border: 2px solid #FF7597;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(255, 117, 151, 0.25);
+      flex-shrink: 0;
+    }
+
+    .char-selected-avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .char-section-divider {
+      border: none;
+      border-top: 2px dashed #EADED5;
+      margin: 16px 0;
+      width: 100%;
+    }
+
+    .sub-char-block {
+      margin-top: 32px;
+      padding-top: 28px;
+      border-top: 2px dashed #EADED5;
+    }
+
+    .sub-char-block:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    /* Bottom Wizard Actions */
+    .wizard-actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+    }
+
+    .wizard-btn {
+      border: none;
+      border-radius: 9999px;
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 11px 30px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+    }
+
+    .wizard-btn-prev {
+      background: #FFFFFF;
+      border: 2px solid #EADED5;
+      color: #8A7463;
+    }
+
+    .wizard-btn-prev:hover {
+      background: #FDFAF4;
+      transform: translateX(-3px);
+    }
+
+    .wizard-btn-save {
+      background: #FEF3C7;
+      border: 2px solid #FDE047;
+      color: #854D0E;
+    }
+
+    .wizard-btn-save:hover {
+      background: #FDE68A;
+      transform: translateY(-2px);
+    }
+
+    .wizard-btn-next {
+      background: linear-gradient(135deg, #ff9eb5, #ff7597);
+      color: #FFFFFF;
+      box-shadow: 0 8px 20px rgba(255, 117, 151, 0.35);
+      padding: 11px 40px;
+    }
+
+    .wizard-btn-next:hover {
+      transform: translateX(4px) scale(1.03);
+      box-shadow: 0 12px 28px rgba(255, 117, 151, 0.45);
+    }
+
+    /* Toast Message */
+    .toast-message {
+      position: fixed;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #334155;
+      color: #FFFFFF;
+      padding: 16px 32px;
+      border-radius: 20px;
+      font-family: 'Mali', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      z-index: 1000000;
+      transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-message.show {
+      bottom: 40px;
+    }
+
+    /* ========== CHARACTER STEP PANEL ========== */
+    .char-step-panel {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      overflow-y: auto;
+      padding-top: 8px;
+      padding-bottom: 60px;
+      padding-left: 16px;
+      padding-right: 16px;
+      margin-top: -8px;
+      margin-bottom: 0;
+      margin-left: -16px;
+      margin-right: -16px;
+    }
+
+    .char-step-panel.active {
+      display: flex;
+    }
+
+    /* ========== CONTEXT, OPENING, UNEXPECTED, OBSTACLE, ATTEMPT & INSIGHT STEP PANEL ========== */
+    .context-step-panel,
+    .opening-step-panel,
+    .unexpected-step-panel,
+    .purpose-step-panel,
+    .obstacle-step-panel,
+    .attempt-step-panel,
+    .ending-step-panel,
+    .insight-step-panel {
+      display: none;
+      flex-direction: column;
+      height: auto;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-left: 2px;
+      padding-right: 8px;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .context-step-panel.active,
+    .opening-step-panel.active,
+    .unexpected-step-panel.active,
+    .purpose-step-panel.active,
+    .obstacle-step-panel.active,
+    .attempt-step-panel.active,
+    .ending-step-panel.active,
+    .insight-step-panel.active {
+      display: flex;
+    }
+
+    /* Custom scrollbars for step panels to indicate scrolling */
+    .char-step-panel::-webkit-scrollbar,
+    .context-step-panel::-webkit-scrollbar,
+    .opening-step-panel::-webkit-scrollbar,
+    .unexpected-step-panel::-webkit-scrollbar,
+    .obstacle-step-panel::-webkit-scrollbar,
+    .attempt-step-panel::-webkit-scrollbar,
+    .insight-step-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+    .char-step-panel::-webkit-scrollbar-track,
+    .context-step-panel::-webkit-scrollbar-track,
+    .opening-step-panel::-webkit-scrollbar-track,
+    .unexpected-step-panel::-webkit-scrollbar-track,
+    .obstacle-step-panel::-webkit-scrollbar-track,
+    .attempt-step-panel::-webkit-scrollbar-track,
+    .insight-step-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 10px;
+    }
+    .char-step-panel::-webkit-scrollbar-thumb,
+    .context-step-panel::-webkit-scrollbar-thumb,
+    .opening-step-panel::-webkit-scrollbar-thumb,
+    .unexpected-step-panel::-webkit-scrollbar-thumb,
+    .obstacle-step-panel::-webkit-scrollbar-thumb,
+    .attempt-step-panel::-webkit-scrollbar-thumb,
+    .insight-step-panel::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 117, 151, 0.5);
+      border-radius: 10px;
+      border: 2px solid #FFFFFF;
+    }
+    .char-step-panel::-webkit-scrollbar-thumb:hover,
+    .context-step-panel::-webkit-scrollbar-thumb:hover,
+    .opening-step-panel::-webkit-scrollbar-thumb:hover,
+    .unexpected-step-panel::-webkit-scrollbar-thumb:hover,
+    .obstacle-step-panel::-webkit-scrollbar-thumb:hover,
+    .attempt-step-panel::-webkit-scrollbar-thumb:hover,
+    .insight-step-panel::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 117, 151, 0.8);
+    }
+    .char-step-panel,
+    .context-step-panel,
+    .opening-step-panel,
+    .unexpected-step-panel,
+    .obstacle-step-panel,
+    .attempt-step-panel,
+    .insight-step-panel {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 117, 151, 0.5) rgba(0, 0, 0, 0.02);
+    }
+    
+    .context-section-label {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #8A7463;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .context-section-label i {
+      font-size: 1rem;
+      color: #FF7597;
+    }
+
+    .time-cards-grid, .space-cards-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .time-cards-grid { grid-template-columns: repeat(4, 1fr); }
+    .space-cards-grid { grid-template-columns: repeat(4, 1fr); }
+
+    .context-card {
+      background: #FFFFFF;
+      border: 3px solid #F8F4F0;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(138, 116, 99, 0.05);
+    }
+
+    .context-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(138, 116, 99, 0.12);
+      border-color: #FFD2DF;
+    }
+
+    .context-card.selected {
+      border-color: #FF7597;
+      background: #FFF5F8;
+      box-shadow: 0 8px 24px rgba(255, 117, 151, 0.2);
+    }
+
+    .context-card-icon {
+      font-size: 2rem;
+      margin-bottom: 4px;
+    }
+    .time-card-icon-1 { color: #F59E0B; }
+    .time-card-icon-2 { color: #F97316; }
+    .time-card-icon-3 { color: #6366F1; }
+    .time-card-icon-4 { color: #1E1B4B; }
+
+    .context-card-text {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #704E48;
+    }
+
+    .custom-space-box {
+      background: #FFFFFF;
+      border: 3px solid #F8F4F0;
+      border-radius: 20px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s ease;
+      margin-top: 24px;
+      box-shadow: 0 4px 12px rgba(138, 116, 99, 0.05);
+    }
+
+    .custom-space-box:focus-within {
+      border-color: #FF7597;
+      border-style: solid;
+      background: #FFF5F8;
+      box-shadow: 0 8px 24px rgba(255, 117, 151, 0.2);
+    }
+
+    .custom-space-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #FFB6C8, #FF7597);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .custom-space-input-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .custom-space-label {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #8A7463;
+      margin-bottom: 2px;
+    }
+
+    .custom-space-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Mali', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #704E48;
+      width: 100%;
+    }
+    
+    .custom-space-input::placeholder {
+      color: #A3857B;
+      font-weight: 700;
+    }
+
+    .custom-space-counter {
+      font-family: 'Mali', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #A3857B;
+      flex-shrink: 0;
+    }
+
+    .char-section-label {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #8A7463;
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .char-section-label i {
+      font-size: 1rem;
+      color: #FF7597;
+    }
+
+    /* The selected character slot */
+    .char-slot-box {
+      background: #FFFFFF;
+      border: 3px solid #F8F4F0;
+      border-radius: 20px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 80px;
+      transition: all 0.2s ease;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(138, 116, 99, 0.05);
+    }
+
+    .sub-char-remove-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #FFEAEF;
+      color: #FF5E97;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      z-index: 2;
+    }
+
+    .sub-char-remove-btn:hover {
+      background: #FF5E97;
+      color: #FFFFFF;
+    }
+
+    .char-slot-box.filled {
+      border: 2.5px solid #FFB6C8;
+      background: #FFF5F8;
+    }
+
+    /* Avatar preview in slot */
+    .char-slot-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #FFE4EF, #FFCCE0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    .char-slot-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 8%;
+      transform: scale(2.3);
+      transform-origin: center 8%;
+    }
+
+    .char-slot-info {
+      flex: 1;
+    }
+
+    .char-slot-name {
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+      color: #334155;
+      margin: 0 0 2px 0;
+    }
+
+    .char-slot-desc {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #94A3B8;
+    }
+
+    /* Action Row: Kho nhân vật & Plus Button */
+    .char-action-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .char-storage-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 2.5px solid #FF7597;
+      border-radius: 18px;
+      padding: 10px 18px;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #704E48;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 117, 151, 0.15);
+      transition: all 0.2s ease;
+      height: 54px;
+    }
+
+    .char-storage-btn:hover {
+      background: #FFEAEF;
+    }
+
+    .char-storage-btn i {
+      color: #FF5E97;
+      font-size: 1.2rem;
+    }
+
+    .char-selected-avatar-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      border: 3px solid #FF5E97;
+      box-shadow: 0 4px 14px rgba(255, 94, 151, 0.3);
+      overflow: hidden;
+      background: #FFFFFF;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .char-selected-avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 8%;
+      transform: scale(2.3);
+      transform-origin: center 8%;
+    }
+
+    .char-create-plus-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      border: 2.5px dashed #C8B5A7;
+      background: transparent;
+      color: #8A7463;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .char-create-plus-btn:hover {
+      border-color: #FF7597;
+      color: #FF7597;
+      background: #FFF5F8;
+    }
+
+    /* Divider between sections */
+    .char-section-divider {
+      border: none;
+      border-top: 2px dashed #EDE0D8;
+      margin: 16px 0;
+    }
+
+    /* Add more supporting char button */
+    .char-add-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #F8F4F0;
+      border: 2.5px dashed #D4C4B8;
+      border-radius: 9999px;
+      padding: 9px 22px;
+      font-family: 'Mali', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #8A7463;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      align-self: flex-start;
+    }
+
+    .char-add-more-btn:hover {
+      border-color: #FF7597;
+      color: #FF5E97;
+      background: #FFF5F8;
+    }
+
+    /* ========== ALBUM POPUP MODAL STYLES ========== */
+    .char-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .char-modal-overlay.show {
+      display: flex;
+    }
+
+    .char-modal-card {
+      width: 860px;
+      max-width: 95vw;
+      max-height: 90vh;
+      background: #FFFDF9;
+      border-radius: 36px;
+      border: 6px solid #FFFFFF;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      padding: 28px 34px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      font-family: 'Mali', sans-serif;
+    }
+
+    .char-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .char-modal-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Chiron GoRound TC', sans-serif;
+      font-weight: 900;
+      font-size: 1.65rem;
+      color: #475569;
+    }
+
+    .char-modal-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .char-modal-select-wrapper {
+      background: #F1ECE6;
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #704E48;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .char-modal-search-wrapper {
+      background: #FFFFFF;
+      border: 2px solid #E2D9CF;
+      border-radius: 9999px;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .char-modal-search-wrapper i {
+      color: #94A3B8;
+      font-size: 1rem;
+    }
+
+    .char-modal-search-wrapper input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: 'Mali', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #334155;
+      width: 170px;
+    }
+
+    .char-modal-close-btn {
+      background: #F1ECE6;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .char-modal-close-btn:hover {
+      background: #FFEAEF;
+      color: #FF5E97;
+    }
+
+    .char-modal-divider {
+      border: none;
+      border-top: 2px dashed #E2D9CF;
+      margin: 18px 0;
+    }
+
+    .char-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-content: start;
+      overflow-y: auto;
+      padding: 8px;
+      height: 540px;
+      min-height: 540px;
+    }
+
+    .char-modal-add-card {
+      aspect-ratio: 1 / 1;
+      border: 3px dashed #C8B5A7;
+      border-radius: 22px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .char-modal-add-card:hover {
+      border-color: #FF5E97;
+      background: #FFF5F8;
+    }
+
+    .char-modal-add-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #D8C7B9;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .char-modal-add-card:hover .char-modal-add-circle {
+      background: #FF7597;
+    }
+
+    .char-album-card {
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      border: 4px solid #FFFFFF;
+      background: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .char-album-card:hover {
+      border-color: #FF7597;
+    }
+
+    .char-album-card.selected {
+      border: 4px solid #FF5E97 !important;
+      box-shadow: 0 6px 20px rgba(255, 94, 151, 0.4) !important;
+    }
+
+    .char-album-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 8%;
+      transform: scale(2.3);
+      transform-origin: center 8%;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Global Meteor Loading Overlay -->
+  <div id="page-loader-overlay">
+    <!-- Space Background Mini Meteors -->
+    <div class="mini-meteor mini-1"></div>
+    <div class="mini-meteor mini-2"></div>
+    <div class="mini-meteor mini-3"></div>
+
+    <!-- Main Meteor Container -->
+    <div class="meteor-container">
+      <div class="meteor-trail"></div>
+      <div class="meteor-head">
+        <div class="meteor-crater meteor-crater-1"></div>
+        <div class="meteor-crater meteor-crater-2"></div>
+        <div class="meteor-crater meteor-crater-3"></div>
+        <div class="meteor-crater meteor-crater-4"></div>
+      </div>
+    </div>
+
+    <!-- Glowing Loading Text -->
+    <div style="margin-top: 50px; text-align: center; z-index: 20;">
+      <h2 style="
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #FFFFFF;
+        font-family: 'Chiron GoRound TC', sans-serif;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 0 0 15px rgba(255, 94, 151, 0.9), 0 0 5px rgba(157, 28, 127, 0.5);
+      ">Bé <span class="custom-đ">d</span>ợi chút nhé<span class="loading-dots"></span></h2>
+    </div>
+  </div>
+
+  <div class="scaler-wrapper">
+    <!-- Top Navigation Header from StoryMee Universe -->
+    <header class="universe-header">
+      <div class="universe-header-left">
+        <div class="universe-logo" onclick="playPopAndNavigate('/')">
+          <img src="/mee/logo.svg" alt="StoryMee Logo" class="logo-image">
+        </div>
+      </div>
+      <div class="universe-header-right">
+        <button class="universe-signup-btn" onclick="playPopAndNavigate('/login')">Đăng Nhập</button>
+      </div>
+    </header>
+
+    <!-- Floating Back Button -->
+    <div class="back-btn-container"
+      style="position: absolute; left: 38px; top: 131px; z-index: 1000; transform: scale(1.1); transform-origin: left top;">
+      <button onclick="playPopAndNavigate('/art/story/genre')" style="
+        background: linear-gradient(135deg, #ff9eb5, #ff7597);
+        border: none;
+        border-radius: 9999px;
+        color: white;
+        font-family: 'Mali', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 10px 25px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(255, 117, 151, 0.3);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      ">
+        <i class="fa-solid fa-house"></i>
+        <span>Trở Về</span>
+      </button>
+    </div>
+
+    <!-- Center Content: Plot Wizard Card -->
+    <div class="plot-wizard-card">
+
+      <!-- Left Sidebar Step List -->
+      <div class="plot-sidebar">
+        <div class="step-item" onclick="selectStep(1)">
+          <i class="fa-solid fa-user step-icon" style="color: #8B5CF6;"></i>
+          <span>Nhân vật</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(2)">
+          <i class="fa-solid fa-mountain-sun step-icon" style="color: #0EA5E9;"></i>
+          <span>Bối cảnh</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(3)">
+          <i class="fa-solid fa-book-open step-icon" style="color: #F59E0B;"></i>
+          <span>Khởi đầu</span>
+        </div>
+
+        <div class="step-item active" onclick="selectStep(4)">
+          <i class="fa-solid fa-wand-magic-sparkles step-icon" style="color: #FF7597;"></i>
+          <span>Điều bất ngờ</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(5)">
+          <i class="fa-solid fa-bullseye step-icon" style="color: #EC4899;"></i>
+          <span>Mục đích</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(6)">
+          <i class="fa-solid fa-hill-rockslide step-icon" style="color: #64748B;"></i>
+          <span>Trở ngại</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(7)">
+          <i class="fa-solid fa-fire step-icon" style="color: #F97316;"></i>
+          <span>Cao trào</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(8)">
+          <i class="fa-solid fa-flag-checkered step-icon" style="color: #9333EA;"></i>
+          <span>Kết thúc</span>
+        </div>
+
+        <div class="step-item" onclick="selectStep(9)">
+          <i class="fa-solid fa-cloud step-icon" style="color: #38BDF8;"></i>
+          <span>Bài học</span>
+        </div>
+      </div>
+
+      <!-- Right Content Panel -->
+      <div class="plot-main-panel">
+
+        <!-- Question Header -->
+        <div class="plot-header-area">
+          <div class="progress-bar-container">
+            <span id="progress-step-label" style="font-family: 'Chiron GoRound TC', sans-serif; font-weight: 900; color: #F97316; font-size: 1.15rem; width: 45px; text-align: right;">0/9</span>
+            <div class="progress-track" style="flex: 1;">
+              <div class="progress-fill" id="progress-fill-bar" style="width: 0%;">
+                <div class="progress-star-handle">
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h2 class="plot-question-title">Nhân vật</h2>
+          <p class="plot-question-subtitle">Chọn nhân vật chính và các nhân vật phụ đồng hành.</p>
+        </div>
+
+        <!-- ===== STEP 1: CHARACTER PANEL ===== -->
+        <div class="char-step-panel active" id="char-step-panel">
+          
+          <!-- Main Character Section -->
+          <div>
+            <p class="char-section-label">
+              <i class="fa-solid fa-star"></i> 
+              Nhân vật chính 
+            </p>
+            <!-- Selected slot -->
+            <div class="char-slot-box" id="main-char-slot">
+              <div class="char-slot-avatar" id="main-char-avatar">
+                <i class="fa-solid fa-user" style="color: #FFB6C8;"></i>
+              </div>
+              <div class="char-slot-info">
+                <p class="char-slot-name" id="main-char-name">Chưa chọn</p>
+                <p class="char-slot-desc">Bấm vào Kho nhân vật bên dưới để chọn</p>
+              </div>
+            </div>
+
+            <!-- Character Questions Box -->
+            <div class="char-questions-box" id="main-char-questions">
+              <div class="char-question-item">
+                <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện?</label>
+                <input type="text" id="main-char-role-input" class="char-question-input" placeholder="Ví dụ: Anh hùng, người dẫn đường..." maxlength="50" oninput="checkStep1Completion()">
+              </div>
+            </div>
+
+            <!-- Action Row: Plus Button then Kho nhân vật -->
+            <div class="char-action-row">
+              <!-- Create new plus button first -->
+              <button class="char-create-plus-btn" onclick="playPopAndNavigate('/character/generate?new=1')"
+                title="Tạo nhân vật mới">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+
+              <button class="char-storage-btn" onclick="openCharAlbumModal('main')">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Kho nhân vật</span>
+              </button>
+
+              <!-- Avatar preview beside Kho nhân vật when selected -->
+              <div class="char-selected-avatar-box" id="main-selected-ava-box" style="display: none;">
+                <img id="main-selected-ava-img" src="" alt="Avatar">
+              </div>
+            </div>
+          </div>
+
+          <hr class="char-section-divider">
+
+          <!-- Add more supporting characters container -->
+          <div id="extra-sub-chars-container"></div>
+
+          <button class="char-add-more-btn" id="add-more-sub-btn" onclick="addMoreSubChar()" style="margin-top: 0;">
+            <i class="fa-solid fa-circle-plus"></i>
+            Thêm nhân vật phụ
+          </button>
+
+        </div>
+
+        <!-- ===== STEP 2: CONTEXT PANEL ===== -->
+        <div class="context-step-panel" id="context-step-panel">
+          
+          <!-- Time Section -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-clock"></i> Thời gian</p>
+            <div class="time-cards-grid">
+              <div class="context-card time-card" onclick="selectTimeCard(this, 'Buổi sáng')">
+                <i class="fa-solid fa-sun context-card-icon time-card-icon-1"></i>
+                <div class="context-card-text">Buổi sáng</div>
+              </div>
+              <div class="context-card time-card" onclick="selectTimeCard(this, 'Buổi chiều')">
+                <i class="fa-solid fa-cloud-sun context-card-icon time-card-icon-2"></i>
+                <div class="context-card-text">Buổi chiều</div>
+              </div>
+              <div class="context-card time-card" onclick="selectTimeCard(this, 'Buổi tối')">
+                <i class="fa-solid fa-moon context-card-icon time-card-icon-3"></i>
+                <div class="context-card-text">Buổi tối</div>
+              </div>
+              <div class="context-card time-card" onclick="selectTimeCard(this, 'Đêm khuya')">
+                <i class="fa-solid fa-star-and-crescent context-card-icon time-card-icon-4"></i>
+                <div class="context-card-text">Đêm khuya</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="char-section-divider">
+
+          <!-- Space Section -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-location-dot"></i> Không gian</p>
+            <div class="space-cards-grid">
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Khu rừng thần tiên')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-solid fa-tree"></i>
+                </div>
+                <div class="context-card-text">Khu rừng thần tiên</div>
+              </div>
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Lâu đài cổ tích')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FBBF24, #D97706); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-brands fa-fort-awesome"></i>
+                </div>
+                <div class="context-card-text">Lâu đài cổ tích</div>
+              </div>
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Thành phố tương lai')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-solid fa-city"></i>
+                </div>
+                <div class="context-card-text">Thành phố tương lai</div>
+              </div>
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Trường học phép thuật')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-solid fa-hat-wizard"></i>
+                </div>
+                <div class="context-card-text">Trường học phép thuật</div>
+              </div>
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Dưới đáy đại dương')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #38BDF8, #0284C7); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-solid fa-fish-fins"></i>
+                </div>
+                <div class="context-card-text">Dưới đáy đại dương</div>
+              </div>
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Hành tinh kỳ lạ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-solid fa-meteor"></i>
+                </div>
+                <div class="context-card-text">Hành tinh kỳ lạ</div>
+              </div>
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Nhà của bé')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-solid fa-house-chimney"></i>
+                </div>
+                <div class="context-card-text">Nhà của bé</div>
+              </div>
+              <div class="context-card space-card" onclick="selectSpaceCard(this, 'Công viên vui chơi')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #A3E635, #65A30D); color: #FFFFFF; margin-bottom: 8px;">
+                  <i class="fa-solid fa-shapes"></i>
+                </div>
+                <div class="context-card-text">Công viên vui chơi</div>
+              </div>
+            </div>
+            
+            <div class="custom-space-box">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-space-input" class="custom-space-input"
+                  placeholder="Viết ý tưởng của em vào đây..." maxlength="50" onfocus="onCustomSpaceFocus()" oninput="updateSpaceCharCounter(this); onCustomSpaceInput()">
+              </div>
+              <div class="custom-space-counter" id="space-char-counter">0 / 50</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ===== STEP 3: OPENING PANEL ===== -->
+        <div class="opening-step-panel" id="opening-step-panel">
+          <!-- Section 1: Hành động -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-person-running"></i> Nhân vật đang làm gì?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Ăn uống')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
+                  <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div class="idea-card-text">Ăn uống</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nằm ngủ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #A78BFA, #7C3AED); color: #FFFFFF;">
+                  <i class="fa-solid fa-bed"></i>
+                </div>
+                <div class="idea-card-text">Nằm ngủ</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Đi trên đường')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;">
+                  <i class="fa-solid fa-person-walking"></i>
+                </div>
+                <div class="idea-card-text">Đi trên đường</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Nói chuyện')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+                  <i class="fa-solid fa-comments"></i>
+                </div>
+                <div class="idea-card-text">Nói chuyện</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Chơi đồ chơi')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
+                  <i class="fa-solid fa-puzzle-piece"></i>
+                </div>
+                <div class="idea-card-text">Chơi đồ chơi</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Đọc sách')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                  <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div class="idea-card-text">Đọc sách</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Dọn dẹp')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #38BDF8, #0284C7); color: #FFFFFF;">
+                  <i class="fa-solid fa-broom"></i>
+                </div>
+                <div class="idea-card-text">Dọn dẹp</div>
+              </div>
+              <div class="idea-card opening-action-card" onclick="selectOpeningActionCard(this, 'Chờ ai đó')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FB923C, #D97706); color: #FFFFFF;">
+                  <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+                <div class="idea-card-text">Chờ ai đó</div>
+              </div>
+            </div>
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-opening-action" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('action-char-counter').innerText = this.value.length + ' / 50'; selectedOpeningAction = this.value.trim(); document.querySelectorAll('.opening-action-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(3); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="action-char-counter">0 / 50</div>
+            </div>
+          </div>
+
+          <hr class="char-section-divider">
+
+          <!-- Section 2: Cảm xúc -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-face-smile-beam"></i> Cảm xúc của nhân vật</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Vui vẻ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-face-laugh-beam"></i></div>
+                <div class="idea-card-text">Vui vẻ</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Háo hức')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-face-grin-stars"></i></div>
+                <div class="idea-card-text">Háo hức</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Sợ hãi')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-face-grimace"></i></div>
+                <div class="idea-card-text">Sợ hãi</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tức giận')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-face-angry"></i></div>
+                <div class="idea-card-text">Tức giận</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Buồn bã')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #3B82F6); color: #FFFFFF;"><i class="fa-solid fa-face-sad-tear"></i></div>
+                <div class="idea-card-text">Buồn bã</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Tò mò')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-face-flushed"></i></div>
+                <div class="idea-card-text">Tò mò</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Ngạc nhiên')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-face-surprise"></i></div>
+                <div class="idea-card-text">Ngạc nhiên</div>
+              </div>
+              <div class="idea-card opening-emotion-card" onclick="selectOpeningEmotionCard(this, 'Lo lắng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #34D399, #059669); color: #FFFFFF;"><i class="fa-solid fa-face-frown-open"></i></div>
+                <div class="idea-card-text">Lo lắng</div>
+              </div>
+            </div>
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-opening-emotion" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('emotion-char-counter').innerText = this.value.length + ' / 50'; selectedOpeningEmotion = this.value.trim(); document.querySelectorAll('.opening-emotion-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(3); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="emotion-char-counter">0 / 50</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 4: UNEXPECTED EVENT PANEL ===== -->
+        <div class="unexpected-step-panel" id="unexpected-step-panel">
+          <!-- Section 1: Điều bất ngờ xảy ra -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-wand-magic-sparkles" style="color: #FF7597;"></i> Điều bất ngờ nào xảy ra?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Món đồ quan trọng bỗng biến mất')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
+                  <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div class="idea-card-text">Món đồ quan trọng bỗng biến mất</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Tìm thấy một vật lạ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div class="idea-card-text">Tìm thấy một vật lạ</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Người bạn bất ngờ xuất hiện')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="idea-card-text">Người bạn bất ngờ xuất hiện</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Có tiếng động kỳ lạ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
+                  <i class="fa-solid fa-volume-high"></i>
+                </div>
+                <div class="idea-card-text">Có tiếng động kỳ lạ</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Một cánh cửa bí mật mở ra')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;">
+                  <i class="fa-solid fa-door-open"></i>
+                </div>
+                <div class="idea-card-text">Một cánh cửa bí mật mở ra</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Một món đồ bỗng biết nói')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                  <i class="fa-solid fa-comment-dots"></i>
+                </div>
+                <div class="idea-card-text">Một món đồ bỗng biết nói</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Vô tình làm hỏng đồ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;">
+                  <i class="fa-solid fa-burst"></i>
+                </div>
+                <div class="idea-card-text">Vô tình làm hỏng đồ</div>
+              </div>
+              <div class="idea-card unexpected-event-card" onclick="selectUnexpectedEventCard(this, 'Bị đưa đến một nơi khác')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #818CF8, #4F46E5); color: #FFFFFF;">
+                  <i class="fa-solid fa-dharmachakra"></i>
+                </div>
+                <div class="idea-card-text">Bị đưa đến một nơi khác</div>
+              </div>
+            </div>
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-unexpected-event" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('unexpected-event-counter').innerText = this.value.length + ' / 50'; selectedUnexpectedEvent = this.value.trim(); document.querySelectorAll('.unexpected-event-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(4); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="unexpected-event-counter">0 / 50</div>
+            </div>
+          </div>
+
+          <hr class="char-section-divider">
+
+          <!-- Section 2: Phản ứng với điều bất ngờ -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-hand-sparkles"></i> Nhân vật phản ứng như thế nào với điều bất ngờ ấy?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Ngạc nhiên đứng sững')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-face-surprise"></i></div>
+                <div class="idea-card-text">Ngạc nhiên đứng sững</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Hoảng hốt lùi lại')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-person-walking-arrow-loop-left"></i></div>
+                <div class="idea-card-text">Hoảng hốt lùi lại</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Tò mò tiến đến gần')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <div class="idea-card-text">Tò mò tiến đến gần</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Vội vàng kiểm tra')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-stopwatch"></i></div>
+                <div class="idea-card-text">Vội vàng kiểm tra</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Gọi người khác giúp')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-bullhorn"></i></div>
+                <div class="idea-card-text">Gọi người khác giúp</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Bình tĩnh quan sát')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-binoculars"></i></div>
+                <div class="idea-card-text">Bình tĩnh quan sát</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Cố giấu sự việc')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-eye-slash"></i></div>
+                <div class="idea-card-text">Cố giấu sự việc</div>
+              </div>
+              <div class="idea-card unexpected-emotion-card" onclick="selectUnexpectedEmotionCard(this, 'Lập tức đuổi theo')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-bolt"></i></div>
+                <div class="idea-card-text">Lập tức đuổi theo</div>
+              </div>
+            </div>
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-unexpected-emotion" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('unexpected-emotion-counter').innerText = this.value.length + ' / 50'; selectedUnexpectedEmotion = this.value.trim(); document.querySelectorAll('.unexpected-emotion-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(4); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="unexpected-emotion-counter">0 / 50</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 5: PURPOSE PANEL ===== -->
+        <div class="purpose-step-panel" id="purpose-step-panel">
+          <div>
+            <div class="idea-cards-grid">
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Tìm lại thứ đã mất')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div class="idea-card-text">Tìm lại thứ đã mất</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Giúp đỡ một người')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                  <i class="fa-solid fa-hand-holding-heart"></i>
+                </div>
+                <div class="idea-card-text">Giúp đỡ một người</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Khám phá một bí mật')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;">
+                  <i class="fa-solid fa-key"></i>
+                </div>
+                <div class="idea-card-text">Khám phá một bí mật</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Hoàn thành nhiệm vụ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;">
+                  <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="idea-card-text">Hoàn thành nhiệm vụ</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Sửa chữa sai lầm')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </div>
+                <div class="idea-card-text">Sửa chữa sai lầm</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Trở về nơi an toàn')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #38BDF8, #0284C7); color: #FFFFFF;">
+                  <i class="fa-solid fa-house"></i>
+                </div>
+                <div class="idea-card-text">Trở về nơi an toàn</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Chứng minh bản thân')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FACC15, #EAB308); color: #FFFFFF;">
+                  <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="idea-card-text">Chứng minh bản thân</div>
+              </div>
+              <div class="idea-card purpose-card" onclick="selectPurposeCard(this, 'Bảo vệ điều quan trọng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="idea-card-text">Bảo vệ điều quan trọng</div>
+              </div>
+            </div>
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="main-char-purpose-input" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('purpose-char-counter').innerText = this.value.length + ' / 50'; document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="purpose-char-counter">0 / 50</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 6: OBSTACLE PANEL (Multi-section) ===== -->
+        <div class="obstacle-step-panel" id="obstacle-step-panel">
+          <!-- Section 1: Trở ngại là gì? -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-triangle-exclamation" style="color: #FF7597;"></i> Trở ngại là gì?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải vượt qua nỗi sợ')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-ghost"></i></div>
+                <div class="idea-card-text">Phải vượt qua nỗi sợ</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không biết bắt đầu từ đâu')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-question"></i></div>
+                <div class="idea-card-text">Không biết bắt đầu từ đâu</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Bị người khác ngăn cản')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-hand"></i></div>
+                <div class="idea-card-text">Bị người khác ngăn cản</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Không ai tin lời')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-comment-slash"></i></div>
+                <div class="idea-card-text">Không ai tin lời</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải giữ bí mật')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-lock"></i></div>
+                <div class="idea-card-text">Phải giữ bí mật</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Phải lựa chọn giữa hai điều quan trọng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div class="idea-card-text">Phải lựa chọn giữa hai điều quan trọng</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Mọi thứ không giống như tưởng tượng')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-cloud-rain"></i></div>
+                <div class="idea-card-text">Mọi thứ không giống như tưởng tượng</div>
+              </div>
+              <div class="idea-card obstacle-card" onclick="selectObstacleCard(this, 'Càng cố giải quyết, rắc rối càng lớn hơn')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="idea-card-text">Càng cố giải quyết, rắc rối càng lớn hơn</div>
+              </div>
+            </div>
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-obstacle-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('obstacle-char-counter').innerText = this.value.length + ' / 50'; selectedObstacle = this.value.trim(); document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="obstacle-char-counter">0 / 50</div>
+            </div>
+          </div>
+
+          <hr class="char-section-divider">
+
+          <!-- Section 2: Nhân vật thử làm gì? -->
+          <div>
+            <p class="context-section-label"><i class="fa-solid fa-lightbulb" style="color: #FF7597;"></i> Nhân vật thử làm gì?</p>
+            <div class="idea-cards-grid">
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Tự tìm cách giải quyết')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-user-gear"></i></div>
+                <div class="idea-card-text">Tự tìm cách giải quyết</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nhờ người khác giúp')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-user-group"></i></div>
+                <div class="idea-card-text">Nhờ người khác giúp</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Thử lại theo cách khác')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-arrows-rotate"></i></div>
+                <div class="idea-card-text">Thử lại theo cách khác</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Dùng một món đồ đặc biệt')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="idea-card-text">Dùng một món đồ đặc biệt</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nghĩ ra một kế hoạch')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-lightbulb"></i></div>
+                <div class="idea-card-text">Nghĩ ra một kế hoạch</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Quan sát và tìm manh mối')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <div class="idea-card-text">Quan sát và tìm manh mối</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Nói chuyện để thuyết phục')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><i class="fa-solid fa-comments"></i></div>
+                <div class="idea-card-text">Nói chuyện để thuyết phục</div>
+              </div>
+              <div class="idea-card attempt-card" onclick="selectAttemptCard(this, 'Làm liều một phen')">
+                <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-bolt-lightning"></i></div>
+                <div class="idea-card-text">Làm liều một phen</div>
+              </div>
+            </div>
+
+            <div class="custom-space-box" style="margin-top: 16px;">
+              <div class="custom-space-icon">
+                <i class="fa-solid fa-pen-fancy"></i>
+              </div>
+              <div class="custom-space-input-wrapper" style="justify-content: center;">
+                <input type="text" id="custom-attempt-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('attempt-char-counter').innerText = this.value.length + ' / 50'; selectedAttempt = this.value.trim(); document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(5); updateProgressUI();">
+              </div>
+              <div class="custom-space-counter" id="attempt-char-counter">0 / 50</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 7: ENDING PANEL ===== -->
+        <div class="ending-step-panel" id="ending-step-panel">
+          <div class="idea-cards-grid">
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc có hậu')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #EAB308); color: #FFFFFF;">
+                <i class="fa-solid fa-face-laugh-beam"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc có hậu</div>
+            </div>
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc mở')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+                <i class="fa-solid fa-door-open"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc mở</div>
+            </div>
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc buồn')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #94A3B8, #475569); color: #FFFFFF;">
+                <i class="fa-solid fa-cloud-rain"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc buồn</div>
+            </div>
+            <div class="idea-card ending-card" onclick="selectEndingCard(this, 'Kết thúc cảm động')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+                <i class="fa-solid fa-heart"></i>
+              </div>
+              <div class="idea-card-text">Kết thúc cảm động</div>
+            </div>
+          </div>
+
+          <div class="custom-space-box" style="margin-top: 16px;">
+            <div class="custom-space-icon">
+              <i class="fa-solid fa-pen-fancy"></i>
+            </div>
+            <div class="custom-space-input-wrapper" style="justify-content: center;">
+              <input type="text" id="custom-ending-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('ending-char-counter').innerText = this.value.length + ' / 50'; selectedEnding = this.value.trim(); selectedIdeaText = this.value.trim(); document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(7); updateProgressUI();">
+            </div>
+            <div class="custom-space-counter" id="ending-char-counter">0 / 50</div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 8: INSIGHT PANEL ===== -->
+        <div class="insight-step-panel" id="insight-step-panel">
+          <div class="idea-cards-grid">
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Không thể làm mọi thứ một mình')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;"><i class="fa-solid fa-handshake-angle"></i></div>
+              <div class="idea-card-text">Không thể làm mọi thứ một mình</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Cần bình tĩnh hơn')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #22D3EE, #0891B2); color: #FFFFFF;"><i class="fa-solid fa-brain"></i></div>
+              <div class="idea-card-text">Cần bình tĩnh hơn</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Phải tin vào bản thân')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;"><i class="fa-solid fa-star"></i></div>
+              <div class="idea-card-text">Phải tin vào bản thân</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Có nhiều cách để giải quyết vấn đề')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;"><i class="fa-solid fa-route"></i></div>
+              <div class="idea-card-text">Có nhiều cách để giải quyết vấn đề</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Cần lắng nghe nhiều hơn')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"/><path d="M15 8.5a2.5 2.5 0 0 0-5 0v2"/></svg></div>
+              <div class="idea-card-text">Cần lắng nghe nhiều hơn</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Cần nói ra sự thật')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;"><i class="fa-solid fa-comment-dots"></i></div>
+              <div class="idea-card-text">Cần nói ra sự thật</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Một sai lầm vẫn có thể sửa chữa')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;"><i class="fa-solid fa-wrench"></i></div>
+              <div class="idea-card-text">Một sai lầm vẫn có thể sửa chữa</div>
+            </div>
+            <div class="idea-card insight-card" onclick="selectInsightCard(this, 'Điều quan trọng ở ngay trước mắt')">
+              <div class="idea-card-icon-box" style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;"><i class="fa-solid fa-gem"></i></div>
+              <div class="idea-card-text">Điều quan trọng ở ngay trước mắt</div>
+            </div>
+          </div>
+
+          <div class="custom-space-box" style="margin-top: 16px;">
+            <div class="custom-space-icon">
+              <i class="fa-solid fa-pen-fancy"></i>
+            </div>
+            <div class="custom-space-input-wrapper" style="justify-content: center;">
+              <input type="text" id="custom-insight-text" class="custom-space-input" placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="document.getElementById('insight-char-counter').innerText = this.value.length + ' / 50'; selectedInsight = this.value.trim(); document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));">
+            </div>
+            <div class="custom-space-counter" id="insight-char-counter">0 / 50</div>
+          </div>
+        </div>
+
+        <!-- 8 Option Cards Grid -->
+        <div class="idea-cards-grid" id="idea-cards-grid">
+
+          <!-- Card 1 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Món đồ quan trọng bỗng biến mất')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #FDE047, #CA8A04); color: #FFFFFF;">
+              <i class="fa-solid fa-box-open"></i>
+            </div>
+            <div class="idea-card-text">Món đồ quan trọng bỗng biến mất</div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Tìm thấy một vật lạ')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #6EE7B7, #059669); color: #FFFFFF;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <div class="idea-card-text">Tìm thấy một vật lạ</div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Người bạn bất ngờ xuất hiện')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #60A5FA, #2563EB); color: #FFFFFF;">
+              <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <div class="idea-card-text">Người bạn bất ngờ xuất hiện</div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Có tiếng động kỳ lạ')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #FDBA74, #EA580C); color: #FFFFFF;">
+              <i class="fa-solid fa-volume-high"></i>
+            </div>
+            <div class="idea-card-text">Có tiếng động kỳ lạ</div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Một cánh cửa bí mật mở ra')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #C084FC, #7C3AED); color: #FFFFFF;">
+              <i class="fa-solid fa-door-open"></i>
+            </div>
+            <div class="idea-card-text">Một cánh cửa bí mật mở ra</div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Một món đồ bỗng biết nói')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #F472B6, #DB2777); color: #FFFFFF;">
+              <i class="fa-solid fa-comment-dots"></i>
+            </div>
+            <div class="idea-card-text">Một món đồ bỗng biết nói</div>
+          </div>
+
+          <!-- Card 7 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Vô tình làm hỏng đồ')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #F87171, #DC2626); color: #FFFFFF;">
+              <i class="fa-solid fa-burst"></i>
+            </div>
+            <div class="idea-card-text">Vô tình làm hỏng đồ</div>
+          </div>
+
+          <!-- Card 8 -->
+          <div class="idea-card" onclick="selectIdeaCard(this, 'Bị đưa đến một nơi khác')">
+            <div class="idea-card-icon-box"
+              style="background: linear-gradient(135deg, #818CF8, #4F46E5); color: #FFFFFF;">
+              <i class="fa-solid fa-dharmachakra"></i>
+            </div>
+            <div class="idea-card-text">Bị đưa đến một nơi khác</div>
+          </div>
+
+        </div>
+
+        <!-- Custom Idea Input Box -->
+        <div class="custom-space-box" id="generic-custom-idea-box" style="margin-top: 16px;">
+          <div class="custom-space-icon">
+            <i class="fa-solid fa-pen-fancy"></i>
+          </div>
+          <div class="custom-space-input-wrapper" style="justify-content: center;">
+            <input type="text" id="custom-idea-text" class="custom-space-input"
+              placeholder="Viết ý tưởng của em vào đây..." maxlength="50" oninput="updateCharCounter(this); selectedClimax = this.value.trim(); document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => c.classList.remove('selected')); saveCurrentStepState(6); updateProgressUI();">
+          </div>
+          <div class="custom-space-counter" id="char-counter">0 / 50</div>
+        </div>
+
+        <!-- Wizard Action Buttons -->
+        <div class="wizard-actions-bar">
+          <button class="wizard-btn wizard-btn-prev" onclick="playPopAndNavigate('/art/story/genre')">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Quay lại</span>
+          </button>
+
+          <button class="wizard-btn wizard-btn-save" onclick="saveDraft()">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Lưu nháp</span>
+          </button>
+
+          <button class="wizard-btn wizard-btn-next" onclick="confirmIdeaNext()">
+            <span>Tiếp tục</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-message"></div>
+
+  <!-- Modal Popup: Album Nhân Vật -->
+  <div id="char-album-modal" class="char-modal-overlay">
+    <div class="char-modal-card">
+
+      <!-- Modal Header -->
+      <div class="char-modal-header">
+        <div class="char-modal-title">
+          <i class="fa-solid fa-box-archive" style="color: #FF5E97; font-size: 1.4rem;"></i>
+          <span>KHO NHÂN VẬT</span>
+        </div>
+        <div class="char-modal-controls">
+          <div class="char-modal-search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="album-search-input" placeholder="Tìm kiếm tên..."
+              oninput="filterAlbumModal(this.value)">
+          </div>
+          <button class="char-modal-close-btn" onclick="closeCharAlbumModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <hr class="char-modal-divider">
+
+      <!-- Modal Character Grid -->
+      <div class="char-modal-grid" id="char-modal-grid">
+        <!-- Grid will be populated dynamically -->
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Bubble pop sound using Web Audio API
+    function playPopSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch (e) {
+        console.warn("Audio Context blocked: ", e);
+      }
+    }
+
+    function playPopAndNavigate(url) {
+      playPopSound();
+      const loader = document.getElementById('page-loader-overlay');
+      if (loader) {
+        loader.style.display = 'flex';
+        loader.offsetHeight;
+        loader.style.opacity = '1';
+      }
+      setTimeout(() => {
+        window.location.href = url;
+      }, 350);
+    }
+
+    function showComingSoon(featureName) {
+      playPopSound();
+      const toast = document.getElementById('toast');
+      toast.innerText = `${featureName}`;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    let selectedTime = '';
+    let selectedSpace = '';
+    let selectedOpeningAction = '';
+    let selectedOpeningEmotion = '';
+    let selectedUnexpectedEvent = '';
+    let selectedUnexpectedEmotion = '';
+    let selectedObstacle = '';
+    let selectedAttempt = '';
+    let selectedEnding = '';
+    let selectedInsight = '';
+
+    function selectEndingCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedEnding = text;
+      const input = document.getElementById('custom-ending-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('ending-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+      saveCurrentStepState(7);
+      updateProgressUI();
+    }
+
+    function selectInsightCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.insight-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedInsight = text;
+      const input = document.getElementById('custom-insight-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('insight-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+      saveCurrentStepState(8);
+      updateProgressUI();
+    }
+
+    function selectAttemptCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.attempt-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedAttempt = text;
+      const input = document.getElementById('custom-attempt-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('attempt-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+      saveCurrentStepState(5);
+      updateProgressUI();
+    }
+
+    function selectObstacleCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.obstacle-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedObstacle = text;
+      const input = document.getElementById('custom-obstacle-text');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('obstacle-char-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+      saveCurrentStepState(5);
+      updateProgressUI();
+    }
+
+    function selectUnexpectedEventCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.unexpected-event-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedUnexpectedEvent = text;
+      const input = document.getElementById('custom-unexpected-event');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('unexpected-event-counter');
+        if (counter) counter.innerText = `${input.value.length} / 60`;
+      }
+      saveCurrentStepState(4);
+      updateProgressUI();
+    }
+
+    function selectUnexpectedEmotionCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.unexpected-emotion-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedUnexpectedEmotion = text;
+      const input = document.getElementById('custom-unexpected-emotion');
+      if (input) {
+        input.value = text;
+        const counter = document.getElementById('unexpected-emotion-counter');
+        if (counter) counter.innerText = `${input.value.length} / 50`;
+      }
+      saveCurrentStepState(4);
+      updateProgressUI();
+    }
+
+    function selectOpeningActionCard(card, actionText) {
+      playPopSound();
+      document.querySelectorAll('.opening-action-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedOpeningAction = actionText;
+
+      const input = document.getElementById('custom-opening-action');
+      if (input) {
+        if (actionText === 'Tự viết ý tưởng của em') {
+          input.focus();
+          selectedOpeningAction = input.value.trim();
+        } else {
+          input.value = actionText;
+          updateActionCharCounter(input);
+        }
+      }
+      saveCurrentStepState(3);
+      updateProgressUI();
+    }
+
+    function selectOpeningEmotionCard(card, emotionText) {
+      playPopSound();
+      document.querySelectorAll('.opening-emotion-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedOpeningEmotion = emotionText;
+
+      const input = document.getElementById('custom-opening-emotion');
+      if (input) {
+        if (emotionText === 'Tự viết ý tưởng của em') {
+          input.focus();
+          selectedOpeningEmotion = input.value.trim();
+        } else {
+          input.value = emotionText;
+          updateEmotionCharCounter(input);
+        }
+      }
+      saveCurrentStepState(3);
+      updateProgressUI();
+    }
+
+    function updateActionCharCounter(input) {
+      const counter = document.getElementById('action-char-counter');
+      if (counter) {
+        counter.innerText = `${input.value.length} / 50`;
+      }
+    }
+
+    function updateEmotionCharCounter(input) {
+      const counter = document.getElementById('emotion-char-counter');
+      if (counter) {
+        counter.innerText = `${input.value.length} / 50`;
+      }
+    }
+
+    function selectTimeCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.time-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedTime = text;
+      updateContextIdeaText();
+      saveCurrentStepState(2);
+      updateProgressUI();
+    }
+
+    function selectSpaceCard(card, text) {
+      playPopSound();
+      document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedSpace = text;
+      const customInput = document.getElementById('custom-space-input');
+      if(customInput) customInput.value = '';
+      updateContextIdeaText();
+      saveCurrentStepState(2);
+      updateProgressUI();
+    }
+
+    function selectPurposeCard(card, textVal) {
+      playPopSound();
+      document.querySelectorAll('.purpose-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      const input = document.getElementById('main-char-purpose-input');
+      if (input) {
+        input.value = textVal;
+        const counter = document.getElementById('purpose-char-counter');
+        if (counter) counter.innerText = `${textVal.length} / 50`;
+      }
+      saveCurrentStepState(5);
+      updateProgressUI();
+    }
+    
+    function onCustomSpaceFocus() {
+      document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+      const customInput = document.getElementById('custom-space-input');
+      if(customInput) {
+        selectedSpace = customInput.value.trim();
+        updateContextIdeaText();
+        saveCurrentStepState(2);
+        updateProgressUI();
+      }
+    }
+
+    function onCustomSpaceInput() {
+      const customInput = document.getElementById('custom-space-input');
+      if(customInput) {
+        document.querySelectorAll('.space-card').forEach(c => c.classList.remove('selected'));
+        selectedSpace = customInput.value.trim();
+        updateContextIdeaText();
+        saveCurrentStepState(2);
+        updateProgressUI();
+      }
+    }
+
+    function updateContextIdeaText() {
+      // Step 2 time & space context update
+    }
+
+    let selectedClimax = '';
+
+    function selectIdeaCard(card, ideaText) {
+      playPopSound();
+      document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedClimax = ideaText;
+
+      const input = document.getElementById('custom-idea-text');
+      if (input) {
+        if (ideaText === 'Tự viết ý tưởng của em') {
+          input.focus();
+        } else {
+          input.value = ideaText;
+          updateCharCounter(input);
+        }
+      }
+      saveCurrentStepState(6);
+      updateProgressUI();
+    }
+
+    function updateCharCounter(input) {
+      const counter = document.getElementById('char-counter');
+      const maxLen = input.getAttribute('maxlength') || 50;
+      if (counter) {
+        counter.innerText = `${input.value.length} / ${maxLen}`;
+      }
+    }
+
+    function updateSpaceCharCounter(input) {
+      const counter = document.getElementById('space-char-counter');
+      if (counter) {
+        counter.innerText = `${input.value.length} / 50`;
+      }
+    }
+
+    let subCharCount = 0;
+    let nextSubCharId = 0;
+    let currentAlbumTargetSlot = 'main'; // 'main' or 'sub-1', 'sub-2'
+
+    // Seed characters for album modal matching Kho Nhân Vật (storage.html)
+    const albumSeeds = [
+      { id: 'seed-yuu', name: 'Yuu', avatar: '/mee/PNG/storage-test-yuu-model.jpeg', fallback: '🐼' },
+      { id: 'seed-nori', name: 'Nori', avatar: '/mee/PNG/storage-test-nori-model.png', fallback: '🐰' },
+      { id: 'seed-bong', name: 'Bông', avatar: '/mee/PNG/storage-test-bông-model.jpeg', fallback: '🐑' }
+    ];
+
+    function openCharAlbumModal(targetSlot) {
+      playPopSound();
+      currentAlbumTargetSlot = targetSlot;
+      renderAlbumModal();
+      document.getElementById('char-album-modal').classList.add('show');
+    }
+
+    function closeCharAlbumModal() {
+      playPopSound();
+      document.getElementById('char-album-modal').classList.remove('show');
+    }
+
+    function renderAlbumModal(filterText = '') {
+      const grid = document.getElementById('char-modal-grid');
+      if (!grid) return;
+
+      let saved = [];
+      try {
+        const str = localStorage.getItem('storymee_saved_characters');
+        if (str) saved = JSON.parse(str);
+      } catch (e) { }
+
+      // Default sort by newest first
+      saved.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      const rawChars = [...saved, ...albumSeeds];
+      const allChars = [];
+      const seen = new Set();
+      rawChars.forEach(c => {
+        const key = c.id || c.avatar || c.name;
+        if (key && !seen.has(key)) {
+          seen.add(key);
+          allChars.push(c);
+        }
+      });
+
+      const keyword = filterText.toLowerCase().trim();
+      const filtered = keyword ? allChars.filter(c => c.name && c.name.toLowerCase().includes(keyword)) : allChars;
+
+      let html = '';
+
+      filtered.forEach(char => {
+        const ava = char.avatar || char.profileImg || '';
+        const fallback = char.fallback || '🧒';
+        html += `
+          <div class="char-album-card" onclick="chooseCharFromAlbum('${char.name.replace(/'/g, "\\'")}', '${ava}', '${fallback}')" title="${char.name}">
+            <img src="${ava}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:2.2rem;display:flex;align-items:center;justify-content:center;height:100%\'>${fallback}</span>';">
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function filterAlbumModal(val) {
+      renderAlbumModal(val);
+    }
+
+    function chooseCharFromAlbum(name, imgSrc, fallbackEmoji) {
+      playPopSound();
+      const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:1.6rem\'>${fallbackEmoji}</span>';">` : `<span style="font-size:1.6rem">${fallbackEmoji}</span>`;
+
+      if (currentAlbumTargetSlot === 'main') {
+        const slot = document.getElementById('main-char-slot');
+        if (slot) slot.classList.add('filled');
+        document.getElementById('main-char-name').innerText = name;
+        document.getElementById('main-char-avatar').innerHTML = imgTag;
+
+        // Show questions box
+        const qBox = document.getElementById('main-char-questions');
+        if (qBox) qBox.classList.add('active');
+
+        // Show avatar next to Kho nhân vật button
+        const avaBox = document.getElementById('main-selected-ava-box');
+        const avaImg = document.getElementById('main-selected-ava-img');
+        if (avaBox && avaImg) {
+          avaImg.src = imgSrc || '';
+          avaImg.onerror = function () {
+            this.style.display = 'none';
+            avaBox.innerHTML = `<span style="font-size:1.5rem">${fallbackEmoji}</span>`;
+          };
+          avaBox.style.display = 'flex';
+        }
+      } else {
+        // e.g. sub-1, sub-2
+        const slotIdx = currentAlbumTargetSlot.replace('sub-', '');
+        const slot = document.getElementById(`sub-char-slot-${slotIdx}`);
+        if (slot) slot.classList.add('filled');
+        const nameEl = document.getElementById(`sub-char-name-${slotIdx}`);
+        if (nameEl) nameEl.innerText = name;
+        const avatarEl = document.getElementById(`sub-char-avatar-${slotIdx}`);
+        if (avatarEl) avatarEl.innerHTML = imgTag;
+
+        const avaBox = document.getElementById(`sub-selected-ava-box-${slotIdx}`);
+        const avaImg = document.getElementById(`sub-selected-ava-img-${slotIdx}`);
+        if (avaBox && avaImg) {
+          avaImg.src = imgSrc || '';
+          avaImg.onerror = function () {
+            this.style.display = 'none';
+            avaBox.innerHTML = `<span style="font-size:1.5rem">${fallbackEmoji}</span>`;
+          };
+          avaBox.style.display = 'flex';
+        }
+
+        // Show questions box
+        const qBox = document.getElementById(`sub-char-questions-${slotIdx}`);
+        if (qBox) qBox.classList.add('active');
+      }
+
+      closeCharAlbumModal();
+      checkStep1Completion();
+    }
+
+    function checkStep1Completion(skipProgressUpdate = false) {
+      const mainSlot = document.getElementById('main-char-slot');
+      const isMainFilled = mainSlot && mainSlot.classList.contains('filled');
+      
+      const roleInput = document.getElementById('main-char-role-input');
+      const purposeInput = document.getElementById('main-char-purpose-input');
+      const roleVal = roleInput ? roleInput.value.trim() : '';
+      const purposeVal = purposeInput ? purposeInput.value.trim() : '';
+
+      if (isMainFilled && roleVal && purposeVal) {
+        completedSteps.add(1);
+      } else {
+        completedSteps.delete(1);
+      }
+      if (!skipProgressUpdate) {
+        updateProgressUI();
+      }
+    }
+
+    function saveCharacterStepData() {
+      const mainName = document.getElementById('main-char-name')?.innerText || '';
+      const mainAvaImg = document.getElementById('main-selected-ava-img')?.src || '';
+      const mainRole = document.getElementById('main-char-role-input')?.value.trim() || '';
+      const mainPurpose = document.getElementById('main-char-purpose-input')?.value.trim() || '';
+
+      const subChars = [];
+      for (let i = 1; i <= nextSubCharId; i++) {
+        const block = document.getElementById(`sub-char-block-${i}`);
+        if (block) {
+          const subName = document.getElementById(`sub-char-name-${i}`)?.innerText || '';
+          const subAvaImg = document.getElementById(`sub-selected-ava-img-${i}`)?.src || '';
+          const inputs = block.querySelectorAll('.char-question-input');
+          const subRole = inputs[0] ? inputs[0].value.trim() : '';
+          const subPurpose = inputs[1] ? inputs[1].value.trim() : '';
+          subChars.push({ name: subName, avatar: subAvaImg, role: subRole, purpose: subPurpose });
+        }
+      }
+
+      const characterData = {
+        mainCharacter: {
+          name: mainName,
+          avatar: mainAvaImg,
+          role: mainRole,
+          purpose: mainPurpose
+        },
+        supportingCharacters: subChars
+      };
+
+      try {
+        localStorage.setItem('storymee_current_story_characters', JSON.stringify(characterData));
+      } catch (e) {
+        console.warn('Cannot save character data to localStorage', e);
+      }
+    }
+
+    function addMoreSubChar() {
+      if (subCharCount >= 3) return;
+      subCharCount++;
+      nextSubCharId++;
+      const idx = nextSubCharId;
+      const container = document.getElementById('extra-sub-chars-container');
+      const labelText = nextSubCharId === 1 ? 'Nhân vật phụ' : `Nhân vật phụ ${nextSubCharId}`;
+      const html = `
+        <div id="sub-char-block-${idx}" class="sub-char-block">
+          <p class="char-section-label">
+            <i class="fa-solid fa-users"></i> ${labelText} 
+          </p>
+          <div class="char-slot-box" id="sub-char-slot-${idx}" style="margin-bottom: 10px;">
+            <button class="sub-char-remove-btn" onclick="removeSubCharBlock(${idx})" title="Xóa nhân vật phụ này">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="char-slot-avatar" id="sub-char-avatar-${idx}">
+              <i class="fa-solid fa-user" style="color: #A5B4FC;"></i>
+            </div>
+            <div class="char-slot-info">
+              <p class="char-slot-name" id="sub-char-name-${idx}">Chưa chọn</p>
+              <p class="char-slot-desc">Bấm vào Kho nhân vật bên dưới để chọn</p>
+            </div>
+          </div>
+          <div class="char-questions-box" id="sub-char-questions-${idx}">
+            <div class="char-question-item">
+              <label class="char-question-label">Nhân vật đóng vai trò gì trong câu chuyện?</label>
+              <input type="text" class="char-question-input" placeholder="Ví dụ: Người đồng hành, trợ thủ...">
+            </div>
+            <div class="char-question-item">
+              <label class="char-question-label">Mục đích của nhân vật trong câu chuyện này là gì?</label>
+              <input type="text" class="char-question-input" placeholder="Ví dụ: Giúp đỡ bạn bè, bảo vệ rừng...">
+            </div>
+          </div>
+          <div class="char-action-row">
+            <button class="char-create-plus-btn" onclick="playPopAndNavigate('/character/generate?new=1')" title="Tạo nhân vật mới">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+            <button class="char-storage-btn" onclick="openCharAlbumModal('sub-${idx}')">
+              <i class="fa-solid fa-box-archive"></i>
+              <span>Kho nhân vật</span>
+            </button>
+            <div class="char-selected-avatar-box" id="sub-selected-ava-box-${idx}" style="display: none;">
+              <img id="sub-selected-ava-img-${idx}" src="" alt="Avatar">
+            </div>
+          </div>
+        </div>`;
+      if (container) container.insertAdjacentHTML('beforeend', html);
+      if (subCharCount >= 3) {
+        const btn = document.getElementById('add-more-sub-btn');
+        if (btn) btn.style.display = 'none';
+      }
+    }
+
+    function removeSubCharBlock(idx) {
+      playPopSound();
+      const block = document.getElementById(`sub-char-block-${idx}`);
+      if (block) {
+        block.remove();
+      }
+      subCharCount = Math.max(0, subCharCount - 1);
+      const addBtn = document.getElementById('add-more-sub-btn');
+      if (addBtn && subCharCount < 3) addBtn.style.display = 'inline-flex';
+    }
+
+    let currentStepIndex = 1;
+    let completedSteps = new Set();
+
+    function saveCurrentStepState(stepIdx) {
+      if (!stepIdx) stepIdx = currentStepIndex;
+
+      if (stepIdx === 1) {
+        checkStep1Completion(true);
+      } else if (stepIdx === 2) {
+        const customSpace = document.getElementById('custom-space-input')?.value.trim() || '';
+        const spaceVal = customSpace || selectedSpace;
+        if (selectedTime && spaceVal) {
+          completedSteps.add(2);
+        } else {
+          completedSteps.delete(2);
+        }
+      } else if (stepIdx === 3) {
+        const actVal = document.getElementById('custom-opening-action')?.value.trim() || selectedOpeningAction;
+        const emoVal = document.getElementById('custom-opening-emotion')?.value.trim() || selectedOpeningEmotion;
+        if (actVal && emoVal) {
+          completedSteps.add(3);
+        } else {
+          completedSteps.delete(3);
+        }
+      } else if (stepIdx === 4) {
+        const evtVal = document.getElementById('custom-unexpected-event')?.value.trim() || selectedUnexpectedEvent;
+        const emoVal = document.getElementById('custom-unexpected-emotion')?.value.trim() || selectedUnexpectedEmotion;
+        if (evtVal && emoVal) {
+          completedSteps.add(4);
+        } else {
+          completedSteps.delete(4);
+        }
+      } else if (stepIdx === 5) {
+        const purposeVal = document.getElementById('main-char-purpose-input')?.value.trim() || '';
+        if (purposeVal) {
+          completedSteps.add(5);
+        } else {
+          completedSteps.delete(5);
+        }
+      } else if (stepIdx === 6) {
+        const obsVal = document.getElementById('custom-obstacle-text')?.value.trim() || selectedObstacle;
+        const attVal = document.getElementById('custom-attempt-text')?.value.trim() || selectedAttempt;
+        if (obsVal && attVal) {
+          completedSteps.add(6);
+        } else {
+          completedSteps.delete(6);
+        }
+      } else if (stepIdx === 7) {
+        const customInput = document.getElementById('custom-idea-text');
+        const customVal = (currentStepIndex === 7 && customInput) ? customInput.value.trim() : selectedClimax;
+        if (customVal) {
+          completedSteps.add(7);
+        } else {
+          completedSteps.delete(7);
+        }
+      } else if (stepIdx === 8) {
+        const endVal = document.getElementById('custom-ending-text')?.value.trim() || selectedEnding;
+        if (endVal) {
+          completedSteps.add(8);
+        } else {
+          completedSteps.delete(8);
+        }
+      } else if (stepIdx === 9) {
+        const insVal = document.getElementById('custom-insight-text')?.value.trim() || selectedInsight;
+        if (insVal) {
+          completedSteps.add(9);
+        } else {
+          completedSteps.delete(9);
+        }
+      }
+    }
+
+    function restoreStepStateUI(stepIdx) {
+      if (stepIdx === 2) {
+        if (selectedTime) {
+          document.querySelectorAll('.time-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedTime.toLowerCase()) {
+              c.classList.add('selected');
+            }
+          });
+        }
+        if (selectedSpace) {
+          let matched = false;
+          document.querySelectorAll('.space-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedSpace.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          const spaceInput = document.getElementById('custom-space-input');
+          if (spaceInput && !matched) {
+            spaceInput.value = selectedSpace;
+            updateSpaceCharCounter(spaceInput);
+          }
+        }
+      } else if (stepIdx === 3) {
+        const actInput = document.getElementById('custom-opening-action');
+        const emoInput = document.getElementById('custom-opening-emotion');
+        if (selectedOpeningAction) {
+          let matched = false;
+          document.querySelectorAll('.opening-action-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedOpeningAction.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (actInput && (!matched || actInput.value)) {
+            if (!matched) actInput.value = selectedOpeningAction;
+            updateActionCharCounter(actInput);
+          }
+        }
+        if (selectedOpeningEmotion) {
+          let matched = false;
+          document.querySelectorAll('.opening-emotion-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedOpeningEmotion.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (emoInput && (!matched || emoInput.value)) {
+            if (!matched) emoInput.value = selectedOpeningEmotion;
+            updateEmotionCharCounter(emoInput);
+          }
+        }
+      } else if (stepIdx === 4) {
+        const evtInput = document.getElementById('custom-unexpected-event');
+        const emoInput = document.getElementById('custom-unexpected-emotion');
+        if (selectedUnexpectedEvent) {
+          let matched = false;
+          document.querySelectorAll('.unexpected-event-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedUnexpectedEvent.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (evtInput && (!matched || evtInput.value)) {
+            if (!matched) evtInput.value = selectedUnexpectedEvent;
+            const counter = document.getElementById('unexpected-event-counter');
+            if (counter) counter.innerText = `${evtInput.value.length} / 50`;
+          }
+        }
+        if (selectedUnexpectedEmotion) {
+          let matched = false;
+          document.querySelectorAll('.unexpected-emotion-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedUnexpectedEmotion.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (emoInput && (!matched || emoInput.value)) {
+            if (!matched) emoInput.value = selectedUnexpectedEmotion;
+            const counter = document.getElementById('unexpected-emotion-counter');
+            if (counter) counter.innerText = `${emoInput.value.length} / 50`;
+          }
+        }
+      } else if (stepIdx === 5) {
+        const purposeInput = document.getElementById('main-char-purpose-input');
+        if (purposeInput && purposeInput.value.trim()) {
+          const val = purposeInput.value.trim().toLowerCase();
+          document.querySelectorAll('.purpose-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === val) {
+              c.classList.add('selected');
+            }
+          });
+          const counter = document.getElementById('purpose-char-counter');
+          if (counter) counter.innerText = `${purposeInput.value.length} / 50`;
+        }
+      } else if (stepIdx === 6) {
+        const obsInput = document.getElementById('custom-obstacle-text');
+        const attInput = document.getElementById('custom-attempt-text');
+        if (selectedObstacle) {
+          let matched = false;
+          document.querySelectorAll('.obstacle-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedObstacle.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (obsInput && (!matched || obsInput.value)) {
+            if (!matched) obsInput.value = selectedObstacle;
+            const counter = document.getElementById('obstacle-char-counter');
+            if (counter) counter.innerText = `${obsInput.value.length} / 50`;
+          }
+        }
+        if (selectedAttempt) {
+          let matched = false;
+          document.querySelectorAll('.attempt-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedAttempt.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (attInput && (!matched || attInput.value)) {
+            if (!matched) attInput.value = selectedAttempt;
+            const counter = document.getElementById('attempt-char-counter');
+            if (counter) counter.innerText = `${attInput.value.length} / 50`;
+          }
+        }
+      } else if (stepIdx === 7) {
+        const customInput = document.getElementById('custom-idea-text');
+        if (selectedClimax) {
+          let matched = false;
+          document.querySelectorAll('#idea-cards-grid .idea-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedClimax.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (customInput) {
+            customInput.value = selectedClimax;
+            updateCharCounter(customInput);
+          }
+        }
+      } else if (stepIdx === 8) {
+        const endInput = document.getElementById('custom-ending-text');
+        if (selectedEnding) {
+          let matched = false;
+          document.querySelectorAll('.ending-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedEnding.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (endInput && (!matched || endInput.value)) {
+            if (!matched) endInput.value = selectedEnding;
+            const counter = document.getElementById('ending-char-counter');
+            if (counter) counter.innerText = `${endInput.value.length} / 50`;
+          }
+        }
+      } else if (stepIdx === 9) {
+        const insInput = document.getElementById('custom-insight-text');
+        if (selectedInsight) {
+          let matched = false;
+          document.querySelectorAll('.insight-card').forEach(c => {
+            if (c.innerText.trim().toLowerCase() === selectedInsight.toLowerCase()) {
+              c.classList.add('selected');
+              matched = true;
+            }
+          });
+          if (insInput && (!matched || insInput.value)) {
+            if (!matched) insInput.value = selectedInsight;
+            const counter = document.getElementById('insight-char-counter');
+            if (counter) counter.innerText = `${insInput.value.length} / 50`;
+          }
+        }
+      }
+    }
+
+    function updateProgressUI() {
+      for (let i = 1; i <= 9; i++) {
+        saveCurrentStepState(i);
+      }
+      const pct = Math.round((completedSteps.size / 9) * 100);
+      const fill = document.getElementById('progress-fill-bar');
+      const label = document.getElementById('progress-step-label');
+      if (fill) fill.style.width = `${pct}%`;
+      if (label) label.innerText = `${completedSteps.size}/9`;
+    }
+
+    function selectStep(stepNumber) {
+      playPopSound();
+
+      // Save previous step state before leaving
+      if (currentStepIndex && currentStepIndex !== stepNumber) {
+        saveCurrentStepState(currentStepIndex);
+      }
+
+      currentStepIndex = stepNumber;
+      const items = document.querySelectorAll('.step-item');
+      items.forEach((item, index) => {
+        if (index + 1 === stepNumber) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+      
+      // Restore UI elements for newly selected step
+      restoreStepStateUI(stepNumber);
+
+      // Save current step & update progress UI
+      saveCurrentStepState(stepNumber);
+      updateProgressUI();
+
+      // Update title and subtitle
+      const titleEl = document.querySelector('.plot-question-title');
+      const subtitleEl = document.querySelector('.plot-question-subtitle');
+      
+      // Toggle between character panel, context panel, idea cards, etc.
+      const charPanel = document.getElementById('char-step-panel');
+      const contextPanel = document.getElementById('context-step-panel');
+      const openingPanel = document.getElementById('opening-step-panel');
+      const unexpectedPanel = document.getElementById('unexpected-step-panel');
+      const purposePanel = document.getElementById('purpose-step-panel');
+      const obstaclePanel = document.getElementById('obstacle-step-panel');
+      const endingPanel = document.getElementById('ending-step-panel');
+      const insightPanel = document.getElementById('insight-step-panel');
+      const ideaGrid = document.getElementById('idea-cards-grid');
+      const customBox = document.getElementById('generic-custom-idea-box');
+      
+      if (stepNumber === 1) {
+        if (titleEl) titleEl.innerText = 'Nhân vật';
+        if (subtitleEl) subtitleEl.innerText = 'Chọn nhân vật chính và các nhân vật phụ đồng hành.';
+        
+        if (charPanel) charPanel.classList.add('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 2) {
+        if (titleEl) titleEl.innerText = 'Bối cảnh';
+        if (subtitleEl) subtitleEl.innerText = 'Chọn thời gian và không gian cho câu chuyện của bạn.';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.add('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 3) {
+        if (titleEl) titleEl.innerText = 'Khởi đầu';
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật đang làm gì và cảm thấy như thế nào?';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.add('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 4) {
+        if (titleEl) titleEl.innerText = 'Điều bất ngờ';
+        if (subtitleEl) subtitleEl.innerText = 'Sự việc nào làm thay đổi nhân vật và nhân vật phản ứng như thế nào với điều bất ngờ ấy?';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.add('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 5) {
+        if (titleEl) titleEl.innerText = 'Mục đích';
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật muốn đạt được điều gì hay giải quyết điều bất ngờ đó ra sao?';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.add('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 6) {
+        if (titleEl) titleEl.innerText = 'Trở ngại';
+        if (subtitleEl) subtitleEl.innerText = 'Trở ngại nào xảy ra và nhân vật lựa chọn cách nào để thử vượt qua?';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.add('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 7) {
+        if (titleEl) titleEl.innerText = 'Cao trào';
+        if (subtitleEl) subtitleEl.innerText = 'Khoảnh khắc quyết định: nhân vật thực hiện hành động quan trọng nhất.';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'grid';
+        if (customBox) customBox.style.display = 'flex';
+      } else if (stepNumber === 8) {
+        if (titleEl) titleEl.innerText = 'Kết thúc';
+        if (subtitleEl) subtitleEl.innerText = 'Chọn loại kết thúc hoặc tự viết kết thúc cho câu chuyện của bạn.';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.add('active');
+        if (insightPanel) insightPanel.classList.remove('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      } else if (stepNumber === 9) {
+        if (titleEl) titleEl.innerText = 'Bài học';
+        if (subtitleEl) subtitleEl.innerText = 'Nhân vật nhận được sự thay đổi hoặc bài học gì?';
+        
+        if (charPanel) charPanel.classList.remove('active');
+        if (contextPanel) contextPanel.classList.remove('active');
+        if (openingPanel) openingPanel.classList.remove('active');
+        if (unexpectedPanel) unexpectedPanel.classList.remove('active');
+        if (purposePanel) purposePanel.classList.remove('active');
+        if (obstaclePanel) obstaclePanel.classList.remove('active');
+        if (endingPanel) endingPanel.classList.remove('active');
+        if (insightPanel) insightPanel.classList.add('active');
+        if (ideaGrid) ideaGrid.style.display = 'none';
+        if (customBox) customBox.style.display = 'none';
+      }
+    }
+
+    function confirmIdeaNext() {
+      playPopSound();
+
+      let isValid = false;
+
+      if (currentStepIndex === 1) {
+        const mainSlot = document.getElementById('main-char-slot');
+        if (!mainSlot || !mainSlot.classList.contains('filled')) {
+          showComingSoon('Vui lòng chọn nhân vật chính!');
+          return;
+        }
+
+        const roleInput = document.getElementById('main-char-role-input');
+        const roleVal = roleInput ? roleInput.value.trim() : '';
+
+        if (!roleVal) {
+          showComingSoon('Vui lòng điền vai trò của nhân vật chính!');
+          return;
+        }
+
+        saveCharacterStepData();
+        isValid = true;
+      } else if (currentStepIndex === 2) {
+        const customSpace = document.getElementById('custom-space-input')?.value.trim() || '';
+        const spaceVal = customSpace || selectedSpace;
+        if (!selectedTime || !spaceVal) {
+          showComingSoon('Vui lòng chọn hoặc nhập cả thời gian và không gian!');
+          return;
+        }
+        isValid = true;
+      } else if (currentStepIndex === 3) {
+        const actionInput = document.getElementById('custom-opening-action');
+        const actionVal = actionInput ? actionInput.value.trim() : '';
+        const emotionInput = document.getElementById('custom-opening-emotion');
+        const emotionVal = emotionInput ? emotionInput.value.trim() : '';
+        
+        if (!actionVal && !selectedOpeningAction) {
+          showComingSoon('Vui lòng chọn hoặc viết hành động của nhân vật!');
+          return;
+        }
+        if (!emotionVal && !selectedOpeningEmotion) {
+          showComingSoon('Vui lòng chọn hoặc viết cảm xúc của nhân vật!');
+          return;
+        }
+        isValid = true;
+      } else if (currentStepIndex === 4) {
+        const eventInput = document.getElementById('custom-unexpected-event');
+        const eventVal = eventInput ? eventInput.value.trim() : '';
+        const emotionInput = document.getElementById('custom-unexpected-emotion');
+        const emotionVal = emotionInput ? emotionInput.value.trim() : '';
+        
+        if (!eventVal && !selectedUnexpectedEvent) {
+          showComingSoon('Vui lòng chọn hoặc viết điều bất ngờ xảy ra!');
+          return;
+        }
+        if (!emotionVal && !selectedUnexpectedEmotion) {
+          showComingSoon('Vui lòng chọn hoặc viết cảm xúc của nhân vật!');
+          return;
+        }
+        isValid = true;
+      } else if (currentStepIndex === 5) {
+        const purposeInput = document.getElementById('main-char-purpose-input');
+        const purposeVal = purposeInput ? purposeInput.value.trim() : '';
+        if (!purposeVal) {
+          showComingSoon('Vui lòng điền mục đích của nhân vật!');
+          return;
+        }
+        saveCharacterStepData();
+        isValid = true;
+      } else if (currentStepIndex === 6) {
+        const obstacleInput = document.getElementById('custom-obstacle-text');
+        const obstacleVal = obstacleInput ? obstacleInput.value.trim() : '';
+        const attemptInput = document.getElementById('custom-attempt-text');
+        const attemptVal = attemptInput ? attemptInput.value.trim() : '';
+
+        const finalObstacle = obstacleVal || selectedObstacle;
+        const finalAttempt = attemptVal || selectedAttempt;
+
+        if (!finalObstacle) {
+          showComingSoon('Vui lòng chọn hoặc tự viết một trở ngại!');
+          return;
+        }
+        if (!finalAttempt) {
+          showComingSoon('Vui lòng chọn hoặc tự viết cách nhân vật thử làm!');
+          return;
+        }
+        selectedIdeaText = `${finalObstacle} | ${finalAttempt}`;
+        isValid = true;
+      } else if (currentStepIndex === 7) {
+        const customInput = document.getElementById('custom-idea-text');
+        const customVal = customInput ? customInput.value.trim() : '';
+        if (!customVal && !selectedIdeaText) {
+          showComingSoon('Vui lòng chọn hoặc tự viết một ý tưởng!');
+          return;
+        }
+        isValid = true;
+      } else if (currentStepIndex === 8) {
+        const endingInput = document.getElementById('custom-ending-text');
+        const endingVal = endingInput ? endingInput.value.trim() : '';
+        if (!endingVal && !selectedEnding) {
+          showComingSoon('Vui lòng chọn hoặc tự viết kết thúc!');
+          return;
+        }
+        selectedIdeaText = endingVal || selectedEnding;
+        isValid = true;
+      } else if (currentStepIndex === 8) {
+        const insightInput = document.getElementById('custom-insight-text');
+        const insightVal = insightInput ? insightInput.value.trim() : '';
+        if (!insightVal && !selectedInsight) {
+          showComingSoon('Vui lòng chọn hoặc tự viết bài học!');
+          return;
+        }
+        selectedIdeaText = insightVal || selectedInsight;
+        isValid = true;
+      } else {
+        const customInput = document.getElementById('custom-idea-text');
+        const customVal = customInput ? customInput.value.trim() : '';
+        if (!customVal && !selectedIdeaText) {
+          showComingSoon('Vui lòng chọn hoặc tự viết một ý tưởng!');
+          return;
+        }
+        isValid = true;
+      }
+
+      if (isValid) {
+        completedSteps.add(currentStepIndex);
+        updateProgressUI();
+        
+        if (currentStepIndex < 9) {
+          selectStep(currentStepIndex + 1);
+        } else {
+          // Collect all story data and save to sessionStorage before navigating
+          const mainCharName = document.getElementById('main-char-name')?.innerText?.trim() || '';
+          const mainCharRole = document.getElementById('main-char-role-input')?.value?.trim() || '';
+          const mainCharPurpose = document.getElementById('main-char-purpose-input')?.value?.trim() || '';
+          const customSpace = document.getElementById('custom-space-input')?.value?.trim() || '';
+          const finalSpace = customSpace || selectedSpace;
+          const openingAction = document.getElementById('custom-opening-action')?.value?.trim() || selectedOpeningAction;
+          const openingEmotion = document.getElementById('custom-opening-emotion')?.value?.trim() || selectedOpeningEmotion;
+          const unexpectedEvent = document.getElementById('custom-unexpected-event')?.value?.trim() || selectedUnexpectedEvent;
+          const unexpectedEmotion = document.getElementById('custom-unexpected-emotion')?.value?.trim() || selectedUnexpectedEmotion;
+          const obstacleText = document.getElementById('custom-obstacle-text')?.value?.trim() || selectedObstacle;
+          const attemptText = document.getElementById('custom-attempt-text')?.value?.trim() || selectedAttempt;
+          const endingText = document.getElementById('custom-ending-text')?.value?.trim() || selectedEnding;
+          const insightText = document.getElementById('custom-insight-text')?.value?.trim() || selectedInsight;
+
+          // Collect supporting characters names
+          let secondaryChars = '';
+          try {
+            const charData = JSON.parse(localStorage.getItem('storymee_current_story_characters') || '{}');
+            if (charData.supportingCharacters && charData.supportingCharacters.length) {
+              secondaryChars = charData.supportingCharacters.map(c => c.name).filter(Boolean).join(', ');
+            }
+          } catch(e) {}
+
+          const storyData = {
+            genre: sessionStorage.getItem('selectedGenre') || '',
+            character: mainCharName,
+            role: mainCharRole,
+            purpose: mainCharPurpose,
+            secondaryChars,
+            time: selectedTime,
+            space: finalSpace,
+            openingAction,
+            openingEmotion,
+            unexpectedEvent,
+            unexpectedEmotion,
+            obstacle: obstacleText,
+            attempt: attemptText,
+            ending: endingText,
+            insight: insightText,
+          };
+          sessionStorage.setItem('storyPlotData', JSON.stringify(storyData));
+          playPopAndNavigate('/art/story/plot');
+        }
+      }
+    }
+
+    function adjustScale() {
+      const wrapper = document.querySelector('.scaler-wrapper');
+      if (!wrapper) return;
+
+      const targetWidth = 1927.63;
+      const targetHeight = 930;
+      const winWidth = window.innerWidth;
+      const winHeight = window.innerHeight;
+
+      const scale = Math.min(winWidth / targetWidth, winHeight / targetHeight);
+      wrapper.style.transform = `translateX(-50%) scale(${scale})`;
+    }
+
+    window.addEventListener('resize', adjustScale);
+    adjustScale();
+
+    let pageLoaded = false;
+    function hidePageLoader() {
+      if (pageLoaded) return;
+      pageLoaded = true;
+      adjustScale();
+      const loader = document.getElementById('page-loader-overlay');
+      if (!loader) return;
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 400);
+      }, 150);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      selectStep(1);
+    });
+
+    window.addEventListener('load', hidePageLoader);
+    setTimeout(hidePageLoader, 500); // Fallback: hide loader after 500ms
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        pageLoaded = false;
+        hidePageLoader();
+      }
+    });
+  </script>
+  <script src="/aikid-nav-bridge.js"></script>
+</body>
+
+</html>

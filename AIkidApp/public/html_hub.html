@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoryMee - AIKids (Testing Hub)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 55%, #FCE082 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    a.btn {
+      display: block;
+      padding: 15px 25px;
+      background: white;
+      color: #FF6B6B;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    a.btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      background: #FFF0F5;
+    }
+    .rn-btn {
+      margin-top: 30px;
+      background: #4CAF50 !important;
+      color: white !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>StoryMee Testing Hub 🚀</h1>
+    <p>Chọn phân hệ HTML gốc mà bạn muốn test độc lập trên cổng 8000.</p>
+    
+    <div class="grid">
+      <a href="/_art_backup_html/index.html" class="btn">🎨 Xưởng Vẽ (HTML)</a>
+      <a href="/_art_backup_html/comic.html" class="btn">📚 Sáng Tác (HTML)</a>
+      <a href="/character.html" class="btn">👾 Tạo Nhân Vật (HTML)</a>
+      <a href="/_mee_backup_html/index.html" class="btn">🗣️ Mee (HTML)</a>
+    </div>
+
+    <a href="http://localhost:8082" class="btn rn-btn" target="_blank">Sang Bản Mới (React Native :8082) ➡️</a>
+  </div>
+</body>
+</html>

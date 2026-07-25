@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76.04 30"><g transform="translate(-0.0000, 0.0000)"><g transform="translate(-0.0050, -234.3413)"><g id="Layer_2" data-name="Layer 2">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <path fill="#ffffff" d="M27.49,249.49a13.62,13.62,0,1,1-25.33-9.85l6.36,2.49L21.11,247Z"/>
+      <path fill="#0fa53a" d="M21.11,247a6.81,6.81,0,0,1-13.44-1.58,6.67,6.67,0,0,1,.85-3.3Z"/>
+      <polyline fill="none" stroke="#000000" stroke-miterlimit="10" stroke-width="1.17" points="27.49 249.49 21.11 247.01 8.52 242.13 2.16 239.64"/>
+      <path fill="#ffffff" d="M48.56,249.49a13.62,13.62,0,1,0,25.33-9.85l-6.36,2.49L54.93,247Z"/>
+      <path fill="#0fa53a" d="M54.93,247a6.82,6.82,0,1,0,12.6-4.88Z"/>
+      <polyline fill="none" stroke="#000000" stroke-miterlimit="10" stroke-width="1.17" points="73.89 239.64 67.53 242.13 54.93 247.01 48.56 249.49"/>
+    </g>
+  </g></g></g></svg>

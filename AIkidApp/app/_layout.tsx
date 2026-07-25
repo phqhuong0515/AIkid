@@ -71,7 +71,36 @@ function AuthCheck({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+import { useFonts } from 'expo-font';
+import {
+  Mali_400Regular,
+  Mali_500Medium,
+  Mali_600SemiBold,
+  Mali_700Bold,
+} from '@expo-google-fonts/mali';
+import {
+  Fredoka_400Regular,
+  Fredoka_500Medium,
+  Fredoka_600SemiBold,
+  Fredoka_700Bold,
+} from '@expo-google-fonts/fredoka';
+
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Mali_400Regular,
+    Mali_500Medium,
+    Mali_600SemiBold,
+    Mali_700Bold,
+    Fredoka_400Regular,
+    Fredoka_500Medium,
+    Fredoka_600SemiBold,
+    Fredoka_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthCheck>
