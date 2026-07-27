@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, Modal, StyleSheet,
   TextInput, Platform, Pressable,
@@ -12,9 +12,10 @@ type PinPadModalProps = {
   subtitle?: string;
   busy?: boolean;
   error?: string | null;
-  pin: string;
-  setPin: (pin: string) => void;
   closeLabel?: string;
+  // Legacy props - ignored, kept for backward compat
+  pin?: string;
+  setPin?: (pin: string) => void;
 };
 
 export function PinPadModal({
@@ -25,18 +26,21 @@ export function PinPadModal({
   subtitle,
   busy,
   error,
-  pin,
-  setPin,
   closeLabel = 'Hủy',
 }: PinPadModalProps) {
   const inputRef = useRef<TextInput>(null);
+  // Internal pin state - self-contained
+  const [pin, setPin] = useState('');
 
-  // Auto-focus khi modal mở (Web: bàn phím vật lý hoạt động ngay)
+  // Reset pin & focus khi modal mở/đóng
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setPin('');
+      return;
+    }
     const timer = setTimeout(() => {
       inputRef.current?.focus();
-    }, 100);
+    }, 150);
     return () => clearTimeout(timer);
   }, [isOpen]);
 
@@ -45,7 +49,7 @@ export function PinPadModal({
     if (busy) return;
     const digitsOnly = raw.replace(/\D/g, '').slice(0, 6);
     setPin(digitsOnly);
-    if (digitsOnly.length === 6 && digitsOnly !== pin) {
+    if (digitsOnly.length === 6) {
       onSubmit(digitsOnly);
     }
   };
@@ -97,10 +101,8 @@ export function PinPadModal({
               caretHidden
               style={styles.hiddenInput}
               editable={!busy}
-              autoFocus={Platform.OS === 'web'}
-              showSoftInputOnFocus={false}
-              autoComplete={Platform.OS === 'web' ? 'one-time-code' : 'off'}
-              // Web: cho phép gõ bàn phím vật lý
+              autoFocus={Platform.OS !== 'web'}
+              // Web: bàn phím vật lý; Mobile: keypad số
               {...(Platform.OS === 'web' && { inputMode: 'numeric' } as any)}
             />
 

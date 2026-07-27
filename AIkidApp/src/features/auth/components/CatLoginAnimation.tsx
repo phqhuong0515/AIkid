@@ -122,7 +122,7 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
   const scaleRatio = SVG_WIDTH / 834.19;
 
   // Debug: verify form positioning on different screen sizes
-  console.log('scaleRatio', scaleRatio, 'formTop', 268.37 * scaleRatio);
+  // scaleRatio computed above
 
   return (
     <KeyboardAvoidingView 
@@ -235,12 +235,14 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
 
           <Animated.View style={[styles.formContainer, formAnimatedStyle, { left: 254.59 * scaleRatio, top: 268.37 * scaleRatio, width: 325 * scaleRatio, height: 111.9 * scaleRatio }]}>
             <TextInput
-              style={[styles.input, { height: Math.max(48, 111.9 * scaleRatio), fontSize: Math.max(15, 18 * scaleRatio), flex: 1 }]}
+              style={[styles.input, { height: Math.max(44, 111.9 * scaleRatio), fontSize: Math.max(15, 18 * scaleRatio) }]}
               placeholder="Tên đăng nhập bé"
               placeholderTextColor="#A99586"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
+              returnKeyType="done"
+              onSubmitEditing={() => { if (email) setShowPinModal(true); }}
               editable={!isSwallowed && !isLoading}
             />
           </Animated.View>
