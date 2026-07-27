@@ -12,9 +12,12 @@ removed from the active branch so a new developer has one source of truth.
 ```bash
 cd AIkidApp
 cp .env.example .env
-npm ci
-npm run typecheck
-npm run web
+npm install
+
+# Run on Web
+npx expo start --web
+# OR Run on Mobile (iOS/Android)
+npx expo start -c
 ```
 
 ## Public web build
