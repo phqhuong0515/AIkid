@@ -9,20 +9,20 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GlobalHeader } from '@/components/GlobalHeader';
 
 const STYLES = [
-  { id: 'Màu Nước', image: require('../../../public/mee-html/PNG/art-style-watercolor.jpeg'), from: 'from-[#FF8E53]', to: 'to-[#FF2E93]' },
-  { id: 'Hoạt Hình', image: require('../../../public/mee-html/PNG/art-style-cartoon.jpeg'), from: 'from-[#00C6FF]', to: 'to-[#0072FF]' },
-  { id: 'Bút Sáp', image: require('../../../public/mee-html/PNG/art-style-crayon.jpeg'), from: 'from-[#11998e]', to: 'to-[#38ef7d]' },
-  { id: 'Anime', image: require('../../../public/mee-html/PNG/art-style-anime.jpeg'), from: 'from-[#FF9966]', to: 'to-[#FF5E62]' },
-  { id: 'Manga', image: require('../../../public/mee-html/PNG/art-style-manga.jpeg'), from: 'from-[#7F00FF]', to: 'to-[#E100FF]' },
-  { id: 'Truyện Tranh', image: require('../../../public/mee-html/PNG/art-style-comic.jpeg'), from: 'from-[#F857A6]', to: 'to-[#FF5858]' },
-  { id: 'Tranh Chì', image: require('../../../public/mee-html/PNG/art-style-sketch.jpeg'), from: 'from-[#4da0b0]', to: 'to-[#d39d38]' },
-  { id: '3D', image: require('../../../public/mee-html/PNG/art-style-3D.jpeg'), from: 'from-[#1A2980]', to: 'to-[#26D0CE]' },
-  { id: 'Pixel', image: require('../../../public/mee-html/PNG/art-style-pixel.jpeg'), from: 'from-[#f12711]', to: 'to-[#f5af19]' },
-  { id: 'Chibi', image: require('../../../public/mee-html/PNG/art-style-chibi.jpeg'), from: 'from-[#FF8E53]', to: 'to-[#FF2E93]' },
-  { id: 'Đất Sét', image: require('../../../public/mee-html/PNG/art-style-clay.jpeg'), from: 'from-[#00C6FF]', to: 'to-[#0072FF]' },
-  { id: 'Vải Nỉ', image: require('../../../public/mee-html/PNG/art-style-farbic.jpeg'), from: 'from-[#11998e]', to: 'to-[#38ef7d]' },
-  { id: 'Manhwa', image: require('../../../public/mee-html/PNG/art-style-manhwa.jpeg'), from: 'from-[#FF9966]', to: 'to-[#FF5E62]' },
-  { id: 'Bán Tả Thực', image: require('../../../public/mee-html/PNG/art-style-semirealistic.jpeg'), from: 'from-[#7F00FF]', to: 'to-[#E100FF]' },
+  { id: 'Màu Nước', image: require('../../../public/art-styles/art-style-watercolor.jpeg'), from: 'from-[#FF8E53]', to: 'to-[#FF2E93]' },
+  { id: 'Hoạt Hình', image: require('../../../public/art-styles/art-style-cartoon.jpeg'), from: 'from-[#00C6FF]', to: 'to-[#0072FF]' },
+  { id: 'Bút Sáp', image: require('../../../public/art-styles/art-style-crayon.jpeg'), from: 'from-[#11998e]', to: 'to-[#38ef7d]' },
+  { id: 'Anime', image: require('../../../public/art-styles/art-style-anime.jpeg'), from: 'from-[#FF9966]', to: 'to-[#FF5E62]' },
+  { id: 'Manga', image: require('../../../public/art-styles/art-style-manga.jpeg'), from: 'from-[#7F00FF]', to: 'to-[#E100FF]' },
+  { id: 'Truyện Tranh', image: require('../../../public/art-styles/art-style-comic.jpeg'), from: 'from-[#F857A6]', to: 'to-[#FF5858]' },
+  { id: 'Tranh Chì', image: require('../../../public/art-styles/art-style-sketch.jpeg'), from: 'from-[#4da0b0]', to: 'to-[#d39d38]' },
+  { id: '3D', image: require('../../../public/art-styles/art-style-3D.jpeg'), from: 'from-[#1A2980]', to: 'to-[#26D0CE]' },
+  { id: 'Pixel', image: require('../../../public/art-styles/art-style-pixel.jpeg'), from: 'from-[#f12711]', to: 'to-[#f5af19]' },
+  { id: 'Chibi', image: require('../../../public/art-styles/art-style-chibi.jpeg'), from: 'from-[#FF8E53]', to: 'to-[#FF2E93]' },
+  { id: 'Đất Sét', image: require('../../../public/art-styles/art-style-clay.jpeg'), from: 'from-[#00C6FF]', to: 'to-[#0072FF]' },
+  { id: 'Vải Nỉ', image: require('../../../public/art-styles/art-style-farbic.jpeg'), from: 'from-[#11998e]', to: 'to-[#38ef7d]' },
+  { id: 'Manhwa', image: require('../../../public/art-styles/art-style-manhwa.jpeg'), from: 'from-[#FF9966]', to: 'to-[#FF5E62]' },
+  { id: 'Bán Tả Thực', image: require('../../../public/art-styles/art-style-semirealistic.jpeg'), from: 'from-[#7F00FF]', to: 'to-[#E100FF]' },
 ];
 
 const baseWidth = 300;
@@ -163,7 +163,7 @@ export default function StyleV2() {
 
   return (
     <ImageBackground 
-      source={require('../../../public/mee-html/PNG/bg-art.png')}
+      source={require('../../../public/lobby-assets/images/bg-art.png')}
       className="flex-1"
       resizeMode="cover"
     >

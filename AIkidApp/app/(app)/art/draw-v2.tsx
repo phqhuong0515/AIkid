@@ -8,12 +8,12 @@ import { usePopSound } from '@/hooks/usePopSound';
 import { GlobalHeader } from '@/components/GlobalHeader';
 
 const STYLES = [
-  { id: 'Màu Nước', image: require('../../../public/mee-html/PNG/art-style-watercolor.jpeg'), colors: ['#FF8E53', '#FF2E93'] },
-  { id: 'Hoạt Hình', image: require('../../../public/mee-html/PNG/art-style-cartoon.jpeg'), colors: ['#00C6FF', '#0072FF'] },
-  { id: 'Bút Sáp', image: require('../../../public/mee-html/PNG/art-style-crayon.jpeg'), colors: ['#11998e', '#38ef7d'] },
-  { id: 'Anime', image: require('../../../public/mee-html/PNG/art-style-anime.jpeg'), colors: ['#FF9966', '#FF5E62'] },
-  { id: 'Manga', image: require('../../../public/mee-html/PNG/art-style-manga.jpeg'), colors: ['#7F00FF', '#E100FF'] },
-  { id: 'Truyện Tranh', image: require('../../../public/mee-html/PNG/art-style-comic.jpeg'), colors: ['#F857A6', '#FF5858'] },
+  { id: 'Màu Nước', image: require('../../../public/art-styles/art-style-watercolor.jpeg'), colors: ['#FF8E53', '#FF2E93'] },
+  { id: 'Hoạt Hình', image: require('../../../public/art-styles/art-style-cartoon.jpeg'), colors: ['#00C6FF', '#0072FF'] },
+  { id: 'Bút Sáp', image: require('../../../public/art-styles/art-style-crayon.jpeg'), colors: ['#11998e', '#38ef7d'] },
+  { id: 'Anime', image: require('../../../public/art-styles/art-style-anime.jpeg'), colors: ['#FF9966', '#FF5E62'] },
+  { id: 'Manga', image: require('../../../public/art-styles/art-style-manga.jpeg'), colors: ['#7F00FF', '#E100FF'] },
+  { id: 'Truyện Tranh', image: require('../../../public/art-styles/art-style-comic.jpeg'), colors: ['#F857A6', '#FF5858'] },
 ];
 
 const StyleCard = ({ style, isSelected, onPress, playPop }: { style: any, isSelected: boolean, onPress: () => void, playPop: () => void }) => {

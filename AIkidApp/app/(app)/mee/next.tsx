@@ -14,7 +14,7 @@ export default function MeeNextPlaceholderScreen() {
 
   return (
     <ImageBackground 
-      source={require('@/../public/mee-html/PNG/bg-mee.png')}
+      source={require('@/../public/lobby-assets/images/bg-mee.png')}
       style={styles.container}
       imageStyle={{ resizeMode: 'cover' }}
     >
