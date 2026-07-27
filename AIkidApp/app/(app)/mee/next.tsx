@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, ImageBackground, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, Pressable, ImageBackground, useWindowDimensions, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GlobalHeader } from '@/components/GlobalHeader';
 
 export default function MeeNextPlaceholderScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   const isMobile = width <= 850;
 
@@ -15,11 +18,20 @@ export default function MeeNextPlaceholderScreen() {
       style={styles.container}
       imageStyle={{ resizeMode: 'cover' }}
     >
+      <View style={{ paddingTop: Math.max(20, insets.top), width: '100%', paddingHorizontal: 16, zIndex: 10 }}>
+        <GlobalHeader />
+      </View>
       <View style={[styles.mainContent, isMobile && styles.mainContentMobile]}>
         
         {/* Left Back Button */}
         <Pressable 
-          onPress={() => router.push('/(app)/mee')}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(app)/lobby');
+            }
+          }}
           style={({ pressed }) => [
             styles.navBtn,
             styles.btnLeft,
@@ -57,13 +69,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f4f8',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   mainContent: {
+    flex: 1,
     width: '100%',
-    height: '100%',
     position: 'relative',
+    justifyContent: 'center',
   },
   mainContentMobile: {
     // Mobile specific styles if needed

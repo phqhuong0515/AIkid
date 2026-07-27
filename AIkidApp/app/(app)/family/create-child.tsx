@@ -2,22 +2,26 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  ImageBackground,
   Pressable,
   ScrollView,
+  StyleSheet,
   Switch,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { extractErrorMessage } from '@/core/api/unwrap';
 import { AGE_BAND_OPTIONS, type AgeBand } from '@/features/family/types';
 import { useFamily } from '@/features/family/store/useFamily';
 import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
+import { GlobalHeader } from '@/components/GlobalHeader';
 
 export default function CreateChildScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const createChildProfile = useFamily((s) => s.createChildProfile);
   const setRecentScope = useRecentAiImages((s) => s.setScope);
 
@@ -53,109 +57,200 @@ export default function CreateChildScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FFF8F2]">
-      <ScrollView
-        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Pressable onPress={() => router.back()} hitSlop={10} className="mb-3">
-          <Text className="text-[14px] font-bold text-brand">← Quay lại</Text>
-        </Pressable>
+    <View style={styles.container}>
+      <ImageBackground source={require('../../../public/lobby-assets/images/bg-art.png')} style={styles.bgImage} resizeMode="cover">
+        <View style={{ paddingTop: Math.max(20, insets.top), flex: 1 }}>
+          <View style={{ paddingHorizontal: 16, zIndex: 10, paddingBottom: 16 }}>
+            <GlobalHeader />
+          </View>
+          
+          <View style={styles.mainCard}>
+            <Text style={{ marginTop: 24, fontSize: 24, fontWeight: '800', color: '#0F172A', textAlign: 'center' }}>Thêm hồ sơ con</Text>
+            <Text style={{ marginTop: 8, color: '#64748B', textAlign: 'center', paddingHorizontal: 20 }}>
+              9–15 tuổi · gắn tài khoản phụ huynh · không cần email riêng
+            </Text>
 
-        <Text className="text-[22px] font-extrabold text-slate-900">
-          Thêm hồ sơ con
-        </Text>
-        <Text className="mt-2 text-[14px] leading-5 text-slate-500">
-          9–15 tuổi · gắn tài khoản phụ huynh · không cần email riêng (giống
-          StoryMee Mobile).
-        </Text>
+            <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
+              <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#334155', marginBottom: 8 }}>Tên hiển thị</Text>
+              <TextInput
+                value={name}
+                onChangeText={(v) => {
+                  setName(v);
+                  setError(null);
+                }}
+                placeholder="Ví dụ: Bé Na"
+                placeholderTextColor="#94A3B8"
+                style={styles.input}
+              />
 
-        <Text className="mb-2 mt-6 text-[13px] font-bold text-slate-700">
-          Tên hiển thị
-        </Text>
-        <TextInput
-          value={name}
-          onChangeText={(v) => {
-            setName(v);
-            setError(null);
-          }}
-          placeholder="Ví dụ: Bé Na"
-          placeholderTextColor="#94A3B8"
-          className="h-12 rounded-xl border border-orange-100 bg-white px-4 text-base text-slate-900"
-        />
+              <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#334155', marginTop: 20, marginBottom: 8 }}>Nhóm tuổi</Text>
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                {AGE_BAND_OPTIONS.map((opt) => {
+                  const on = ageBand === opt.id;
+                  return (
+                    <Pressable
+                      key={opt.id}
+                      onPress={() => setAgeBand(opt.id)}
+                      style={[styles.ageOption, on ? styles.ageOptionActive : styles.ageOptionInactive]}
+                    >
+                      <Text style={[styles.ageOptionTitle, on ? styles.ageOptionTitleActive : styles.ageOptionTitleInactive]}>
+                        {opt.label}
+                      </Text>
+                      <Text style={styles.ageOptionHint}>{opt.hint}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
 
-        <Text className="mb-2 mt-5 text-[13px] font-bold text-slate-700">
-          Nhóm tuổi
-        </Text>
-        <View className="flex-row gap-2">
-          {AGE_BAND_OPTIONS.map((opt) => {
-            const on = ageBand === opt.id;
-            return (
+              <View style={styles.switchGroup}>
+                <View style={styles.switchRow}>
+                  <Text style={styles.switchLabel}>Cho phép tạo ảnh AI</Text>
+                  <Switch
+                    value={allowAi}
+                    onValueChange={setAllowAi}
+                    trackColor={{ true: '#FFB6C1', false: '#E2E8F0' }}
+                    thumbColor={allowAi ? '#FF7597' : '#F8FAFC'}
+                  />
+                </View>
+                <View style={[styles.switchRow, { borderBottomWidth: 0 }]}>
+                  <Text style={styles.switchLabel}>Camera / ảnh mẫu</Text>
+                  <Switch
+                    value={allowPhoto}
+                    onValueChange={setAllowPhoto}
+                    trackColor={{ true: '#FFB6C1', false: '#E2E8F0' }}
+                    thumbColor={allowPhoto ? '#FF7597' : '#F8FAFC'}
+                  />
+                </View>
+              </View>
+
+              {error ? (
+                <Text style={{ marginTop: 12, fontSize: 13, fontWeight: '500', color: '#DC2626' }}>{error}</Text>
+              ) : null}
+
               <Pressable
-                key={opt.id}
-                onPress={() => setAgeBand(opt.id)}
-                className={`flex-1 rounded-xl border-2 px-3 py-3 ${
-                  on ? 'border-brand bg-orange-50' : 'border-slate-100 bg-white'
-                }`}
+                onPress={() => void onSubmit()}
+                disabled={busy}
+                style={[styles.submitBtn, busy ? styles.submitBtnDisabled : styles.submitBtnActive]}
               >
-                <Text
-                  className={`text-center text-[14px] font-extrabold ${
-                    on ? 'text-brand' : 'text-slate-900'
-                  }`}
-                >
-                  {opt.label}
-                </Text>
-                <Text className="mt-1 text-center text-[11px] leading-4 text-slate-500">
-                  {opt.hint}
-                </Text>
+                {busy ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.submitBtnText}>Tạo hồ sơ</Text>
+                )}
               </Pressable>
-            );
-          })}
-        </View>
-
-        <View className="mt-5 rounded-xl border border-orange-100 bg-white px-4">
-          <View className="flex-row items-center justify-between border-b border-slate-100 py-3.5">
-            <Text className="flex-1 text-[14px] font-semibold text-slate-700">
-              Cho phép tạo ảnh AI
-            </Text>
-            <Switch
-              value={allowAi}
-              onValueChange={setAllowAi}
-              trackColor={{ true: '#FECACA', false: '#E2E8F0' }}
-              thumbColor={allowAi ? '#FF6B6B' : '#F8FAFC'}
-            />
-          </View>
-          <View className="flex-row items-center justify-between py-3.5">
-            <Text className="flex-1 text-[14px] font-semibold text-slate-700">
-              Camera / ảnh mẫu
-            </Text>
-            <Switch
-              value={allowPhoto}
-              onValueChange={setAllowPhoto}
-              trackColor={{ true: '#FECACA', false: '#E2E8F0' }}
-              thumbColor={allowPhoto ? '#FF6B6B' : '#F8FAFC'}
-            />
+            </ScrollView>
           </View>
         </View>
-
-        {error ? (
-          <Text className="mt-3 text-[13px] font-medium text-red-600">{error}</Text>
-        ) : null}
-
-        <Pressable
-          onPress={() => void onSubmit()}
-          disabled={busy}
-          className={`mt-6 h-12 items-center justify-center rounded-2xl ${
-            busy ? 'bg-slate-300' : 'bg-brand'
-          }`}
-        >
-          {busy ? (
-            <ActivityIndicator color="#FFF" />
-          ) : (
-            <Text className="text-base font-extrabold text-white">Tạo hồ sơ</Text>
-          )}
-        </Pressable>
-      </ScrollView>
-    </SafeAreaView>
+      </ImageBackground>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFF8F2',
+  },
+  bgImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  mainCard: {
+    flex: 1,
+    backgroundColor: '#FDFAF4',
+    borderRadius: 40,
+    borderWidth: 8,
+    borderColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 5,
+    overflow: 'hidden',
+  },
+  input: {
+    height: 52,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#0F172A',
+  },
+  ageOption: {
+    flex: 1,
+    borderRadius: 16,
+    borderWidth: 2,
+    padding: 12,
+  },
+  ageOptionActive: {
+    borderColor: '#FF7597',
+    backgroundColor: '#FFF7ED',
+  },
+  ageOptionInactive: {
+    borderColor: '#F1F5F9',
+    backgroundColor: '#FFFFFF',
+  },
+  ageOptionTitle: {
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  ageOptionTitleActive: {
+    color: '#FF7597',
+  },
+  ageOptionTitleInactive: {
+    color: '#0F172A',
+  },
+  ageOptionHint: {
+    marginTop: 4,
+    textAlign: 'center',
+    fontSize: 11,
+    lineHeight: 16,
+    color: '#64748B',
+  },
+  switchGroup: {
+    marginTop: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  switchLabel: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#334155',
+  },
+  submitBtn: {
+    marginTop: 24,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+  },
+  submitBtnActive: {
+    backgroundColor: '#FF7597',
+  },
+  submitBtnDisabled: {
+    backgroundColor: '#CBD5E1',
+  },
+  submitBtnText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+});

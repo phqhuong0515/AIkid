@@ -5,15 +5,17 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  ImageBackground,
   Linking,
   Modal,
   Pressable,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { extractErrorMessage } from '@/core/api/unwrap';
 import { useAuth } from '@/core/auth/useAuth';
@@ -31,12 +33,11 @@ import { familyApi, mediaApi, profileApi } from '@/core/storymee';
 import { ageBandLabel } from '@/features/family/types';
 import { useFamily } from '@/features/family/store/useFamily';
 import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
+import { GlobalHeader } from '@/components/GlobalHeader';
 
-/**
- * Account — parent JWT + family children (MobileApp model).
- */
 export default function AccountScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { user, actor, logout, deleteAccount, isLoading: authBusy } = useAuth();
   const {
     workspaces,
@@ -169,210 +170,177 @@ export default function AccountScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FFF8F2]">
-      <View className="flex-row items-center justify-between border-b border-orange-100 bg-white px-4 py-3">
-        <Pressable
-          onPress={() => router.back()}
-          className="rounded-full bg-orange-50 px-3 py-1.5"
-          accessibilityRole="button"
-        >
-          <Text className="text-[14px] font-bold text-brand">← Về</Text>
-        </Pressable>
-        <Text className="text-[17px] font-extrabold text-slate-900">
-          Tài khoản
-        </Text>
-        <View className="w-[72px]" />
-      </View>
+    <View style={styles.container}>
+      <ImageBackground source={require('../../public/lobby-assets/images/bg-art.png')} style={styles.bgImage} resizeMode="cover">
+        <View style={{ paddingTop: Math.max(20, insets.top), flex: 1 }}>
+          <View style={{ paddingHorizontal: 16, zIndex: 10, paddingBottom: 16 }}>
+            <GlobalHeader />
+          </View>
+          
+          <View style={styles.mainCard}>
+            <Text style={{ marginTop: 24, fontSize: 24, fontWeight: '800', color: '#0F172A', textAlign: 'center' }}>Tài khoản</Text>
+            
+            <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60, gap: 16 }}>
+              {/* Identity */}
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionSubtitle}>
+                  {actor === 'child' ? 'Tài khoản bé' : 'Phụ huynh'}
+                </Text>
+                {profileLoading ? (
+                  <ActivityIndicator style={{ marginTop: 12 }} color="#FF7597" />
+                ) : (
+                  <>
+                    <Text style={styles.titleText}>{String(displayName)}</Text>
+                    <Text style={styles.subtitleText}>{email}</Text>
+                    {profileError ? (
+                      <Pressable onPress={() => void refetchProfile()} style={{ marginTop: 8 }}>
+                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#FF7597' }}>
+                          Không tải được profile · Thử lại
+                        </Text>
+                      </Pressable>
+                    ) : null}
+                  </>
+                )}
+                <Pressable onPress={() => void changeAvatar()} disabled={avatarBusy} style={styles.actionBtn}>
+                  {(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) ? (
+                    <Image source={{ uri: String(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) }} style={{ width: 48, height: 48, borderRadius: 24 }} />
+                  ) : (
+                    <View style={{ height: 48, width: 48, borderRadius: 24, backgroundColor: '#FED7AA' }} />
+                  )}
+                  <Text style={styles.actionBtnText}>{avatarBusy ? 'Đang tải…' : 'Đổi ảnh đại diện'}</Text>
+                </Pressable>
+              </View>
 
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 48 }}>
-        {/* Identity */}
-        <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
-          <Text className="text-[12px] font-bold uppercase tracking-wide text-slate-400">
-            {actor === 'child' ? 'Tài khoản bé' : 'Phụ huynh'}
-          </Text>
-          {profileLoading ? (
-            <ActivityIndicator className="mt-3" color="#FF6B6B" />
-          ) : (
-            <>
-              <Text className="mt-2 text-xl font-extrabold text-slate-900">
-                {String(displayName)}
-              </Text>
-              <Text className="mt-1 text-[14px] text-slate-600">{email}</Text>
-              {profileError ? (
-                <Pressable onPress={() => void refetchProfile()} className="mt-2">
-                  <Text className="text-[13px] font-semibold text-brand">
-                    Không tải được profile · Thử lại
+              {/* Family children */}
+              {actor === 'parent' ? (
+                <View style={styles.sectionCard}>
+                  <View style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={styles.sectionSubtitle}>Hồ sơ con</Text>
+                    <Pressable onPress={() => router.push('/(app)/family')}>
+                      <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#FF7597' }}>Quản lý</Text>
+                    </Pressable>
+                  </View>
+                  {children.length === 0 ? (
+                    <Pressable
+                      onPress={() => router.push('/(app)/family/create-child')}
+                      style={styles.dashedBtn}
+                    >
+                      <Text style={{ textAlign: 'center', fontSize: 14, fontWeight: 'bold', color: '#FF7597' }}>
+                        + Tạo hồ sơ con
+                      </Text>
+                      <Text style={{ marginTop: 4, textAlign: 'center', fontSize: 12, color: '#64748B' }}>
+                        9–15 tuổi · không email riêng
+                      </Text>
+                    </Pressable>
+                  ) : (
+                    children.map((c) => {
+                      const on = c.id === activeChildId;
+                      return (
+                        <Pressable
+                          key={c.id}
+                          onPress={() => {
+                            void (async () => {
+                              await setActiveChild(c.id);
+                              await setRecentScope(c.id);
+                            })();
+                          }}
+                          style={[styles.itemRow, on ? styles.itemRowActive : styles.itemRowInactive]}
+                        >
+                          <Text style={[styles.itemRowTitle, on ? styles.itemRowTitleActive : styles.itemRowTitleInactive]}>
+                            {c.name}
+                            {on ? ' · đang chọn' : ''}
+                          </Text>
+                          <Text style={styles.itemRowSubtitle}>
+                            {ageBandLabel(String(c.ageBand))} · AI{' '}
+                            {c.consent.allowAiCreate ? 'bật' : 'tắt'}
+                          </Text>
+                        </Pressable>
+                      );
+                    })
+                  )}
+                </View>
+              ) : null}
+
+              {/* Workspace */}
+              <View style={styles.sectionCard}>
+                <View style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text style={styles.sectionSubtitle}>Workspace (ipId)</Text>
+                  <Pressable onPress={() => void loadWorkspaces()}>
+                    <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#FF7597' }}>Làm mới</Text>
+                  </Pressable>
+                </View>
+                {wsError ? (
+                  <Text style={{ marginBottom: 8, fontSize: 12, color: '#EF4444' }}>{wsError}</Text>
+                ) : null}
+                {wsLoading && !workspaces.length ? (
+                  <ActivityIndicator color="#FF7597" />
+                ) : workspaces.length === 0 ? (
+                  <Text style={{ fontSize: 13, color: '#64748B' }}>
+                    Chưa có workspace — dùng ipId mặc định khi gen ảnh.
                   </Text>
+                ) : (
+                  workspaces.map((ws) => {
+                    const active = ws.ipId === activeIpId;
+                    return (
+                      <Pressable
+                        key={ws.ipId}
+                        onPress={() => void handleSelectWorkspace(ws.ipId)}
+                        style={[styles.itemRow, active ? styles.itemRowActive : styles.itemRowInactive]}
+                      >
+                        <Text style={[styles.itemRowTitle, active ? styles.itemRowTitleActive : styles.itemRowTitleInactive]}>
+                          {ws.name || 'Workspace'}
+                          {active ? ' · đang chọn' : ''}
+                        </Text>
+                        <Text style={{ marginTop: 2, fontFamily: 'monospace', fontSize: 11, color: '#94A3B8' }}>
+                          {ws.ipId}
+                        </Text>
+                      </Pressable>
+                    );
+                  })
+                )}
+              </View>
+
+              {/* Legal / support */}
+              <View style={styles.sectionCard}>
+                <Text style={[styles.sectionSubtitle, { marginBottom: 12 }]}>Pháp lý & hỗ trợ</Text>
+                <LinkRow label="Chính sách bảo mật" onPress={() => void Linking.openURL(PRIVACY_POLICY_URL)} />
+                <LinkRow label="Điều khoản sử dụng" onPress={() => void Linking.openURL(TERMS_OF_SERVICE_URL)} />
+                <LinkRow label={`Hỗ trợ · ${SUPPORT_EMAIL}`} onPress={() => void Linking.openURL(SUPPORT_MAILTO)} />
+                <LinkRow label="Xóa tài khoản (web)" onPress={() => void Linking.openURL(DELETE_ACCOUNT_WEB_URL)} />
+              </View>
+
+              {/* Actions */}
+              <Pressable
+                onPress={handleLogout}
+                disabled={authBusy}
+                style={styles.logoutBtn}
+              >
+                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#1E293B' }}>Đăng xuất</Text>
+              </Pressable>
+
+              {actor === 'parent' ? (
+                <Pressable
+                  onPress={openDeleteFlow}
+                  style={styles.deleteBtn}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#DC2626' }}>Xóa tài khoản</Text>
                 </Pressable>
               ) : null}
-            </>
-          )}
-          <Pressable onPress={() => void changeAvatar()} disabled={avatarBusy} className="mt-4 flex-row items-center gap-3 rounded-xl bg-orange-50 p-3">
-            {(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) ? <Image source={{ uri: String(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) }} style={{ width: 48, height: 48, borderRadius: 24 }} /> : <View className="h-12 w-12 rounded-full bg-orange-200" />}
-            <Text className="font-bold text-brand">{avatarBusy ? 'Đang tải…' : 'Đổi ảnh đại diện'}</Text>
-          </Pressable>
-        </View>
-
-        {/* Family children */}
-        {actor === 'parent' ? <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
-          <View className="mb-2 flex-row items-center justify-between">
-            <Text className="text-[12px] font-bold uppercase tracking-wide text-slate-400">
-              Hồ sơ con
-            </Text>
-            <Pressable onPress={() => router.push('/(app)/family')}>
-              <Text className="text-[12px] font-bold text-brand">Quản lý</Text>
-            </Pressable>
+            </ScrollView>
           </View>
-          {children.length === 0 ? (
-            <Pressable
-              onPress={() => router.push('/(app)/family/create-child')}
-              className="rounded-xl border border-dashed border-orange-200 bg-orange-50 px-3 py-4"
-            >
-              <Text className="text-center text-[14px] font-bold text-brand">
-                + Tạo hồ sơ con
-              </Text>
-              <Text className="mt-1 text-center text-[12px] text-slate-500">
-                9–15 tuổi · không email riêng
-              </Text>
-            </Pressable>
-          ) : (
-            children.map((c) => {
-              const on = c.id === activeChildId;
-              return (
-                <Pressable
-                  key={c.id}
-                  onPress={() => {
-                    void (async () => {
-                      await setActiveChild(c.id);
-                      await setRecentScope(c.id);
-                    })();
-                  }}
-                  className={`mb-2 rounded-xl border px-3 py-3 ${
-                    on ? 'border-brand bg-orange-50' : 'border-slate-100 bg-slate-50'
-                  }`}
-                >
-                  <Text
-                    className={`text-[15px] font-bold ${
-                      on ? 'text-brand' : 'text-slate-800'
-                    }`}
-                  >
-                    {c.name}
-                    {on ? ' · đang chọn' : ''}
-                  </Text>
-                  <Text className="mt-0.5 text-[12px] text-slate-500">
-                    {ageBandLabel(String(c.ageBand))} · AI{' '}
-                    {c.consent.allowAiCreate ? 'bật' : 'tắt'}
-                  </Text>
-                </Pressable>
-              );
-            })
-          )}
-        </View> : null}
-
-        {/* Workspace */}
-        <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
-          <View className="mb-2 flex-row items-center justify-between">
-            <Text className="text-[12px] font-bold uppercase tracking-wide text-slate-400">
-              Workspace (ipId)
-            </Text>
-            <Pressable onPress={() => void loadWorkspaces()}>
-              <Text className="text-[12px] font-bold text-brand">Làm mới</Text>
-            </Pressable>
-          </View>
-          {wsError ? (
-            <Text className="mb-2 text-[12px] text-red-500">{wsError}</Text>
-          ) : null}
-          {wsLoading && !workspaces.length ? (
-            <ActivityIndicator color="#FF6B6B" />
-          ) : workspaces.length === 0 ? (
-            <Text className="text-[13px] text-slate-500">
-              Chưa có workspace — dùng ipId mặc định khi gen ảnh.
-            </Text>
-          ) : (
-            workspaces.map((ws) => {
-              const active = ws.ipId === activeIpId;
-              return (
-                <Pressable
-                  key={ws.ipId}
-                  onPress={() => void handleSelectWorkspace(ws.ipId)}
-                  className={`mb-2 rounded-xl border px-3 py-3 ${
-                    active
-                      ? 'border-brand bg-orange-50'
-                      : 'border-slate-100 bg-slate-50'
-                  }`}
-                >
-                  <Text
-                    className={`text-[15px] font-bold ${
-                      active ? 'text-brand' : 'text-slate-800'
-                    }`}
-                  >
-                    {ws.name || 'Workspace'}
-                    {active ? ' · đang chọn' : ''}
-                  </Text>
-                  <Text className="mt-0.5 font-mono text-[11px] text-slate-400">
-                    {ws.ipId}
-                  </Text>
-                </Pressable>
-              );
-            })
-          )}
         </View>
-
-        {/* Legal / support */}
-        <View className="mb-4 rounded-2xl border border-orange-100 bg-white p-4">
-          <Text className="mb-2 text-[12px] font-bold uppercase tracking-wide text-slate-400">
-            Pháp lý & hỗ trợ
-          </Text>
-          <LinkRow
-            label="Chính sách bảo mật"
-            onPress={() => void Linking.openURL(PRIVACY_POLICY_URL)}
-          />
-          <LinkRow
-            label="Điều khoản sử dụng"
-            onPress={() => void Linking.openURL(TERMS_OF_SERVICE_URL)}
-          />
-          <LinkRow
-            label={`Hỗ trợ · ${SUPPORT_EMAIL}`}
-            onPress={() => void Linking.openURL(SUPPORT_MAILTO)}
-          />
-          <LinkRow
-            label="Xóa tài khoản (web)"
-            onPress={() => void Linking.openURL(DELETE_ACCOUNT_WEB_URL)}
-          />
-        </View>
-
-        {/* Actions */}
-        <Pressable
-          onPress={handleLogout}
-          disabled={authBusy}
-          className="mb-3 h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white"
-        >
-          <Text className="text-[15px] font-bold text-slate-800">Đăng xuất</Text>
-        </Pressable>
-
-        {actor === 'parent' ? <Pressable
-          onPress={openDeleteFlow}
-          className="h-12 items-center justify-center rounded-2xl bg-red-50"
-        >
-          <Text className="text-[15px] font-bold text-red-600">
-            Xóa tài khoản
-          </Text>
-        </Pressable> : null}
-      </ScrollView>
+      </ImageBackground>
 
       {/* Delete confirm modal */}
       <Modal visible={deleteOpen} transparent animationType="fade">
-        <View className="flex-1 items-center justify-center bg-black/40 px-6">
-          <View className="w-full max-w-md rounded-2xl bg-white p-5">
-            <Text className="text-lg font-extrabold text-slate-900">
-              Xác nhận xóa
-            </Text>
-            <Text className="mt-2 text-[13px] leading-5 text-slate-600">
-              Nhập mật khẩu tài khoản phụ huynh để xóa vĩnh viễn (DELETE
-              /api/v1/account/me).
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.4)', paddingHorizontal: 24 }}>
+          <View style={{ width: '100%', maxWidth: 400, borderRadius: 24, backgroundColor: '#FFFFFF', padding: 24 }}>
+            <Text style={{ fontSize: 20, fontWeight: '800', color: '#0F172A' }}>Xác nhận xóa</Text>
+            <Text style={{ marginTop: 8, fontSize: 13, lineHeight: 20, color: '#475569' }}>
+              Nhập mật khẩu tài khoản phụ huynh để xóa vĩnh viễn (DELETE /api/v1/account/me).
             </Text>
             <TextInput
-              className="mt-4 h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 text-base text-slate-900"
+              style={{ marginTop: 16, height: 48, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0', backgroundColor: '#F8FAFC', paddingHorizontal: 16, fontSize: 16, color: '#0F172A' }}
               secureTextEntry
               placeholder="Mật khẩu"
               placeholderTextColor="#94A3B8"
@@ -383,33 +351,31 @@ export default function AccountScreen() {
               }}
             />
             {deleteError ? (
-              <Text className="mt-2 text-[13px] font-medium text-red-600">
-                {deleteError}
-              </Text>
+              <Text style={{ marginTop: 8, fontSize: 13, fontWeight: '500', color: '#DC2626' }}>{deleteError}</Text>
             ) : null}
-            <View className="mt-4 flex-row gap-2">
+            <View style={{ marginTop: 24, flexDirection: 'row', gap: 12 }}>
               <Pressable
                 onPress={() => setDeleteOpen(false)}
-                className="h-11 flex-1 items-center justify-center rounded-xl border border-slate-200"
+                style={{ flex: 1, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0' }}
               >
-                <Text className="font-bold text-slate-700">Huỷ</Text>
+                <Text style={{ fontWeight: 'bold', color: '#334155' }}>Huỷ</Text>
               </Pressable>
               <Pressable
                 onPress={() => void confirmDelete()}
                 disabled={deleting}
-                className="h-11 flex-1 items-center justify-center rounded-xl bg-red-500"
+                style={{ flex: 1, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#EF4444' }}
               >
                 {deleting ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text className="font-bold text-white">Xóa</Text>
+                  <Text style={{ fontWeight: 'bold', color: '#FFFFFF' }}>Xóa</Text>
                 )}
               </Pressable>
             </View>
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -417,9 +383,129 @@ function LinkRow({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}
-      className="border-b border-slate-100 py-3 active:opacity-70"
+      style={{ borderBottomWidth: 1, borderBottomColor: '#F1F5F9', paddingVertical: 14 }}
     >
-      <Text className="text-[14px] font-semibold text-slate-800">{label}</Text>
+      <Text style={{ fontSize: 14, fontWeight: '600', color: '#1E293B' }}>{label}</Text>
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFF8F2',
+  },
+  bgImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  mainCard: {
+    flex: 1,
+    backgroundColor: '#FDFAF4',
+    borderRadius: 40,
+    borderWidth: 8,
+    borderColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 5,
+    overflow: 'hidden',
+  },
+  sectionCard: {
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    color: '#94A3B8',
+  },
+  titleText: {
+    marginTop: 8,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  subtitleText: {
+    marginTop: 4,
+    fontSize: 14,
+    color: '#475569',
+  },
+  actionBtn: {
+    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    backgroundColor: '#FFF7ED',
+    padding: 12,
+  },
+  actionBtnText: {
+    fontWeight: 'bold',
+    color: '#FF7597',
+  },
+  dashedBtn: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#FED7AA',
+    backgroundColor: '#FFF7ED',
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+  },
+  itemRow: {
+    marginBottom: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  itemRowActive: {
+    borderColor: '#FF7597',
+    backgroundColor: '#FFF7ED',
+  },
+  itemRowInactive: {
+    borderColor: '#F1F5F9',
+    backgroundColor: '#F8FAFC',
+  },
+  itemRowTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  itemRowTitleActive: {
+    color: '#FF7597',
+  },
+  itemRowTitleInactive: {
+    color: '#1E293B',
+  },
+  itemRowSubtitle: {
+    marginTop: 2,
+    fontSize: 12,
+    color: '#64748B',
+  },
+  logoutBtn: {
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF',
+  },
+  deleteBtn: {
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: '#FEF2F2',
+  },
+});
