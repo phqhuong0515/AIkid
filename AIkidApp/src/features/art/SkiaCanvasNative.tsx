@@ -9,7 +9,7 @@ import {
 } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSharedValue, runOnJS } from 'react-native-reanimated';
-import type { SkiaCanvasProps, DrawTool } from './SkiaCanvas';
+import type { SkiaCanvasProps, DrawTool } from './SkiaCanvasTypes';
 
 export default function SkiaCanvasNative({
   tool,

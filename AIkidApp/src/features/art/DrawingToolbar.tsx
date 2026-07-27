@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AikidTheme } from '@/features/kids-ui/theme';
-import { DrawTool } from './SkiaCanvas';
+import { DrawTool } from './SkiaCanvasTypes';
 
 export type DrawingToolbarProps = {
   tool: DrawTool;
