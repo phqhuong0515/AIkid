@@ -1,10 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, TouchableOpacity, Modal, StyleSheet,
-  TextInput, Platform, Pressable,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Platform,
 } from 'react-native';
 
-type PinPadModalProps = {
+export type PinPadModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (pin: string) => void;
@@ -13,7 +18,7 @@ type PinPadModalProps = {
   busy?: boolean;
   error?: string | null;
   closeLabel?: string;
-  // Legacy props - ignored, kept for backward compat
+  // Legacy — ignored
   pin?: string;
   setPin?: (pin: string) => void;
 };
@@ -28,155 +33,189 @@ export function PinPadModal({
   error,
   closeLabel = 'Hủy',
 }: PinPadModalProps) {
+  const [pin, setInternalPin] = useState('');
+  const [internalError, setInternalError] = useState<string | null>(null);
   const inputRef = useRef<TextInput>(null);
-  // Internal pin state - self-contained
-  const [pin, setPin] = useState('');
 
-  // Reset pin & focus khi modal mở/đóng
   useEffect(() => {
     if (!isOpen) {
-      setPin('');
+      setInternalPin('');
+      setInternalError(null);
       return;
     }
     const timer = setTimeout(() => {
       inputRef.current?.focus();
-    }, 150);
+    }, 50);
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  // Nhận input từ bàn phím (vật lý hoặc ảo) — lọc chỉ lấy số
-  const handleChangeText = (raw: string) => {
+  const handleInputChange = (rawVal: string) => {
     if (busy) return;
-    const digitsOnly = raw.replace(/\D/g, '').slice(0, 6);
-    setPin(digitsOnly);
-    if (digitsOnly.length === 6) {
+    const digitsOnly = rawVal.replace(/\D/g, '').slice(0, 6);
+
+    if (/\D/.test(rawVal)) {
+      setInternalError('Chỉ được phép nhập số!');
+    } else {
+      setInternalError(null);
+    }
+
+    setInternalPin(digitsOnly);
+    if (digitsOnly.length === 6 && digitsOnly !== pin) {
       onSubmit(digitsOnly);
     }
   };
 
-  // Bàn phím ảo UI — bấm số
-  function onPinDigit(d: string) {
+  const handleInputSubmit = () => {
+    if (pin.length === 6 && !busy) {
+      onSubmit(pin);
+    }
+  };
+
+  const onPinDigit = (d: string) => {
     if (busy || pin.length >= 6) return;
     const next = (pin + d).slice(0, 6);
-    setPin(next);
-    // Giữ focus để keyboard tiếp tục nhận input
+    setInternalPin(next);
+    setInternalError(null);
     inputRef.current?.focus();
     if (next.length === 6) {
       onSubmit(next);
     }
-  }
+  };
 
-  // Bàn phím ảo UI — xóa
-  function onPinBack() {
+  const onPinBack = () => {
     if (busy) return;
-    setPin(pin.slice(0, -1));
+    const next = pin.slice(0, -1);
+    setInternalPin(next);
+    setInternalError(null);
     inputRef.current?.focus();
-  }
+  };
+
+  if (!isOpen) return null;
+
+  const displayError = error || internalError;
+
+  const keypadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok'];
 
   return (
-    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.overlay} onPress={() => inputRef.current?.focus()}>
-        <Pressable style={styles.card} onPress={() => {}}>
+    <Modal
+      visible={isOpen}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{title}</Text>
+            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          </View>
 
-          {/* Title */}
-          <Text style={styles.title}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          {displayError ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{displayError}</Text>
+            </View>
+          ) : null}
 
-          {/* Error */}
-          {error && <Text style={styles.errorText}>{error}</Text>}
-
-          {/* PIN dots + ẩn TextInput bên dưới để nhận keyboard */}
-          <Pressable
-            style={styles.dotsContainer}
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.pinDisplayContainer}
             onPress={() => inputRef.current?.focus()}
-            accessibilityLabel="Nhập mã PIN 6 số"
           >
-            {/* Input ẩn — chỉ để nhận keyboard events (vật lý + ảo hệ thống) */}
             <TextInput
               ref={inputRef}
-              value={pin}
-              onChangeText={handleChangeText}
+              style={styles.hiddenInput}
               keyboardType="number-pad"
               maxLength={6}
-              caretHidden
-              style={styles.hiddenInput}
+              value={pin}
+              onChangeText={handleInputChange}
+              returnKeyType="done"
+              onSubmitEditing={handleInputSubmit}
               editable={!busy}
               autoFocus={Platform.OS !== 'web'}
-              // Web: bàn phím vật lý; Mobile: keypad số
-              {...(Platform.OS === 'web' && { inputMode: 'numeric' } as any)}
             />
 
-            {/* Dots hiển thị */}
-            <View style={styles.dotsRow}>
-              {Array.from({ length: 6 }).map((_, i) => {
-                const isFilled = pin.length > i;
-                const isCurrent = pin.length === i || (pin.length === 6 && i === 5);
-                return (
-                  <View
-                    key={i}
+            {Array.from({ length: 6 }).map((_, i) => {
+              const isFilled = pin.length > i;
+              const isCurrentIndex = pin.length === i || (pin.length === 6 && i === 5);
+
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.pinBox,
+                    isFilled
+                      ? styles.pinBoxFilled
+                      : isCurrentIndex
+                      ? styles.pinBoxCurrent
+                      : styles.pinBoxEmpty,
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.dotBox,
-                      isFilled && styles.dotBoxFilled,
-                      !isFilled && isCurrent && styles.dotBoxCurrent,
+                      styles.pinDot,
+                      isFilled ? styles.pinDotFilled : styles.pinDotEmpty,
                     ]}
                   >
-                    {isFilled && <Text style={styles.dotText}>•</Text>}
-                  </View>
-                );
-              })}
-            </View>
-          </Pressable>
+                    {isFilled ? '•' : ''}
+                  </Text>
+                </View>
+              );
+            })}
+          </TouchableOpacity>
 
-          {/* Bàn phím ảo UI (vẫn giữ để dễ dùng trên mobile) */}
-          <View style={styles.keypad}>
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok'].map((key) => {
+          <View style={styles.keypadContainer}>
+            {keypadKeys.map((key) => {
               if (key === 'del') {
                 return (
                   <TouchableOpacity
                     key={key}
-                    style={styles.keyBtnSec}
+                    style={[styles.keyButton, styles.keyButtonSecondary]}
                     onPress={onPinBack}
                     disabled={busy}
-                    activeOpacity={0.7}
                   >
-                    <Text style={styles.keyBtnSecText}>⌫</Text>
+                    <Text style={[styles.keyText, styles.keyTextSecondary]}>Xóa</Text>
                   </TouchableOpacity>
                 );
               }
               if (key === 'ok') {
+                const isOkDisabled = busy || pin.length !== 6;
                 return (
                   <TouchableOpacity
                     key={key}
-                    style={[styles.keyBtnPri, pin.length !== 6 && styles.keyBtnDisabled]}
-                    onPress={() => pin.length === 6 && !busy && onSubmit(pin)}
-                    disabled={busy || pin.length !== 6}
-                    activeOpacity={0.7}
+                    style={[
+                      styles.keyButton,
+                      styles.keyButtonPrimary,
+                      isOkDisabled && styles.keyButtonDisabled,
+                    ]}
+                    disabled={isOkDisabled}
+                    onPress={() => onSubmit(pin)}
                   >
-                    <Text style={styles.keyBtnPriText}>{busy ? '…' : '✓ Vào'}</Text>
+                    <Text style={styles.keyTextPrimary}>{busy ? '…' : 'Vào'}</Text>
                   </TouchableOpacity>
                 );
               }
               return (
                 <TouchableOpacity
                   key={key}
-                  style={styles.keyBtnSec}
+                  style={[styles.keyButton, styles.keyButtonSecondary]}
                   onPress={() => onPinDigit(key)}
                   disabled={busy}
-                  activeOpacity={0.7}
                 >
-                  <Text style={styles.keyBtnText}>{key}</Text>
+                  <Text style={[styles.keyText, styles.keyTextSecondary]}>{key}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          {/* Hủy */}
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose} disabled={busy}>
-            <Text style={styles.closeBtnText}>{closeLabel}</Text>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={onClose}
+            disabled={busy}
+          >
+            <Text style={styles.closeButtonText}>{closeLabel}</Text>
           </TouchableOpacity>
-
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
@@ -184,163 +223,141 @@ export function PinPadModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   card: {
     backgroundColor: '#FDFAF4',
-    width: '100%',
-    maxWidth: 480,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 32,
-    alignItems: 'center',
-    // White border + shadow giống các screens khác
-    borderWidth: 0,
+    padding: 20,
+    width: '100%',
+    maxWidth: 448, // max-w-md
+    alignSelf: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 10,
+  },
+  header: {
+    marginBottom: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#475569',
-    marginBottom: 4,
-    textAlign: 'center',
+    color: '#1a1a1a', // display
   },
   subtitle: {
     fontSize: 14,
-    color: '#8A7463',
-    marginBottom: 20,
-    textAlign: 'center',
+    color: '#666', // muted
+    marginTop: 4,
   },
-  errorText: {
-    color: '#E11D48',
-    backgroundColor: '#FFF1F2',
+  errorContainer: {
+    marginBottom: 16,
+    backgroundColor: '#FFE5E5', // coral-100 equivalent
+    borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 12,
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 12,
-    textAlign: 'center',
-    width: '100%',
   },
-  dotsContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 28,
+  errorText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#E02424', // danger
+  },
+  pinDisplayContainer: {
     position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 24,
   },
-  // Input ẩn: nhận keyboard events, không hiển thị cho người dùng
   hiddenInput: {
     position: 'absolute',
-    opacity: 0,
-    width: 1,
-    height: 1,
     top: 0,
     left: 0,
-    // Web: pointer-events để click vào dots vẫn trigger focus
-    ...(Platform.OS === 'web' && { pointerEvents: 'none' } as any),
+    right: 0,
+    bottom: 0,
+    opacity: 0,
+    zIndex: 10,
   },
-  dotsRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  dotBox: {
-    width: 46,
+  pinBox: {
     height: 54,
+    width: 46,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 14,
     borderWidth: 2,
-    borderColor: '#E2D9CF',
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  dotBoxFilled: {
-    borderColor: '#FF7597',
-    backgroundColor: '#FFEAEF',
+  pinBoxFilled: {
+    borderColor: '#FF7597', // brand-500
+    backgroundColor: '#FFF0F3', // brand-50
   },
-  dotBoxCurrent: {
-    borderColor: '#FF9EB5',
-    backgroundColor: '#fff',
-    shadowColor: '#FF7597',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 3,
+  pinBoxCurrent: {
+    borderColor: '#FF99B0', // brand-400
+    backgroundColor: '#FFFFFF',
   },
-  dotText: {
-    fontSize: 26,
+  pinBoxEmpty: {
+    borderColor: '#E5E5E5', // border
+    backgroundColor: '#FFFFFF',
+  },
+  pinDot: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF7597',
-    lineHeight: 30,
   },
-  keypad: {
-    width: '100%',
+  pinDotFilled: {
+    color: '#E0476F', // brand-600
+  },
+  pinDotEmpty: {
+    color: '#999999', // muted
+  },
+  keypadContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 8,
     justifyContent: 'space-between',
-    gap: 10,
-    marginBottom: 4,
   },
-  keyBtnSec: {
-    width: '30%',
+  keyButton: {
+    width: '31%', // roughly 3 cols with gap
     height: 62,
-    backgroundColor: '#F0ECE6',
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
-  keyBtnPri: {
-    width: '30%',
-    height: 62,
+  keyButtonPrimary: {
     backgroundColor: '#FF7597',
-    borderRadius: 18,
-    justifyContent: 'center',
+  },
+  keyButtonSecondary: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  keyButtonDisabled: {
+    opacity: 0.5,
+  },
+  keyText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  keyTextPrimary: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  keyTextSecondary: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+  closeButton: {
+    marginTop: 16,
+    paddingVertical: 12,
     alignItems: 'center',
-    marginBottom: 10,
-    shadowColor: '#FF7597',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 4,
   },
-  keyBtnDisabled: {
-    backgroundColor: '#E2D9CF',
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  keyBtnText: {
-    fontSize: 26,
+  closeButtonText: {
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#475569',
-  },
-  keyBtnSecText: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#8A7463',
-  },
-  keyBtnPriText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  closeBtn: {
-    marginTop: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-  },
-  closeBtnText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#8A7463',
-    textAlign: 'center',
+    color: '#666666', // muted
   },
 });
