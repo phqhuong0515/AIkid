@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { ActivityIndicator, Alert, Image, ImageBackground, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
@@ -205,21 +205,25 @@ export default function MeeScreen() {
   const canUndo = past.length > 0;
   const canRedo = future.length > 0;
 
-  const colorButton = (color: string, selected: boolean, onPress: () => void, rounded = true, label = color) => (
-    <Pressable 
-      accessibilityRole="button" 
-      accessibilityLabel={label} 
-      accessibilityState={{ selected }} 
-      onPress={() => { playPop(); onPress(); }} 
-      className={`h-12 w-12 items-center justify-center ${rounded ? 'rounded-full' : 'rounded-2xl'}`} 
-      style={{ backgroundColor: color, borderWidth: selected ? 3 : 1, borderColor: selected ? '#ff7597' : '#ebdcd0' }} 
-    />
-  );
+  const colorButton = (color: string, selected: boolean, onPress: () => void, rounded = true, label = color) => {
+    return React.createElement(Pressable, {
+      accessibilityRole: "button",
+      accessibilityLabel: label,
+      accessibilityState: { selected },
+      onPress: () => { playPop(); onPress(); },
+      className: `h-12 w-12 items-center justify-center ${rounded ? 'rounded-full' : 'rounded-2xl'}`,
+      style: { backgroundColor: color, borderWidth: selected ? 3 : 1, borderColor: selected ? '#ff7597' : '#ebdcd0' }
+    });
+  };
+
 
   return (
     <View className="flex-1 bg-[#e8f4fa]">
       <MeteorLoadingOverlay isVisible={!isHydrated} />
+      {!isHydrated ? null : (
+      <>
       <SafeAreaView edges={['top', 'bottom']} className="flex-1" style={{ overflow: 'hidden' }}>
+
         <View className="z-10 px-4 pt-4">
           <GlobalHeader />
         </View>
@@ -458,6 +462,8 @@ export default function MeeScreen() {
       >
         <Ionicons name="arrow-forward" size={32} color="white" />
       </Pressable>
+      </>
+      )}
     </View>
   );
 }

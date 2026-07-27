@@ -97,6 +97,8 @@ export function PinPadModal({
               caretHidden
               style={styles.hiddenInput}
               editable={!busy}
+              autoFocus={Platform.OS === 'web'}
+              showSoftInputOnFocus={false}
               autoComplete={Platform.OS === 'web' ? 'one-time-code' : 'off'}
               // Web: cho phép gõ bàn phím vật lý
               {...(Platform.OS === 'web' && { inputMode: 'numeric' } as any)}

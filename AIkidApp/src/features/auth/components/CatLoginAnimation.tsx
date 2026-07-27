@@ -17,7 +17,6 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
   const { loginStudent, isLoading } = useAuth();
   
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isSwallowed, setIsSwallowed] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [showPinModal, setShowPinModal] = useState(false);
@@ -42,7 +41,7 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
   }
 
   const triggerLoginSequence = async (pinValue?: string) => {
-    const finalPin = pinValue || password;
+    const finalPin = pinValue;
     if (!email || !finalPin) return;
 
     setShowPinModal(false);
@@ -122,6 +121,9 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
   const SVG_HEIGHT = SVG_WIDTH * ASPECT_RATIO;
   const scaleRatio = SVG_WIDTH / 834.19;
 
+  // Debug: verify form positioning on different screen sizes
+  console.log('scaleRatio', scaleRatio, 'formTop', 268.37 * scaleRatio);
+
   return (
     <KeyboardAvoidingView 
       style={{flex: 1}} 
@@ -132,9 +134,9 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
       <PinPadModal 
         isOpen={showPinModal} 
         onClose={() => setShowPinModal(false)} 
-        onSubmit={(p) => { setPassword(p); triggerLoginSequence(p); }} 
-        pin={password}
-        setPin={setPassword}
+        onSubmit={(p) => { triggerLoginSequence(p); }} 
+        pin=""
+        setPin={() => {}}
         title={`Xin chào ${email || 'bạn nhỏ'}!`}
         subtitle="Nhập mã PIN 6 số ba/mẹ đã đặt"
       />
@@ -233,7 +235,7 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
 
           <Animated.View style={[styles.formContainer, formAnimatedStyle, { left: 254.59 * scaleRatio, top: 268.37 * scaleRatio, width: 325 * scaleRatio, height: 111.9 * scaleRatio }]}>
             <TextInput
-              style={[styles.input, { height: (111.9 * scaleRatio) / 2 }]}
+              style={[styles.input, { height: Math.max(48, 111.9 * scaleRatio), fontSize: Math.max(15, 18 * scaleRatio), flex: 1 }]}
               placeholder="Tên đăng nhập bé"
               placeholderTextColor="#A99586"
               value={email}
@@ -241,23 +243,13 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
               autoCapitalize="none"
               editable={!isSwallowed && !isLoading}
             />
-            <View style={{height: 1, backgroundColor: '#E5D9CE', marginHorizontal: 20}} />
-            <TouchableOpacity 
-              style={{flex: 1, height: (111.9 * scaleRatio) / 2, paddingHorizontal: 20, justifyContent: 'center'}}
-              onPress={() => {
-                if (!email) return;
-                setShowPinModal(true);
-              }}
-              disabled={isSwallowed || isLoading}
-            >
-              <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.input, { paddingHorizontal: 0, color: password ? '#4A3D3C' : '#A99586', lineHeight: 28 }]}>
-                {password ? '••••••' : 'Nhập mã PIN'}
-              </Text>
-            </TouchableOpacity>
           </Animated.View>
 
           <Animated.View style={[styles.actionContainer, formAnimatedStyle, { left: 250 * scaleRatio, top: 400 * scaleRatio, width: 334 * scaleRatio }]}>
-             <TouchableOpacity style={styles.loginBtn} onPress={() => triggerLoginSequence()} disabled={isLoading}>
+             <TouchableOpacity style={styles.loginBtn} onPress={() => {
+               if (!email) return;
+               setShowPinModal(true);
+             }} disabled={isLoading}>
                <Text style={styles.loginBtnText}>ĐĂNG NHẬP</Text>
              </TouchableOpacity>
           </Animated.View>
@@ -296,6 +288,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   input: {
+    flex: 1,
+    width: '100%',
     paddingHorizontal: 20,
     fontSize: 16,
     color: '#4A3D3C',

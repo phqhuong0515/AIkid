@@ -143,6 +143,72 @@ export default function CanvasScreen() {
     );
   }
 
+  // --- Compact (mobile) layout: vertical stack, no absolute overlays ---
+  if (isCompact) {
+    return (
+      <ScreenChrome title={displayName} backHref="/(app)/art/style-v2">
+        <View style={{ flex: 1, backgroundColor: '#E8F6F8' }}>
+          {/* Top action bar - inline, not absolute */}
+          <View style={styles.mobileTopBar}>
+            <TouchableOpacity style={styles.pillBtn} onPress={handleUpload}>
+              <Text style={styles.pillText}>☁️ Tải lên</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.pillBtn} onPress={handleClear}>
+              <Text style={styles.pillText}>🗑️ Xóa</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.pillBtn} onPress={handleUndo}>
+              <Text style={styles.pillText}>⬅️ Hoàn tác</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.pillBtn} onPress={handleRedo}>
+              <Text style={styles.pillText}>Khôi phục ➡️</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Drawing toolbar rendered in its default vertical mode */}
+          <View style={styles.mobileToolbarRow}>
+            <DrawingToolbar
+              tool={tool}
+              onToolChange={setTool}
+              color={color}
+              onColorChange={setColor}
+              strokeWidth={strokeWidth}
+              onStrokeWidthChange={setStrokeWidth}
+              activeStamp={activeStamp}
+              onStampChange={setActiveStamp}
+            />
+
+            {/* Canvas occupies remaining width */}
+            <View style={styles.mobileCanvasArea}>
+              <SkiaCanvas
+                tool={tool}
+                color={color}
+                strokeWidth={strokeWidth}
+                activeStamp={activeStamp}
+                canvasRef={canvasRef}
+                onPathAdded={handlePathAdded}
+                backgroundDataUrl={backgroundDataUrl}
+                paths={paths}
+                setPaths={setPaths}
+              />
+            </View>
+          </View>
+
+          {/* AI panel at bottom */}
+          <View style={styles.mobileAiPanel}>
+            <AiResultPanel
+              styleName={styleConfig?.labelVi || 'Mặc định'}
+              onGenerate={handleGenerate}
+              aiState={aiState}
+              aiImageUrl={aiImageUrl}
+              onDownload={handleDownload}
+              errorMessage={errorMsg}
+            />
+          </View>
+        </View>
+      </ScreenChrome>
+    );
+  }
+
   return (
     <ScreenChrome title={displayName} backHref="/(app)/art/style-v2">
       <View style={[styles.container, isCompact && styles.containerCompact]}>
@@ -217,7 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 20,
     padding: 20,
-    backgroundColor: '#E8F6F8', // Light blue background
+    backgroundColor: '#E8F6F8',
   },
   containerCompact: {
     flexDirection: 'column',
@@ -284,4 +350,31 @@ const styles = StyleSheet.create({
   canvasWrapper: {
     flex: 1,
   },
+  // ---- Mobile-specific styles ----
+  mobileTopBar: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  mobileToolbarRow: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 8,
+  },
+  mobileCanvasArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#EBDCD0',
+  },
+  mobileAiPanel: {
+    margin: 8,
+  },
 });
+

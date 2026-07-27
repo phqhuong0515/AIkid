@@ -3,7 +3,8 @@ import { View, Text, TouchableOpacity, Image, ImageBackground, StyleSheet } from
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming, withSpring, useSharedValue, runOnJS } from 'react-native-reanimated';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { usePopSound } from '@/hooks/usePopSound';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlobalHeader } from '@/components/GlobalHeader';
@@ -104,7 +105,7 @@ const StyleCard = ({
   return (
     <Animated.View 
       style={[
-        { position: 'absolute', left: '50%', top: '50%', marginLeft: -150, marginTop: -175, width: 300, height: 350 },
+        { position: 'absolute', left: '50%', top: '50%', marginLeft: -150, marginTop: -160, width: 300, height: 350 },
         animatedStyle,
       ]}
       pointerEvents={opacity === 0 ? 'none' : 'auto'}
@@ -139,8 +140,19 @@ const StyleCard = ({
             />
           )}
           
-          <View className={`absolute -top-6 px-6 py-2 rounded-full border-[4px] border-white z-10 bg-gradient-to-br ${style.from} ${style.to} ${isActive ? 'left-5' : 'left-8'}`}>
-            <Text className="text-white font-bold text-xl uppercase tracking-wide" style={{ fontFamily: 'Mali' }}>{style.id}</Text>
+          <View style={{ 
+            position: 'absolute', 
+            bottom: -20,
+            alignSelf: 'center',
+            paddingHorizontal: 16, 
+            paddingVertical: 6, 
+            borderRadius: 20, 
+            borderWidth: 3, 
+            borderColor: '#fff',
+            backgroundColor: '#FF7597',
+            zIndex: 20,
+          }}>
+            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.5 }}>{style.id}</Text>
           </View>
           <View style={{ width: '100%', height: '100%', borderRadius: 38, overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
             <Image source={style.image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
@@ -160,6 +172,23 @@ export default function StyleV2() {
   const handleStyleSelect = (id: string, index: number) => {
     setActiveIndex(index);
   };
+
+  // Swipe gesture to navigate styles
+  const startX = useSharedValue(0);
+  const panGesture = Gesture.Pan()
+    .activeOffsetX([-20, 20])
+    .failOffsetY([-10, 10])
+    .onBegin((e) => { startX.value = e.translationX; })
+    .onEnd((e) => {
+      const diff = e.translationX - startX.value;
+      if (diff < -40) {
+        // swipe left → next
+        runOnJS(setActiveIndex)(Math.min(activeIndex + 1, STYLES.length - 1));
+      } else if (diff > 40) {
+        // swipe right → prev
+        runOnJS(setActiveIndex)(Math.max(activeIndex - 1, 0));
+      }
+    });
 
   return (
     <ImageBackground 
@@ -188,18 +217,20 @@ export default function StyleV2() {
       <View className="flex-1 items-center justify-center z-10">
         <Text className="text-4xl font-bold text-gray-800 mb-8 shadow-sm" style={{ fontFamily: 'Mali' }}>CHỌN PHONG CÁCH VẼ</Text>
         
-        <View style={{ height: 420, width: '100%', position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
-          {STYLES.map((style, index) => (
-            <StyleCard 
-              key={style.id}
-              index={index}
-              activeIndex={activeIndex}
-              style={style}
-              onPress={() => handleStyleSelect(style.id, index)}
-              playPop={playPop}
-            />
-          ))}
-        </View>
+        <GestureDetector gesture={panGesture}>
+          <View style={{ height: 420, width: '100%', position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
+            {STYLES.map((style, index) => (
+              <StyleCard 
+                key={style.id}
+                index={index}
+                activeIndex={activeIndex}
+                style={style}
+                onPress={() => handleStyleSelect(style.id, index)}
+                playPop={playPop}
+              />
+            ))}
+          </View>
+        </GestureDetector>
 
         <TouchableOpacity 
           style={{
@@ -209,12 +240,12 @@ export default function StyleV2() {
             borderRadius: 35,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: '#ff7597',
-            shadowColor: '#ff7597',
+            backgroundColor: '#FF5E97',
+            shadowColor: '#FF5E97',
             shadowOpacity: 0.35,
             shadowRadius: 35,
             shadowOffset: { width: 0, height: 12 },
-            elevation: 8,
+            elevation: 12,
           }}
           activeOpacity={0.8}
           onPress={() => {
