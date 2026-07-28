@@ -24,7 +24,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/core/auth/useAuth';
 import { billingApi } from '@/core/storymee';

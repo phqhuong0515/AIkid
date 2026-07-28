@@ -1,4 +1,4 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { create as createAxios, type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
 import {
   clearAccessToken,
@@ -21,7 +21,7 @@ export function setChildProfileIdResolver(fn: () => string | null): void {
 }
 
 /** Axios transport for the SDK. Consumer traffic is always `/api/v1/*`. */
-export const apiClient = axios.create({
+export const apiClient = createAxios({
   baseURL: GATEWAY_BASE_URL,
   timeout: 30_000,
   headers: {

@@ -202,7 +202,11 @@ export default function StyleV2() {
         <GlobalHeader />
         <TouchableOpacity
           style={styles.backBtnWrapper}
-          onPress={() => { playPop(); router.canGoBack() ? router.back() : router.replace('/(app)/art'); }}
+          onPress={() => {
+            playPop();
+            if (router.canGoBack()) router.back();
+            else router.replace('/(app)/art');
+          }}
           activeOpacity={0.8}
         >
           <LinearGradient

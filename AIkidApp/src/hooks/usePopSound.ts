@@ -3,7 +3,7 @@
  *
  * Web   → Web Audio API synthesis (identical to HTML source: dual-oscillator bubble pop)
  *         No file loading required → instant, no race conditions
- * Native → expo-av với pop.mp3 (async load with error handling)
+ * Native → expo-av with a bundled WAV asset (async load with error handling)
  *
  * Shared navigation feedback for Expo Web, iOS and Android.
  *   - osc1 (triangle): 200 → 350 → 80 Hz, gain 0.35, duration 0.15s  (warm body)
@@ -78,7 +78,7 @@ export function usePopSound() {
       try {
         await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
         const { sound } = await Audio.Sound.createAsync(
-          require('../../assets/audio/pop.mp3'),
+          require('../../assets/audio/pop.wav'),
           { shouldPlay: false, volume: 1.0 }
         );
         if (mounted) {
@@ -88,7 +88,7 @@ export function usePopSound() {
           sound.unloadAsync();
         }
       } catch (err) {
-        console.warn('usePopSound: could not load pop.mp3', err);
+        console.warn('usePopSound: could not load pop.wav', err);
       }
     }
 

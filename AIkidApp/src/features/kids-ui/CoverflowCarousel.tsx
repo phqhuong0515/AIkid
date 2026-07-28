@@ -23,10 +23,7 @@ interface Props {
 
 export function CoverflowCarousel({ items }: Props) {
   const { width } = useWindowDimensions();
-  const router = useRouter();
-  
   const ITEM_WIDTH = 280;
-  const ITEM_HEIGHT = 380;
   
   // Calculate padding so the first and last items can be centered
   const paddingHorizontal = Math.max(0, (width - ITEM_WIDTH) / 2);

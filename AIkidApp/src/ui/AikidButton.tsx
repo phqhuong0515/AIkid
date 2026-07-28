@@ -19,7 +19,6 @@
 import React from 'react';
 import {
   TouchableOpacity,
-  View,
   StyleSheet,
   ActivityIndicator,
   ViewStyle,

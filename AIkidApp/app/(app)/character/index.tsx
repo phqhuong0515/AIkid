@@ -26,8 +26,6 @@ export default function CharacterLobby() {
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.cardsWrapper}>
-          
-          {/* Bản Mới */}
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
@@ -37,7 +35,7 @@ export default function CharacterLobby() {
               <Text style={styles.icon}>✨</Text>
             </View>
             <Text style={styles.cardTitle}>Tạo nhân vật</Text>
-            <Text style={styles.cardBadge}>Bản Mới</Text>
+            <Text style={styles.cardBadge}>Sáng tạo cùng AI</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -49,34 +47,8 @@ export default function CharacterLobby() {
               <Text style={styles.icon}>📚</Text>
             </View>
             <Text style={styles.cardTitle}>Kho nhân vật</Text>
-            <Text style={styles.cardBadge}>Bản Mới</Text>
+            <Text style={styles.cardBadge}>Thư viện của bé</Text>
           </TouchableOpacity>
-
-          {/* Bản Cũ (Legacy) */}
-          <TouchableOpacity
-            style={[styles.card, styles.cardLegacy]}
-            activeOpacity={0.8}
-            onPress={() => handlePress('/(app)/character/legacy-hub')}
-          >
-            <View style={styles.iconContainer}>
-              <Text style={styles.icon}>🪄</Text>
-            </View>
-            <Text style={styles.cardTitle}>Tạo nhân vật</Text>
-            <Text style={[styles.cardBadge, styles.badgeLegacy]}>Bản Cũ</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.card, styles.cardLegacy]}
-            activeOpacity={0.8}
-            onPress={() => handlePress('/(app)/gallery')}
-          >
-            <View style={styles.iconContainer}>
-              <Text style={styles.icon}>📦</Text>
-            </View>
-            <Text style={styles.cardTitle}>Kho nhân vật</Text>
-            <Text style={[styles.cardBadge, styles.badgeLegacy]}>Bản Cũ</Text>
-          </TouchableOpacity>
-          
         </View>
       </ScrollView>
     </ImageBackground>
@@ -120,10 +92,6 @@ const styles = StyleSheet.create({
     padding: 16,
     position: 'relative',
   },
-  cardLegacy: {
-    opacity: 0.9,
-    borderColor: '#F3E8DE',
-  },
   iconContainer: {
     marginBottom: 12,
   },
@@ -146,9 +114,5 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     overflow: 'hidden',
-  },
-  badgeLegacy: {
-    color: '#8A7463',
-    backgroundColor: '#EBDCD0',
   },
 });

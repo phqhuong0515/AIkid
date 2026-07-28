@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, ImageBackground, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -47,7 +46,6 @@ const StyleCard = ({ style, isSelected, onPress, playPop }: { style: any, isSele
 };
 
 export default function DrawV2() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState(1);
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);

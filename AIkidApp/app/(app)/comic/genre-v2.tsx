@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert, useWi
 import { useRouter } from 'expo-router';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { usePopSound } from '@/hooks/usePopSound';
-import { FontAwesome5, Ionicons, FontAwesome6 } from '@expo/vector-icons';
+import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -112,7 +112,11 @@ export default function ComicGenreV2() {
         <GlobalHeader />
         <TouchableOpacity
           style={styles.backBtnWrapper}
-          onPress={() => { playPop(); router.canGoBack() ? router.back() : router.replace('/(app)/comic/create-v2'); }}
+          onPress={() => {
+            playPop();
+            if (router.canGoBack()) router.back();
+            else router.replace('/(app)/comic/create-v2');
+          }}
           activeOpacity={0.8}
         >
           <LinearGradient

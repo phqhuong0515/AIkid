@@ -3,7 +3,7 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import Svg, { Defs, LinearGradient, Stop, G, Path, Line, Rect } from 'react-native-svg';
 
 export function CatLoginMascot({ children }: { children: React.ReactNode }) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   // Scale down the cat if the screen is too small
   const maxScale = Math.min(1, width / 840);
   

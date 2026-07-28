@@ -7,7 +7,7 @@ function inner(svg: string): string {
 
 /** React Native SVG does not reliably apply CSS rules from embedded <style>. */
 function inlineClassStyles(svg: string): string {
-  const rules = new Map<string, Array<[string, string]>>();
+  const rules = new Map<string, [string, string][]>();
   for (const style of svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) {
     for (const rule of style[1].matchAll(/([^{}]+)\{([^{}]+)\}/g)) {
       const declarations = rule[2].split(';').map((declaration) => declaration.trim()).filter(Boolean)

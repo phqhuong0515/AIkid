@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -55,7 +55,7 @@ const Sparkle = ({ style, delay = 0, type }: { style: any; delay?: number; type:
       -1,
       false
     ));
-  }, []);
+  }, [delay, opacity, rotation, scale]);
 
   const animStyle = useAnimatedStyle(() => {
     return {
@@ -83,7 +83,6 @@ export default function LobbyScreen() {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   
-  const activeChild = useFamily((state) => state.getActiveChild());
   const loadFamily = useFamily((state) => state.loadFamily);
   
   const { playPop } = usePopSound();

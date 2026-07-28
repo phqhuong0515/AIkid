@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +8,6 @@ import { useAuth } from '@/core/auth/useAuth';
 import { GlobalHeader } from '@/components/GlobalHeader';
 
 export default function PlansScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const actor = useAuth((s) => s.actor);

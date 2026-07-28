@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, Image, ImageBackground, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path, Mask, Rect, Line, G } from 'react-native-svg';
@@ -24,6 +23,8 @@ import { uploadMeePreview } from '@/features/mee/preview';
 import { uploadPickedImageAsPublicRef } from '@/features/media/api/mediaHooks';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { usePopSound } from '@/hooks/usePopSound';
+
+import { MeteorLoadingOverlay } from '@/features/mee/MeteorLoadingOverlay';
 
 const SHIRTS = ['#FB7185', '#38BDF8', '#A78BFA', '#34D399', '#FBBF24'];
 const BACKGROUNDS = ['#FFF7ED', '#E0F2FE', '#F3E8FF', '#DCFCE7', '#FEF3C7'];
@@ -60,7 +61,7 @@ const ShoesIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const EDITOR_CATEGORIES: Array<{ id: EditorGroupId; label: string; icon: any; isCustomSvg?: boolean }> = [
+const EDITOR_CATEGORIES: { id: EditorGroupId; label: string; icon: any; isCustomSvg?: boolean }[] = [
   { id: 'identity', label: 'Nhân vật', icon: 'person' }, 
   { id: 'face', label: 'Khuôn mặt', icon: 'eye' },
   { id: 'hair', label: 'Tóc', icon: 'cut' }, 
@@ -82,8 +83,6 @@ function EditorPanel({ title, subtitle, children }: { title: string; subtitle?: 
     <View>{children}</View>
   </View>;
 }
-
-import { MeteorLoadingOverlay } from '@/features/mee/MeteorLoadingOverlay';
 
 export default function MeeScreen() {
   const router = useRouter();
@@ -128,7 +127,14 @@ export default function MeeScreen() {
         setField('customShadowColor', null);
       }
     }
-  }, [useCustomSkin, skinR, skinG, skinB, setField]);
+  }, [
+    draft.customPrimaryColor,
+    setField,
+    skinB,
+    skinG,
+    skinR,
+    useCustomSkin,
+  ]);
 
   async function savePreview(): Promise<string | null> {
     if (!token || !child) { setFeedback({ tone: 'error', title: 'Chưa sẵn sàng', message: 'Đăng nhập và chọn hồ sơ con trước.' }); return null; }

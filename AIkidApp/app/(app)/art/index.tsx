@@ -23,7 +23,7 @@ function Toast({ message, visible }: { message: string; visible: boolean }) {
         Animated.timing(translateY, { toValue: 20, duration: 300, useNativeDriver: true }),
       ]).start();
     }
-  }, [visible]);
+  }, [opacity, translateY, visible]);
 
   return (
     <Animated.View style={[styles.toast, { opacity, transform: [{ translateY }] }]} pointerEvents="none">
@@ -93,7 +93,11 @@ export default function ArtLobby() {
         {/* Back Button - gradient hồng như HTML */}
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => { playPop(); router.canGoBack() ? router.back() : router.replace('/(app)/lobby' as any); }}
+          onPress={() => {
+            playPop();
+            if (router.canGoBack()) router.back();
+            else router.replace('/(app)/lobby' as any);
+          }}
         >
           <LinearGradient
             colors={['#FF9EB5', '#FF7597']}

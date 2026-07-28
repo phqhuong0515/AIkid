@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { AikidButton } from '@/features/kids-ui/AikidButton';
-import { AikidTheme } from '@/features/kids-ui/theme';
 
 export type AiResultPanelProps = {
   styleName: string;

@@ -522,7 +522,7 @@ async function fetchAiImagesPage(offset: number): Promise<GalleryPage> {
       }
     }
 
-    const items = (jobs as Array<Record<string, unknown>>)
+    const items = (jobs as Record<string, unknown>[])
       .filter((job) => {
         if (!job || typeof job !== 'object') return false;
         const status = String(job.status || '').toLowerCase();

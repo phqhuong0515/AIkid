@@ -4,7 +4,7 @@ import {
   createEmptyDraft,
   defaultSelectedAnswerKeys,
   defaultCategoryInputs,
-} from '../constants';
+ buildCharacterUserPrompt , CATEGORY_QUESTIONS } from '../constants';
 import {
   loadDraftJson,
   loadSavedJson,
@@ -19,8 +19,6 @@ import type {
   CharacterDraft,
   SavedCharacter,
 } from '../types';
-import { buildCharacterUserPrompt } from '../constants';
-import { CATEGORY_QUESTIONS } from '../constants';
 
 type CharacterState = {
   draft: CharacterDraft;

@@ -73,7 +73,7 @@ export default function StorageV2() {
   };
 
   // Animated buttons
-  const makeBtnAnim = () => {
+  const useButtonAnimation = () => {
     const scale = useSharedValue(1);
     return {
       style: useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] })),
@@ -81,11 +81,11 @@ export default function StorageV2() {
       onPressOut: () => { scale.value = withSpring(1); },
     };
   };
-  const btnDownload = makeBtnAnim();
-  const btnGallery  = makeBtnAnim();
-  const btnProfile  = makeBtnAnim();
-  const btnEdit     = makeBtnAnim();
-  const btnDelete   = makeBtnAnim();
+  const btnDownload = useButtonAnimation();
+  const btnGallery  = useButtonAnimation();
+  const btnProfile  = useButtonAnimation();
+  const btnEdit     = useButtonAnimation();
+  const btnDelete   = useButtonAnimation();
 
   // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -250,7 +250,11 @@ export default function StorageV2() {
         <GlobalHeader />
         <TouchableOpacity
           style={styles.backBtnWrapper}
-          onPress={() => { playPop(); router.canGoBack() ? router.back() : router.replace('/(app)/character'); }}
+          onPress={() => {
+            playPop();
+            if (router.canGoBack()) router.back();
+            else router.replace('/(app)/character');
+          }}
         >
           <LinearGradient colors={['#FF9EB5', '#FF7597']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.backBtnGradient}>
             <Ionicons name="arrow-back" size={16} color="#FFF" />

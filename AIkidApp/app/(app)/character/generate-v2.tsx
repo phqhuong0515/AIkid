@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Pressable, TextInput, ScrollView, useWindowDimensions } from 'react-native';
-import { useRouter } from 'expo-router';
-import { GlobalHeader } from '@/components/GlobalHeader';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, TextInput, ScrollView, useWindowDimensions } from 'react-native';
 import { AikidLayout } from '@/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { usePopSound } from '@/hooks/usePopSound';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -65,7 +62,6 @@ const CATEGORY_QUESTIONS: Record<string, { label: string; placeholder: string }[
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function GenerateV2() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { playPop } = usePopSound();
   const { width } = useWindowDimensions();

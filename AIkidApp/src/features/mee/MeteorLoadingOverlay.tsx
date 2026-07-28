@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, useWindowDimensions, Platform } from 'react-native';
+import { View, StyleSheet, Text, useWindowDimensions } from 'react-native';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -9,7 +9,6 @@ import Animated, {
   Easing,
   interpolate,
   runOnJS,
-  withSequence,
   SharedValue
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,7 +22,6 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
   const mini1Anim = useSharedValue(0);
   const mini2Anim = useSharedValue(0);
   const mini3Anim = useSharedValue(0);
-  const dotsAnim = useSharedValue(0);
 
   useEffect(() => {
     if (isVisible) {
@@ -42,9 +40,6 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
       mini2Anim.value = withDelay(900, withRepeat(withTiming(1, { duration: 1900, easing: Easing.linear }), -1, false));
       mini3Anim.value = withDelay(100, withRepeat(withTiming(1, { duration: 1400, easing: Easing.linear }), -1, false));
 
-      // Dots
-      dotsAnim.value = withRepeat(withTiming(3, { duration: 1500, easing: Easing.linear }), -1, false);
-
     } else {
       opacity.value = withTiming(0, { duration: 400 }, (finished) => {
         if (finished) {
@@ -53,7 +48,15 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
         }
       });
     }
-  }, [isVisible]);
+  }, [
+    isVisible,
+    mainMeteorAnim,
+    mini1Anim,
+    mini2Anim,
+    mini3Anim,
+    onFadedOut,
+    opacity,
+  ]);
 
   const overlayStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -74,7 +77,7 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
     };
   });
 
-  const getMiniMeteorStyle = (animValue: SharedValue<number>) => {
+  const useMiniMeteorStyle = (animValue: SharedValue<number>) => {
     return useAnimatedStyle(() => {
       const translateX = interpolate(animValue.value, [0, 1], [width * 0.6, -width * 0.6]);
       const translateY = interpolate(animValue.value, [0, 1], [-height * 0.6, height * 0.6]);
@@ -90,14 +93,9 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
     });
   };
 
-  const mini1Style = getMiniMeteorStyle(mini1Anim);
-  const mini2Style = getMiniMeteorStyle(mini2Anim);
-  const mini3Style = getMiniMeteorStyle(mini3Anim);
-
-  const dotsStyle = useAnimatedStyle(() => {
-    // 0 -> 1 = ., 1 -> 2 = .., 2 -> 3 = ...
-    return {};
-  });
+  const mini1Style = useMiniMeteorStyle(mini1Anim);
+  const mini2Style = useMiniMeteorStyle(mini2Anim);
+  const mini3Style = useMiniMeteorStyle(mini3Anim);
 
   if (!isRendered && !isVisible) return null;
 

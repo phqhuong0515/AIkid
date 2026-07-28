@@ -55,7 +55,8 @@ export default function IdeaV2Screen() {
     if (step > 1) {
       setStep(step - 1);
     } else {
-      router.canGoBack() ? router.back() : router.replace('/(app)/comic/genre-v2');
+      if (router.canGoBack()) router.back();
+      else router.replace('/(app)/comic/genre-v2');
     }
   };
 
@@ -115,7 +116,6 @@ export default function IdeaV2Screen() {
   );
 
   const renderStep2 = () => {
-    const colCount = isMobile ? 2 : 3;
     return (
       <Animated.View entering={FadeInDown.duration(400)} style={styles.stepContainer}>
         <Text style={styles.stepTitle}>Bối cảnh</Text>
@@ -158,7 +158,6 @@ export default function IdeaV2Screen() {
   };
 
   const renderStep3 = () => {
-    const colCount = isMobile ? 2 : 4;
     return (
       <Animated.View entering={FadeInDown.duration(400)} style={styles.stepContainer}>
         <Text style={styles.stepTitle}>Cốt truyện</Text>

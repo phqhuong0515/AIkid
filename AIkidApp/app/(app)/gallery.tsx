@@ -43,7 +43,7 @@ export default function GalleryScreen() {
     void setRecentScope(childId);
     void query.refetch();
     void aiQuery.refetch();
-  }, [childId, ipId, setRecentScope]));
+  }, [aiQuery, childId, ipId, query, setRecentScope]));
   
   const remoteAi = aiQuery.data?.pages.flatMap((page) => page.items) ?? [];
   const aiItems = [...recentAi, ...remoteAi].filter(

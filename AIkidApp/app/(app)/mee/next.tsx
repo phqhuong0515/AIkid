@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, ImageBackground, useWindowDimensions, Text } from 'react-native';
+import { View, StyleSheet, Pressable, ImageBackground, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

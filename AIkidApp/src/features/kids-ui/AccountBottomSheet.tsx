@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import { View, Text, Pressable, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { useAuth } from '@/core/auth/useAuth';

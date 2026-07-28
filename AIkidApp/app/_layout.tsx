@@ -14,6 +14,20 @@ import { queryClient } from '@/core/query/queryClient';
 import { TemplateProvider } from '@/design-system';
 import { useFamily } from '@/features/family/store/useFamily';
 
+import { useFonts } from 'expo-font';
+import {
+  Mali_400Regular,
+  Mali_500Medium,
+  Mali_600SemiBold,
+  Mali_700Bold,
+} from '@expo-google-fonts/mali';
+import {
+  Fredoka_400Regular,
+  Fredoka_500Medium,
+  Fredoka_600SemiBold,
+  Fredoka_700Bold,
+} from '@expo-google-fonts/fredoka';
+
 /**
  * Auth gate: hydrate JWT, redirect login ↔ lobby.
  * parent_only mode (v1) — no family picker yet.
@@ -72,20 +86,6 @@ function AuthCheck({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
-
-import { useFonts } from 'expo-font';
-import {
-  Mali_400Regular,
-  Mali_500Medium,
-  Mali_600SemiBold,
-  Mali_700Bold,
-} from '@expo-google-fonts/mali';
-import {
-  Fredoka_400Regular,
-  Fredoka_500Medium,
-  Fredoka_600SemiBold,
-  Fredoka_700Bold,
-} from '@expo-google-fonts/fredoka';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert, Platform, StyleSheet, Dimensions } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, Text, TouchableOpacity, Alert, Platform, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { useCanvasRef } from '@shopify/react-native-skia';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as MediaLibrary from 'expo-media-library';
 
 import { ART_STYLES } from '@/features/art/constants';
 import { useFamily } from '@/features/family/store/useFamily';
@@ -19,7 +20,6 @@ import { useResponsiveLayout } from '@/features/kids-ui/useResponsiveLayout';
 
 export default function CanvasScreen() {
   const { style } = useLocalSearchParams<{ style: string }>();
-  const router = useRouter();
   
   const activeChild = useFamily((s) => s.children.find(c => c.id === s.activeChildId));
   const displayName = activeChild?.name || 'Bé';
@@ -113,7 +113,6 @@ export default function CanvasScreen() {
       return; 
     }
     try {
-      const MediaLibrary = require('expo-media-library');
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') { 
         Alert.alert('Cần quyền lưu ảnh'); 

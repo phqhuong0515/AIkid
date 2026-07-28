@@ -6,7 +6,6 @@ import Animated, {
   withTiming,
   withRepeat,
   withDelay,
-  withSequence,
   Easing,
   interpolate,
 } from 'react-native-reanimated';
@@ -29,7 +28,7 @@ const Meteor = ({ delay = 0, isMini = false, duration = 2200 }) => {
         false
       )
     );
-  }, [delay, duration]);
+  }, [delay, duration, progress]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const translateX = interpolate(

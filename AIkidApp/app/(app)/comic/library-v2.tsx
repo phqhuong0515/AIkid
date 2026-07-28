@@ -43,7 +43,11 @@ export default function LibraryV2Screen() {
         <GlobalHeader />
         <TouchableOpacity
           style={styles.backBtnWrapper}
-          onPress={() => { playPop(); router.canGoBack() ? router.back() : router.replace('/(app)/comic/idea-v2'); }}
+          onPress={() => {
+            playPop();
+            if (router.canGoBack()) router.back();
+            else router.replace('/(app)/comic/idea-v2');
+          }}
           activeOpacity={0.8}
         >
           <LinearGradient
