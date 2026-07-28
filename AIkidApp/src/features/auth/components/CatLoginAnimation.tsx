@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Dimensions, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSequence, withRepeat, Easing } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient, Stop, G, Path, Line, Rect } from 'react-native-svg';
-import { Audio } from 'expo-av';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/core/auth/useAuth';
+import { usePopSound } from '@/hooks/usePopSound';
 import { MeteorLoader } from './MeteorLoader';
 import { PinPadModal } from './PinPadModal';
 
@@ -15,6 +15,7 @@ const ASPECT_RATIO = 711.34 / 834.19;
 export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
   const router = useRouter();
   const { loginStudent, isLoading } = useAuth();
+  const { playPop } = usePopSound();
   
   const [email, setEmail] = useState('');
   const [isSwallowed, setIsSwallowed] = useState(false);
@@ -29,23 +30,12 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
   const catTranslateY = useSharedValue(0);
   const catScaleY = useSharedValue(1);
 
-  async function playPopSound() {
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../../../../public/lobby-assets/audio/pop.mp3')
-      );
-      await sound.playAsync();
-    } catch (e) {
-      console.log('Audio error:', e);
-    }
-  }
-
   const triggerLoginSequence = async (pinValue?: string) => {
     const finalPin = pinValue;
     if (!email || !finalPin) return;
 
     setShowPinModal(false);
-    playPopSound();
+    playPop();
     
     formScale.value = withTiming(0, { duration: 600, easing: Easing.bezier(0.6, -0.28, 0.735, 0.045) });
     formTranslateY.value = withTiming(160, { duration: 600, easing: Easing.bezier(0.6, -0.28, 0.735, 0.045) });
@@ -72,9 +62,9 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
         false
       );
 
-      setTimeout(playPopSound, 350);
-      setTimeout(playPopSound, 700);
-      setTimeout(playPopSound, 1050);
+      setTimeout(playPop, 350);
+      setTimeout(playPop, 700);
+      setTimeout(playPop, 1050);
 
       setShowLoader(true);
     }, 400);

@@ -110,14 +110,14 @@ function CoverflowItem({
       >
         <Image
           source={{ uri: item.image }}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
           contentFit="cover"
           transition={200}
         />
         {/* Gradient/Overlay to make text readable */}
         <View
           style={{
-            ...StyleSheet.absoluteFillObject,
+            ...StyleSheet.absoluteFill,
             backgroundColor: 'rgba(0,0,0,0.3)',
             top: '50%', // Fade from middle to bottom
           }}

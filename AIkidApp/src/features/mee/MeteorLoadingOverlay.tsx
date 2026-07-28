@@ -105,7 +105,7 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
         colors={['#FF6B6B', '#FF8E53', '#FCE082']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
       {/* Fallback pattern for stars could be added here */}
       
@@ -142,7 +142,7 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 999999,
     alignItems: 'center',
     justifyContent: 'center',

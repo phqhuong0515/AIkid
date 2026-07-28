@@ -60,7 +60,7 @@ export function PageBackground({
       {/* Subtle white overlay to soften bg and keep text readable */}
       <View
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           { backgroundColor: `rgba(253,250,244,${opacity})` },
         ]}
         pointerEvents="none"

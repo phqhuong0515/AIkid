@@ -32,7 +32,13 @@ module.exports = () => {
       favicon: './assets/favicon.png',
       bundler: 'metro',
     },
-    plugins: ['expo-router', 'expo-secure-store', 'expo-screen-orientation'],
+    plugins: [
+      'expo-router',
+      'expo-audio',
+      'expo-asset',
+      'expo-secure-store',
+      'expo-screen-orientation',
+    ],
     experiments: {
       typedRoutes: true,
       ...(baseUrl ? { baseUrl } : {}),

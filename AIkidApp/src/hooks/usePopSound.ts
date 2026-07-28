@@ -3,7 +3,7 @@
  *
  * Web   → Web Audio API synthesis (identical to HTML source: dual-oscillator bubble pop)
  *         No file loading required → instant, no race conditions
- * Native → expo-av with a bundled WAV asset (async load with error handling)
+ * Native → expo-audio with a bundled WAV asset
  *
  * Shared navigation feedback for Expo Web, iOS and Android.
  *   - osc1 (triangle): 200 → 350 → 80 Hz, gain 0.35, duration 0.15s  (warm body)
@@ -11,8 +11,8 @@
  */
 
 import { Platform } from 'react-native';
-import { Audio } from 'expo-av';
-import { useCallback, useEffect, useRef } from 'react';
+import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
+import { useCallback, useEffect } from 'react';
 
 // ─── Web Audio API: synthesized bubble pop (matches HTML exactly) ────────────
 function playWebAudioPop() {
@@ -65,43 +65,15 @@ function playWebAudioPop() {
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 export function usePopSound() {
-  const soundRef = useRef<Audio.Sound | null>(null);
-  const isLoadedRef = useRef(false);
+  const player = useAudioPlayer(require('../../assets/audio/pop.wav'));
 
   useEffect(() => {
     // On web, use Web Audio API — no need to load file
     if (Platform.OS === 'web') return;
 
-    let mounted = true;
-
-    async function load() {
-      try {
-        await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-        const { sound } = await Audio.Sound.createAsync(
-          require('../../assets/audio/pop.wav'),
-          { shouldPlay: false, volume: 1.0 }
-        );
-        if (mounted) {
-          soundRef.current = sound;
-          isLoadedRef.current = true;
-        } else {
-          sound.unloadAsync();
-        }
-      } catch (err) {
-        console.warn('usePopSound: could not load pop.wav', err);
-      }
-    }
-
-    load();
-
-    return () => {
-      mounted = false;
-      isLoadedRef.current = false;
-      if (soundRef.current) {
-        soundRef.current.unloadAsync().catch(() => {});
-        soundRef.current = null;
-      }
-    };
+    setAudioModeAsync({ playsInSilentMode: true }).catch((err) => {
+      console.warn('usePopSound: could not configure audio', err);
+    });
   }, []);
 
   const playPop = useCallback(async () => {
@@ -111,15 +83,14 @@ export function usePopSound() {
       return;
     }
 
-    // Native: expo-av
-    if (!isLoadedRef.current || !soundRef.current) return;
+    // Native: expo-audio
     try {
-      await soundRef.current.replayAsync();
+      await player.seekTo(0);
+      player.play();
     } catch (err) {
-      // Sound might be in bad state (unloaded, interrupted, etc.) — ignore
-      console.warn('usePopSound: replayAsync failed', err);
+      console.warn('usePopSound: playback failed', err);
     }
-  }, []);
+  }, [player]);
 
   return { playPop };
 }
