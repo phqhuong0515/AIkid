@@ -5,7 +5,7 @@
  *         No file loading required → instant, no race conditions
  * Native → expo-av với pop.mp3 (async load with error handling)
  *
- * HTML Reference: public/_art_backup_html/index.html playPopSound()
+ * Shared navigation feedback for Expo Web, iOS and Android.
  *   - osc1 (triangle): 200 → 350 → 80 Hz, gain 0.35, duration 0.15s  (warm body)
  *   - osc2 (sine):     850 → 1600 → 450 Hz, gain 0.18, duration 0.08s (click)
  */

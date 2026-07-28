@@ -26,7 +26,7 @@ import {
   StyleProp,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { AikidButtonGradients, AikidRadius, AikidShadows, AikidTextColors } from '@/features/kids-ui/theme';
+import { useAikidTemplate } from '@/design-system';
 import { AikidText } from './AikidText';
 
 export type BtnVariant = 'nav' | 'cta' | 'feature' | 'encourage' | 'discourage' | 'delete' | 'icon';
@@ -36,26 +36,6 @@ const SIZE_MAP: Record<BtnSize, { height: number; paddingH: number; fontSize: nu
   sm: { height: 40, paddingH: 16, fontSize: 14, iconSize: 38 },
   md: { height: 52, paddingH: 24, fontSize: 16, iconSize: 52 },
   lg: { height: 62, paddingH: 32, fontSize: 18, iconSize: 62 },
-};
-
-const GRADIENT_MAP: Record<BtnVariant, readonly string[]> = {
-  nav:        AikidButtonGradients.nav,
-  cta:        AikidButtonGradients.cta,
-  feature:    AikidButtonGradients.feature,
-  encourage:  AikidButtonGradients.encourage,
-  discourage: AikidButtonGradients.discourage,
-  delete:     AikidButtonGradients.delete,
-  icon:       AikidButtonGradients.navIcon,
-};
-
-const TEXT_COLOR_MAP: Record<BtnVariant, string> = {
-  nav:        AikidTextColors.white,
-  cta:        AikidTextColors.white,
-  feature:    AikidTextColors.heading,   // dark text on white bg
-  encourage:  AikidTextColors.white,
-  discourage: AikidTextColors.white,
-  delete:     AikidTextColors.white,
-  icon:       AikidTextColors.white,
 };
 
 // Shadow per variant
@@ -77,6 +57,10 @@ type AikidButtonProps = {
   loading?: boolean;
   /** Use for icon-only buttons (variant="icon") */
   icon?: React.ReactNode;
+  /** Icon placed before text */
+  leftIcon?: React.ReactNode;
+  /** Icon placed after text */
+  rightIcon?: React.ReactNode;
   /** Full-width button */
   fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -90,17 +74,23 @@ export function AikidButton({
   disabled,
   loading,
   icon,
+  leftIcon,
+  rightIcon,
   fullWidth,
   style,
   children,
 }: AikidButtonProps) {
+  const template = useAikidTemplate();
   const sz = SIZE_MAP[size];
-  const gradient = GRADIENT_MAP[variant];
-  const textColor = TEXT_COLOR_MAP[variant];
+  const gradient = template.gradients[variant];
+  const textColor =
+    variant === 'feature'
+      ? template.colors.text.heading
+      : template.colors.text.white;
   const shadow = SHADOW_MAP[variant];
 
   const isIcon = variant === 'icon';
-  const btnRadius = isIcon ? AikidRadius.pill : AikidRadius.btn;
+  const btnRadius = isIcon ? template.radius.pill : template.radius.btn;
   const btnWidth = isIcon ? sz.iconSize : fullWidth ? '100%' : undefined;
 
   const isDisabled = disabled || loading;
@@ -118,7 +108,11 @@ export function AikidButton({
       ]}
     >
       <LinearGradient
-        colors={isDisabled ? ['#D4CAC0', '#C0B8B0'] : (gradient as [string, string, ...string[]])}
+        colors={
+          isDisabled
+            ? ['#D4CAC0', '#C0B8B0']
+            : [gradient[0], gradient[1]]
+        }
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[
@@ -142,12 +136,16 @@ export function AikidButton({
         ) : icon ? (
           icon
         ) : (
-          <AikidText
-            variant={variant === 'feature' ? 'btnFeature' : 'btnNav'}
-            style={{ fontSize: sz.fontSize, color: isDisabled ? '#9A8F87' : textColor }}
-          >
-            {children}
-          </AikidText>
+          <>
+            {leftIcon}
+            <AikidText
+              variant={variant === 'feature' ? 'btnFeature' : 'btnNav'}
+              style={{ fontSize: sz.fontSize, color: isDisabled ? '#9A8F87' : textColor }}
+            >
+              {children}
+            </AikidText>
+            {rightIcon}
+          </>
         )}
       </LinearGradient>
     </TouchableOpacity>

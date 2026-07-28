@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Pressable, TextInput, ScrollView, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { GlobalHeader } from '@/components/GlobalHeader';
+import { AikidLayout } from '@/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { usePopSound } from '@/hooks/usePopSound';
@@ -121,39 +122,17 @@ export default function GenerateV2() {
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <ImageBackground
-      source={require('../../../public/lobby-assets/images/bg-character-feature.png')}
-      style={styles.bg}
-      resizeMode="cover"
-    >
-      {/* Header */}
-      <View style={{ paddingTop: insets.top }}>
-        <GlobalHeader />
-        <TouchableOpacity
-          onPress={() => { playPop(); router.canGoBack() ? router.back() : router.replace('/(app)/character'); }}
-          style={styles.backBtnWrapper}
-        >
-          <LinearGradient colors={['#FF9EB5', '#FF7597']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.backBtnGradient}>
-            <Ionicons name="arrow-back" size={16} color="#FFF" />
-            <Text style={styles.backBtnText}>Trở về</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
+    <AikidLayout scene="character" showBack layoutMode="wide" rightAction={<ToggleBtn />}>
       {isTablet ? (
         /* ════════════════ TABLET: 2 panel ngang ════════════════ */
         <View style={[styles.tabletWrapper, { paddingBottom: insets.bottom + 16 }]}>
 
           {/* Left panel */}
           <View style={[styles.panel, { flex: 1.5 }]}>
-            <View style={styles.panelHeaderRow}>
-              <ToggleBtn />
-            </View>
-
             {inputMode === 'image' ? (
-              <View style={{ flex: 1, flexDirection: 'row', gap: 14 }}>
+              <View style={{ flex: 1, gap: 14 }}>
                 {/* Ideas */}
-                <View style={[styles.ideaFrame, { flex: 1 }]}>
+                <View>
                   <SectionHeader onReset={() => playPop()} />
                   <ScrollView showsVerticalScrollIndicator={false}>
                     {[
@@ -169,9 +148,9 @@ export default function GenerateV2() {
                   </ScrollView>
                 </View>
                 {/* Upload */}
-                <View style={{ flex: 1 }}>
-                  <Pressable style={styles.uploadBox} onPress={() => playPop()}>
-                    <Ionicons name="cloud-upload" size={52} color="#EBDCD0" />
+                <View>
+                  <Pressable style={styles.uploadBoxMobile} onPress={() => playPop()}>
+                    <Ionicons name="cloud-upload" size={42} color="#EBDCD0" />
                     <Text style={styles.uploadTitle}>Tải ảnh phác họa lên</Text>
                     <Text style={styles.uploadSub}>Click hoặc chạm để tải ảnh vào đây</Text>
                   </Pressable>
@@ -204,13 +183,6 @@ export default function GenerateV2() {
               </View>
             )}
 
-            <View style={styles.promptBox}>
-              <View style={styles.formulaBanner}>
-                <Ionicons name="star" size={12} color="#FF5C8A" />
-                <Text style={styles.formulaText}>Công thức: [Nhân vật] + [Hình dáng] + [Trang phục]</Text>
-              </View>
-              <Text style={[styles.promptDisplayText, { marginTop: 6 }]}>Bản vẽ thiết kế...</Text>
-            </View>
           </View>
 
           {/* Right panel: AI */}
@@ -225,6 +197,15 @@ export default function GenerateV2() {
                 <Text style={[styles.actionText, { marginLeft: 4 }]}>Tải về</Text>
               </TouchableOpacity>
             </View>
+
+            <View style={[styles.promptBox, { marginTop: 0, marginBottom: 14 }]}>
+              <View style={styles.formulaBanner}>
+                <Ionicons name="star" size={12} color="#FF5C8A" />
+                <Text style={styles.formulaText}>Công thức: [Nhân vật] + [Hình dáng] + [Trang phục]</Text>
+              </View>
+              <Text style={[styles.promptDisplayText, { marginTop: 6 }]}>Bản vẽ thiết kế...</Text>
+            </View>
+
             <View style={styles.aiViewport}>
               <View style={styles.aiPlaceholder}>
                 <Ionicons name="color-wand" size={58} color="#FF5C8A" style={{ marginBottom: 16 }} />
@@ -253,8 +234,6 @@ export default function GenerateV2() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Toggle btn */}
-          <ToggleBtn />
 
           {/* Input card */}
           {inputMode === 'image' ? (
@@ -337,7 +316,7 @@ export default function GenerateV2() {
           </View>
         </ScrollView>
       )}
-    </ImageBackground>
+    </AikidLayout>
   );
 }
 

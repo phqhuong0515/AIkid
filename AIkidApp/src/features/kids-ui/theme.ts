@@ -183,12 +183,12 @@ export const AikidShadows = {
 // ─── Background Assets (per-screen) ───────────────────────────────────────────
 
 export const AikidBgAssets = {
-  lobby: require('../../public/lobby-assets/images/bg-home.png'),
-  art: require('../../public/lobby-assets/images/bg-art.png'),
-  character: require('../../public/lobby-assets/images/bg-character.png'),
-  mee: require('../../public/lobby-assets/images/bg-mee.png'),
-  comic: require('../../public/lobby-assets/images/bg-art.png'), // TODO: bg-comic.png
-  login: require('../../public/lobby-assets/images/bg-login.jpeg'),
+  lobby: require('../../../public/lobby-assets/images/bg-home.png'),
+  art: require('../../../public/lobby-assets/images/bg-art.png'),
+  character: require('../../../public/lobby-assets/images/bg-character.png'),
+  mee: require('../../../public/lobby-assets/images/bg-mee.png'),
+  comic: require('../../../public/lobby-assets/images/bg-art.png'), // TODO: bg-comic.png
+  login: require('../../../public/lobby-assets/images/bg-login.jpeg'),
 } as const;
 
 // ─── Legacy alias (backward compat) ───────────────────────────────────────────
@@ -228,9 +228,9 @@ export const AikidTheme = {
     bgCharacter: AikidBgAssets.character,
     bgMee: AikidBgAssets.mee,
     bgLogin: AikidBgAssets.login,
-    bgCharacterFeature: require('../../public/lobby-assets/images/bg-character-feature.png'),
-    titleHome: require('../../public/lobby-assets/images/title-home-vn.png'),
-    logo: require('../../public/hub-images/logo.svg'),
+    bgCharacterFeature: require('../../../public/lobby-assets/images/bg-character-feature.png'),
+    titleHome: require('../../../public/lobby-assets/images/title-home-vn.png'),
+    logo: require('../../../public/hub-images/logo.svg'),
   },
   radius: AikidRadius,
   shadow: AikidShadows,

@@ -21,9 +21,9 @@
 
 import React from 'react';
 import { ImageBackground, View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { AikidBgAssets } from '@/features/kids-ui/theme';
+import { useAikidTemplate, type AikidScene } from '@/design-system';
 
-export type BgScene = 'lobby' | 'art' | 'character' | 'mee' | 'comic' | 'login';
+export type BgScene = AikidScene;
 
 const OVERLAY_OPACITY: Record<BgScene, number> = {
   lobby:     0.05,
@@ -48,7 +48,7 @@ export function PageBackground({
   style,
   overlayOpacity,
 }: PageBackgroundProps) {
-  const src = AikidBgAssets[scene];
+  const src = useAikidTemplate().assets[scene];
   const opacity = overlayOpacity ?? OVERLAY_OPACITY[scene];
 
   return (

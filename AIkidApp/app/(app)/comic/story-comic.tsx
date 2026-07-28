@@ -1,11 +1,5 @@
-import { HtmlEmbed } from '@/features/kids-ui/HtmlEmbed';
+import { Redirect } from 'expo-router';
 
 export default function StoryComicScreen() {
-  return (
-    <HtmlEmbed
-      title="Truyện Tranh"
-      src="/art/story/genre.html"
-      nativeHint="Truyện tranh."
-    />
-  );
+  return <Redirect href="/(app)/comic/genre-v2" />;
 }

@@ -7,8 +7,9 @@
  */
 
 import React from 'react';
-import { Text, TextStyle, StyleSheet, StyleProp } from 'react-native';
-import { AikidFonts, AikidTextColors } from '@/features/kids-ui/theme';
+import { Text, type TextStyle, type StyleProp } from 'react-native';
+
+import { useAikidTemplate, type AikidTemplate } from '@/design-system';
 
 type TextVariant =
   | 'heading'    // Fredoka Bold 28 — #334155 — Tên tính năng, tiêu đề màn hình
@@ -23,76 +24,81 @@ type TextVariant =
   | 'btnFeature' // Fredoka SemiBold 16 — #334155 — Text trên button tính năng
   | 'caption';   // Mali Regular 12 — #8C6F65 — Caption, timestamp
 
-const variantStyles: Record<TextVariant, TextStyle> = {
+function createVariantStyles(
+  template: AikidTemplate,
+): Record<TextVariant, TextStyle> {
+  const { fonts, colors } = template;
+  return {
   heading: {
-    fontFamily: AikidFonts.headingBold,
+    fontFamily: fonts.headingBold,
     fontSize: 28,
     lineHeight: 36,
-    color: AikidTextColors.heading,
+    color: colors.text.heading,
     letterSpacing: 0.2,
   },
   title: {
-    fontFamily: AikidFonts.headingSemi,
+    fontFamily: fonts.headingSemi,
     fontSize: 22,
     lineHeight: 30,
-    color: AikidTextColors.title,
+    color: colors.text.title,
   },
   label: {
-    fontFamily: AikidFonts.headingMed,
+    fontFamily: fonts.headingMed,
     fontSize: 16,
     lineHeight: 24,
-    color: AikidTextColors.heading,
+    color: colors.text.heading,
   },
   body: {
-    fontFamily: AikidFonts.bodyReg,
+    fontFamily: fonts.bodyReg,
     fontSize: 15,
     lineHeight: 22,
-    color: AikidTextColors.body,
+    color: colors.text.body,
   },
   bodyBold: {
-    fontFamily: AikidFonts.bodyBold,
+    fontFamily: fonts.bodyBold,
     fontSize: 15,
     lineHeight: 22,
-    color: AikidTextColors.heading,
+    color: colors.text.heading,
   },
   hint: {
-    fontFamily: AikidFonts.bodyReg,
+    fontFamily: fonts.bodyReg,
     fontSize: 13,
     lineHeight: 18,
-    color: AikidTextColors.placeholder,
+    color: colors.text.placeholder,
   },
   brand: {
-    fontFamily: AikidFonts.bodySemi,
+    fontFamily: fonts.bodySemi,
     fontSize: 15,
     lineHeight: 22,
-    color: AikidTextColors.brand,
+    color: colors.text.brand,
   },
   white: {
-    fontFamily: AikidFonts.headingSemi,
+    fontFamily: fonts.headingSemi,
     fontSize: 16,
     lineHeight: 22,
-    color: AikidTextColors.white,
+    color: colors.text.white,
   },
   btnNav: {
-    fontFamily: AikidFonts.headingBold,
+    fontFamily: fonts.headingBold,
     fontSize: 18,
     lineHeight: 24,
-    color: AikidTextColors.white,
+    color: colors.text.white,
     letterSpacing: 0.3,
   },
   btnFeature: {
-    fontFamily: AikidFonts.headingSemi,
+    fontFamily: fonts.headingSemi,
     fontSize: 16,
     lineHeight: 22,
-    color: AikidTextColors.heading,
+    color: colors.text.heading,
   },
   caption: {
-    fontFamily: AikidFonts.bodyReg,
+    fontFamily: fonts.bodyReg,
     fontSize: 12,
     lineHeight: 16,
-    color: AikidTextColors.body,
+    color: colors.text.body,
   },
-};
+  };
+}
 
 type AikidTextProps = {
   variant?: TextVariant;
@@ -110,6 +116,7 @@ export function AikidText({
   children,
   color,
 }: AikidTextProps) {
+  const variantStyles = createVariantStyles(useAikidTemplate());
   return (
     <Text
       style={[variantStyles[variant], color ? { color } : undefined, style]}

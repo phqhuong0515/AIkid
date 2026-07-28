@@ -17,55 +17,61 @@
  */
 
 import React from 'react';
-import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { AikidFrameColors, AikidRadius, AikidShadows, AikidBrandColors } from '@/features/kids-ui/theme';
+import { View, type ViewStyle, type StyleProp } from 'react-native';
+
+import { useAikidTemplate, type AikidTemplate } from '@/design-system';
 
 export type CardVariant = 'raised' | 'soft' | 'flat' | 'dashed' | 'outlined' | 'selected';
 
-const variantStyles: Record<CardVariant, ViewStyle> = {
+function createVariantStyles(
+  template: AikidTemplate,
+): Record<CardVariant, ViewStyle> {
+  const { colors, radius, shadows } = template;
+  return {
   raised: {
-    backgroundColor: AikidFrameColors.paper,
+    backgroundColor: colors.frame.paper,
     borderWidth: 8,
-    borderColor: AikidFrameColors.white,
-    borderRadius: AikidRadius.cardXl,
-    ...AikidShadows.raised,
+    borderColor: colors.frame.white,
+    borderRadius: radius.cardXl,
+    ...shadows.raised,
   },
   soft: {
-    backgroundColor: AikidFrameColors.paper,
+    backgroundColor: colors.frame.paper,
     borderWidth: 4,
-    borderColor: AikidFrameColors.white,
-    borderRadius: AikidRadius.cardLg,
-    ...AikidShadows.card,
+    borderColor: colors.frame.white,
+    borderRadius: radius.cardLg,
+    ...shadows.card,
   },
   flat: {
-    backgroundColor: AikidFrameColors.paper,
+    backgroundColor: colors.frame.paper,
     borderWidth: 2,
-    borderColor: AikidFrameColors.white,
-    borderRadius: AikidRadius.card,
+    borderColor: colors.frame.white,
+    borderRadius: radius.card,
   },
   dashed: {
-    backgroundColor: AikidFrameColors.paper,
+    backgroundColor: colors.frame.paper,
     borderWidth: 2,
     borderColor: '#EBDCD0',
     borderStyle: 'dashed',
-    borderRadius: AikidRadius.cardLg,
-    ...AikidShadows.soft,
+    borderRadius: radius.cardLg,
+    ...shadows.soft,
   },
   outlined: {
-    backgroundColor: AikidFrameColors.paper,
+    backgroundColor: colors.frame.paper,
     borderWidth: 2,
     borderColor: '#E2D9CF',
-    borderRadius: AikidRadius.card,
-    ...AikidShadows.soft,
+    borderRadius: radius.card,
+    ...shadows.soft,
   },
   selected: {
-    backgroundColor: AikidBrandColors.pinkLight,
+    backgroundColor: colors.brand.pinkLight,
     borderWidth: 2.5,
-    borderColor: AikidBrandColors.pink,
-    borderRadius: AikidRadius.card,
-    ...AikidShadows.soft,
+    borderColor: colors.brand.pink,
+    borderRadius: radius.card,
+    ...shadows.soft,
   },
-};
+  };
+}
 
 type AikidCardProps = {
   variant?: CardVariant;
@@ -84,6 +90,7 @@ export function AikidCard({
   padding = 20,
   noPadding = false,
 }: AikidCardProps) {
+  const variantStyles = createVariantStyles(useAikidTemplate());
   return (
     <View
       style={[

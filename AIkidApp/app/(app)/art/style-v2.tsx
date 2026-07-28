@@ -94,14 +94,6 @@ const StyleCard = ({
     };
   }, [translateX, scale, isActive, opacity, zIndex]);
 
-  const innerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      shadowOpacity: withTiming(isActive ? 0.25 : 0.15, { duration: 300 }),
-      shadowRadius: withTiming(isActive ? 60 : 45, { duration: 300 }),
-      elevation: isActive ? 10 : 5,
-    };
-  }, [isActive]);
-
   return (
     <Animated.View 
       style={[
@@ -115,8 +107,8 @@ const StyleCard = ({
         onPress={() => { playPop(); onPress(); }}
         style={{ width: 300, height: 350 }}
       >
-        <Animated.View 
-          style={[innerAnimatedStyle, {
+        <View
+          style={{
             width: 300, height: 350,
             backgroundColor: '#fff',
             borderRadius: 48,
@@ -125,7 +117,10 @@ const StyleCard = ({
             borderColor: '#fff',
             shadowColor: '#000',
             shadowOffset: { width: 0, height: isActive ? 25 : 15 },
-          }]}
+            shadowOpacity: isActive ? 0.2 : 0.1,
+            shadowRadius: isActive ? 35 : 20,
+            elevation: isActive ? 10 : 5,
+          }}
         >
           {isActive && (
             <View 
@@ -139,6 +134,10 @@ const StyleCard = ({
               pointerEvents="none"
             />
           )}
+
+          <View style={{ width: '100%', height: '100%', borderRadius: 38, overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
+            <Image source={style.image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+          </View>
           
           <View style={{ 
             position: 'absolute', 
@@ -151,13 +150,16 @@ const StyleCard = ({
             borderColor: '#fff',
             backgroundColor: '#FF7597',
             zIndex: 20,
+            // Thêm shadow nhẹ cho label để nổi lên
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 8,
+            elevation: 5,
           }}>
             <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.5 }}>{style.id}</Text>
           </View>
-          <View style={{ width: '100%', height: '100%', borderRadius: 38, overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
-            <Image source={style.image} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-          </View>
-        </Animated.View>
+        </View>
       </TouchableOpacity>
     </Animated.View>
   );

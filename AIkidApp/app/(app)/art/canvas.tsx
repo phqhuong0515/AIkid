@@ -5,10 +5,6 @@ import { useCanvasRef } from '@shopify/react-native-skia';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 
-// We import AuthenticatedEmbed from standard place if available, otherwise just mock or build conditionally
-// I'll assume we can import AuthenticatedEmbed from '@/features/kids-ui/AuthenticatedEmbed' or similar, but the user requested:
-// <AuthenticatedEmbed src="/art/image-generate.html" title={displayName} /> as safety net.
-import { AuthenticatedEmbed } from '@/features/kids-ui/AuthenticatedEmbed';
 import { ART_STYLES } from '@/features/art/constants';
 import { useFamily } from '@/features/family/store/useFamily';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
@@ -32,9 +28,6 @@ export default function CanvasScreen() {
   const layout = useResponsiveLayout();
   const isCompact = layout.width < 768; // basic fallback if in multi-colmpact not directly returned
 
-  // Skia web might not work properly
-  const isWebSkiaUnsupported = Platform.OS === 'web';
-  
   // Canvas State
   const canvasRef = useCanvasRef();
   const [tool, setTool] = useState<DrawTool>('brush');
@@ -133,14 +126,6 @@ export default function CanvasScreen() {
     } catch { 
       Alert.alert('Lỗi tải ảnh'); 
     }
-  }
-
-  if (isWebSkiaUnsupported) {
-    return (
-      <ScreenChrome title={displayName} backHref="/(app)/art/style-v2">
-        <AuthenticatedEmbed src="/_art_backup_html/image-generate.html" title={displayName} />
-      </ScreenChrome>
-    );
   }
 
   // --- Compact (mobile) layout: vertical stack, no absolute overlays ---
@@ -377,4 +362,3 @@ const styles = StyleSheet.create({
     margin: 8,
   },
 });
-

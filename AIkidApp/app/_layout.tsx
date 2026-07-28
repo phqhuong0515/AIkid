@@ -11,6 +11,7 @@ import { setChildProfileIdResolver } from '@/core/api/client';
 import { onSessionInvalidated } from '@/core/auth/sessionEvents';
 import { useAuth } from '@/core/auth/useAuth';
 import { queryClient } from '@/core/query/queryClient';
+import { TemplateProvider } from '@/design-system';
 import { useFamily } from '@/features/family/store/useFamily';
 
 /**
@@ -104,24 +105,26 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <AuthCheck>
-          <StatusBar style="dark" />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: '#FFF7ED' },
-              animation: 'fade',
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(auth)/login" />
-            <Stack.Screen name="(auth)/register" />
-            <Stack.Screen name="(auth)/forgot-password" />
-            <Stack.Screen name="(app)" />
-          </Stack>
-        </AuthCheck>
-      </QueryClientProvider>
+      <TemplateProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthCheck>
+            <StatusBar style="dark" />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: '#FFF7ED' },
+                animation: 'fade',
+              }}
+            >
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(auth)/login" />
+              <Stack.Screen name="(auth)/register" />
+              <Stack.Screen name="(auth)/forgot-password" />
+              <Stack.Screen name="(app)" />
+            </Stack>
+          </AuthCheck>
+        </QueryClientProvider>
+      </TemplateProvider>
     </GestureHandlerRootView>
   );
 }

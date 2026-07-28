@@ -254,7 +254,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom: 8,
     // Pill-shaped frosted header
-    marginHorizontal: 12,
     backgroundColor: 'rgba(253,250,244,0.88)',
     borderRadius: AikidRadius.pill,
     borderWidth: 2,

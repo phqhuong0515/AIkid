@@ -19,6 +19,8 @@ export { AikidModal } from './AikidModal';
 export { PageBackground } from './PageBackground';
 export type { BgScene } from './PageBackground';
 
+export { AikidLayout } from './AikidLayout';
+
 // Re-export tokens for convenience
 export {
   AikidFonts,

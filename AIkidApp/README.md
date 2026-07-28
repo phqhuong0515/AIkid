@@ -59,3 +59,7 @@ npx expo export --platform web --output-dir /tmp/aikid-export
 See `AGENTS.md` for the standalone project boundary. The canonical SDK source
 continues to live in the private StoryMee monorepo; refresh the vendored copy
 deliberately whenever its public client contract changes.
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for module boundaries,
+replaceable web/mobile UI templates, VPS Gateway integration and the
+source-to-`gh-pages` deployment flow.
