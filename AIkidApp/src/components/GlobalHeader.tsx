@@ -36,7 +36,7 @@ import {
   AikidRadius,
   AikidShadows,
   AikidTextColors,
-} from '@/ui';
+} from '@/features/kids-ui/theme';
 import { AikidModal } from '@/ui/AikidModal';
 
 function formatExpiry(value?: string | null) {

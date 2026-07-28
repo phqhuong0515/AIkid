@@ -4,7 +4,6 @@ import { useLocalSearchParams } from 'expo-router';
 import { useCanvasRef } from '@shopify/react-native-skia';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
-import * as MediaLibrary from 'expo-media-library';
 
 import { ART_STYLES } from '@/features/art/constants';
 import { useFamily } from '@/features/family/store/useFamily';
@@ -113,6 +112,8 @@ export default function CanvasScreen() {
       return; 
     }
     try {
+      // Keep the native-only module out of the web route bundle.
+      const MediaLibrary = await import('expo-media-library');
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') { 
         Alert.alert('Cần quyền lưu ảnh'); 
