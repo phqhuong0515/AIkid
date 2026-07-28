@@ -1,13 +1,27 @@
+/**
+ * GlobalHeader — Thanh header chuẩn AIkid
+ *
+ * Hiển thị trên mọi màn hình trong app (auth):
+ *   LEFT  → Logo Alkid (→ về lobby khi tap)
+ *   RIGHT → Avatar circle (→ mở Account bottom sheet)
+ *
+ * Account bottom sheet:
+ *   - Thông tin user / child
+ *   - Số lượt AI còn lại
+ *   - Quick actions: Tài khoản, Gallery, Gói AI, Hồ sơ bé
+ *   - Đăng xuất
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,6 +30,15 @@ import { useAuth } from '@/core/auth/useAuth';
 import { billingApi } from '@/core/storymee';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { useFamily } from '@/features/family/store/useFamily';
+import {
+  AikidBrandColors,
+  AikidFonts,
+  AikidFrameColors,
+  AikidRadius,
+  AikidShadows,
+  AikidTextColors,
+} from '@/ui';
+import { AikidModal } from '@/ui/AikidModal';
 
 function formatExpiry(value?: string | null) {
   if (!value) return 'Không giới hạn';
@@ -23,144 +46,372 @@ function formatExpiry(value?: string | null) {
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('vi-VN');
 }
 
-export function GlobalHeader() {
+// ─── Account Bottom Sheet ──────────────────────────────────────────────────────
+
+function AccountSheet({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  
   const { user, actor, logout } = useAuth();
   const { activeIpId, workspaces, isHydrated } = useWorkspace();
   const activeChild = useFamily((state) => state.getActiveChild());
-  
-  const [accountOpen, setAccountOpen] = useState(false);
+
   const summary = useQuery({
     queryKey: ['billing', 'summary'],
     queryFn: () => billingApi.getAiSummary(),
     staleTime: 30_000,
+    enabled: open,
   });
 
-  const displayName = String(user?.name || user?.email || (actor === 'child' ? activeChild?.name || 'Bé sáng tạo' : 'Phụ huynh'));
-  const avatarUrl = typeof user?.avatarUrl === 'string' ? user.avatarUrl : actor === 'child' ? activeChild?.avatarUrl : null;
+  const displayName = String(
+    user?.name ||
+    user?.email ||
+    (actor === 'child' ? activeChild?.name || 'Bé sáng tạo' : 'Phụ huynh'),
+  );
+  const avatarUrl = typeof user?.avatarUrl === 'string' ? user.avatarUrl : null;
   const initial = displayName.trim().charAt(0).toUpperCase() || 'A';
-  const workspaceName = workspaces.find((w) => w.ipId === activeIpId)?.name ?? 'StoryMee';
+  const workspaceName =
+    workspaces.find((w) => w.ipId === activeIpId)?.name ?? 'StoryMee';
 
   async function handleLogout() {
-    setAccountOpen(false);
+    onClose();
     await logout();
     router.replace('/(auth)/login');
   }
 
   function go(path: '/(app)/account' | '/(app)/plans' | '/(app)/gallery' | '/(app)/family') {
-    setAccountOpen(false);
+    onClose();
     router.push(path);
   }
 
   return (
+    <AikidModal isOpen={open} onClose={onClose} position="bottom" maxWidth={560} noPadding>
+      <View style={sheet.inner}>
+        {/* Avatar + Name row */}
+        <View style={sheet.profileRow}>
+          <View style={sheet.avatarLg}>
+            {avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={sheet.avatarImg} contentFit="cover" />
+            ) : (
+              <View style={sheet.avatarFallback}>
+                <Text style={sheet.avatarInitial}>{initial}</Text>
+              </View>
+            )}
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={sheet.profileName} numberOfLines={1}>{displayName}</Text>
+            {actor !== 'child' ? (
+              <Text style={sheet.profileSub} numberOfLines={1}>
+                Tài khoản phụ huynh · {isHydrated ? workspaceName : '…'}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+
+        {/* AI Credits block */}
+        <View style={sheet.creditsBlock}>
+          {summary.isLoading ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <ActivityIndicator color="#FDBA74" />
+              <Text style={sheet.creditsMuted}>Đang tải số lượt AI…</Text>
+            </View>
+          ) : summary.isError ? (
+            <View>
+              <Text style={[sheet.creditsCount, { color: '#F87171' }]}>
+                Không tải được số lượt AI
+              </Text>
+              <TouchableOpacity
+                onPress={() => void summary.refetch()}
+                style={sheet.retryBtn}
+              >
+                <Text style={sheet.retryBtnText}>Thử lại</Text>
+              </TouchableOpacity>
+            </View>
+          ) : actor === 'child' ? (
+            <Text style={sheet.creditsCount}>
+              ✨ {summary.data?.remainingCreateCredits ?? 0} lượt còn lại
+            </Text>
+          ) : (
+            <>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={sheet.planBadge}>GÓI {summary.data?.plan?.toUpperCase() || 'FREE'}</Text>
+                <Text style={sheet.creditsMuted}>HH: {formatExpiry(summary.data?.expiresAt)}</Text>
+              </View>
+              <Text style={sheet.creditsCount}>
+                {summary.data?.remainingCreateCredits ?? 0} lượt còn lại
+              </Text>
+              <Text style={sheet.creditsMuted}>
+                Tháng: {summary.data?.monthlyRemainingCreateCredits ?? 0}/{summary.data?.monthlyCreateCredits ?? 0}
+                {' · '}Mua thêm: {summary.data?.bonusCreateCredits ?? 0}
+              </Text>
+            </>
+          )}
+        </View>
+
+        {/* Quick actions */}
+        <View style={sheet.actionGrid}>
+          <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#FFF7ED' }]} onPress={() => go('/(app)/account')}>
+            <Text style={[sheet.actionBtnText, { color: '#92400E' }]}>🧑 Tài khoản</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => go('/(app)/gallery')}>
+            <Text style={[sheet.actionBtnText, { color: '#334155' }]}>🖼️ Gallery</Text>
+          </TouchableOpacity>
+          {actor !== 'child' && (
+            <>
+              <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: AikidBrandColors.pinkLight }]} onPress={() => go('/(app)/plans')}>
+                <Text style={[sheet.actionBtnText, { color: AikidBrandColors.pink }]}>✨ Gói AI</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => go('/(app)/family')}>
+                <Text style={[sheet.actionBtnText, { color: '#334155' }]}>👨‍👩‍👧 Hồ sơ bé</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+
+        {/* Logout */}
+        <TouchableOpacity style={sheet.logoutBtn} onPress={() => void handleLogout()}>
+          <Text style={sheet.logoutText}>Đăng xuất</Text>
+        </TouchableOpacity>
+      </View>
+    </AikidModal>
+  );
+}
+
+// ─── GlobalHeader ──────────────────────────────────────────────────────────────
+
+type GlobalHeaderProps = {
+  /** Tắt bottom padding mặc định */
+  noMargin?: boolean;
+};
+
+export function GlobalHeader({ noMargin }: GlobalHeaderProps) {
+  const router = useRouter();
+  const { user, actor } = useAuth();
+  const activeChild = useFamily((state) => state.getActiveChild());
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const displayName = String(
+    user?.name ||
+    user?.email ||
+    (actor === 'child' ? activeChild?.name || 'Bé sáng tạo' : 'Phụ huynh'),
+  );
+  const avatarUrl = typeof user?.avatarUrl === 'string' ? user.avatarUrl : null;
+  const initial = displayName.trim().charAt(0).toUpperCase() || 'A';
+
+  return (
     <>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.push('/(app)/lobby' as any)} style={styles.logoContainer}>
-          <Image source={require('../../public/hub-images/logo.svg')} style={styles.logo} contentFit="contain" />
+      <View style={[styles.header, noMargin && { marginBottom: 0 }]}>
+        {/* Logo → lobby */}
+        <Pressable
+          onPress={() => router.push('/(app)/lobby' as any)}
+          style={styles.logoBtn}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Image
+            source={require('../../public/hub-images/logo.svg')}
+            style={styles.logo}
+            contentFit="contain"
+          />
         </Pressable>
-        
-        <Pressable onPress={() => setAccountOpen(true)} style={styles.avatarContainer}>
+
+        {/* Avatar → account */}
+        <Pressable
+          onPress={() => setSheetOpen(true)}
+          style={styles.avatarBtn}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
           {avatarUrl ? (
-            <Image source={{ uri: avatarUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+            <Image
+              source={{ uri: avatarUrl }}
+              style={styles.avatarImg}
+              contentFit="cover"
+            />
           ) : (
             <View style={styles.avatarFallback}>
-              <Text style={styles.avatarFallbackText}>{initial}</Text>
+              <Text style={styles.avatarInitial}>{initial}</Text>
             </View>
           )}
         </Pressable>
       </View>
 
-      <Modal visible={accountOpen} transparent animationType="fade" onRequestClose={() => setAccountOpen(false)}>
-        <View className="flex-1 justify-end bg-slate-950/35">
-          <Pressable className="absolute inset-0" onPress={() => setAccountOpen(false)} accessibilityLabel="Đóng thông tin tài khoản" />
-          <View className="w-full self-center rounded-t-[30px] bg-white px-5 pt-3" style={{ maxWidth: 560, paddingBottom: Math.max(insets.bottom, 18), shadowColor: '#0F172A', shadowOpacity: 0.22, shadowRadius: 24 }}>
-            <View className="mb-4 h-1.5 w-12 self-center rounded-full bg-slate-200" />
-            <View className="flex-row items-center">
-              <View className="h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-brand">
-                {avatarUrl ? <Image source={{ uri: avatarUrl }} style={{ width: 56, height: 56 }} contentFit="cover" /> : <Text className="text-xl font-extrabold text-white">{initial}</Text>}
-              </View>
-              <View className="ml-3 min-w-0 flex-1">
-                <Text className="text-lg font-extrabold text-slate-900" numberOfLines={1}>{displayName}</Text>
-                {actor !== 'child' ? <Text className="mt-0.5 text-xs text-slate-500" numberOfLines={1}>Tài khoản phụ huynh · {isHydrated ? workspaceName : 'Đang tải…'}</Text> : null}
-              </View>
-              <Pressable onPress={() => setAccountOpen(false)} className="h-10 w-10 items-center justify-center rounded-full bg-slate-100" accessibilityRole="button"><Text className="text-lg text-slate-600">×</Text></Pressable>
-            </View>
-
-            <View className="mt-4 rounded-2xl bg-slate-900 p-4">
-              {summary.isLoading ? <View className="flex-row items-center"><ActivityIndicator color="#FDBA74" /><Text className="ml-3 font-bold text-slate-300">Đang tải số lượt AI…</Text></View> : summary.isError ? <View><Text className="font-extrabold text-red-300">Không tải được số lượt AI</Text><Pressable onPress={() => void summary.refetch()} className="mt-2 self-start rounded-xl bg-white/10 px-3 py-2"><Text className="font-bold text-white">Thử lại</Text></Pressable></View> : actor === 'child' ? (
-                <Text className="text-3xl font-extrabold text-white">✨ {summary.data?.remainingCreateCredits ?? 0} lượt còn lại</Text>
-              ) : <>
-                <View className="flex-row items-center justify-between"><Text className="font-bold uppercase tracking-wide text-orange-200">Gói {summary.data?.plan || 'free'}</Text><Text className="text-xs text-slate-400">Hết hạn: {formatExpiry(summary.data?.expiresAt)}</Text></View>
-                <Text className="mt-2 text-3xl font-extrabold text-white">{summary.data?.remainingCreateCredits ?? 0} lượt còn lại</Text>
-                <Text className="mt-1 text-xs text-slate-300">Tháng: {summary.data?.monthlyRemainingCreateCredits ?? 0}/{summary.data?.monthlyCreateCredits ?? 0} · Mua thêm: {summary.data?.bonusCreateCredits ?? 0}</Text>
-              </>}
-            </View>
-
-            <View className="mt-4 flex-row flex-wrap gap-2">
-              <Pressable onPress={() => go('/(app)/account')} className="basis-[48%] flex-1 rounded-2xl bg-orange-50 px-4 py-3"><Text className="text-center font-extrabold text-orange-900">Tài khoản</Text></Pressable>
-              <Pressable onPress={() => go('/(app)/gallery')} className="basis-[48%] flex-1 rounded-2xl bg-slate-100 px-4 py-3"><Text className="text-center font-extrabold text-slate-800">Gallery</Text></Pressable>
-              {actor !== 'child' ? <>
-                <Pressable onPress={() => go('/(app)/plans')} className="basis-[48%] flex-1 rounded-2xl bg-brand px-4 py-3"><Text className="text-center font-extrabold text-white">Gói AI & lượt</Text></Pressable>
-                <Pressable onPress={() => go('/(app)/family')} className="basis-[48%] flex-1 rounded-2xl bg-slate-100 px-4 py-3"><Text className="text-center font-extrabold text-slate-800">Hồ sơ bé</Text></Pressable>
-              </> : null}
-            </View>
-            <Pressable onPress={() => void handleLogout()} className="mt-3 py-3" accessibilityRole="button"><Text className="text-center text-sm font-bold text-red-500">Đăng xuất</Text></Pressable>
-          </View>
-        </View>
-      </Modal>
+      <AccountSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
     </>
   );
 }
 
+// ─── Styles ────────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
   header: {
-    width: '100%',
-    height: 70,
-    backgroundColor: 'rgba(253, 250, 244, 0.8)',
-    borderRadius: 35,
-    paddingHorizontal: 24,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
-    alignSelf: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    marginBottom: 8,
+    // Pill-shaped frosted header
+    marginHorizontal: 12,
+    backgroundColor: 'rgba(253,250,244,0.88)',
+    borderRadius: AikidRadius.pill,
+    borderWidth: 2,
+    borderColor: AikidFrameColors.white,
+    ...AikidShadows.soft,
     maxWidth: 1200,
+    alignSelf: 'center',
+    width: '100%',
   },
-  logoContainer: {
+  logoBtn: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   logo: {
-    height: 40,
     width: 120,
+    height: 38,
   },
-  avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#ffffff',
-    borderWidth: 3,
-    borderColor: '#ff7597',
+  avatarBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: AikidRadius.pill,
+    backgroundColor: AikidFrameColors.white,
+    borderWidth: 2.5,
+    borderColor: AikidBrandColors.pink,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#ff7597',
+    shadowColor: AikidBrandColors.pink,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  avatarImg: {
+    width: '100%',
+    height: '100%',
   },
   avatarFallback: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#FF5C8A',
+    backgroundColor: AikidBrandColors.pink,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarFallbackText: {
+  avatarInitial: {
+    fontFamily: AikidFonts.headingBold,
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    color: AikidTextColors.white,
+  },
+});
+
+const sheet = StyleSheet.create({
+  inner: {
+    paddingHorizontal: 22,
+    paddingTop: 4,
+    gap: 14,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatarLg: {
+    width: 56,
+    height: 56,
+    borderRadius: AikidRadius.pill,
+    backgroundColor: AikidBrandColors.pinkLight,
+    overflow: 'hidden',
+    borderWidth: 2.5,
+    borderColor: AikidBrandColors.pink,
+  },
+  avatarImg: {
+    width: 56,
+    height: 56,
+  },
+  avatarFallback: {
+    width: 56,
+    height: 56,
+    backgroundColor: AikidBrandColors.pink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitial: {
+    fontFamily: AikidFonts.headingBold,
+    fontSize: 22,
+    color: AikidTextColors.white,
+  },
+  profileName: {
+    fontFamily: AikidFonts.headingBold,
+    fontSize: 18,
+    color: AikidTextColors.heading,
+  },
+  profileSub: {
+    fontFamily: AikidFonts.bodyReg,
+    fontSize: 12,
+    color: AikidTextColors.body,
+    marginTop: 2,
+  },
+  creditsBlock: {
+    backgroundColor: '#1E293B',
+    borderRadius: AikidRadius.card,
+    padding: 16,
+    gap: 6,
+  },
+  planBadge: {
+    fontFamily: AikidFonts.headingMed,
+    fontSize: 11,
+    color: '#FDBA74',
+    letterSpacing: 0.8,
+  },
+  creditsCount: {
+    fontFamily: AikidFonts.headingBold,
+    fontSize: 26,
+    color: AikidFrameColors.white,
+  },
+  creditsMuted: {
+    fontFamily: AikidFonts.bodyReg,
+    fontSize: 12,
+    color: '#94A3B8',
+  },
+  retryBtn: {
+    marginTop: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: AikidRadius.sm,
+    alignSelf: 'flex-start',
+  },
+  retryBtnText: {
+    fontFamily: AikidFonts.bodySemi,
+    fontSize: 13,
+    color: AikidFrameColors.white,
+  },
+  actionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  actionBtn: {
+    flex: 1,
+    minWidth: '44%',
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+    borderRadius: AikidRadius.input,
+    alignItems: 'center',
+  },
+  actionBtnText: {
+    fontFamily: AikidFonts.headingSemi,
+    fontSize: 14,
+  },
+  logoutBtn: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  logoutText: {
+    fontFamily: AikidFonts.bodySemi,
+    fontSize: 14,
+    color: '#EF4444',
   },
 });
