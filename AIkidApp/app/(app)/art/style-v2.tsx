@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useAnimatedStyle, withTiming, withSpring, useSharedValue, runOnJS } from 'react-native-reanimated';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  type SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { usePopSound } from '@/hooks/usePopSound';
-import { LinearGradient } from 'expo-linear-gradient';
-import { GlobalHeader } from '@/components/GlobalHeader';
+import { AikidPage } from '@/ui';
 
 const STYLES = [
   { id: 'Màu Nước', image: require('../../../public/art-styles/art-style-watercolor.jpeg'), from: 'from-[#FF8E53]', to: 'to-[#FF2E93]' },
@@ -32,6 +37,15 @@ const d1Scale = 0.88;
 const d2Scale = 0.76;
 const g1 = 36;
 const g2 = 24;
+const swipeStep = 190;
+const springConfig = { damping: 22, stiffness: 180, mass: 0.75 };
+const distanceInput = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+const offsetOutput = distanceInput.map((distance) => {
+  const direction = distance > 0 ? 1 : distance < 0 ? -1 : 0;
+  return direction * getCardOffset(Math.abs(distance));
+});
+const scaleOutput = distanceInput.map((distance) => getScaleForDistance(Math.abs(distance)));
+const opacityOutput = distanceInput.map((distance) => getOpacityForDistance(Math.abs(distance)));
 
 function getScaleForDistance(distance: number) {
   if (distance === 0) return activeScale;
@@ -65,34 +79,61 @@ const StyleCard = ({
   style, 
   index, 
   activeIndex, 
+  carouselPosition,
   onPress, 
   playPop 
 }: { 
   style: any, 
   index: number, 
   activeIndex: number, 
+  carouselPosition: SharedValue<number>,
   onPress: () => void, 
   playPop: () => void 
 }) => {
   const d = Math.abs(index - activeIndex);
-  const scale = getScaleForDistance(d);
   const opacity = getOpacityForDistance(d);
-  const direction = index > activeIndex ? 1 : index < activeIndex ? -1 : 0;
-  const translateX = direction * getCardOffset(d);
-  const zIndex = 10 - d;
   const isActive = index === activeIndex;
 
   const animatedStyle = useAnimatedStyle(() => {
+    const distance = index - carouselPosition.value;
+    const absoluteDistance = Math.abs(distance);
+
     return {
       transform: [
-        { translateX: withSpring(translateX, { damping: 20, stiffness: 90 }) },
-        { scale: withSpring(scale, { damping: 20, stiffness: 90 }) },
-        { translateY: withSpring(isActive ? -16 : 0, { damping: 20, stiffness: 90 }) }
+        {
+          translateX: interpolate(
+            distance,
+            distanceInput,
+            offsetOutput,
+            Extrapolation.CLAMP,
+          ),
+        },
+        {
+          scale: interpolate(
+            distance,
+            distanceInput,
+            scaleOutput,
+            Extrapolation.CLAMP,
+          ),
+        },
+        {
+          translateY: interpolate(
+            absoluteDistance,
+            [0, 1],
+            [-16, 0],
+            Extrapolation.CLAMP,
+          ),
+        },
       ],
-      opacity: withTiming(opacity, { duration: 300 }),
-      zIndex: zIndex,
+      opacity: interpolate(
+        distance,
+        distanceInput,
+        opacityOutput,
+        Extrapolation.CLAMP,
+      ),
+      zIndex: Math.max(0, 20 - Math.round(absoluteDistance * 2)),
     };
-  }, [translateX, scale, isActive, opacity, zIndex]);
+  }, [carouselPosition, index]);
 
   return (
     <Animated.View 
@@ -167,62 +208,57 @@ const StyleCard = ({
 
 export default function StyleV2() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { playPop } = usePopSound();
   const [activeIndex, setActiveIndex] = useState(0);
+  const carouselPosition = useSharedValue(0);
+  const gestureStartPosition = useSharedValue(0);
 
-  const handleStyleSelect = (id: string, index: number) => {
+  const handleStyleSelect = (_id: string, index: number) => {
     setActiveIndex(index);
+    carouselPosition.value = withSpring(index, springConfig);
   };
 
   // Swipe gesture to navigate styles
-  const startX = useSharedValue(0);
   const panGesture = Gesture.Pan()
-    .activeOffsetX([-20, 20])
-    .failOffsetY([-10, 10])
-    .onBegin((e) => { startX.value = e.translationX; })
+    .activeOffsetX([-8, 8])
+    .failOffsetY([-24, 24])
+    .onBegin(() => {
+      gestureStartPosition.value = carouselPosition.value;
+    })
+    .onUpdate((event) => {
+      carouselPosition.value = Math.max(
+        0,
+        Math.min(
+          STYLES.length - 1,
+          gestureStartPosition.value - event.translationX / swipeStep,
+        ),
+      );
+    })
     .onEnd((e) => {
-      const diff = e.translationX - startX.value;
-      if (diff < -40) {
-        // swipe left → next
-        runOnJS(setActiveIndex)(Math.min(activeIndex + 1, STYLES.length - 1));
-      } else if (diff > 40) {
-        // swipe right → prev
-        runOnJS(setActiveIndex)(Math.max(activeIndex - 1, 0));
-      }
+      const projectedPosition = Math.max(
+        gestureStartPosition.value - 2,
+        Math.min(
+          gestureStartPosition.value + 2,
+          carouselPosition.value - e.velocityX / 5000,
+        ),
+      );
+      const nextIndex = Math.max(
+        0,
+        Math.min(STYLES.length - 1, Math.round(projectedPosition)),
+      );
+      carouselPosition.value = withSpring(nextIndex, springConfig);
+      runOnJS(setActiveIndex)(nextIndex);
     });
 
   return (
-    <ImageBackground 
-      source={require('../../../public/lobby-assets/images/bg-art.png')}
-      className="flex-1"
-      resizeMode="cover"
+    <AikidPage
+      scene="art"
+      title="Chọn phong cách vẽ"
+      backHref="/(app)/art"
+      container="wide"
+      scroll={false}
     >
-      <View style={{ paddingTop: insets.top }}>
-        <GlobalHeader />
-        <TouchableOpacity
-          style={styles.backBtnWrapper}
-          onPress={() => {
-            playPop();
-            if (router.canGoBack()) router.back();
-            else router.replace('/(app)/art');
-          }}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#FF9EB5', '#FF7597']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={styles.backBtnGradient}
-          >
-            <Ionicons name="arrow-back" size={16} color="#FFF" />
-            <Text style={styles.backBtnText}>Trở về</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
       <View className="flex-1 items-center justify-center z-10">
-        <Text className="text-4xl font-bold text-gray-800 mb-8 shadow-sm" style={{ fontFamily: 'Mali' }}>CHỌN PHONG CÁCH VẼ</Text>
-        
         <GestureDetector gesture={panGesture}>
           <View style={{ height: 420, width: '100%', position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
             {STYLES.map((style, index) => (
@@ -230,6 +266,7 @@ export default function StyleV2() {
                 key={style.id}
                 index={index}
                 activeIndex={activeIndex}
+                carouselPosition={carouselPosition}
                 style={style}
                 onPress={() => handleStyleSelect(style.id, index)}
                 playPop={playPop}
@@ -259,21 +296,9 @@ export default function StyleV2() {
             router.push({ pathname: '/(app)/art/canvas', params: { style: STYLES[activeIndex].id } });
           }}
         >
-          <Text className="text-white font-bold text-xl uppercase tracking-wider" style={{ fontFamily: 'Mali' }}>CHỌN</Text>
+          <Text className="text-white text-xl uppercase tracking-wider" style={{ fontFamily: 'Mali_600SemiBold' }}>CHỌN</Text>
         </TouchableOpacity>
       </View>
-    </ImageBackground>
+    </AikidPage>
   );
 }
-
-const styles = StyleSheet.create({
-  backBtnWrapper: {
-    alignSelf: 'flex-start', marginLeft: 18, marginTop: 2,
-    shadowColor: '#FF7597', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.28, shadowRadius: 8, elevation: 5,
-  },
-  backBtnGradient: {
-    flexDirection: 'row', alignItems: 'center', gap: 7,
-    paddingHorizontal: 18, paddingVertical: 8, borderRadius: 9999,
-  },
-  backBtnText: { marginLeft: 2, fontSize: 14, fontWeight: 'bold', color: '#FFF' },
-});

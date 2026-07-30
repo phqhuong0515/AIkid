@@ -21,12 +21,6 @@ import {
   Mali_600SemiBold,
   Mali_700Bold,
 } from '@expo-google-fonts/mali';
-import {
-  Fredoka_400Regular,
-  Fredoka_500Medium,
-  Fredoka_600SemiBold,
-  Fredoka_700Bold,
-} from '@expo-google-fonts/fredoka';
 
 /**
  * Auth gate: hydrate JWT, redirect login ↔ lobby.
@@ -93,10 +87,11 @@ export default function RootLayout() {
     Mali_500Medium,
     Mali_600SemiBold,
     Mali_700Bold,
-    Fredoka_400Regular,
-    Fredoka_500Medium,
-    Fredoka_600SemiBold,
-    Fredoka_700Bold,
+    ChironGoRoundTC_400Regular: require('../assets/fonts/chiron-go-round-tc/ChironGoRoundTC-Regular.ttf'),
+    ChironGoRoundTC_500Medium: require('../assets/fonts/chiron-go-round-tc/ChironGoRoundTC-Medium.ttf'),
+    ChironGoRoundTC_600SemiBold: require('../assets/fonts/chiron-go-round-tc/ChironGoRoundTC-SemiBold.ttf'),
+    ChironGoRoundTC_700Bold: require('../assets/fonts/chiron-go-round-tc/ChironGoRoundTC-Bold.ttf'),
+    ChironGoRoundTC_800ExtraBold: require('../assets/fonts/chiron-go-round-tc/ChironGoRoundTC-ExtraBold.ttf'),
   });
 
   if (!fontsLoaded) {

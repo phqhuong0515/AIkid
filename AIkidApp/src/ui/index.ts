@@ -20,6 +20,14 @@ export { PageBackground } from './PageBackground';
 export type { BgScene } from './PageBackground';
 
 export { AikidLayout } from './AikidLayout';
+export { AikidPage } from './AikidPage';
+export type { PageContainer } from './AikidPage';
+export { AikidIcon } from './AikidIcon';
+export type { AikidIconName } from './AikidIcon';
+export { AikidBackButton } from './AikidBackButton';
+export { AikidSafeBox } from './AikidSafeBox';
+export { AikidPanel } from './AikidPanel';
+export { AikidWizard } from './AikidWizard';
 
 // Re-export tokens for convenience
 export {
@@ -30,6 +38,7 @@ export {
   AikidButtonGradients,
   AikidRadius,
   AikidSpacing,
+  AikidMetrics,
   AikidShadows,
   AikidBgAssets,
   AikidTheme,

@@ -23,7 +23,7 @@ export default function SkiaCanvasNative({
   paths,
   setPaths,
 }: SkiaCanvasProps) {
-  const currentPath = useSharedValue<ReturnType<typeof Skia.Path.Make> | null>(null);
+  const currentPath = useSharedValue<ReturnType<typeof Skia.Path.Make>>(Skia.Path.Make());
   const currentPathColor = useSharedValue<string>('#000000');
   const currentPathWidth = useSharedValue<number>(5);
   const currentPathOpacity = useSharedValue<number>(1);
@@ -83,16 +83,16 @@ export default function SkiaCanvasNative({
     })
     .onUpdate((e) => {
       'worklet';
-      if (!currentPath.value || tool === 'stamp') return;
+      if (tool === 'stamp') return;
       currentPath.value.lineTo(e.x, e.y);
       currentPath.value = currentPath.value.copy();
     })
     .onEnd(() => {
       'worklet';
-      if (currentPath.value && tool !== 'stamp') {
+      if (tool !== 'stamp') {
         runOnJS(commitPath)(currentPath.value.copy(), currentPathColor.value, currentPathWidth.value, currentPathTool.value, currentPathOpacity.value);
       }
-      currentPath.value = null;
+      currentPath.value = Skia.Path.Make();
     });
 
   const tapGesture = Gesture.Tap().onEnd((e) => {
@@ -130,9 +130,15 @@ export default function SkiaCanvasNative({
                 />
               );
             })}
-            {/* We could render the current path as well, but Skia in reanimated needs special handling. We'll rely on fast state updates or render it with a custom hook. 
-                Wait, actually we can render the shared value using useDerivedValue if we want, but for now we let it re-render.
-                Actually we should render currentPath to show drawing feedback. */}
+            <Path
+              path={currentPath}
+              color={currentPathColor}
+              style="stroke"
+              strokeWidth={currentPathWidth}
+              strokeCap="round"
+              strokeJoin="round"
+              opacity={currentPathOpacity}
+            />
           </Canvas>
           {/* Stamps Layer (Overlay) */}
           {paths.filter(p => p.tool === 'stamp').map((p, i) => (

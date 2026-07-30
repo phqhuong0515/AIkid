@@ -1,15 +1,14 @@
-import { Text, View } from 'react-native';
-
-import { ScreenChrome } from '@/features/kids-ui/ScreenChrome';
+import { View } from 'react-native';
+import { AikidPage, AikidText } from '@/ui';
 
 export default function LibraryScreen() {
   return (
-    <ScreenChrome title="Thư viện">
+    <AikidPage scene="lobby" title="Thư viện" container="standard">
       <View className="flex-1 items-center justify-center p-6">
-        <Text className="text-center text-lg font-medium text-slate-500">
+        <AikidText variant="body" style={{ textAlign: 'center', fontSize: 18 }}>
           Đang tải thư viện...
-        </Text>
+        </AikidText>
       </View>
-    </ScreenChrome>
+    </AikidPage>
   );
 }

@@ -234,11 +234,6 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 448, // max-w-md
     alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 10,
   },
   header: {
     marginBottom: 16,

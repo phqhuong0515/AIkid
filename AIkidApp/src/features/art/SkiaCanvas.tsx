@@ -1,6 +1,7 @@
 import React from 'react';
 import SkiaCanvasNativeComp from './SkiaCanvasNative';
-import { useCanvasRef } from '@shopify/react-native-skia';
+import type { CanvasRef } from '@shopify/react-native-skia';
+import type { RefObject } from 'react';
 import type { SkiaCanvasProps, DrawTool, DrawPath } from './SkiaCanvasTypes';
 
 export type { SkiaCanvasProps, DrawTool, DrawPath };
@@ -9,7 +10,7 @@ export function SkiaCanvas(props: SkiaCanvasProps) {
   return <SkiaCanvasNativeComp {...props} />;
 }
 
-export function exportCanvasAsDataUrl(ref: ReturnType<typeof useCanvasRef>): string | null {
+export function exportCanvasAsDataUrl(ref: RefObject<CanvasRef | null>): string | null {
   try {
     const image = ref.current?.makeImageSnapshot();
     if (!image) return null;

@@ -15,13 +15,17 @@ import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { useCallback, useEffect } from 'react';
 
 // ─── Web Audio API: synthesized bubble pop (matches HTML exactly) ────────────
+let sharedWebAudioContext: AudioContext | null = null;
+
 function playWebAudioPop() {
   try {
     const AudioCtx =
       (window as any).AudioContext || (window as any).webkitAudioContext;
     if (!AudioCtx) return;
 
-    const ctx = new AudioCtx() as AudioContext;
+    const ctx = sharedWebAudioContext ?? new AudioCtx() as AudioContext;
+    sharedWebAudioContext = ctx;
+    if (ctx.state === 'suspended') void ctx.resume();
     const now = ctx.currentTime;
 
     // 1. Warm resonant body — Triangle wave
@@ -54,10 +58,6 @@ function playWebAudioPop() {
     osc2.start(now);
     osc2.stop(now + 0.09);
 
-    // Close context after sounds finish
-    setTimeout(() => {
-      ctx.close().catch(() => {});
-    }, 300);
   } catch (e) {
     console.warn('Web Audio API pop failed:', e);
   }

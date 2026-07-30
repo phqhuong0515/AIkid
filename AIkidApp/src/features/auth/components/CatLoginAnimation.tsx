@@ -209,12 +209,11 @@ export const CatLoginAnimation = ({ onBack }: { onBack: () => void }) => {
                     <Path id="svg-tooth-left" fill="#fffffe" transform="translate(0, 198.87) scale(1, 0.93) translate(0, -198.87)" d="M308.73,197l-9.06,23.14-7.82,20a8.62,8.62,0,0,1-14.47,2.54l-13.7-16.21-13.79-16.33A115.07,115.07,0,0,1,303.36,197Z"/>
                     <Path id="svg-tooth-right" fill="#fffffe" transform="translate(0, 198.87) scale(1, 0.93) translate(0, -198.87)" d="M584.52,211.63l-14,16-13.7,15.6a8.78,8.78,0,0,1-14.47-2.44l-7.82-19.23-9.21-22.64h5.52A118.53,118.53,0,0,1,584.52,211.63Z"/>
                     <Rect id="svg-input-bg-card" fill="#fffffe" x="254.59" y="268.37" width="325" height="111.9" rx="11.62"/>
-                    <Rect id="svg-input-bg-line" fill="#E5D9CE" x="254.59" y="320.48" width="325" height="6"/>
                   </>
                 )}
                 
                 {isSwallowed && (
-                  <G id="svg-chewing-group" originX="417" originY="180">
+                  <G id="svg-chewing-group">
                     <Path fill="#f48108" d="M434.47,150.91H399.72A7.47,7.47,0,0,0,394,163.17l6.45,7.75L411.35,184a7.58,7.58,0,0,0,.85.85v20.39a4.3,4.3,0,0,0,4.3,4.3h.88a4.29,4.29,0,0,0,4.3-4.3V185.14a8.06,8.06,0,0,0,1.16-1.11l10.92-13.11,6.45-7.75A7.47,7.47,0,0,0,434.47,150.91Z"/>
                     <Path fill="#e5500e" d="M327.47,228.66a5,5,0,0,1-.86-10L506.84,187a5,5,0,1,1,1.73,9.9L328.34,228.59A5.1,5.1,0,0,1,327.47,228.66Z"/>
                   </G>

@@ -111,7 +111,10 @@ function prefixIds(svg: string, prefix: string): string {
 
 function layer(svg: string, prefix: string, transform = ''): string {
   if (!svg) return '';
-  const nativeSafeSvg = materializeGradientInheritance(inlineClassStyles(svg));
+  const nativeSafeSvg = materializeGradientInheritance(inlineClassStyles(svg))
+    // Illustrator metadata becomes the invalid React DOM prop `dataName`
+    // after react-native-svg parses it. It is decorative and safe to remove.
+    .replace(/\sdata-name=(["'])[\s\S]*?\1/gi, '');
   return `<g id="${prefix}"${transform ? ` transform="${transform}"` : ''}>${inner(prefixIds(nativeSafeSvg, prefix))}</g>`;
 }
 

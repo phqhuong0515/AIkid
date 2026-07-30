@@ -20,7 +20,7 @@
  */
 
 import React from 'react';
-import { ImageBackground, View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { ImageBackground, View, StyleSheet, StyleProp, ViewStyle, type ImageSourcePropType } from 'react-native';
 import { useAikidTemplate, type AikidScene } from '@/design-system';
 
 export type BgScene = AikidScene;
@@ -40,6 +40,7 @@ type PageBackgroundProps = {
   style?: StyleProp<ViewStyle>;
   /** Override overlay opacity (0-1) */
   overlayOpacity?: number;
+  source?: ImageSourcePropType;
 };
 
 export function PageBackground({
@@ -47,8 +48,9 @@ export function PageBackground({
   children,
   style,
   overlayOpacity,
+  source,
 }: PageBackgroundProps) {
-  const src = useAikidTemplate().assets[scene];
+  const src = source ?? useAikidTemplate().assets[scene];
   const opacity = overlayOpacity ?? OVERLAY_OPACITY[scene];
 
   return (

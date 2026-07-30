@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert, useWindowDimensions, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
-import { GlobalHeader } from '@/components/GlobalHeader';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, useWindowDimensions, ScrollView } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { usePopSound } from '@/hooks/usePopSound';
-import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FontAwesome6 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { AikidButton, AikidPage, AikidPanel } from '@/ui';
+import { StoryFlowProgress } from '@/features/comic/components/StoryFlowProgress';
 
 type GenreType = {
   id: string;
@@ -82,8 +82,8 @@ const GenreCard = ({
 
 export default function ComicGenreV2() {
   const router = useRouter();
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
   const { playPop } = usePopSound();
-  const insets = useSafeAreaInsets();
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
 
   const { width } = useWindowDimensions();
@@ -98,42 +98,27 @@ export default function ComicGenreV2() {
     // Navigate to next screen with selected genre
     router.push({
       pathname: '/(app)/comic/idea-v2',
-      params: { genre: selectedGenre }
+      params: { genre: selectedGenre, mode: typeof mode === 'string' ? mode : 'text' }
     });
   };
 
   return (
-    <ImageBackground
-      source={require('../../../public/lobby-assets/images/bg-art.png')}
-      style={styles.background}
-      resizeMode="cover"
+    <AikidPage
+      scene="comic"
+      title="Chọn thể loại"
+      backHref="/(app)/comic/create-v2"
+      container="wide"
+      scroll={false}
     >
-      <View style={{ paddingTop: insets.top }}>
-        <GlobalHeader />
-        <TouchableOpacity
-          style={styles.backBtnWrapper}
-          onPress={() => {
-            playPop();
-            if (router.canGoBack()) router.back();
-            else router.replace('/(app)/comic/create-v2');
-          }}
-          activeOpacity={0.8}
+      <StoryFlowProgress
+        currentStep={1}
+      />
+      <ScrollView style={styles.contentScroll} contentContainerStyle={styles.contentScrollInner} showsVerticalScrollIndicator={false}>
+        <AikidPanel
+          title="Thể loại cốt truyện"
+          icon="grid"
+          contentStyle={styles.panelContent}
         >
-          <LinearGradient
-            colors={['#FF9EB5', '#FF7597']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={styles.backBtnGradient}
-          >
-            <Ionicons name="arrow-back" size={16} color="#FFF" />
-            <Text style={styles.backBtnText}>Trở về</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        <View style={[styles.mainCard, isTablet && styles.mainCardTablet]}>
-          <Text style={styles.title}>THỂ LOẠI</Text>
-
           <View style={[styles.grid, isTablet && styles.gridTablet]}>
             {GENRES.map((genre) => (
               <View key={genre.id} style={[styles.gridItem, isTablet && styles.gridItemTablet]}>
@@ -148,24 +133,12 @@ export default function ComicGenreV2() {
               </View>
             ))}
           </View>
-
-          <TouchableOpacity
-            style={styles.continueButton}
-            onPress={handleContinue}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={['#ff7597', '#ff9eb5']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.continueGradient}
-            >
-              <Text style={styles.continueText}>TIẾP TỤC</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.mobileFooter}>
+            <AikidButton variant="nav" onPress={handleContinue}>Tiếp tục</AikidButton>
+          </View>
+        </AikidPanel>
       </ScrollView>
-    </ImageBackground>
+    </AikidPage>
   );
 }
 
@@ -183,13 +156,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18, paddingVertical: 8, borderRadius: 9999,
   },
   backBtnText: { marginLeft: 2, fontSize: 14, fontWeight: 'bold', color: '#FFF' },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-  },
+  panelContent: { alignItems: 'center' },
+  contentScroll: { flex: 1, width: '100%' },
+  contentScrollInner: { paddingBottom: 20 },
   mainCard: {
     width: '100%',
     maxWidth: 960,
@@ -218,6 +187,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   grid: {
+    width: '100%',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
@@ -289,5 +259,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 20,
     textTransform: 'uppercase',
-  }
+  },
+  mobileFooter: {
+    width: '100%',
+    alignItems: 'flex-end',
+    marginTop: 20,
+  },
 });

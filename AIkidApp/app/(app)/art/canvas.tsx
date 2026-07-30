@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert, Platform, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { useCanvasRef } from '@shopify/react-native-skia';
+import { View, Alert, Platform, StyleSheet } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import type { CanvasRef } from '@shopify/react-native-skia';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 
@@ -13,34 +13,38 @@ import { buildArtRedrawPrompt } from '@/features/art/buildArtRedrawPrompt';
 import { SkiaCanvas, exportCanvasAsDataUrl, DrawTool, DrawPath } from '@/features/art/SkiaCanvas';
 import { DrawingToolbar } from '@/features/art/DrawingToolbar';
 import { AiResultPanel } from '@/features/art/AiResultPanel';
-import { ScreenChrome } from '@/features/kids-ui/ScreenChrome';
-// Assuming useResponsiveLayout exists and returns something like { isCompact: boolean }
 import { useResponsiveLayout } from '@/features/kids-ui/useResponsiveLayout';
+import { AikidButton, AikidIcon, AikidPage, AikidSafeBox } from '@/ui';
 
 export default function CanvasScreen() {
   const { style } = useLocalSearchParams<{ style: string }>();
+  const router = useRouter();
   
   const activeChild = useFamily((s) => s.children.find(c => c.id === s.activeChildId));
   const displayName = activeChild?.name || 'Bé';
   const activeIpId = useWorkspace((s) => s.activeIpId);
   
   const layout = useResponsiveLayout();
-  const isCompact = layout.width < 768; // basic fallback if in multi-colmpact not directly returned
+  const isCompact = !layout.isTabletUp;
 
   // Canvas State
-  const canvasRef = useCanvasRef();
+  // Do not import/use Skia runtime before WithSkiaWeb has loaded CanvasKit.
+  const canvasRef = useRef<CanvasRef | null>(null);
   const [tool, setTool] = useState<DrawTool>('brush');
   const [color, setColor] = useState<string>('#000000');
   const [strokeWidth, setStrokeWidth] = useState<number>(5);
   const [activeStamp, setActiveStamp] = useState<string>('⭐');
   const [backgroundDataUrl, setBackgroundDataUrl] = useState<string | null>(null);
+  const [referenceDataUrl, setReferenceDataUrl] = useState<string | null>(null);
   
   // Path History
   const [paths, setPaths] = useState<DrawPath[]>([]);
   const historyRef = useRef<DrawPath[][]>([]);
+  const redoRef = useRef<DrawPath[][]>([]);
   
   const handlePathAdded = useCallback(() => {
     historyRef.current.push([...paths]);
+    redoRef.current = [];
     if (historyRef.current.length > 30) {
       historyRef.current.shift();
     }
@@ -48,32 +52,58 @@ export default function CanvasScreen() {
 
   const handleUndo = useCallback(() => {
     if (historyRef.current.length > 0) {
-      historyRef.current.pop(); // remove current state
+      redoRef.current.push([...paths]);
+      historyRef.current.pop();
       const prev = historyRef.current[historyRef.current.length - 1] || [];
       setPaths([...prev]);
     } else {
       setPaths([]);
     }
-  }, []);
+  }, [paths]);
 
   const handleRedo = useCallback(() => {
-    // Redo logic requires keeping track of undone paths, which we skipped for simplicity 
-    // to match max 30 states. Let's just clear for now or ignore.
-    Alert.alert('Chức năng Redo đang phát triển');
-  }, []);
+    const next = redoRef.current.pop();
+    if (!next) return;
+    historyRef.current.push([...paths]);
+    setPaths(next);
+  }, [paths]);
 
   const handleClear = useCallback(() => {
     setPaths([]);
     historyRef.current = [];
+    redoRef.current = [];
     setBackgroundDataUrl(null);
+    setReferenceDataUrl(null);
   }, []);
 
   const handleUpload = useCallback(async () => {
-    const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], base64: true, quality: 0.9 });
-    if (!r.canceled && r.assets[0]?.base64) {
-      setBackgroundDataUrl(`data:image/jpeg;base64,${r.assets[0].base64}`);
+    const r = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      base64: Platform.OS !== 'web',
+      quality: 0.7,
+    });
+    if (!r.canceled && r.assets[0]) {
+      const asset = r.assets[0];
+      // Show the selected image immediately. Base64 conversion on web is
+      // deferred until AI generation so the picker never freezes the UI.
+      setBackgroundDataUrl(asset.uri);
+      setReferenceDataUrl(asset.base64 ? `data:image/jpeg;base64,${asset.base64}` : asset.uri);
     }
   }, []);
+
+  const resolveReferenceDataUrl = useCallback(async () => {
+    if (!referenceDataUrl) return null;
+    if (referenceDataUrl.startsWith('data:')) return referenceDataUrl;
+    if (Platform.OS !== 'web') return null;
+    const response = await fetch(referenceDataUrl);
+    const blob = await response.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Không đọc được ảnh đã chọn'));
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.readAsDataURL(blob);
+    });
+  }, [referenceDataUrl]);
 
   // AI State
   const [aiState, setAiState] = useState<'idle' | 'generating' | 'done' | 'error'>('idle');
@@ -84,15 +114,16 @@ export default function CanvasScreen() {
 
   async function handleGenerate() {
     const dataUrl = exportCanvasAsDataUrl(canvasRef);
-    if (!dataUrl) {
+    if (!dataUrl && !referenceDataUrl) {
       Alert.alert('Canvas trống, hãy vẽ gì đó trước!');
       return;
     }
     setAiState('generating');
     try {
+      const uploadedReference = await resolveReferenceDataUrl();
       const result = await generateImageViaGateway({
         userPrompt: buildArtRedrawPrompt(styleConfig, displayName),
-        referenceDataUrl: dataUrl,
+        referenceDataUrl: uploadedReference || dataUrl,
         provider: 'google-native',
         childProfileId: activeChild?.id,
         ipId: activeIpId ?? undefined,
@@ -128,98 +159,34 @@ export default function CanvasScreen() {
     }
   }
 
-  // --- Compact (mobile) layout: vertical stack, no absolute overlays ---
-  if (isCompact) {
-    return (
-      <ScreenChrome title={displayName} backHref="/(app)/art/style-v2">
-        <View style={{ flex: 1, backgroundColor: '#E8F6F8' }}>
-          {/* Top action bar - inline, not absolute */}
-          <View style={styles.mobileTopBar}>
-            <TouchableOpacity style={styles.pillBtn} onPress={handleUpload}>
-              <Text style={styles.pillText}>☁️ Tải lên</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.pillBtn} onPress={handleClear}>
-              <Text style={styles.pillText}>🗑️ Xóa</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.pillBtn} onPress={handleUndo}>
-              <Text style={styles.pillText}>⬅️ Hoàn tác</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.pillBtn} onPress={handleRedo}>
-              <Text style={styles.pillText}>Khôi phục ➡️</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Drawing toolbar rendered in its default vertical mode */}
-          <View style={styles.mobileToolbarRow}>
-            <DrawingToolbar
-              tool={tool}
-              onToolChange={setTool}
-              color={color}
-              onColorChange={setColor}
-              strokeWidth={strokeWidth}
-              onStrokeWidthChange={setStrokeWidth}
-              activeStamp={activeStamp}
-              onStampChange={setActiveStamp}
-            />
-
-            {/* Canvas occupies remaining width */}
-            <View style={styles.mobileCanvasArea}>
-              <SkiaCanvas
-                tool={tool}
-                color={color}
-                strokeWidth={strokeWidth}
-                activeStamp={activeStamp}
-                canvasRef={canvasRef}
-                onPathAdded={handlePathAdded}
-                backgroundDataUrl={backgroundDataUrl}
-                paths={paths}
-                setPaths={setPaths}
-              />
-            </View>
-          </View>
-
-          {/* AI panel at bottom */}
-          <View style={styles.mobileAiPanel}>
-            <AiResultPanel
-              styleName={styleConfig?.labelVi || 'Mặc định'}
-              onGenerate={handleGenerate}
-              aiState={aiState}
-              aiImageUrl={aiImageUrl}
-              onDownload={handleDownload}
-              errorMessage={errorMsg}
-            />
-          </View>
-        </View>
-      </ScreenChrome>
-    );
-  }
-
   return (
-    <ScreenChrome title={displayName} backHref="/(app)/art/style-v2">
-      <View style={[styles.container, isCompact && styles.containerCompact]}>
-        {/* LEFT PANEL */}
-        <View style={styles.leftPanel}>
-          {/* Floating Top Action Bar */}
-          <View style={styles.floatingTopBar}>
-            <TouchableOpacity style={styles.pillBtn} onPress={handleUpload}>
-              <Text style={styles.pillText}>☁️ Tải lên</Text>
-            </TouchableOpacity>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TouchableOpacity style={styles.pillBtn} onPress={handleClear}>
-                <Text style={styles.pillText}>🗑️ Xóa</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.pillBtn} onPress={handleUndo}>
-                <Text style={styles.pillText}>⬅️ Hoàn tác</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.pillBtn} onPress={handleRedo}>
-                <Text style={styles.pillText}>Khôi phục ➡️</Text>
-              </TouchableOpacity>
-            </View>
+    <AikidPage
+      scene="art"
+      title={displayName}
+      backHref="/(app)/art/style-v2"
+      container="workspace"
+      scroll={isCompact}
+    >
+      <View style={[styles.workspace, isCompact && styles.workspaceCompact]}>
+        <AikidSafeBox style={[styles.drawPanel, isCompact && styles.panelCompact]} variant="panel">
+          <View style={styles.actionBar}>
+            <AikidButton variant="feature" size="sm" onPress={handleUpload} leftIcon={<AikidIcon name="upload" size={18} color="#704E48" />}>
+              Tải lên
+            </AikidButton>
+            <AikidButton variant="feature" size="sm" onPress={handleClear} leftIcon={<AikidIcon name="trash" size={18} color="#704E48" />}>
+              Xóa
+            </AikidButton>
+            <AikidButton variant="feature" size="sm" onPress={handleUndo} leftIcon={<AikidIcon name="undo" size={18} color="#704E48" />}>
+              Hoàn tác
+            </AikidButton>
+            <AikidButton variant="feature" size="sm" onPress={handleRedo} leftIcon={<AikidIcon name="redo" size={18} color="#704E48" />}>
+              Khôi phục
+            </AikidButton>
           </View>
-          
-          {/* Floating Left Toolbar */}
-          <View style={styles.floatingLeftBar}>
+
+          <View style={[styles.editor, isCompact && styles.editorCompact]}>
             <DrawingToolbar
+              orientation={isCompact ? 'horizontal' : 'vertical'}
               tool={tool}
               onToolChange={setTool}
               color={color}
@@ -229,9 +196,7 @@ export default function CanvasScreen() {
               activeStamp={activeStamp}
               onStampChange={setActiveStamp}
             />
-          </View>
-          
-          <View style={styles.canvasWrapper}>
+            <View style={styles.canvasWrapper}>
             <SkiaCanvas
               tool={tool}
               color={color}
@@ -244,112 +209,71 @@ export default function CanvasScreen() {
               setPaths={setPaths}
             />
           </View>
-        </View>
+          </View>
+        </AikidSafeBox>
 
-        {/* RIGHT PANEL */}
-        <View style={isCompact ? styles.aiPanelCompact : styles.rightPanel}>
-          <AiResultPanel
+        <AikidSafeBox style={[styles.resultPanel, isCompact && styles.panelCompact]} variant="panel">
+            <AiResultPanel
             styleName={styleConfig?.labelVi || 'Mặc định'}
             onGenerate={handleGenerate}
             aiState={aiState}
             aiImageUrl={aiImageUrl}
             onDownload={handleDownload}
-            errorMessage={errorMsg}
-          />
-        </View>
+              errorMessage={errorMsg}
+              onChooseStyle={() => router.push('/(app)/art/style-v2')}
+            />
+        </AikidSafeBox>
       </View>
-    </ScreenChrome>
+    </AikidPage>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  workspace: {
     flex: 1,
     flexDirection: 'row',
     gap: 20,
-    padding: 20,
-    backgroundColor: '#E8F6F8',
+    minHeight: 0,
   },
-  containerCompact: {
+  workspaceCompact: {
     flexDirection: 'column',
-    padding: 10,
+    flex: 0,
   },
-  leftPanel: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: '#EBDCD0',
-    overflow: 'hidden',
-    position: 'relative',
+  drawPanel: {
+    flex: 1.05,
+    padding: 16,
+    minWidth: 0,
   },
-  rightPanel: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: '#EBDCD0',
-    overflow: 'hidden',
-    position: 'relative',
+  resultPanel: {
+    flex: 0.95,
+    padding: 0,
+    minWidth: 0,
   },
-  aiPanelCompact: {
+  panelCompact: {
+    flex: 0,
     width: '100%',
-    height: 400,
+    minHeight: 520,
   },
-  floatingTopBar: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    right: 20,
+  actionBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    zIndex: 10,
-    pointerEvents: 'box-none',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EBDCD0',
   },
-  floatingLeftBar: {
-    position: 'absolute',
-    top: 80,
-    left: 20,
-    zIndex: 10,
+  editor: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 12,
+    paddingTop: 12,
   },
-  pillBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#FFFBEB',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  pillText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#4A3D3C',
+  editorCompact: {
+    flexDirection: 'column',
+    minHeight: 430,
   },
   canvasWrapper: {
-    flex: 1,
-  },
-  // ---- Mobile-specific styles ----
-  mobileTopBar: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  mobileToolbarRow: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 8,
-    paddingHorizontal: 8,
-  },
-  mobileCanvasArea: {
     flex: 1,
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -357,8 +281,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderStyle: 'dashed',
     borderColor: '#EBDCD0',
-  },
-  mobileAiPanel: {
-    margin: 8,
   },
 });

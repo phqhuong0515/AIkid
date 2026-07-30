@@ -20,6 +20,7 @@ import React from 'react';
 import { View, type ViewStyle, type StyleProp } from 'react-native';
 
 import { useAikidTemplate, type AikidTemplate } from '@/design-system';
+import { AikidMetrics } from '@/features/kids-ui/theme';
 
 export type CardVariant = 'raised' | 'soft' | 'flat' | 'dashed' | 'outlined' | 'selected';
 
@@ -30,14 +31,14 @@ function createVariantStyles(
   return {
   raised: {
     backgroundColor: colors.frame.paper,
-    borderWidth: 8,
+    borderWidth: AikidMetrics.borderWidth.panel,
     borderColor: colors.frame.white,
     borderRadius: radius.cardXl,
     ...shadows.raised,
   },
   soft: {
     backgroundColor: colors.frame.paper,
-    borderWidth: 4,
+    borderWidth: AikidMetrics.borderWidth.card,
     borderColor: colors.frame.white,
     borderRadius: radius.cardLg,
     ...shadows.card,
@@ -87,7 +88,7 @@ export function AikidCard({
   variant = 'soft',
   style,
   children,
-  padding = 20,
+  padding = AikidMetrics.cardPadding.regular,
   noPadding = false,
 }: AikidCardProps) {
   const variantStyles = createVariantStyles(useAikidTemplate());

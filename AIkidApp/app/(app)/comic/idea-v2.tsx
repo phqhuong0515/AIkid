@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, ImageBackground, Modal, FlatList, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, FlatList, StyleSheet, useWindowDimensions, Alert, Image } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { usePopSound } from '@/hooks/usePopSound';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GlobalHeader } from '@/components/GlobalHeader';
+import { AikidButton, AikidIcon, AikidModal, AikidPage, AikidWizard } from '@/ui';
+import { generateComicScriptViaGateway } from '@/features/comic/api/generateComicScript';
+import { useComicDraft, type ComicCharacter } from '@/features/comic/store/useComicDraft';
+import { useFamily } from '@/features/family/store/useFamily';
+import { StoryFlowProgress } from '@/features/comic/components/StoryFlowProgress';
+import { useCharacterDraft } from '@/features/character';
 
 const SEED_CHARACTERS = [
-  { id: 'seed-yuu', name: 'Yuu', avatar: '🐼' },
-  { id: 'seed-nori', name: 'Nori', avatar: '🐰' },
-  { id: 'seed-bong', name: 'Bông', avatar: '🐑' }
+  { id: 'seed-yuu', name: 'Yuu', avatar: '🐼', imageUrl: null, species: '' },
+  { id: 'seed-nori', name: 'Nori', avatar: '🐰', imageUrl: null, species: '' },
+  { id: 'seed-bong', name: 'Bông', avatar: '🐑', imageUrl: null, species: '' }
 ];
 
 const CONTEXT_CARDS = [
   { id: 'c1', name: 'Sáng sớm', icon: 'partly-sunny', colors: ['#FDBA74', '#F97316'] },
-  { id: 'c2', name: 'Chiều tà', icon: 'sunset', colors: ['#F472B6', '#DB2777'] },
+  { id: 'c2', name: 'Chiều tà', icon: 'sunny-outline', colors: ['#F472B6', '#DB2777'] },
   { id: 'c3', name: 'Đêm trăng', icon: 'moon', colors: ['#818CF8', '#4F46E5'] },
   { id: 'c4', name: 'Cổ đại', icon: 'hourglass', colors: ['#D4D4D8', '#71717A'] },
   { id: 'c5', name: 'Tương lai', icon: 'rocket', colors: ['#6EE7B7', '#3B82F6'] },
@@ -42,13 +46,41 @@ export default function IdeaV2Screen() {
   const [customContext, setCustomContext] = useState('');
   const [selectedPlot, setSelectedPlot] = useState<string | null>(null);
   const [customPlot, setCustomPlot] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState('');
 
   const router = useRouter();
-  const { genre } = useLocalSearchParams();
+  const { genre, mode } = useLocalSearchParams<{ genre?: string; mode?: string }>();
   const { playPop } = usePopSound();
-  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const activeChild = useFamily((s) => s.getActiveChild());
+  const project = useComicDraft((s) => s.project);
+  const hydrated = useComicDraft((s) => s.hydrated);
+  const hydrate = useComicDraft((s) => s.hydrate);
+  const patchProject = useComicDraft((s) => s.patchProject);
+  const updatePage = useComicDraft((s) => s.updatePage);
+  const saveToLibrary = useComicDraft((s) => s.saveToLibrary);
+  const savedCharacters = useCharacterDraft((s) => s.saved);
+  const hydrateCharacters = useCharacterDraft((s) => s.hydrate);
+
+  const availableCharacters = savedCharacters.length
+    ? savedCharacters.map((character) => ({
+        id: character.id,
+        name: character.name,
+        avatar: '✨',
+        imageUrl: character.avatarUri || null,
+        species: character.species || '',
+      }))
+    : SEED_CHARACTERS;
+
+  useEffect(() => {
+    if (!hydrated) void hydrate();
+  }, [hydrate, hydrated]);
+
+  useEffect(() => {
+    void hydrateCharacters();
+  }, [hydrateCharacters]);
 
   const handleBack = () => {
     playPop();
@@ -56,59 +88,170 @@ export default function IdeaV2Screen() {
       setStep(step - 1);
     } else {
       if (router.canGoBack()) router.back();
-      else router.replace('/(app)/comic/genre-v2');
+      else router.replace({ pathname: '/(app)/comic/genre-v2', params: { mode: mode || 'text' } });
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     playPop();
     if (step < 3) {
+      if (step === 1 && !selectedChar) {
+        Alert.alert('Chọn nhân vật', 'Hãy chọn một nhân vật chính trước.');
+        return;
+      }
+      if (step === 2 && !selectedContext && !customContext.trim()) {
+        Alert.alert('Chọn bối cảnh', 'Hãy chọn hoặc nhập bối cảnh câu chuyện.');
+        return;
+      }
       setStep(step + 1);
     } else {
-      router.push('/(app)/comic/library-v2');
+      if (isGenerating) return;
+      const contextName = customContext.trim() || CONTEXT_CARDS.find((item) => item.id === selectedContext)?.name;
+      const plotName = customPlot.trim() || PLOT_CARDS.find((item) => item.id === selectedPlot)?.name;
+      if (!selectedChar || !contextName || !plotName) {
+        Alert.alert('Thiếu ý tưởng', 'Hãy chọn nhân vật, bối cảnh và cốt truyện trước khi tạo.');
+        return;
+      }
+      const page = project.pages[0];
+      if (!page) {
+        Alert.alert('Không thể tạo truyện', 'Bản nháp chưa sẵn sàng.');
+        return;
+      }
+      const cast: ComicCharacter[] = [{
+        id: selectedChar.id,
+        sourceId: selectedChar.id,
+        name: selectedChar.name,
+        role: 'main',
+        personality: 'đáng yêu, tò mò và dũng cảm',
+        appearancePrompt: `${selectedChar.species || 'Nhân vật'} ${selectedChar.name}`,
+        referenceImageUrl: selectedChar.imageUrl || null,
+      }];
+      const idea = `${selectedChar.name} trong bối cảnh ${contextName}: ${plotName}.`;
+      setIsGenerating(true);
+      setGenerationError('');
+      try {
+        const panels = await generateComicScriptViaGateway({
+          pageId: page.id,
+          idea,
+          genre: typeof genre === 'string' ? genre : 'Phiêu lưu',
+          panelCount: page.panelCount,
+          cast,
+          childProfileId: activeChild?.id,
+        });
+        patchProject({
+          title: `${plotName} của ${selectedChar.name}`,
+          genre: typeof genre === 'string' ? genre : 'Phiêu lưu',
+          cast,
+        });
+        updatePage(page.id, { idea, title: plotName, panels, status: 'draft', error: null });
+        await saveToLibrary();
+        router.push('/(app)/comic/library-v2');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Vui lòng thử lại.';
+        setGenerationError(message);
+        Alert.alert('Không tạo được truyện', message);
+      } finally {
+        setIsGenerating(false);
+      }
     }
+  };
+
+  const handleSaveDraft = async () => {
+    playPop();
+    await saveToLibrary();
+    Alert.alert('Đã lưu nháp', 'Bản nháp đã được thêm vào thư viện.');
   };
 
   const renderStep1 = () => (
     <Animated.View entering={FadeInDown.duration(400)} style={styles.stepContainer}>
       <Text style={styles.stepTitle}>Nhân vật chính</Text>
       <Text style={styles.stepSubtitle}>Ai sẽ tham gia chuyến phiêu lưu này?</Text>
-      
-      <View style={styles.charSelectionArea}>
-        {selectedChar ? (
-          <View style={styles.selectedCharCard}>
-            <Text style={styles.charAvatarLarge}>{selectedChar.avatar}</Text>
-            <Text style={styles.charNameLarge}>{selectedChar.name}</Text>
-            <TouchableOpacity 
-              style={styles.changeCharBtn} 
-              onPress={() => { playPop(); setSelectedChar(null); }}
-            >
-              <Text style={styles.changeCharBtnText}>Xóa</Text>
+
+      <View style={[styles.characterWorkspace, isMobile && styles.characterWorkspaceMobile]}>
+        <View style={styles.characterPreviewPane}>
+          <Text style={styles.characterPaneLabel}>NHÂN VẬT ĐANG CHỌN</Text>
+          <View style={[styles.selectedCharCard, !selectedChar && styles.emptyCharCard]}>
+            {selectedChar ? (
+              <>
+                {selectedChar.imageUrl ? (
+                  <Image source={{ uri: selectedChar.imageUrl }} style={styles.selectedCharImage} resizeMode="contain" />
+                ) : (
+                  <Text style={styles.charAvatarLarge}>{selectedChar.avatar}</Text>
+                )}
+                <Text style={styles.charNameLarge}>{selectedChar.name}</Text>
+                {selectedChar.species ? <Text style={styles.charSpecies}>{selectedChar.species}</Text> : null}
+                <TouchableOpacity
+                  style={styles.changeCharBtn}
+                  onPress={() => { playPop(); setSelectedChar(null); }}
+                >
+                  <Ionicons name="close" size={15} color="#64748B" />
+                  <Text style={styles.changeCharBtnText}>Bỏ chọn</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <View style={styles.emptyCharIcon}>
+                  <Ionicons name="person-add-outline" size={38} color="#C0CBD9" />
+                </View>
+                <Text style={styles.emptyCharTitle}>Chưa chọn nhân vật</Text>
+                <Text style={styles.emptyCharText}>Chọn một nhân vật trong danh sách bên cạnh.</Text>
+              </>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.characterLibraryPane}>
+          <View style={styles.characterLibraryHeader}>
+            <View>
+              <Text style={styles.characterPaneLabel}>CHỌN NHANH TỪ KHO</Text>
+              <Text style={styles.characterLibraryHint}>{availableCharacters.length} nhân vật sẵn sàng</Text>
+            </View>
+            <TouchableOpacity style={styles.openLibraryButton} onPress={() => { playPop(); setShowCharModal(true); }}>
+              <Ionicons name="grid-outline" size={16} color="#FF5E97" />
+              <Text style={styles.openLibraryText}>Xem tất cả</Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <View style={styles.emptyCharCard}>
-            <Ionicons name="person-add-outline" size={48} color="#CBD5E1" />
-            <Text style={styles.emptyCharText}>Chưa chọn nhân vật</Text>
-          </View>
-        )}
-
-        <TouchableOpacity onPress={() => { playPop(); setShowCharModal(true); }}>
-          <LinearGradient colors={['#FF9EB5', '#FF5E97']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.charLibraryBtn}>
-            <Ionicons name="library" size={24} color="#FFF" />
-            <Text style={styles.charLibraryBtnText}>Kho nhân vật</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <View style={styles.seedContainer}>
-          <Text style={styles.seedTitle}>Hoặc chọn nhanh:</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.seedScroll}>
-            {SEED_CHARACTERS.map(c => (
-              <TouchableOpacity key={c.id} style={styles.seedPill} onPress={() => { playPop(); setSelectedChar(c); }}>
-                <Text style={styles.seedPillAvatar}>{c.avatar}</Text>
-                <Text style={styles.seedPillName}>{c.name}</Text>
-              </TouchableOpacity>
-            ))}
+          <ScrollView
+            style={styles.characterQuickScroll}
+            contentContainerStyle={styles.characterQuickGrid}
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={availableCharacters.length > 4}
+          >
+            <TouchableOpacity
+              style={[styles.characterQuickCard, styles.createCharacterCard]}
+              onPress={() => {
+                playPop();
+                router.push('/(app)/character/generate-v2');
+              }}
+            >
+              <View style={styles.createCharacterIcon}>
+                <Ionicons name="add" size={38} color="#FF5E97" />
+              </View>
+              <Text style={styles.createCharacterTitle}>Tạo nhân vật mới</Text>
+              <Text style={styles.createCharacterHint}>Mở flow nhân vật</Text>
+            </TouchableOpacity>
+            {availableCharacters.map((character) => {
+              const active = selectedChar?.id === character.id;
+              return (
+                <TouchableOpacity
+                  key={character.id}
+                  style={[styles.characterQuickCard, active && styles.characterQuickCardActive]}
+                  onPress={() => { playPop(); setSelectedChar(character); }}
+                >
+                  <View style={styles.characterQuickImageBox}>
+                    {character.imageUrl ? (
+                      <Image source={{ uri: character.imageUrl }} style={styles.characterQuickImage} resizeMode="contain" />
+                    ) : (
+                      <Text style={styles.characterQuickEmoji}>{character.avatar}</Text>
+                    )}
+                  </View>
+                  <Text style={[styles.characterQuickName, active && styles.characterQuickNameActive]} numberOfLines={1}>
+                    {character.name}
+                  </Text>
+                  {active ? <Text style={styles.characterQuickSelected}>ĐANG CHỌN</Text> : null}
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
       </View>
@@ -202,74 +345,78 @@ export default function IdeaV2Screen() {
   };
 
   return (
-    <ImageBackground source={require('../../../public/lobby-assets/images/bg-art.png')} style={styles.container} resizeMode="cover">
-      <View style={{ paddingTop: insets.top }}>
-        <GlobalHeader />
-        <TouchableOpacity onPress={handleBack} style={styles.backBtnWrapper}>
-          <LinearGradient colors={['#FF9EB5', '#FF7597']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={24} color="#FFF" />
-            <Text style={styles.backBtnText}>Trở về</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardView}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <View style={styles.mainCard}>
-            
-            {/* Header: Progress Bar */}
-            <View style={styles.progressHeader}>
-              <View style={styles.progressTextRow}>
-                <Text style={styles.progressText}>Bước {step}/3</Text>
-                {genre && (
-                  <View style={styles.genreBadge}>
-                    <Text style={styles.genreBadgeText}>{genre}</Text>
-                  </View>
-                )}
-              </View>
-              <View style={styles.progressTrack}>
-                <LinearGradient 
-                  colors={['#FDBA74', '#F97316']} 
-                  start={{x:0,y:0}} end={{x:1,y:0}}
-                  style={[styles.progressFill, { width: `${Math.round((step / 3) * 100)}%` }]} 
-                />
-              </View>
-            </View>
-
-            {/* Content */}
-            <View style={styles.contentArea}>
-              {step === 1 && renderStep1()}
-              {step === 2 && renderStep2()}
-              {step === 3 && renderStep3()}
-            </View>
-
-            {/* Footer */}
-            <View style={styles.footerRow}>
+    <AikidPage
+      scene="comic"
+      title="Tạo truyện"
+      backHref="/(app)/comic/genre-v2"
+      container="wide"
+      keyboardAware
+      scroll={false}
+    >
+      <StoryFlowProgress
+        currentStep={step + 1}
+        onStepPress={(target) => {
+          playPop();
+          if (target === 1) {
+            router.replace({ pathname: '/(app)/comic/genre-v2', params: { mode: mode || 'text' } });
+          } else if (target >= 2 && target < step + 1) {
+            setStep(target - 1);
+          }
+        }}
+      />
+      <ScrollView
+        style={styles.stepScroll}
+        contentContainerStyle={styles.stepScrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+      <AikidWizard
+          step={step}
+          total={3}
+          badge={typeof genre === 'string' ? genre : undefined}
+          showProgress={false}
+          footer={
+            <>
+              {step > 1 ? (
+                <AikidButton variant="feature" onPress={handleBack} leftIcon={<AikidIcon name="arrow-left" size={18} />}>
+                  Quay lại
+                </AikidButton>
+              ) : null}
               {step === 3 ? (
-                <TouchableOpacity style={styles.draftBtn} onPress={() => playPop()}>
-                  <Text style={styles.draftBtnText}>Lưu Nháp</Text>
-                </TouchableOpacity>
-              ) : (
-                <View />
-              )}
-              
-              <TouchableOpacity onPress={handleNext}>
-                <LinearGradient colors={['#FF9EB5', '#FF5E97']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.nextBtn}>
-                  <Text style={styles.nextBtnText}>{step === 3 ? 'Tạo Truyện ✨' : 'Tiếp Tục ➡'}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+                <AikidButton variant="feature" onPress={() => void handleSaveDraft()} leftIcon={<AikidIcon name="save" size={18} />}>
+                  Lưu nháp
+                </AikidButton>
+              ) : null}
+              <AikidButton variant="nav" onPress={() => void handleNext()} loading={isGenerating}>
+                {step === 3 ? 'Tạo truyện' : 'Tiếp tục'}
+              </AikidButton>
+            </>
+          }
+        >
+          {step === 1 && renderStep1()}
+          {step === 2 && renderStep2()}
+          {step === 3 && renderStep3()}
+          {generationError ? (
+            <View style={styles.generationError}>
+              <Ionicons name="alert-circle-outline" size={18} color="#D64545" />
+              <View style={styles.generationErrorCopy}>
+                <Text style={styles.generationErrorTitle}>Chưa tạo được truyện</Text>
+                <Text style={styles.generationErrorText}>{generationError}</Text>
+              </View>
             </View>
+          ) : null}
+        </AikidWizard>
+      </ScrollView>
 
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-
-      <Modal visible={showCharModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Kho nhân vật</Text>
+      <AikidModal
+        isOpen={showCharModal}
+        onClose={() => setShowCharModal(false)}
+        position="center"
+        size="sm"
+        title="Kho nhân vật"
+      >
             <FlatList 
-              data={SEED_CHARACTERS}
+              data={availableCharacters}
               keyExtractor={item => item.id}
               renderItem={({item}) => (
                 <TouchableOpacity style={styles.modalItem} onPress={() => {
@@ -277,25 +424,33 @@ export default function IdeaV2Screen() {
                   setShowCharModal(false);
                   playPop();
                 }}>
-                  <Text style={styles.modalItemAvatar}>{item.avatar}</Text>
+                  {item.imageUrl ? (
+                    <Image source={{ uri: item.imageUrl }} style={styles.modalItemImage} resizeMode="contain" />
+                  ) : (
+                    <Text style={styles.modalItemAvatar}>{item.avatar}</Text>
+                  )}
                   <Text style={styles.modalItemName}>{item.name}</Text>
                 </TouchableOpacity>
               )}
             />
-            <TouchableOpacity style={styles.closeModalBtn} onPress={() => setShowCharModal(false)}>
-              <Text style={styles.closeModalBtnText}>Đóng</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-    </ImageBackground>
+        <AikidButton variant="feature" fullWidth onPress={() => setShowCharModal(false)}>
+          Đóng
+        </AikidButton>
+      </AikidModal>
+    </AikidPage>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  stepScroll: {
+    flex: 1,
+    width: '100%',
+  },
+  stepScrollContent: {
+    paddingBottom: 20,
   },
   backBtnWrapper: {
     alignSelf: 'flex-start',
@@ -394,27 +549,76 @@ const styles = StyleSheet.create({
   charSelectionArea: {
     alignItems: 'center',
   },
-  selectedCharCard: {
-    backgroundColor: '#FDFAF4',
-    borderWidth: 2,
-    borderColor: '#EADED5',
-    borderStyle: 'dashed',
-    borderRadius: 22,
-    padding: 24,
-    alignItems: 'center',
+  characterWorkspace: {
     width: '100%',
-    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 18,
+  },
+  characterWorkspaceMobile: {
+    flexDirection: 'column',
+  },
+  characterPreviewPane: {
+    flex: 0.85,
+    minWidth: 260,
+    borderWidth: 1.5,
+    borderColor: '#EBDCD0',
+    borderRadius: 22,
+    backgroundColor: '#FFFDFB',
+    padding: 14,
+  },
+  characterLibraryPane: {
+    flex: 1.15,
+    minWidth: 0,
+    borderRadius: 22,
+    backgroundColor: '#FFF8F2',
+    padding: 14,
+  },
+  characterPaneLabel: {
+    color: '#8A7463',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.55,
+  },
+  selectedCharCard: {
+    flex: 1,
+    minHeight: 300,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: 10,
   },
   charAvatarLarge: {
     fontSize: 64,
+  },
+  selectedCharImage: {
+    width: '100%',
+    maxWidth: 260,
+    height: 220,
+    borderRadius: 24,
+    backgroundColor: '#FFF',
   },
   charNameLarge: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#475569',
-    marginTop: 8,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  charSpecies: {
+    color: '#8A7463',
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 3,
+    textAlign: 'center',
   },
   changeCharBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     marginTop: 12,
     backgroundColor: '#F1F5F9',
     paddingHorizontal: 16,
@@ -426,20 +630,171 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   emptyCharCard: {
-    backgroundColor: '#FDFAF4',
-    borderWidth: 2,
-    borderColor: '#EADED5',
+    minHeight: 300,
+    backgroundColor: '#FFFDFB',
+    borderWidth: 1.5,
+    borderColor: '#EBDCD0',
     borderStyle: 'dashed',
-    borderRadius: 22,
-    padding: 32,
+  },
+  emptyCharIcon: {
+    width: 76,
+    height: 76,
+    borderRadius: 24,
     alignItems: 'center',
-    width: '100%',
-    marginBottom: 20,
+    justifyContent: 'center',
+    backgroundColor: '#F3F6FA',
+  },
+  emptyCharTitle: {
+    color: '#64748B',
+    fontSize: 17,
+    fontWeight: '800',
+    marginTop: 14,
   },
   emptyCharText: {
     color: '#94A3B8',
-    marginTop: 12,
+    marginTop: 5,
     fontWeight: '500',
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: 'center',
+    maxWidth: 230,
+  },
+  characterLibraryHeader: {
+    minHeight: 42,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 10,
+  },
+  characterLibraryHint: {
+    color: '#8A7463',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  openLibraryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    borderRadius: 999,
+    backgroundColor: '#FFF0F3',
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+  },
+  openLibraryText: {
+    color: '#FF5E97',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  characterQuickScroll: {
+    maxHeight: 330,
+  },
+  characterQuickGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    paddingBottom: 2,
+  },
+  characterQuickCard: {
+    width: 150,
+    minHeight: 180,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    padding: 8,
+  },
+  characterQuickCardActive: {
+    borderColor: '#FF5E97',
+    backgroundColor: '#FFF4F7',
+  },
+  characterQuickImageBox: {
+    width: '100%',
+    height: 125,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: 14,
+    backgroundColor: '#FFF8F2',
+  },
+  characterQuickImage: {
+    width: '100%',
+    height: '100%',
+  },
+  characterQuickEmoji: {
+    fontSize: 56,
+  },
+  characterQuickName: {
+    maxWidth: '100%',
+    color: '#475569',
+    fontSize: 12,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginTop: 7,
+  },
+  characterQuickNameActive: {
+    color: '#FF5E97',
+  },
+  characterQuickSelected: {
+    color: '#FF5E97',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 0.4,
+    marginTop: 2,
+  },
+  createCharacterCard: {
+    justifyContent: 'center',
+    borderColor: '#F2B7C7',
+    borderStyle: 'dashed',
+    backgroundColor: '#FFF9FB',
+  },
+  createCharacterIcon: {
+    width: 68,
+    height: 68,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF0F3',
+  },
+  createCharacterTitle: {
+    color: '#FF5E97',
+    fontSize: 12,
+    fontWeight: '900',
+    textAlign: 'center',
+    marginTop: 9,
+  },
+  createCharacterHint: {
+    color: '#9A8790',
+    fontSize: 9,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  generationError: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 9,
+    borderWidth: 1,
+    borderColor: '#F3B7B7',
+    borderRadius: 14,
+    backgroundColor: '#FFF1F1',
+    padding: 12,
+    marginTop: 14,
+  },
+  generationErrorCopy: {
+    flex: 1,
+  },
+  generationErrorTitle: {
+    color: '#B83434',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  generationErrorText: {
+    color: '#8F4A4A',
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 2,
   },
   charLibraryBtn: {
     flexDirection: 'row',
@@ -480,6 +835,13 @@ const styles = StyleSheet.create({
   seedPillAvatar: {
     fontSize: 20,
     marginRight: 8,
+  },
+  seedPillImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    marginRight: 8,
+    backgroundColor: '#FFF',
   },
   seedPillName: {
     color: '#475569',
@@ -605,6 +967,13 @@ const styles = StyleSheet.create({
   modalItemAvatar: {
     fontSize: 32,
     marginRight: 16,
+  },
+  modalItemImage: {
+    width: 58,
+    height: 58,
+    borderRadius: 14,
+    marginRight: 12,
+    backgroundColor: '#FFF8F2',
   },
   modalItemName: {
     fontSize: 16,

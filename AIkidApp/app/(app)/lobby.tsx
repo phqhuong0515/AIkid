@@ -24,6 +24,8 @@ import Animated, {
 import { useFamily } from '@/features/family/store/useFamily';
 import { usePopSound } from '@/hooks/usePopSound';
 import { GlobalHeader } from '@/components/GlobalHeader';
+import { PageBackground, AikidCard, AikidText } from '@/ui';
+import { useAikidTemplate } from '@/design-system';
 
 const Sparkle = ({ style, delay = 0, type }: { style: any; delay?: number; type: string }) => {
   const rotation = useSharedValue(0);
@@ -82,9 +84,9 @@ export default function LobbyScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const template = useAikidTemplate();
   
   const loadFamily = useFamily((state) => state.loadFamily);
-  
   const { playPop } = usePopSound();
 
   useEffect(() => { void loadFamily(); }, [loadFamily]);
@@ -99,75 +101,69 @@ export default function LobbyScreen() {
   const isSmallScreen = width < 768;
 
   return (
-    <View style={styles.container}>
-      <ImageBackground 
-        source={require('../../public/hub-images/bg-home.png')} 
-        style={styles.bgImage}
-        resizeMode="cover"
+    <PageBackground scene="lobby">
+      <ScrollView 
+        contentContainerStyle={[styles.scrollContent, { paddingTop: Math.max(20, insets.top), paddingBottom: Math.max(40, insets.bottom) }]} 
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView 
-          contentContainerStyle={[styles.scrollContent, { paddingTop: Math.max(20, insets.top), paddingBottom: Math.max(40, insets.bottom) }]} 
-          showsVerticalScrollIndicator={false}
-        >
-          <GlobalHeader />
+        <GlobalHeader />
 
-          {/* Hero Section (Title + Mascot) */}
-          <View style={[styles.heroSection, isSmallScreen ? { flexDirection: 'column' } : { flexDirection: 'row' }]}>
-            <View style={[styles.titleContainer, isSmallScreen ? { width: '100%', marginBottom: 20 } : { width: '55%' }]}>
-              <Image source={require('../../public/hub-images/title-home-vn.png')} style={styles.titleImg} contentFit="contain" />
-              <Sparkle style={styles.sparkle1} delay={200} type="blue" />
-              <Sparkle style={styles.sparkle2} delay={800} type="pink" />
-              <Sparkle style={styles.sparkle3} delay={1400} type="yellow" />
-              <Sparkle style={styles.sparkle4} delay={2000} type="yellow" />
-              <Sparkle style={styles.sparkle5} delay={500} type="pink" />
-              <Sparkle style={styles.sparkle6} delay={1700} type="blue" />
+        {/* Hero Section (Title + Mascot) */}
+        <View style={[styles.heroSection, isSmallScreen ? { flexDirection: 'column' } : { flexDirection: 'row' }]}>
+          <View style={[styles.titleContainer, isSmallScreen ? { width: '100%', marginBottom: 20 } : { width: '55%' }]}>
+            <Image source={template.assets.lobby ? require('../../public/hub-images/title-home-vn.png') : require('../../public/hub-images/title-home-vn.png')} style={styles.titleImg} contentFit="contain" />
+            <Sparkle style={styles.sparkle1} delay={200} type="blue" />
+            <Sparkle style={styles.sparkle2} delay={800} type="pink" />
+            <Sparkle style={styles.sparkle3} delay={1400} type="yellow" />
+            <Sparkle style={styles.sparkle4} delay={2000} type="yellow" />
+            <Sparkle style={styles.sparkle5} delay={500} type="pink" />
+            <Sparkle style={styles.sparkle6} delay={1700} type="blue" />
+          </View>
+
+          <View style={[styles.mascotContainer, isSmallScreen ? { width: '100%', height: 250 } : { width: '45%' }]}>
+            <Image source={require('../../public/hub-images/mascot.png')} style={styles.mascotImg} contentFit="contain" />
+          </View>
+        </View>
+
+        {/* Intro Box */}
+        <AikidCard variant="raised" style={styles.descriptionBox}>
+          <AikidText variant="bodyBold" style={{ textAlign: 'center', fontSize: 18, lineHeight: 28, color: template.colors.text.heading }}>
+            Chào mừng bé đến với vũ trụ sáng tạo diệu kỳ! Hãy tự tay thiết kế nhân vật Mee đáng yêu, sáng tác những cuốn truyện tranh đầy màu sắc và ghi lại hành trình thú vị của riêng mình nhé!
+          </AikidText>
+        </AikidCard>
+
+        {/* Cards Section */}
+        <View style={[styles.cardsContainer, isSmallScreen ? { flexDirection: 'column' } : { flexDirection: 'row', flexWrap: 'wrap' }]}>
+          <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/mee')}>
+            <Image source={require('../../public/hub-images/card_mee.jpeg')} style={styles.cardImg} contentFit="cover" />
+            <View style={[styles.cardLabel, { backgroundColor: 'rgba(77,148,255,0.75)' }]}>
+              <AikidText variant="btnNav" style={styles.cardLabelText}>MEE</AikidText>
             </View>
+          </Pressable>
 
-            <View style={[styles.mascotContainer, isSmallScreen ? { width: '100%', height: 250 } : { width: '45%' }]}>
-              <Image source={require('../../public/hub-images/mascot.png')} style={styles.mascotImg} contentFit="contain" />
+          <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/character')}>
+            <Image source={require('../../public/hub-images/home-character.jpeg')} style={styles.cardImg} contentFit="cover" />
+            <View style={[styles.cardLabel, { backgroundColor: 'rgba(255,144,64,0.75)' }]}>
+              <AikidText variant="btnNav" style={styles.cardLabelText}>NHÂN VẬT</AikidText>
             </View>
-          </View>
+          </Pressable>
 
-          {/* Intro Box */}
-          <View style={styles.descriptionBox}>
-            <Text style={styles.descriptionText}>
-              Chào mừng bé đến với vũ trụ sáng tạo diệu kỳ! Hãy tự tay thiết kế nhân vật Mee đáng yêu, sáng tác những cuốn truyện tranh đầy màu sắc và ghi lại hành trình thú vị của riêng mình nhé!
-            </Text>
-          </View>
+          <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/art')}>
+            <Image source={require('../../public/hub-images/card_art.jpeg')} style={styles.cardImg} contentFit="cover" />
+            <View style={[styles.cardLabel, { backgroundColor: 'rgba(232,64,64,0.75)' }]}>
+              <AikidText variant="btnNav" style={styles.cardLabelText}>XƯỞNG SÁNG TẠO</AikidText>
+            </View>
+          </Pressable>
 
-          {/* Cards Section */}
-          <View style={[styles.cardsContainer, isSmallScreen ? { flexDirection: 'column' } : { flexDirection: 'row', flexWrap: 'wrap' }]}>
-            <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/mee')}>
-              <Image source={require('../../public/hub-images/card_mee.jpeg')} style={styles.cardImg} contentFit="cover" />
-              <View style={[styles.cardLabel, { backgroundColor: 'rgba(77,148,255,0.7)' }]}>
-                <Text style={styles.cardLabelText}>MEE</Text>
-              </View>
-            </Pressable>
-
-            <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/character')}>
-              <Image source={require('../../public/hub-images/home-character.jpeg')} style={styles.cardImg} contentFit="cover" />
-              <View style={[styles.cardLabel, { backgroundColor: 'rgba(255,180,0,0.7)' }]}>
-                <Text style={styles.cardLabelText}>NHÂN VẬT</Text>
-              </View>
-            </Pressable>
-
-            <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/art')}>
-              <Image source={require('../../public/hub-images/card_art.jpeg')} style={styles.cardImg} contentFit="cover" />
-              <View style={[styles.cardLabel, { backgroundColor: 'rgba(215,55,71,0.7)' }]}>
-                <Text style={styles.cardLabelText}>XƯỞNG SÁNG TẠO</Text>
-              </View>
-            </Pressable>
-
-            <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/comic/library-v2')}>
-              <Image source={require('../../public/hub-images/home-explore.jpeg')} style={styles.cardImg} contentFit="cover" />
-              <View style={[styles.cardLabel, { backgroundColor: 'rgba(62,210,17,0.7)' }]}>
-                <Text style={styles.cardLabelText}>KHÁM PHÁ</Text>
-              </View>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </ImageBackground>
-    </View>
+          <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/gallery')}>
+            <Image source={require('../../public/hub-images/home-explore.jpeg')} style={styles.cardImg} contentFit="cover" />
+            <View style={[styles.cardLabel, { backgroundColor: 'rgba(76,175,138,0.75)' }]}>
+              <AikidText variant="btnNav" style={styles.cardLabelText}>KHÁM PHÁ</AikidText>
+            </View>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </PageBackground>
   );
 }
 
@@ -282,7 +278,7 @@ const styles = StyleSheet.create({
   },
   cardLabelText: {
     color: '#FFFFFF',
-    fontFamily: 'Fredoka_700Bold',
+    fontFamily: 'ChironGoRoundTC_700Bold',
     fontSize: 24,
     textTransform: 'uppercase',
     letterSpacing: 0.5,

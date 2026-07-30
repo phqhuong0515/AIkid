@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path, Mask, Rect, Line, G } from 'react-native-svg';
 import Slider from '@react-native-community/slider';
@@ -21,8 +20,8 @@ import { MeeAssetPicker, MeeAssetPreview, type MeeAssetPreviewHandle } from '@/f
 import { SKIN_TONE_COLORS } from '@/features/mee/skinTones';
 import { uploadMeePreview } from '@/features/mee/preview';
 import { uploadPickedImageAsPublicRef } from '@/features/media/api/mediaHooks';
-import { GlobalHeader } from '@/components/GlobalHeader';
 import { usePopSound } from '@/hooks/usePopSound';
+import { AikidButton, AikidIcon, AikidPage } from '@/ui';
 
 import { MeteorLoadingOverlay } from '@/features/mee/MeteorLoadingOverlay';
 
@@ -113,28 +112,14 @@ export default function MeeScreen() {
   
   useEffect(() => { void hydrate(); }, [hydrate]);
 
-
-  useEffect(() => {
-    if (useCustomSkin) {
-      const toHex = (c: number) => Math.round(c).toString(16).padStart(2, '0');
-      const primaryHex = `#${toHex(skinR)}${toHex(skinG)}${toHex(skinB)}`;
-      const shadowHex = `#${toHex(Math.max(0, skinR - 20))}${toHex(Math.max(0, skinG - 35))}${toHex(Math.max(0, skinB - 35))}`;
-      setField('customPrimaryColor', primaryHex);
-      setField('customShadowColor', shadowHex);
-    } else {
-      if (draft.customPrimaryColor !== null) {
-        setField('customPrimaryColor', null);
-        setField('customShadowColor', null);
-      }
-    }
-  }, [
-    draft.customPrimaryColor,
-    setField,
-    skinB,
-    skinG,
-    skinR,
-    useCustomSkin,
-  ]);
+  const applyCustomSkin = (red = skinR, green = skinG, blue = skinB) => {
+    const toHex = (channel: number) => Math.round(channel).toString(16).padStart(2, '0');
+    setField('customPrimaryColor', `#${toHex(red)}${toHex(green)}${toHex(blue)}`);
+    setField(
+      'customShadowColor',
+      `#${toHex(Math.max(0, red - 20))}${toHex(Math.max(0, green - 35))}${toHex(Math.max(0, blue - 35))}`,
+    );
+  };
 
   async function savePreview(): Promise<string | null> {
     if (!token || !child) { setFeedback({ tone: 'error', title: 'Chưa sẵn sàng', message: 'Đăng nhập và chọn hồ sơ con trước.' }); return null; }
@@ -224,19 +209,33 @@ export default function MeeScreen() {
 
 
   return (
-    <View className="flex-1 bg-[#e8f4fa]">
+    <AikidPage
+      scene="mee"
+      title="Thiết kế Mee"
+      backHref="/(app)/lobby"
+      container="workspace"
+      scroll={false}
+      actions={
+        <AikidButton
+          variant="nav"
+          onPress={() => { playPop(); router.push('/(app)/mee/next'); }}
+          rightIcon={<AikidIcon name="arrow-right" size={18} color="#FFF" />}
+        >
+          Tiếp tục
+        </AikidButton>
+      }
+    >
       <MeteorLoadingOverlay isVisible={!isHydrated} />
       {!isHydrated ? null : (
-      <>
-      <SafeAreaView edges={['top', 'bottom']} className="flex-1" style={{ overflow: 'hidden' }}>
-
-        <View className="z-10 px-4 pt-4">
-          <GlobalHeader />
-        </View>
-
-        <View className={`flex-1 overflow-hidden ${desktop ? 'flex-row gap-5 px-6 pb-8' : 'flex-col px-4 pb-6 gap-3'}`} style={{ width: '100%', maxWidth: 1200, alignSelf: 'center' }}>
+        <View className={`flex-1 overflow-hidden ${desktop ? 'flex-row gap-5' : 'flex-col gap-3'}`} style={{ width: '100%', alignSelf: 'center' }}>
         
-        <View className={`${desktop ? 'w-[360px]' : 'w-full h-[360px] shrink-0'} items-center justify-center`}>
+        <View
+          className="items-center justify-center"
+          style={desktop
+            ? { width: '34%', minWidth: 300, maxWidth: 440 }
+            : { width: '100%', minHeight: 300, maxHeight: 420, flex: 1 }
+          }
+        >
           <View className={`w-full flex-1 overflow-hidden ${desktop ? 'rounded-[24px] border-[3px] border-white bg-[#fdfaf4] p-5 shadow-sm flex-col gap-4' : 'rounded-[32px] border-[3px] border-white bg-[#fdfaf4] p-4 shadow-lg flex-col gap-3'}`}>
             <View className={`flex-row items-center justify-between bg-transparent`}>
               <Pressable onPress={() => { playPop(); reset(); }} className={`flex-row items-center justify-center gap-2 px-3 py-2 rounded-full bg-white border border-[#ebdcd0]`} style={{ flex: 1, marginRight: 8 }}>
@@ -281,6 +280,9 @@ export default function MeeScreen() {
                   <Pressable 
                     key={cat.id} 
                     onPress={() => { playPop(); setEditorGroup(cat.id); }} 
+                    accessibilityRole="tab"
+                    accessibilityLabel={cat.label}
+                    accessibilityState={{ selected: isActive }}
                     className={`items-center justify-center rounded-[20px] ${desktop ? 'h-16 w-16' : 'h-16 w-[72px]'} ${isActive ? 'bg-[#ff7597] shadow-sm' : 'bg-transparent'}`}
                   >
                     {cat.isCustomSvg && CustomIcon ? (
@@ -322,7 +324,19 @@ export default function MeeScreen() {
                 <View className="flex-row items-center justify-between mt-2">
                   <Text className="text-sm font-extrabold text-[#4a3728]">Tùy chọn màu da riêng</Text>
                   <Pressable 
-                    onPress={() => { playPop(); setUseCustomSkin(!useCustomSkin); }}
+                    accessibilityRole="switch"
+                    accessibilityLabel="Tùy chọn màu da riêng"
+                    accessibilityState={{ checked: useCustomSkin }}
+                    onPress={() => {
+                      playPop();
+                      const next = !useCustomSkin;
+                      setUseCustomSkin(next);
+                      if (next) applyCustomSkin();
+                      else {
+                        setField('customPrimaryColor', null);
+                        setField('customShadowColor', null);
+                      }
+                    }}
                     className={`w-12 h-6 rounded-full justify-center px-1 ${useCustomSkin ? 'bg-[#ff7597]' : 'bg-[#ebdcd0]'}`}
                   >
                     <View className={`w-4 h-4 rounded-full bg-white ${useCustomSkin ? 'self-end' : 'self-start'}`} />
@@ -334,6 +348,7 @@ export default function MeeScreen() {
                       <Text className="text-xs font-bold text-red-500 mb-1">Đỏ (R): {skinR}</Text>
                       <Slider
                         minimumValue={0} maximumValue={255} step={1} value={skinR} onValueChange={setSkinR}
+                        onSlidingComplete={(value) => applyCustomSkin(value, skinG, skinB)}
                         minimumTrackTintColor="#ef4444" thumbTintColor="#ef4444"
                       />
                     </View>
@@ -341,6 +356,7 @@ export default function MeeScreen() {
                       <Text className="text-xs font-bold text-green-500 mb-1">Lục (G): {skinG}</Text>
                       <Slider
                         minimumValue={0} maximumValue={255} step={1} value={skinG} onValueChange={setSkinG}
+                        onSlidingComplete={(value) => applyCustomSkin(skinR, value, skinB)}
                         minimumTrackTintColor="#22c55e" thumbTintColor="#22c55e"
                       />
                     </View>
@@ -348,6 +364,7 @@ export default function MeeScreen() {
                       <Text className="text-xs font-bold text-blue-500 mb-1">Lam (B): {skinB}</Text>
                       <Slider
                         minimumValue={0} maximumValue={255} step={1} value={skinB} onValueChange={setSkinB}
+                        onSlidingComplete={(value) => applyCustomSkin(skinR, skinG, value)}
                         minimumTrackTintColor="#3b82f6" thumbTintColor="#3b82f6"
                       />
                     </View>
@@ -456,20 +473,7 @@ export default function MeeScreen() {
         </View>
 
         </View>
-      </SafeAreaView>
-
-      {/* Floating Next Button */}
-      <Pressable 
-        onPress={() => { playPop(); router.push('/(app)/mee/next'); }}
-        className="absolute bottom-8 right-8 w-[64px] h-[64px] bg-[#ff7597] rounded-full items-center justify-center border-[4px] border-[#FCF4DB]"
-        style={{ shadowColor: '#ff7597', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.4, shadowRadius: 20, elevation: 10 }}
-        accessibilityRole="button"
-        accessibilityLabel="Trang tiếp theo"
-      >
-        <Ionicons name="arrow-forward" size={32} color="white" />
-      </Pressable>
-      </>
       )}
-    </View>
+    </AikidPage>
   );
 }

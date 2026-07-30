@@ -1,126 +1,107 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert, useWindowDimensions, Pressable } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, useWindowDimensions, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { GlobalHeader } from '@/components/GlobalHeader';
 import { usePopSound } from '@/hooks/usePopSound';
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { FontAwesome5 } from '@expo/vector-icons';
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+import { AikidPage, AikidText } from '@/ui';
+import { useComicDraft } from '@/features/comic/store/useComicDraft';
 
 export default function ComicCreateV2() {
   const router = useRouter();
   const { playPop } = usePopSound();
-  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
+  const library = useComicDraft((state) => state.library);
+  const project = useComicDraft((state) => state.project);
+  const hydrated = useComicDraft((state) => state.hydrated);
+  const hydrate = useComicDraft((state) => state.hydrate);
+  const hasPlot = library.some((item) => item.pages.some((page) => page.idea.trim()))
+    || project.pages.some((page) => page.idea.trim());
 
-  const handlePress = (route: string) => {
+  useEffect(() => {
+    if (!hydrated) void hydrate();
+  }, [hydrate, hydrated]);
+
+  const handlePress = (route: string, mode?: string) => {
     playPop();
-    if (route === 'coming_soon') {
-      Alert.alert('Thông báo', 'Tính năng đang được phát triển!');
-    } else {
-      router.push(route as any);
-    }
+    router.push({ pathname: route as never, params: mode ? { mode } : undefined });
   };
 
-  const GradientIcon = ({ name, solid = true }: { name: string; solid?: boolean }) => (
-    <MaskedView
-      style={{ width: 80, height: 80 }}
-      maskElement={
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <FontAwesome5 name={name} size={64} solid={solid} color="white" />
-        </View>
-      }
-    >
-      <LinearGradient
-        colors={['#FF5E97', '#FF9EB5']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{ flex: 1 }}
-      />
-    </MaskedView>
-  );
-
-  const OptionCard = ({ title, iconName, onPress }: { title: string; iconName: string; onPress: () => void }) => {
-    const scale = useSharedValue(1);
-
-    const animatedStyle = useAnimatedStyle(() => {
-      return {
-        transform: [{ scale: scale.value }],
-      };
-    });
-
-    const handlePressIn = () => {
-      scale.value = withSpring(0.95, { damping: 10, stiffness: 400 });
-    };
-
-    const handlePressOut = () => {
-      scale.value = withSpring(1, { damping: 10, stiffness: 400 });
-    };
-
+  const OptionCard = ({ title, description, iconName, onPress }: { title: string; description: string; iconName: string; onPress: () => void }) => {
     return (
-      <AnimatedPressable
-        style={[styles.card, isTablet && styles.cardTablet, animatedStyle]}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
+      <Pressable
+        style={({ pressed }) => [styles.card, isTablet && styles.cardTablet, pressed && styles.cardPressed]}
         onPress={onPress}
       >
         <View style={styles.cardContent}>
-          <GradientIcon name={iconName} solid />
-          <Text style={styles.cardTitle}>{title}</Text>
+          <View style={styles.iconBox}>
+            <FontAwesome5 name={iconName} size={42} solid color="#FF6F79" />
+          </View>
+          <AikidText variant="heading" style={styles.cardTitle}>{title}</AikidText>
+          <AikidText variant="body" style={styles.cardDescription}>{description}</AikidText>
+          <View style={styles.cardAction}>
+            <AikidText variant="brand" style={styles.cardActionText}>Chọn hình thức này</AikidText>
+            <FontAwesome5 name="arrow-right" size={15} color="#FF5E97" />
+          </View>
         </View>
-      </AnimatedPressable>
+      </Pressable>
     );
   };
 
   return (
-    <ImageBackground
-      source={require('../../../public/lobby-assets/images/bg-art.png')}
-      style={styles.background}
-      resizeMode="cover"
+    <AikidPage
+      scene="comic"
+      title="Tạo truyện"
+      backHref="/(app)/comic"
+      container="wide"
+      scroll={false}
     >
-      <View style={{ paddingTop: insets.top }}>
-        <GlobalHeader />
-        <TouchableOpacity
-          style={styles.backBtnWrapper}
-          onPress={() => {
-            playPop();
-            if (router.canGoBack()) router.back();
-            else router.replace('/(app)/art');
-          }}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#FF9EB5', '#FF7597']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={styles.backBtnGradient}
-          >
-            <Ionicons name="arrow-back" size={16} color="#FFF" />
-            <Text style={styles.backBtnText}>Trở về</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
-      {/* Center Content */}
-      <View style={styles.container}>
-        <View style={[styles.cardsWrapper, isTablet && styles.cardsWrapperTablet]}>
-          <OptionCard
-            title="Truyện Chữ"
-            iconName="book"
-            onPress={() => handlePress('/(app)/comic/genre-v2')}
-          />
-          <OptionCard
-            title="Truyện Tranh"
-            iconName="book-open"
-            onPress={() => handlePress('coming_soon')}
-          />
+      <ScrollView style={styles.contentScroll} contentContainerStyle={styles.contentScrollInner} showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+          <View style={styles.intro}>
+            <AikidText variant="title" style={styles.introTitle}>Bắt đầu từ cốt truyện</AikidText>
+            <AikidText variant="body" style={styles.introDescription}>
+              Hoàn thiện ý tưởng nền trước, sau đó em có thể phát triển thành truyện chữ hoặc truyện tranh.
+            </AikidText>
+          </View>
+          <View style={[styles.cardsWrapper, isTablet && styles.cardsWrapperTablet]}>
+            <OptionCard
+              title="Tạo cốt truyện"
+              description="Chọn thể loại, nhân vật, bối cảnh và sự kiện chính để AI dựng cốt truyện."
+              iconName="map"
+              onPress={() => handlePress('/(app)/comic/genre-v2')}
+            />
+            <View style={styles.lockedColumn}>
+              <Pressable
+                disabled={!hasPlot}
+                onPress={() => handlePress('/(app)/comic/story-text')}
+                style={({ pressed }) => [styles.lockedCard, hasPlot && styles.unlockedCard, pressed && styles.cardPressed]}
+              >
+                <FontAwesome5 name="book" size={28} color="#A18D7F" />
+                <View style={styles.lockedCopy}>
+                  <AikidText variant="title" style={styles.lockedTitle}>Truyện chữ</AikidText>
+                  <AikidText variant="body" style={styles.lockedText}>{hasPlot ? 'Chọn cốt truyện và bắt đầu viết truyện ngắn.' : 'Mở sau khi hoàn thành cốt truyện.'}</AikidText>
+                </View>
+                <FontAwesome5 name={hasPlot ? 'arrow-right' : 'lock'} size={16} color={hasPlot ? '#FF5E97' : '#A18D7F'} />
+              </Pressable>
+              <Pressable
+                disabled={!hasPlot}
+                onPress={() => handlePress('/(app)/comic/story-comic')}
+                style={({ pressed }) => [styles.lockedCard, hasPlot && styles.unlockedCard, pressed && styles.cardPressed]}
+              >
+                <FontAwesome5 name="book-open" size={28} color={hasPlot ? '#FF6F79' : '#A18D7F'} />
+                <View style={styles.lockedCopy}>
+                  <AikidText variant="title" style={styles.lockedTitle}>Truyện tranh</AikidText>
+                  <AikidText variant="body" style={styles.lockedText}>{hasPlot ? 'Chọn cốt truyện hoặc truyện chữ để chia thành các panel.' : 'Mở sau khi hoàn thành cốt truyện.'}</AikidText>
+                </View>
+                <FontAwesome5 name={hasPlot ? 'arrow-right' : 'lock'} size={16} color={hasPlot ? '#FF5E97' : '#A18D7F'} />
+              </Pressable>
+            </View>
+          </View>
         </View>
-      </View>
-    </ImageBackground>
+      </ScrollView>
+    </AikidPage>
   );
 }
 
@@ -139,10 +120,34 @@ const styles = StyleSheet.create({
   },
   backBtnText: { marginLeft: 2, fontSize: 14, fontWeight: 'bold', color: '#FFF' },
   container: {
-    flex: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+  contentScroll: {
+    flex: 1,
+    width: '100%',
+  },
+  contentScrollInner: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  intro: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  introTitle: {
+    color: '#475569',
+    fontSize: 24,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  introDescription: {
+    color: '#6C7A91',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 5,
   },
   cardsWrapper: {
     flexDirection: 'column',
@@ -156,10 +161,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 50,
   },
+  lockedColumn: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 380,
+    gap: 14,
+  },
+  lockedCard: {
+    flex: 1,
+    minHeight: 145,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+    borderRadius: 26,
+    backgroundColor: 'rgba(253,250,244,0.88)',
+    padding: 20,
+  },
+  unlockedCard: {
+    borderColor: '#FFD5E1',
+    backgroundColor: '#FFF7F9',
+  },
+  lockedCopy: {
+    flex: 1,
+  },
+  lockedTitle: {
+    color: '#6C625B',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  lockedText: {
+    color: '#A18D7F',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 4,
+  },
   card: {
     width: '100%',
     maxWidth: 380,
-    aspectRatio: 1,
+    minHeight: 240,
     backgroundColor: '#FDFAF4',
     borderWidth: 10,
     borderColor: '#FFFFFF',
@@ -174,12 +215,27 @@ const styles = StyleSheet.create({
   },
   cardTablet: {
     flex: 1,
-    aspectRatio: 0.8,
+    minHeight: 320,
+  },
+  cardPressed: {
+    opacity: 0.86,
+    transform: [{ scale: 0.985 }],
   },
   cardContent: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 24,
+    gap: 14,
+  },
+  iconBox: {
+    width: 82,
+    height: 82,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF0F3',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   cardTitle: {
     fontWeight: '900',
@@ -188,5 +244,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  cardDescription: {
+    color: '#6C7A91',
+    fontSize: 14,
+    lineHeight: 21,
+    textAlign: 'center',
+    maxWidth: 280,
+  },
+  cardAction: {
+    width: '100%',
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 14,
+    backgroundColor: '#FFF0F3',
+    paddingHorizontal: 14,
+    marginTop: 6,
+  },
+  cardActionText: {
+    color: '#FF5E97',
+    fontSize: 12,
+    fontWeight: '900',
   },
 });

@@ -11,11 +11,14 @@ import { useProfile } from '@/features/account/api/accountHooks';
 import { AikidTheme } from './theme';
 import { AccountBottomSheet } from './AccountBottomSheet';
 
+import { useAikidTemplate } from '@/design-system';
+
 function AppHeader() {
   const { user, actor } = useAuth();
   const activeChild = useFamily((s) => s.getActiveChild());
   const { data: profileData } = useProfile();
   const [sheetVisible, setSheetVisible] = useState(false);
+  const template = useAikidTemplate();
 
   const isChild = actor === 'child' || !!activeChild;
   
@@ -32,7 +35,7 @@ function AppHeader() {
           justifyContent: 'space-between',
           paddingHorizontal: 20,
           paddingVertical: 12,
-          backgroundColor: 'rgba(253, 250, 244, 0.94)',
+          backgroundColor: template.colors.frame.paper,
           borderBottomWidth: 1,
           borderBottomColor: 'rgba(255, 92, 138, 0.12)',
           zIndex: 10,
@@ -44,10 +47,10 @@ function AppHeader() {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: '#FFF',
+            backgroundColor: template.colors.frame.white,
             padding: 6,
             paddingRight: 12,
-            borderRadius: 999,
+            borderRadius: template.radius.pill,
             shadowColor: '#4A3728',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.05,
@@ -64,35 +67,35 @@ function AppHeader() {
           <View style={{ marginLeft: 10, marginRight: 4 }}>
             <Text
               style={{
-                fontFamily: AikidTheme.fonts.bold,
+                fontFamily: template.fonts.headingBold,
                 fontSize: 14,
-                color: AikidTheme.colors.ink,
+                color: template.colors.text.heading,
               }}
               numberOfLines={1}
             >
               {displayName}
             </Text>
-            <Text style={{ fontSize: 11, color: AikidTheme.colors.inkMuted }}>
+            <Text style={{ fontFamily: template.fonts.bodyReg, fontSize: 11, color: template.colors.text.body }}>
               {isChild ? 'Thành viên' : 'Quản lý'}
             </Text>
           </View>
-          <Ionicons name="chevron-down" size={16} color={AikidTheme.colors.inkMuted} />
+          <Ionicons name="chevron-down" size={16} color={template.colors.text.body} />
         </Pressable>
 
         {/* RIGHT: Stats / Ví phụ huynh */}
         <View style={{ alignItems: 'flex-end' }}>
           <View
             style={{
-              backgroundColor: '#FFF',
+              backgroundColor: template.colors.frame.white,
               paddingHorizontal: 12,
               paddingVertical: 6,
-              borderRadius: 999,
+              borderRadius: template.radius.pill,
               borderWidth: 1,
               borderColor: 'rgba(255, 92, 138, 0.2)',
             }}
           >
-            <Text style={{ fontSize: 12, fontFamily: AikidTheme.fonts.bold, color: '#FF8E53' }}>
-              ✨ {profileData?.stats.imagesGenerated ?? 0} <Text style={{ fontFamily: AikidTheme.fonts.main, color: AikidTheme.colors.inkMuted }}>lượt</Text>
+            <Text style={{ fontSize: 12, fontFamily: template.fonts.headingBold, color: template.colors.brand.coral }}>
+              ✨ {profileData?.stats.imagesGenerated ?? 0} <Text style={{ fontFamily: template.fonts.bodyReg, color: template.colors.text.body }}>lượt</Text>
             </Text>
           </View>
         </View>

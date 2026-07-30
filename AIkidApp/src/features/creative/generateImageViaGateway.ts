@@ -18,6 +18,7 @@ export type CreativeGenerateInput = {
   /** Optional data-URL or already-public https ref */
   referenceDataUrl?: string | null;
   referenceHttpsUrl?: string | null;
+  referenceHttpsUrls?: string[];
   provider?: string;
   childProfileId?: string;
   ipId?: string;
@@ -37,9 +38,10 @@ export async function generateImageViaGateway(
     throw new Error('Cần mô tả / prompt để tạo ảnh');
   }
 
-  const refs: string[] = [];
+  const refs: string[] = (input.referenceHttpsUrls || [])
+    .filter((url) => url.startsWith('http'));
   if (input.referenceHttpsUrl?.startsWith('http')) {
-    refs.push(input.referenceHttpsUrl);
+    refs.unshift(input.referenceHttpsUrl);
   } else if (input.referenceDataUrl?.startsWith('data:')) {
     const publicUrl = await uploadDataUrlAsPublicRef(input.referenceDataUrl, {
       fileName: `aikid-ref-${Date.now()}.png`,
@@ -47,12 +49,13 @@ export async function generateImageViaGateway(
     });
     refs.push(publicUrl);
   }
+  const uniqueRefs = [...new Set(refs)];
 
   const jobId = await createImageJob({
     prompt,
     provider: input.provider,
     ipId: input.ipId,
-    referenceImageUrls: refs.length ? refs : undefined,
+    referenceImageUrls: uniqueRefs.length ? uniqueRefs : undefined,
     childProfileId: input.childProfileId,
   });
 

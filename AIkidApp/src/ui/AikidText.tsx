@@ -12,16 +12,16 @@ import { Text, type TextStyle, type StyleProp } from 'react-native';
 import { useAikidTemplate, type AikidTemplate } from '@/design-system';
 
 type TextVariant =
-  | 'heading'    // Fredoka Bold 28 — #334155 — Tên tính năng, tiêu đề màn hình
-  | 'title'      // Fredoka SemiBold 22 — #704E48 — Sub-heading, card title
-  | 'label'      // Fredoka Medium 16 — #334155 — Label, nav text
+  | 'heading'    // Chiron Bold 28 — #334155 — Tên tính năng, tiêu đề màn hình
+  | 'title'      // Chiron SemiBold 22 — #704E48 — Sub-heading, card title
+  | 'label'      // Chiron Medium 16 — #334155 — Label, nav text
   | 'body'       // Mali Regular 16 — #8C6F65 — Mô tả
   | 'bodyBold'   // Mali Bold 16 — #334155 — Nội dung nhấn
   | 'hint'       // Mali Regular 13 — #C3A69D — Placeholder text, đếm ký tự
-  | 'brand'      // Mali SemiBold 15 — #FF7597 — Chú ý, gợi ý, link
-  | 'white'      // Fredoka SemiBold 16 — #FFFFFF — Chữ trên button tối
-  | 'btnNav'     // Fredoka Bold 18 — #FFFFFF — Text trên button chuyển trang
-  | 'btnFeature' // Fredoka SemiBold 16 — #334155 — Text trên button tính năng
+  | 'brand'      // Mali SemiBold 15 — #FF5C8A — Chú ý, gợi ý, link
+  | 'white'      // Mali SemiBold 16 — #FFFFFF — Chữ trên button tối
+  | 'btnNav'     // Mali SemiBold 18 — #FFFFFF — Text trên button chuyển trang
+  | 'btnFeature' // Mali SemiBold 16 — #334155 — Text trên button tính năng
   | 'caption';   // Mali Regular 12 — #8C6F65 — Caption, timestamp
 
 function createVariantStyles(
@@ -73,20 +73,20 @@ function createVariantStyles(
     color: colors.text.brand,
   },
   white: {
-    fontFamily: fonts.headingSemi,
+    fontFamily: fonts.bodySemi,
     fontSize: 16,
     lineHeight: 22,
     color: colors.text.white,
   },
   btnNav: {
-    fontFamily: fonts.headingBold,
+    fontFamily: fonts.bodySemi,
     fontSize: 18,
     lineHeight: 24,
     color: colors.text.white,
     letterSpacing: 0.3,
   },
   btnFeature: {
-    fontFamily: fonts.headingSemi,
+    fontFamily: fonts.bodySemi,
     fontSize: 16,
     lineHeight: 22,
     color: colors.text.heading,

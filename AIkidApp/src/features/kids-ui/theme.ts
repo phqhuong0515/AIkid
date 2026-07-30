@@ -4,8 +4,10 @@
  * SOURCE: Design guide (Alkid.vn) — July 2026
  *
  * Font mapping:
- *   Heading/Title → Fredoka (700/600) — replaces Chiron GoRound TC
- *   Body          → Mali (400/500)
+ *   Heading       → Chiron GoRound TC (700/800)
+ *   Title         → Chiron GoRound TC (400/500/600)
+ *   Body          → Mali Regular
+ *   Button        → Mali SemiBold
  *
  * Color naming follows design guide sections:
  *   text.*   → Typography colors
@@ -19,14 +21,16 @@ import type { ViewStyle } from 'react-native';
 // ─── Typography ────────────────────────────────────────────────────────────────
 
 export const AikidFonts = {
-  /** Heading / Title — Fredoka Bold (replace Chiron GoRound TC 700-800) */
-  headingBold: 'Fredoka_700Bold',
+  /** Heading — Chiron GoRound TC 700 */
+  headingBold: 'ChironGoRoundTC_700Bold',
+  /** Strong heading — Chiron GoRound TC 800 */
+  headingExtra: 'ChironGoRoundTC_800ExtraBold',
   /** Sub-heading / Title medium */
-  headingSemi: 'Fredoka_600SemiBold',
+  headingSemi: 'ChironGoRoundTC_600SemiBold',
   /** Card label, nav label */
-  headingMed: 'Fredoka_500Medium',
+  headingMed: 'ChironGoRoundTC_500Medium',
   /** Heading regular */
-  headingReg: 'Fredoka_400Regular',
+  headingReg: 'ChironGoRoundTC_400Regular',
   /** Body text */
   bodyReg: 'Mali_400Regular',
   /** Body medium */
@@ -51,8 +55,8 @@ export const AikidTextColors = {
   placeholder: '#C3A69D',
   /** #FFFFFF — Chữ trên button chuyển giữa các trang */
   white: '#FFFFFF',
-  /** #FF7597 — Chữ trong các thẻ mang tính chất chú ý / gợi ý */
-  brand: '#FF7597',
+  /** #FF5C8A — Chữ trong các thẻ mang tính chất chú ý / gợi ý */
+  brand: '#FF5C8A',
 } as const;
 
 // ─── Frame / Element Colors ────────────────────────────────────────────────────
@@ -110,6 +114,8 @@ export const AikidButtonGradients = {
   delete: ['#F06060', '#E84040'] as const,
   /** Button chuyển trang (icon) — Hồng tròn */
   navIcon: ['#FF9EB5', '#FF7597'] as const,
+  /** Icon button alias */
+  icon: ['#FF9EB5', '#FF7597'] as const,
 } as const;
 
 // ─── Border Radius ─────────────────────────────────────────────────────────────
@@ -145,6 +151,43 @@ export const AikidSpacing = {
   '2xl': 32,
   '3xl': 40,
   '4xl': 48,
+} as const;
+
+// ─── Shared component geometry ───────────────────────────────────────────────
+// Components and pages consume these values instead of inventing local sizes.
+
+export const AikidMetrics = {
+  controlHeight: {
+    sm: 40,
+    md: 48,
+    lg: 56,
+  },
+  iconButtonSize: {
+    sm: 40,
+    md: 48,
+    lg: 56,
+  },
+  controlPaddingX: {
+    sm: 16,
+    md: 22,
+    lg: 28,
+  },
+  borderWidth: {
+    control: 2,
+    card: 4,
+    panel: 6,
+  },
+  cardPadding: {
+    compact: 16,
+    regular: 24,
+  },
+  modalWidth: {
+    sm: 400,
+    md: 560,
+    lg: 760,
+  },
+  modalPadding: 24,
+  minTouchTarget: 44,
 } as const;
 
 // ─── Shadows ───────────────────────────────────────────────────────────────────
@@ -235,4 +278,5 @@ export const AikidTheme = {
   radius: AikidRadius,
   shadow: AikidShadows,
   spacing: AikidSpacing,
+  metrics: AikidMetrics,
 } as const;

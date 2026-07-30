@@ -28,7 +28,6 @@ import React from 'react';
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   Pressable,
@@ -40,9 +39,13 @@ import {
   AikidShadows,
   AikidTextColors,
   AikidFonts,
+  AikidMetrics,
 } from '@/features/kids-ui/theme';
+import { AikidText } from './AikidText';
+import { AikidIcon } from './AikidIcon';
 
 type ModalPosition = 'bottom' | 'center';
+type ModalSize = 'sm' | 'md' | 'lg';
 
 type AikidModalProps = {
   isOpen: boolean;
@@ -54,6 +57,8 @@ type AikidModalProps = {
   position?: ModalPosition;
   /** Max width for center/large screen (default 560) */
   maxWidth?: number;
+  /** Shared modal width token. Ignored when maxWidth is provided. */
+  size?: ModalSize;
   /** Remove default card padding */
   noPadding?: boolean;
   children: React.ReactNode;
@@ -65,12 +70,14 @@ export function AikidModal({
   title,
   subtitle,
   position = 'bottom',
-  maxWidth = 560,
+  maxWidth,
+  size = 'md',
   noPadding = false,
   children,
 }: AikidModalProps) {
   const insets = useSafeAreaInsets();
   const isBottom = position === 'bottom';
+  const resolvedMaxWidth = maxWidth ?? AikidMetrics.modalWidth[size];
 
   return (
     <Modal
@@ -97,8 +104,8 @@ export function AikidModal({
           style={[
             styles.card,
             isBottom ? styles.cardBottom : styles.cardCenter,
-            { paddingBottom: Math.max(insets.bottom, 20) },
-            { maxWidth },
+            { paddingBottom: Math.max(insets.bottom, AikidMetrics.modalPadding) },
+            { maxWidth: resolvedMaxWidth },
             !noPadding && styles.cardPadding,
           ]}
         >
@@ -112,10 +119,10 @@ export function AikidModal({
             <View style={styles.header}>
               <View style={styles.headerText}>
                 {title && (
-                  <Text style={styles.titleText}>{title}</Text>
+                  <AikidText variant="title" style={styles.titleText}>{title}</AikidText>
                 )}
                 {subtitle && (
-                  <Text style={styles.subtitleText}>{subtitle}</Text>
+                  <AikidText variant="body" style={styles.subtitleText}>{subtitle}</AikidText>
                 )}
               </View>
               <TouchableOpacity
@@ -123,7 +130,7 @@ export function AikidModal({
                 style={styles.closeBtn}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text style={styles.closeBtnText}>×</Text>
+                <AikidIcon name="close" size={20} color={AikidTextColors.body} />
               </TouchableOpacity>
             </View>
           )}
@@ -171,18 +178,18 @@ const styles = StyleSheet.create({
   cardBottom: {
     borderTopLeftRadius: AikidRadius.cardLg,
     borderTopRightRadius: AikidRadius.cardLg,
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-    borderRightWidth: 4,
+    borderTopWidth: AikidMetrics.borderWidth.panel,
+    borderLeftWidth: AikidMetrics.borderWidth.panel,
+    borderRightWidth: AikidMetrics.borderWidth.panel,
     borderColor: AikidFrameColors.white,
   },
   cardCenter: {
     borderRadius: AikidRadius.cardLg,
-    borderWidth: 6,
+    borderWidth: AikidMetrics.borderWidth.panel,
     borderColor: AikidFrameColors.white,
   },
   cardPadding: {
-    paddingHorizontal: 24,
+    paddingHorizontal: AikidMetrics.modalPadding,
     paddingTop: 8,
   },
   dragHandle: {
@@ -218,17 +225,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   closeBtn: {
-    width: 36,
-    height: 36,
+    width: AikidMetrics.minTouchTarget,
+    height: AikidMetrics.minTouchTarget,
     borderRadius: AikidRadius.pill,
     backgroundColor: '#F0ECE6',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  closeBtnText: {
-    fontSize: 22,
-    lineHeight: 28,
-    color: AikidTextColors.body,
-    fontWeight: '400',
   },
 });

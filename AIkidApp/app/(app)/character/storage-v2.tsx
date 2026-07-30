@@ -1,34 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View, Text, ImageBackground, StyleSheet, TouchableOpacity, ScrollView,
-  TextInput, Pressable, Image, Modal, useWindowDimensions,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView,
+  TextInput, Image, useWindowDimensions,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { GlobalHeader } from '@/components/GlobalHeader';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 import { usePopSound } from '@/hooks/usePopSound';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+import { AikidButton, AikidIcon, AikidModal, AikidPage, AikidPanel, AikidText } from '@/ui';
+import { useCharacterDraft } from '@/features/character';
 
 // ─── Seed Data ─────────────────────────────────────────────────────────────────
-const SEED_CHARS = [
-  { id: '1', name: 'Yuu', age: 10, dob: '01/01', gender: 'Nam', bio: 'Bé Yuu năng động, thích khám phá thế giới xung quanh.', avatar: null },
-  { id: '2', name: 'Nori', age: 8, dob: '15/05', gender: 'Nữ', bio: 'Nori rất thích vẽ tranh và nghe nhạc.', avatar: null },
-  { id: '3', name: 'Bông', age: 5, dob: '20/10', gender: 'Nữ', bio: 'Bé Bông đáng yêu, thích ăn kẹo.', avatar: null },
+type UiCharacter = {
+  id: string;
+  name: string;
+  species: string;
+  age: number;
+  dob: string;
+  gender: string;
+  bio: string;
+  avatar: string | null;
+};
+
+const SEED_CHARS: UiCharacter[] = [
+  { id: '1', name: 'Yuu', species: 'Nhân vật phiêu lưu', age: 10, dob: '01/01', gender: 'Nam', bio: 'Bé Yuu năng động, thích khám phá thế giới xung quanh.', avatar: null },
+  { id: '2', name: 'Nori', species: 'Nhân vật nghệ sĩ', age: 8, dob: '15/05', gender: 'Nữ', bio: 'Nori rất thích vẽ tranh và nghe nhạc.', avatar: null },
+  { id: '3', name: 'Bông', species: 'Nhân vật đáng yêu', age: 5, dob: '20/10', gender: 'Nữ', bio: 'Bé Bông đáng yêu, thích ăn kẹo.', avatar: null },
 ];
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function StorageV2() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { playPop } = usePopSound();
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
+  const savedCharacters = useCharacterDraft((state) => state.saved);
+  const hydrateCharacters = useCharacterDraft((state) => state.hydrate);
+  const removeSavedCharacter = useCharacterDraft((state) => state.removeSaved);
 
-  const [characters, setCharacters] = useState(SEED_CHARS);
+  const [characters, setCharacters] = useState<UiCharacter[]>(SEED_CHARS);
   const [activeCharId, setActiveCharId] = useState(SEED_CHARS[0].id);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOption, setFilterOption] = useState('Tất cả');
@@ -38,6 +49,26 @@ export default function StorageV2() {
   const [toastMessage, setToastMessage] = useState('');
   // Mobile tab state
   const [activeTab, setActiveTab] = useState<'detail' | 'list'>('detail');
+
+  useEffect(() => {
+    void hydrateCharacters();
+  }, [hydrateCharacters]);
+
+  useEffect(() => {
+    if (!savedCharacters.length) return;
+    const mapped: UiCharacter[] = savedCharacters.map((character) => ({
+      id: character.id,
+      name: character.name,
+      species: character.species || '',
+      age: Number(character.age) || 0,
+      dob: character.birthday || '01/01',
+      gender: character.gender || 'Khác',
+      bio: character.description || '',
+      avatar: character.avatarUri || null,
+    }));
+    setCharacters(mapped);
+    setActiveCharId((current) => mapped.some((character) => character.id === current) ? current : mapped[0].id);
+  }, [savedCharacters]);
 
   const activeChar = characters.find(c => c.id === activeCharId) || characters[0];
 
@@ -56,10 +87,46 @@ export default function StorageV2() {
 
   const handleSave = () => { playPop(); showToast('Lưu thành công! ✨'); };
 
+  const handlePickAvatar = async () => {
+    playPop();
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.9,
+    });
+    const uri = !result.canceled ? result.assets[0]?.uri : null;
+    if (uri) {
+      updateActiveChar('avatar', uri);
+      showToast('Đã cập nhật ảnh nhân vật');
+    }
+  };
+
+  const changeBirthdayDay = (delta: number) => {
+    const [dayRaw, monthRaw] = String(activeChar?.dob || '01/01').split('/');
+    const month = Math.min(12, Math.max(1, Number(monthRaw) || 1));
+    const maxDay = new Date(2024, month, 0).getDate();
+    const day = Math.min(maxDay, Math.max(1, (Number(dayRaw) || 1) + delta));
+    updateActiveChar('dob', `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`);
+    playPop();
+  };
+
+  const handleAddCharacter = () => {
+    playPop();
+    const id = `character-${Date.now()}`;
+    setCharacters((current) => [
+      ...current,
+      { id, name: 'Nhân vật mới', species: '', age: 7, dob: '01/01', gender: 'Khác', bio: '', avatar: null },
+    ]);
+    setActiveCharId(id);
+    setActiveTab('detail');
+  };
+
   const handleDeleteConfirm = () => {
     playPop();
     const newChars = characters.filter(c => c.id !== activeCharId);
     setCharacters(newChars);
+    if (savedCharacters.some((character) => character.id === activeCharId)) {
+      void removeSavedCharacter(activeCharId);
+    }
     if (newChars.length > 0) setActiveCharId(newChars[0].id);
     setShowDeleteModal(false);
     showToast('Đã xóa nhân vật');
@@ -72,21 +139,6 @@ export default function StorageV2() {
     return filtered;
   };
 
-  // Animated buttons
-  const useButtonAnimation = () => {
-    const scale = useSharedValue(1);
-    return {
-      style: useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] })),
-      onPressIn: () => { scale.value = withSpring(0.92); },
-      onPressOut: () => { scale.value = withSpring(1); },
-    };
-  };
-  const btnDownload = useButtonAnimation();
-  const btnGallery  = useButtonAnimation();
-  const btnProfile  = useButtonAnimation();
-  const btnEdit     = useButtonAnimation();
-  const btnDelete   = useButtonAnimation();
-
   // ─── Sub-components ──────────────────────────────────────────────────────────
 
   const DetailContent = () => (
@@ -96,7 +148,7 @@ export default function StorageV2() {
         <View style={styles.avatarRow}>
           <View style={styles.avatarBox}>
             {activeChar?.avatar
-              ? <Image source={{ uri: activeChar.avatar }} style={styles.avatarImg} />
+              ? <Image source={{ uri: activeChar.avatar }} style={styles.avatarImg} resizeMode="contain" />
               : <Ionicons name="person" size={isTablet ? 80 : 56} color="#FFB6C1" />
             }
           </View>
@@ -113,6 +165,17 @@ export default function StorageV2() {
             />
             <Ionicons name="pencil" size={18} color="#8A7463" style={styles.inputIcon} />
           </View>
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Loài / kiểu nhân vật</Text>
+          <TextInput
+            style={styles.input}
+            value={activeChar?.species}
+            onChangeText={t => updateActiveChar('species', t)}
+            placeholder="Ví dụ: mèo phi hành gia"
+            placeholderTextColor="#A3A3A3"
+          />
         </View>
 
         {/* Age + DOB */}
@@ -138,9 +201,9 @@ export default function StorageV2() {
           <View style={[styles.formGroup, { flex: 1 }]}>
             <Text style={styles.label}>Ngày sinh</Text>
             <View style={styles.datePickerBox}>
-              <TouchableOpacity onPress={() => playPop()}><Ionicons name="remove-circle" size={22} color="#FF9EB5" /></TouchableOpacity>
+              <TouchableOpacity onPress={() => changeBirthdayDay(-1)}><Ionicons name="remove-circle" size={22} color="#FF9EB5" /></TouchableOpacity>
               <Text style={styles.pickerText}>{activeChar?.dob}</Text>
-              <TouchableOpacity onPress={() => playPop()}><Ionicons name="add-circle" size={22} color="#FF9EB5" /></TouchableOpacity>
+              <TouchableOpacity onPress={() => changeBirthdayDay(1)}><Ionicons name="add-circle" size={22} color="#FF9EB5" /></TouchableOpacity>
             </View>
           </View>
         </View>
@@ -165,21 +228,21 @@ export default function StorageV2() {
 
         {/* Actions */}
         <View style={styles.detailActions}>
-          <AnimatedPressable {...btnDownload} onPress={handleSave} style={[styles.btnAction, { backgroundColor: '#48BB78' }, btnDownload.style]}>
-            <Ionicons name="download" size={20} color="#FFF" />
-          </AnimatedPressable>
-          <AnimatedPressable {...btnGallery} onPress={() => playPop()} style={[styles.btnAction, { backgroundColor: '#B794F4' }, btnGallery.style]}>
-            <Ionicons name="images" size={20} color="#FFF" />
-          </AnimatedPressable>
-          <AnimatedPressable {...btnProfile} onPress={() => playPop()} style={[styles.btnAction, { backgroundColor: '#4299E1' }, btnProfile.style]}>
-            <Ionicons name="person" size={20} color="#FFF" />
-          </AnimatedPressable>
-          <AnimatedPressable {...btnEdit} onPress={() => playPop()} style={[styles.btnAction, { backgroundColor: '#ED8936' }, btnEdit.style]}>
-            <Ionicons name="pencil" size={20} color="#FFF" />
-          </AnimatedPressable>
-          <AnimatedPressable {...btnDelete} onPress={() => { playPop(); setShowDeleteModal(true); }} style={[styles.btnAction, { backgroundColor: '#E53E3E' }, btnDelete.style]}>
-            <Ionicons name="trash" size={20} color="#FFF" />
-          </AnimatedPressable>
+          <AikidButton variant="encourage" size="sm" onPress={handleSave} leftIcon={<AikidIcon name="save" size={18} color="#FFF" />}>
+            Lưu
+          </AikidButton>
+          <AikidButton variant="feature" size="sm" onPress={() => void handlePickAvatar()} leftIcon={<AikidIcon name="image" size={18} />}>
+            Ảnh
+          </AikidButton>
+          <AikidButton variant="feature" size="sm" onPress={() => router.push('/(app)/account')} leftIcon={<AikidIcon name="person" size={18} />}>
+            Hồ sơ
+          </AikidButton>
+          <AikidButton variant="feature" size="sm" onPress={() => showToast('Các trường đã sẵn sàng để chỉnh sửa')} leftIcon={<AikidIcon name="pencil" size={18} />}>
+            Sửa
+          </AikidButton>
+          <AikidButton variant="delete" size="sm" onPress={() => { playPop(); setShowDeleteModal(true); }} leftIcon={<AikidIcon name="trash" size={18} color="#FFF" />}>
+            Xóa
+          </AikidButton>
         </View>
       </View>
     </ScrollView>
@@ -216,20 +279,22 @@ export default function StorageV2() {
 
         {/* Grid */}
         <View style={styles.characterGrid}>
-          <TouchableOpacity style={[styles.charCard, styles.addNewCard, { width: cardW, height: cardW + 24 }]} onPress={() => playPop()}>
+          <TouchableOpacity style={[styles.charCard, styles.addNewCard, { width: cardW, height: cardW + 38 }]} onPress={handleAddCharacter}>
             <Ionicons name="add" size={42} color="#C8B5A7" />
+            <Text style={styles.addNewText}>Tạo nhân vật mới</Text>
           </TouchableOpacity>
           {getFilteredChars().map((char, i) => {
             const isActive = char.id === activeCharId;
             return (
-              <TouchableOpacity key={char.id} style={[styles.charCard, isActive && styles.charCardActive, { width: cardW, height: cardW + 24 }]} onPress={() => { playPop(); setActiveCharId(char.id); if (!isTablet) setActiveTab('detail'); }}>
+              <TouchableOpacity key={char.id} style={[styles.charCard, isActive && styles.charCardActive, { width: cardW, height: cardW + 38 }]} onPress={() => { playPop(); setActiveCharId(char.id); if (!isTablet) setActiveTab('detail'); }}>
                 <View style={[styles.charPlaceholder, isActive && { backgroundColor: 'transparent' }]}>
                   {char.avatar
-                    ? <Image source={{ uri: char.avatar }} style={styles.charAvatar} />
+                    ? <Image source={{ uri: char.avatar }} style={styles.charAvatar} resizeMode="contain" />
                     : <Ionicons name="happy" size={isTablet ? 50 : 40} color={['#FFB6C1', '#87CEFA', '#98FB98', '#FFD700'][i % 4]} />
                   }
                 </View>
                 <Text style={[styles.charName, isActive && { color: '#FF5E97' }]} numberOfLines={1}>{char.name}</Text>
+                {isActive ? <Text style={styles.selectedText}>ĐANG CHỌN</Text> : null}
               </TouchableOpacity>
             );
           })}
@@ -240,60 +305,32 @@ export default function StorageV2() {
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <ImageBackground
-      source={require('../../../public/lobby-assets/images/bg-character-feature.png')}
-      style={styles.background}
-      resizeMode="cover"
+    <AikidPage
+      scene="character"
+      title="Nhân vật của bé"
+      backHref="/(app)/character"
+      container="wide"
+      scroll={false}
     >
-      {/* Header */}
-      <View style={{ paddingTop: insets.top }}>
-        <GlobalHeader />
-        <TouchableOpacity
-          style={styles.backBtnWrapper}
-          onPress={() => {
-            playPop();
-            if (router.canGoBack()) router.back();
-            else router.replace('/(app)/character');
-          }}
-        >
-          <LinearGradient colors={['#FF9EB5', '#FF7597']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.backBtnGradient}>
-            <Ionicons name="arrow-back" size={16} color="#FFF" />
-            <Text style={styles.backBtnText}>Trở về</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-
       {isTablet ? (
         /* ════ TABLET: 2 panel ngang ════ */
-        <View style={[styles.workspaceWrapper, { paddingBottom: insets.bottom + 16 }]}>
+        <View style={styles.workspaceWrapper}>
           <View style={styles.workspaceContainer}>
 
             {/* Panel Detail */}
-            <View style={[styles.panel, { flex: 1.4 }]}>
-              <View style={styles.panelHeader}>
-                <View style={styles.panelTitle}>
-                  <Ionicons name="information-circle" size={26} color="#FF5E97" />
-                  <Text style={styles.titleText}>Thông tin nhân vật</Text>
-                </View>
-              </View>
+            <AikidPanel title="Thông tin nhân vật" icon="info" style={[styles.panel, { flex: 1.4 }]}>
               <DetailContent />
-            </View>
+            </AikidPanel>
 
             {/* Panel List */}
-            <View style={[styles.panel, { flex: 1 }]}>
-              <View style={styles.panelHeader}>
-                <View style={styles.panelTitle}>
-                  <Ionicons name="grid" size={26} color="#FF5E97" />
-                  <Text style={styles.titleText}>Danh sách</Text>
-                </View>
-              </View>
+            <AikidPanel title="Danh sách" icon="grid" style={[styles.panel, { flex: 1 }]}>
               <ListContent />
-            </View>
+            </AikidPanel>
           </View>
         </View>
       ) : (
         /* ════ MOBILE: Tab-based single column ════ */
-        <View style={{ flex: 1, paddingBottom: insets.bottom + 8 }}>
+        <View style={{ flex: 1 }}>
           {/* Tab Bar */}
           <View style={styles.tabBar}>
             {[
@@ -324,60 +361,44 @@ export default function StorageV2() {
       )}
 
       {/* Delete Modal */}
-      <Modal visible={showDeleteModal} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Xóa nhân vật?</Text>
-            <Text style={styles.modalDesc}>Bạn có chắc chắn muốn xóa nhân vật này không?</Text>
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#E2E8F0' }]} onPress={() => setShowDeleteModal(false)}>
-                <Text style={[styles.btnText, { color: '#4A5568' }]}>Hủy</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#E53E3E' }]} onPress={handleDeleteConfirm}>
-                <Text style={styles.btnText}>Xóa</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+      <AikidModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        position="center"
+        size="sm"
+        title="Xóa nhân vật?"
+      >
+        <AikidText variant="body" style={styles.modalDesc}>
+          Bạn có chắc chắn muốn xóa nhân vật này không?
+        </AikidText>
+        <View style={styles.modalActions}>
+          <AikidButton variant="feature" fullWidth onPress={() => setShowDeleteModal(false)}>
+            Hủy
+          </AikidButton>
+          <AikidButton variant="delete" fullWidth onPress={handleDeleteConfirm}>
+            Xóa
+          </AikidButton>
         </View>
-      </Modal>
+      </AikidModal>
 
       {/* Toast */}
       <Animated.View style={[styles.toastContainer, toastStyle]}>
         <Ionicons name="checkmark-circle" size={22} color="#48BB78" />
         <Text style={styles.toastText}>{toastMessage}</Text>
       </Animated.View>
-    </ImageBackground>
+    </AikidPage>
   );
 }
 
 // ─── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  background: { flex: 1, backgroundColor: '#fad698' },
-
-  // Back button
-  backBtnWrapper: {
-    alignSelf: 'flex-start', marginLeft: 18, marginTop: 6,
-    shadowColor: '#FF7597', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.28, shadowRadius: 8,
-  },
-  backBtnGradient: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 8, borderRadius: 9999 },
-  backBtnText: { marginLeft: 6, fontSize: 14, fontWeight: 'bold', color: '#FFF' },
-
   // ── Tablet layout ──
-  workspaceWrapper: { flex: 1, paddingHorizontal: 18, paddingTop: 8 },
+  workspaceWrapper: { flex: 1 },
   workspaceContainer: { flex: 1, flexDirection: 'row', gap: 16 },
 
   panel: {
-    backgroundColor: '#FDFAF4', borderRadius: 32, padding: 20,
-    borderWidth: 6, borderColor: '#FFFFFF',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.07, shadowRadius: 20, elevation: 6,
+    minWidth: 0,
   },
-  panelHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    borderBottomWidth: 2, borderBottomColor: '#EBDCD0', borderStyle: 'dashed',
-    paddingBottom: 12, marginBottom: 16,
-  },
-  panelTitle: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  titleText: { fontSize: 20, fontWeight: '900', color: '#475569' },
 
   // ── Mobile layout ──
   tabBar: {
@@ -400,7 +421,7 @@ const styles = StyleSheet.create({
   // Avatar
   avatarRow: { alignItems: 'center', marginBottom: 16 },
   avatarBox: {
-    width: 100, height: 100, borderRadius: 28, backgroundColor: '#FFF0F5',
+    width: 124, height: 124, borderRadius: 30, backgroundColor: '#FFF8F2',
     borderWidth: 4, borderColor: '#FFF', justifyContent: 'center', alignItems: 'center',
     shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 16, elevation: 3,
   },
@@ -442,11 +463,7 @@ const styles = StyleSheet.create({
   textArea: { height: 80, textAlignVertical: 'top' },
 
   // Action buttons
-  detailActions: { flexDirection: 'row', gap: 10, justifyContent: 'center', marginTop: 16 },
-  btnAction: {
-    width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 2,
-  },
+  detailActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 16 },
 
   // Search
   searchBox: {
@@ -472,22 +489,28 @@ const styles = StyleSheet.create({
   characterGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   charCard: {
     backgroundColor: '#FFF', borderRadius: 20, borderWidth: 4, borderColor: '#FFF',
-    alignItems: 'center', paddingTop: 10,
+    alignItems: 'center', padding: 8,
     shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.03, shadowRadius: 10, elevation: 1,
   },
   charCardActive: { borderColor: '#FF5E97', backgroundColor: '#FFF5F7' },
-  charName: { marginTop: 6, fontWeight: '700', color: '#475569', fontSize: 13 },
-  addNewCard: { backgroundColor: 'transparent', borderColor: '#C8B5A7', borderStyle: 'dashed', justifyContent: 'center', paddingTop: 0 },
-  charPlaceholder: { width: 70, height: 70, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F7FAFC', borderRadius: 18 },
-  charAvatar: { width: '100%', height: '100%', borderRadius: 18 },
+  charName: { marginTop: 7, fontWeight: '800', color: '#475569', fontSize: 13, textAlign: 'center' },
+  selectedText: { color: '#FF5E97', fontSize: 9, fontWeight: '900', letterSpacing: 0.5, marginTop: 2 },
+  addNewCard: { backgroundColor: '#FFFDF9', borderColor: '#C8B5A7', borderStyle: 'dashed', justifyContent: 'center' },
+  addNewText: { color: '#8A7463', fontSize: 11, fontWeight: '800', textAlign: 'center', marginTop: 6 },
+  charPlaceholder: {
+    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    backgroundColor: '#F7FAFC',
+    borderRadius: 16,
+  },
+  charAvatar: { width: '100%', height: '100%' },
 
   // Modal
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: 300, backgroundColor: '#FDFAF4', borderRadius: 24, padding: 22, alignItems: 'center', borderWidth: 4, borderColor: '#FFF' },
-  modalTitle: { fontSize: 18, fontWeight: '800', color: '#2D3748', marginBottom: 8 },
-  modalDesc: { fontSize: 14, color: '#718096', textAlign: 'center', marginBottom: 18 },
+  modalDesc: { textAlign: 'center', marginBottom: 20 },
   modalActions: { flexDirection: 'row', gap: 10, width: '100%' },
-  modalBtn: { flex: 1, paddingVertical: 11, borderRadius: 14, alignItems: 'center' },
   btnText: { color: '#FFF', fontWeight: '700', fontSize: 14 },
 
   // Toast

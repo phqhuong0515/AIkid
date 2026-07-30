@@ -4,6 +4,7 @@ import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AikidTheme } from '@/features/kids-ui/theme';
 import { DrawTool } from './SkiaCanvasTypes';
+import { AikidIcon, type AikidIconName } from '@/ui/AikidIcon';
 
 export type DrawingToolbarProps = {
   tool: DrawTool;
@@ -14,15 +15,16 @@ export type DrawingToolbarProps = {
   onStrokeWidthChange: (w: number) => void;
   activeStamp: string;
   onStampChange: (s: string) => void;
+  orientation?: 'horizontal' | 'vertical';
 };
 
 const COLORS = ['#000000','#FFFFFF','#FF0000','#FF8C00','#FFD700','#00AA00','#0066CC','#9933CC','#FF69B4','#8B4513'];
 const STAMPS = ['⭐','🌸','🦋','🌈','❤️','🐱','🐶','🌺','🎵','🏆','🌙','🍀','🦄','🐠','🎨'];
-const TOOLS: { id: DrawTool; icon: string; label: string }[] = [
-  { id: 'brush', icon: '🖌️', label: 'Cọ' },
-  { id: 'pencil', icon: '✏️', label: 'Chì' },
-  { id: 'eraser', icon: '📦', label: 'Xóa' }, // Using box emoji as a placeholder for eraser since the instruction had 📦
-  { id: 'stamp', icon: '🌠', label: 'Dấu' },
+const TOOLS: { id: DrawTool; icon: AikidIconName; label: string }[] = [
+  { id: 'brush', icon: 'brush', label: 'Cọ' },
+  { id: 'pencil', icon: 'pencil', label: 'Chì' },
+  { id: 'eraser', icon: 'eraser', label: 'Tẩy' },
+  { id: 'stamp', icon: 'stamp', label: 'Dấu' },
 ];
 
 export function DrawingToolbar({
@@ -34,32 +36,39 @@ export function DrawingToolbar({
   onStrokeWidthChange,
   activeStamp,
   onStampChange,
+  orientation = 'vertical',
 }: DrawingToolbarProps) {
+  const horizontal = orientation === 'horizontal';
   return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+    <View style={[styles.container, horizontal && styles.containerHorizontal]}>
+      <ScrollView
+        horizontal={horizontal}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scrollContent, horizontal && styles.scrollContentHorizontal]}
+      >
         {/* Tools */}
-        <View style={styles.section}>
+        <View style={[styles.section, horizontal && styles.sectionHorizontal]}>
           {TOOLS.map((t) => (
             <TouchableOpacity key={t.id} onPress={() => onToolChange(t.id)} style={styles.toolBtnContainer}>
               {tool === t.id ? (
                 <LinearGradient colors={['#FF5C8A', '#FF8E53']} style={[styles.activeToolBg, { borderRadius: 12 }]}>
-                  <Text style={styles.toolIcon}>{t.icon}</Text>
+                  <AikidIcon name={t.icon} size={22} color="#FFFFFF" />
                 </LinearGradient>
               ) : (
                 <View style={styles.inactiveToolBg}>
-                  <Text style={styles.toolIcon}>{t.icon}</Text>
+                  <AikidIcon name={t.icon} size={22} color="#334155" />
                 </View>
               )}
             </TouchableOpacity>
           ))}
         </View>
 
-        <View style={styles.divider} />
+        <View style={[styles.divider, horizontal && styles.dividerHorizontal]} />
 
         {/* Colors (only if not eraser/stamp) */}
         {(tool === 'brush' || tool === 'pencil') && (
-          <View style={styles.section}>
+          <View style={[styles.section, horizontal && styles.sectionHorizontal]}>
             {COLORS.map((c) => (
               <TouchableOpacity
                 key={c}
@@ -75,7 +84,7 @@ export function DrawingToolbar({
 
         {/* Stamps (only if stamp) */}
         {tool === 'stamp' && (
-          <View style={styles.section}>
+          <View style={[styles.section, horizontal && styles.sectionHorizontal]}>
             {STAMPS.map((s) => (
               <TouchableOpacity
                 key={s}
@@ -88,10 +97,10 @@ export function DrawingToolbar({
           </View>
         )}
 
-        <View style={styles.divider} />
+        {!horizontal && <View style={styles.divider} />}
 
         {/* Stroke Width */}
-        {(tool === 'brush' || tool === 'pencil' || tool === 'eraser') && (
+        {!horizontal && (tool === 'brush' || tool === 'pencil' || tool === 'eraser') && (
           <View style={styles.sliderSection}>
             <Text style={styles.sliderLabel}>Cỡ nét</Text>
             <Slider
@@ -115,27 +124,41 @@ export function DrawingToolbar({
 
 const styles = StyleSheet.create({
   container: {
-    width: 60,
-    backgroundColor: '#FFFBEB',
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-    paddingVertical: 12,
+    width: 64,
+    backgroundColor: '#FDFAFA',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#EBDCD0',
+    paddingVertical: 10,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
-    maxHeight: 500,
+    maxHeight: 560,
+  },
+  containerHorizontal: {
+    width: '100%',
+    maxHeight: 68,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 18,
   },
   scrollContent: {
     alignItems: 'center',
     gap: 12,
   },
+  scrollContentHorizontal: {
+    flexDirection: 'row',
+    paddingRight: 8,
+  },
   section: {
     alignItems: 'center',
     gap: 8,
+  },
+  sectionHorizontal: {
+    flexDirection: 'row',
   },
   toolBtnContainer: {
     width: 44,
@@ -157,14 +180,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
-  toolIcon: {
-    fontSize: 20,
-  },
   divider: {
     width: 32,
     height: 1,
     backgroundColor: '#E5E7EB',
     marginVertical: 4,
+  },
+  dividerHorizontal: {
+    width: 1,
+    height: 32,
+    marginHorizontal: 4,
+    marginVertical: 0,
   },
   colorBtn: {
     width: 32,

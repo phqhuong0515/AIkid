@@ -6,6 +6,8 @@ import type { ComicCharacter, ComicPanel, PanelCount } from '../store/useComicDr
 
 type LlmPanel = {
   action?: unknown;
+  title?: unknown;
+  summary?: unknown;
   speaker?: unknown;
   dialogue?: unknown;
 };
@@ -21,16 +23,20 @@ function parseRelaxedJson(raw: string): unknown {
 
 function normalizePanels(raw: unknown, pageId: string, count: PanelCount): ComicPanel[] {
   const root = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
-  const source = Array.isArray(root.panels) ? root.panels : Array.isArray(root.scenes) ? root.scenes : [];
-  if (!source.length) throw new Error('Kịch bản AI không có panels');
+  const source = Array.isArray(root.beats) ? root.beats : Array.isArray(root.panels) ? root.panels : Array.isArray(root.scenes) ? root.scenes : [];
+  if (!source.length) throw new Error('AI chưa trả về khung cốt truyện');
   return Array.from({ length: count }, (_, index) => {
     const value = source[index] && typeof source[index] === 'object' ? source[index] as LlmPanel : {};
+    const beatTitle = typeof value.title === 'string' ? value.title.trim() : '';
+    const beatSummary = typeof value.summary === 'string'
+      ? value.summary.trim()
+      : typeof value.action === 'string' ? value.action.trim() : '';
     return {
       id: `${pageId}-panel-${index + 1}`,
       order: index + 1,
-      action: typeof value.action === 'string' ? value.action.trim() : '',
-      speaker: typeof value.speaker === 'string' ? value.speaker.trim() : '',
-      dialogue: typeof value.dialogue === 'string' ? value.dialogue.trim() : '',
+      action: beatTitle ? `${beatTitle}: ${beatSummary}` : beatSummary,
+      speaker: '',
+      dialogue: '',
       status: 'draft',
       jobId: null,
       imageUrl: null,
@@ -46,6 +52,7 @@ export async function generateComicScriptViaGateway(input: {
   panelCount: PanelCount;
   cast: ComicCharacter[];
   childProfileId?: string;
+  provider?: string;
 }): Promise<ComicPanel[]> {
   const ipId = useWorkspace.getState().getActiveIpId();
   if (!ipId) throw new Error('Chưa có IP/project context để tạo kịch bản');
@@ -53,18 +60,32 @@ export async function generateComicScriptViaGateway(input: {
     ? input.cast.map((item) => `${item.name} (${item.role === 'main' ? 'nhân vật chính' : 'nhân vật phụ'}): ${item.personality || item.appearancePrompt || 'đáng yêu'}`).join('; ')
     : 'AI tự đề xuất nhân vật phù hợp';
   const prompt = [
-    'Bạn là biên kịch truyện tranh thiếu nhi bằng tiếng Việt.',
-    `Hãy chia ý tưởng sau thành đúng ${input.panelCount} panel: ${input.idea.trim()}`,
+    'Bạn là người hướng dẫn xây dựng cốt truyện cho học sinh 9–15 tuổi.',
+    `Hãy phát triển ý tưởng sau thành đúng ${input.panelCount} mốc của KHUNG CỐT TRUYỆN: ${input.idea.trim()}`,
     `Thể loại: ${input.genre}. Nhân vật: ${castText}.`,
-    'Mỗi panel chỉ có một hành động rõ ràng và tối đa một câu thoại tiếng Việt tự nhiên, không quá 12 từ.',
-    'Trường speaker phải khớp chính xác tên một nhân vật đã cho. Nếu không có ai nói thì speaker và dialogue đều là chuỗi rỗng.',
-    'Không lặp lời thoại giữa các panel; lời thoại phải đúng với hành động của chính panel đó.',
-    'Câu chuyện phải có mở đầu, diễn biến và kết thúc trọn vẹn ngay trong một trang.',
-    'Chỉ trả JSON hợp lệ theo schema: {"panels":[{"action":"...","speaker":"...","dialogue":"..."}]}.',
-    `Mảng panels phải có đúng ${input.panelCount} phần tử. Không markdown, không giải thích.`,
+    'Đây chưa phải truyện chữ và chưa phải kịch bản tranh: không viết văn dài, không chia panel, không tạo lời thoại.',
+    'Mỗi mốc chỉ mô tả sự kiện cốt lõi và quan hệ nguyên nhân–kết quả trong 1–2 câu.',
+    'Bốn vai trò theo thứ tự: Mở đầu, Biến cố, Cao trào, Kết quả.',
+    'Chỉ trả JSON hợp lệ theo schema: {"beats":[{"title":"Mở đầu","summary":"..."},{"title":"Biến cố","summary":"..."},{"title":"Cao trào","summary":"..."},{"title":"Kết quả","summary":"..."}]}.',
+    `Mảng beats phải có đúng ${input.panelCount} phần tử. Không markdown, không giải thích.`,
   ].join('\n');
-  const jobId = await generateApi.createJob({ jobType: 'llm', prompt, ipId, childProfileId: input.childProfileId });
-  const job = await pollJobUntilDone(jobId, { maxTicks: 48, pollMs: 2000 });
+  // Provider routing belongs to Hub/core-job-api. When no explicit override is
+  // requested, omit provider and _mediaRoute so Hub starts the canonical LLM
+  // route at Vertex and owns any retry/fallback transition.
+  const provider = input.provider;
+  const jobId = await generateApi.createJob({
+    jobType: 'llm',
+    prompt,
+    provider,
+    ipId,
+    childProfileId: input.childProfileId,
+    extraInputParams: {
+      ...(provider ? { provider } : {}),
+      task: 'aikids-plot-framework',
+      response_format: 'json',
+    },
+  });
+  const job = await pollJobUntilDone(jobId, { maxTicks: 72, pollMs: 2500 });
   const outputText = typeof job.inputParams?.outputText === 'string' ? job.inputParams.outputText : '';
   if (!outputText.trim()) throw new Error('LLM job hoàn thành nhưng không có kịch bản');
   return normalizePanels(parseRelaxedJson(outputText), input.pageId, input.panelCount);

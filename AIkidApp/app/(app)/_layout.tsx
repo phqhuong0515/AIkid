@@ -35,6 +35,7 @@ export default function AppLayout() {
       <Stack.Screen name="comic/genre-v2" />
       <Stack.Screen name="comic/idea-v2" />
       <Stack.Screen name="comic/library-v2" />
+      <Stack.Screen name="comic/story-reader" />
 
       {/* Mee routes */}
       <Stack.Screen

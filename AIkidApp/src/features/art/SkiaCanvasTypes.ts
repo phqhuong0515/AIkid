@@ -1,4 +1,5 @@
-import type { Skia, useCanvasRef } from '@shopify/react-native-skia';
+import type { CanvasRef, Skia } from '@shopify/react-native-skia';
+import type { RefObject } from 'react';
 import type { ViewStyle } from 'react-native';
 
 export type DrawTool = 'brush' | 'pencil' | 'eraser' | 'stamp';
@@ -19,7 +20,7 @@ export type SkiaCanvasProps = {
   color: string;
   strokeWidth: number;
   activeStamp: string;
-  canvasRef: ReturnType<typeof useCanvasRef>;
+  canvasRef: RefObject<CanvasRef | null>;
   onPathAdded?: () => void;
   backgroundDataUrl?: string | null;
   style?: ViewStyle;

@@ -1,118 +1,32 @@
-import React from 'react';
-import { View, Text, ImageBackground, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { GlobalHeader } from '@/components/GlobalHeader';
+import { ScrollView } from 'react-native';
+
+import { CategoryHub, categoryHubScreenStyles } from '@/features/kids-ui/CategoryHub';
 import { usePopSound } from '@/hooks/usePopSound';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AikidPage } from '@/ui';
 
 export default function CharacterLobby() {
   const router = useRouter();
   const { playPop } = usePopSound();
-  const insets = useSafeAreaInsets();
-
-  const handlePress = (route: string) => {
+  const open = (route: string) => {
     playPop();
-    router.push(route as any);
+    router.push(route as never);
   };
 
   return (
-    <ImageBackground
-      source={require('../../../public/lobby-assets/images/bg-character-feature.png')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={{ paddingTop: insets.top }}>
-        <GlobalHeader />
-      </View>
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        <View style={styles.cardsWrapper}>
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.8}
-            onPress={() => handlePress('/(app)/character/generate-v2')}
-          >
-            <View style={styles.iconContainer}>
-              <Text style={styles.icon}>✨</Text>
-            </View>
-            <Text style={styles.cardTitle}>Tạo nhân vật</Text>
-            <Text style={styles.cardBadge}>Sáng tạo cùng AI</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.8}
-            onPress={() => handlePress('/(app)/character/storage-v2')}
-          >
-            <View style={styles.iconContainer}>
-              <Text style={styles.icon}>📚</Text>
-            </View>
-            <Text style={styles.cardTitle}>Kho nhân vật</Text>
-            <Text style={styles.cardBadge}>Thư viện của bé</Text>
-          </TouchableOpacity>
-        </View>
+    <AikidPage scene="character" title="Nhân vật" backHref="/(app)/lobby" container="wide" scroll={false}>
+      <ScrollView contentContainerStyle={categoryHubScreenStyles.scroll} showsVerticalScrollIndicator={false}>
+        <CategoryHub
+          icon="people-outline"
+          title="Xây dựng nhân vật của em"
+          description="Bắt đầu một thiết kế mới hoặc mở kho để tiếp tục phát triển nhân vật đã có."
+          items={[
+            { id: 'create', title: 'Tạo nhân vật mới', description: 'Biến mô tả hoặc ảnh phác hoạ thành nhân vật, sau đó bổ sung tính cách và hồ sơ.', icon: 'color-wand-outline', badge: 'BẮT ĐẦU', action: 'Bắt đầu sáng tạo', onPress: () => open('/(app)/character/generate-v2') },
+            { id: 'library', title: 'Kho nhân vật', description: 'Xem lại, chỉnh sửa và quản lý các nhân vật em đã tạo cho những câu chuyện tiếp theo.', icon: 'person-circle-outline', badge: 'TIẾP TỤC', action: 'Mở kho nhân vật', accent: 'coral', onPress: () => open('/(app)/character/storage-v2') },
+          ]}
+          hint="Nhân vật đã hoàn thiện sẽ sẵn sàng để dùng trong Xưởng sáng tạo."
+        />
       </ScrollView>
-    </ImageBackground>
+    </AikidPage>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    backgroundColor: '#fad698',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-  },
-  cardsWrapper: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 24,
-    width: '100%',
-    maxWidth: 960,
-  },
-  card: {
-    width: 210,
-    height: 270,
-    backgroundColor: '#FDFAF4',
-    borderWidth: 6,
-    borderColor: '#FFFFFF',
-    borderRadius: 36,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-    position: 'relative',
-  },
-  iconContainer: {
-    marginBottom: 12,
-  },
-  icon: {
-    fontSize: 56,
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#475569',
-    textAlign: 'center',
-  },
-  cardBadge: {
-    marginTop: 8,
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FF7597',
-    backgroundColor: '#FFF0F3',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-});

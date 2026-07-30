@@ -66,8 +66,9 @@ export const useMeeDraft = create<MeeState>((set, get) => ({
   },
 
   setGender: (g) => {
+    if (get().draft.gender === g) return;
     set((s) => ({
-      past: [...s.past, s.draft],
+      past: [...s.past, s.draft].slice(-50),
       future: [],
       draft: { ...s.draft, gender: g },
     }));
@@ -75,8 +76,9 @@ export const useMeeDraft = create<MeeState>((set, get) => ({
   },
 
   setField: (key, value) => {
+    if (get().draft[key] === value) return;
     set((s) => ({
-      past: [...s.past, s.draft],
+      past: [...s.past, s.draft].slice(-50),
       future: [],
       draft: { ...s.draft, [key]: value },
     }));
@@ -109,7 +111,7 @@ export const useMeeDraft = create<MeeState>((set, get) => ({
       const next = s.future[0];
       const newFuture = s.future.slice(1);
       return {
-        past: [...s.past, s.draft],
+        past: [...s.past, s.draft].slice(-50),
         future: newFuture,
         draft: next,
       };
@@ -142,7 +144,7 @@ export const useMeeDraft = create<MeeState>((set, get) => ({
       };
 
       return {
-        past: [...s.past, s.draft],
+        past: [...s.past, s.draft].slice(-50),
         future: [],
         draft: newDraft,
       };

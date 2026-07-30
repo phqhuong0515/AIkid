@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,6 +15,16 @@ import { useCharacterDraft } from '@/features/character';
 import type { SavedCharacter } from '@/features/character/types';
 import { GlobalHeader } from '@/components/GlobalHeader';
 
+type StoredComicStory = {
+  id: string;
+  title?: string;
+  artStyle?: string;
+  coverImageUrl?: string;
+  pages?: { id?: string; imageUrl?: string }[];
+};
+
+const COMIC_STORY_KEY = 'aikid.comic.stories.v1';
+
 export default function GalleryScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -25,30 +36,50 @@ export default function GalleryScreen() {
   const characters = allCharacters.filter(
     (character) => !character.childProfileId || character.childProfileId === childId,
   );
-  const [section, setSection] = useState<'all' | 'ai' | 'uploads' | 'characters'>('all');
+  const [section, setSection] = useState<'all' | 'ai' | 'uploads' | 'characters' | 'comics'>('all');
   const [selectedCharacter, setSelectedCharacter] = useState<SavedCharacter | null>(null);
+  const [comicStories, setComicStories] = useState<StoredComicStory[]>([]);
+
+  const loadComicStories = useCallback(async () => {
+    try {
+      const raw = await AsyncStorage.getItem(COMIC_STORY_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      setComicStories(Array.isArray(parsed) ? parsed.filter((story) => story?.id) : []);
+    } catch {
+      setComicStories([]);
+    }
+  }, []);
   
   useEffect(() => { void hydrateCharacters(); }, [hydrateCharacters]);
+  useEffect(() => { void loadComicStories(); }, [loadComicStories]);
   
   const query = useQuery({
     queryKey: ['media', 'gallery', childId, ipId],
     enabled: !!childId && !!ipId,
-    queryFn: () => mediaApi.listGallery({ ipId: ipId!, tag: `child:${childId}`, limit: 100, offset: 0 }),
+    queryFn: () => mediaApi.listGallery({ ipId: ipId!, tag: `child:${childId}`, limit: 48, offset: 0 }),
   });
   
   const aiQuery = useAiImages({ enabled: !!childId && !!ipId, childId, ipId });
+  const refetchGallery = query.refetch;
+  const refetchAi = aiQuery.refetch;
   
   useFocusEffect(useCallback(() => {
     if (!childId || !ipId) return;
     void setRecentScope(childId);
-    void query.refetch();
-    void aiQuery.refetch();
-  }, [aiQuery, childId, ipId, query, setRecentScope]));
+    void refetchGallery();
+    void refetchAi();
+    void loadComicStories();
+  }, [childId, ipId, loadComicStories, refetchAi, refetchGallery, setRecentScope]));
   
   const remoteAi = aiQuery.data?.pages.flatMap((page) => page.items) ?? [];
-  const aiItems = [...recentAi, ...remoteAi].filter(
+  const allAiItems = [...recentAi, ...remoteAi].filter(
     (item, index, all) => all.findIndex((candidate) => candidate.id === item.id || candidate.uri === item.uri) === index,
   );
+  const comicImageUrls = new Set(comicStories.flatMap((story) => [
+    story.coverImageUrl,
+    ...(story.pages?.map((page) => page.imageUrl) || []),
+  ].filter((url): url is string => Boolean(url))));
+  const aiItems = allAiItems.filter((item) => !comicImageUrls.has(item.uri));
 
   return (
     <View style={styles.container}>
@@ -74,7 +105,11 @@ export default function GalleryScreen() {
                 <View style={styles.tabContainer}>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                     {([
-                      ['all', 'Tất cả'], ['ai', `AI · ${aiItems.length}`], ['uploads', `Tải lên · ${query.data?.items.length ?? 0}`], ['characters', `Nhân vật · ${characters.length}`],
+                      ['all', 'Tất cả'],
+                      ['ai', `Ảnh AI · ${aiItems.length}`],
+                      ['uploads', `Tải lên · ${query.data?.items.length ?? 0}`],
+                      ['characters', `Nhân vật · ${characters.length}`],
+                      ['comics', `Truyện tranh · ${comicStories.length}`],
                     ] as const).map(([id, label]) => (
                       <Pressable 
                         accessibilityRole="button" 
@@ -120,11 +155,39 @@ export default function GalleryScreen() {
                     </GallerySection>
                   ) : null}
                   {(section === 'all' || section === 'ai') && aiItems.length ? (
-                    <GallerySection title="Ảnh AI">
+                    <GallerySection title="Ảnh AI" hint="Ảnh đơn được tạo trong Xưởng vẽ">
                       <View style={styles.grid}>
                         {aiItems.map((item) => (
                           <Image key={`ai-${item.id}`} source={{ uri: item.uri }} style={styles.mediaImage} contentFit="cover" />
                         ))}
+                      </View>
+                    </GallerySection>
+                  ) : null}
+                  {(section === 'all' || section === 'comics') && comicStories.length ? (
+                    <GallerySection title="Truyện tranh" hint="Mỗi thẻ là một bộ truyện">
+                      <View style={styles.comicGrid}>
+                        {comicStories.map((story) => {
+                          const pages = story.pages?.filter((page) => page.imageUrl) || [];
+                          const cover = story.coverImageUrl || pages[0]?.imageUrl;
+                          return (
+                            <Pressable
+                              key={story.id}
+                              accessibilityRole="button"
+                              accessibilityLabel={`Mở truyện ${story.title || 'Truyện của em'}`}
+                              onPress={() => router.push({ pathname: '/(app)/comic/story-reader', params: { id: story.id, type: 'comic' } })}
+                              style={styles.comicCard}
+                            >
+                              {cover ? <Image source={{ uri: cover }} style={styles.comicCover} contentFit="cover" /> : <View style={styles.comicCoverEmpty}><Text style={styles.comicCoverEmoji}>📖</Text></View>}
+                              <View style={styles.comicInfo}>
+                                <View style={styles.comicInfoCopy}>
+                                  <Text style={styles.comicTitle} numberOfLines={1}>{story.title || 'Truyện của em'}</Text>
+                                  <Text style={styles.comicMeta}>{pages.length} trang · {story.artStyle || 'Nét vẽ tự do'}</Text>
+                                </View>
+                                <View style={styles.comicOpen}><Text style={styles.comicOpenText}>Mở truyện →</Text></View>
+                              </View>
+                            </Pressable>
+                          );
+                        })}
                       </View>
                     </GallerySection>
                   ) : null}
@@ -138,7 +201,7 @@ export default function GalleryScreen() {
                       </View>
                     </GallerySection>
                   ) : null}
-                  {!query.data?.items.length && !aiItems.length && !characters.length ? (
+                  {!query.data?.items.length && !aiItems.length && !characters.length && !comicStories.length ? (
                     <Text style={{ paddingVertical: 64, textAlign: 'center', color: '#64748B' }}>Chưa có ảnh. Chụp, chọn ảnh từ thư viện hoặc tạo ảnh AI.</Text>
                   ) : null}
                 </ScrollView>
@@ -288,5 +351,66 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: 14,
     marginBottom: 8,
+  },
+  comicGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  comicCard: {
+    width: '48%',
+    minWidth: 280,
+    overflow: 'hidden',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#F2DED2',
+    backgroundColor: '#FFFFFF',
+    marginBottom: 8,
+  },
+  comicCover: {
+    width: '100%',
+    aspectRatio: 1.55,
+    backgroundColor: '#F5EFEA',
+  },
+  comicCoverEmpty: {
+    width: '100%',
+    aspectRatio: 1.55,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF7ED',
+  },
+  comicCoverEmoji: {
+    fontSize: 44,
+  },
+  comicInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+  },
+  comicInfoCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
+  comicTitle: {
+    color: '#0F172A',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  comicMeta: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 3,
+  },
+  comicOpen: {
+    borderRadius: 999,
+    backgroundColor: '#FFF0F4',
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+  },
+  comicOpenText: {
+    color: '#FF5E97',
+    fontSize: 10,
+    fontWeight: '900',
   },
 });

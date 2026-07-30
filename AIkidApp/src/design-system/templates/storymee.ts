@@ -29,7 +29,7 @@ export const storymeeTemplate: AikidTemplate = {
     encourage: AikidButtonGradients.encourage,
     discourage: AikidButtonGradients.discourage,
     delete: AikidButtonGradients.delete,
-    icon: AikidButtonGradients.navIcon,
+    icon: AikidButtonGradients.icon,
   },
   radius: AikidRadius,
   spacing: AikidSpacing,

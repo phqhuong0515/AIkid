@@ -142,7 +142,6 @@ export function CatLoginMascot({ children }: { children: React.ReactNode }) {
           </G>
 
           <Rect id="svg-input-bg-card" fill="#fffffe" x="254.59" y="268.37" width="325" height="111.9" rx="11.62" />
-          <Rect id="svg-input-bg-line" fill="#E5D9CE" x="254.59" y="320.48" width="325" height="6" />
         </G>
       </G>
     </Svg>

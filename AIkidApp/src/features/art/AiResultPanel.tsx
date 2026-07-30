@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
-import { AikidButton } from '@/features/kids-ui/AikidButton';
+import { AikidButton, AikidIcon, AikidText } from '@/ui';
 
 export type AiResultPanelProps = {
   styleName: string;
@@ -10,6 +10,7 @@ export type AiResultPanelProps = {
   aiImageUrl?: string | null;
   onDownload: () => void;
   errorMessage?: string | null;
+  onChooseStyle?: () => void;
 };
 
 export function AiResultPanel({
@@ -19,45 +20,44 @@ export function AiResultPanel({
   aiImageUrl,
   onDownload,
   errorMessage,
+  onChooseStyle,
 }: AiResultPanelProps) {
   return (
     <View style={styles.container}>
-      {/* Floating Top Bar for AI Panel */}
-      <View style={styles.floatingTopBar}>
-        <TouchableOpacity style={styles.pillBtn}>
-          <Text style={styles.pillText}>🎨 Chọn lại phong cách vẽ</Text>
-        </TouchableOpacity>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-           <TouchableOpacity style={styles.pillBtn} onPress={onGenerate}>
-             <Text style={styles.pillText}>🔄 Làm lại</Text>
-           </TouchableOpacity>
-           <TouchableOpacity style={styles.pillBtn} onPress={onDownload}>
-             <Text style={styles.pillText}>📥 Tải về</Text>
-           </TouchableOpacity>
-        </View>
+      <View style={styles.actionBar}>
+        <AikidButton variant="feature" size="sm" onPress={onChooseStyle} leftIcon={<AikidIcon name="palette" size={18} color="#704E48" />}>
+          Phong cách
+        </AikidButton>
+        <AikidButton variant="feature" size="sm" onPress={onGenerate} leftIcon={<AikidIcon name="refresh" size={18} color="#704E48" />}>
+          Làm lại
+        </AikidButton>
+        <AikidButton variant="feature" size="sm" onPress={onDownload} leftIcon={<AikidIcon name="download" size={18} color="#704E48" />}>
+          Tải về
+        </AikidButton>
       </View>
 
       <View style={styles.content}>
         {aiState === 'idle' && (
           <View style={styles.idleContainer}>
-            <Text style={styles.magicIcon}>🪄</Text>
-            <Text style={styles.idleText}>
-              Hãy vẽ tranh hoặc tải ảnh lên, sau đó bấm{'\n'}
-              <Text style={styles.idleTextBold}>AI Vẽ Lại</Text> để xem phép thuật nhé!
-            </Text>
+            <AikidIcon name="wand" size={48} color="#FF6B93" />
+            <AikidText variant="body" style={styles.idleText}>
+              Hãy vẽ tranh hoặc tải ảnh lên, sau đó bấm AI Vẽ Lại để xem phép thuật nhé!
+            </AikidText>
             <AikidButton
-              title="✨ AI VẼ LẠI"
-              variant="primary"
+              variant="cta"
+              size="lg"
+              leftIcon={<AikidIcon name="wand" size={20} color="#FFFFFF" />}
               onPress={onGenerate}
-              style={[styles.generateBtn, { backgroundColor: '#FF6B93', borderColor: '#FF6B93' }]}
-            />
+            >
+              AI VẼ LẠI
+            </AikidButton>
           </View>
         )}
 
         {aiState === 'generating' && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#FF6B93" />
-            <Text style={styles.loadingText}>Đang dùng phép thuật AI...</Text>
+            <AikidText variant="brand" style={styles.loadingText}>Đang dùng phép thuật AI...</AikidText>
           </View>
         )}
 
@@ -74,8 +74,8 @@ export function AiResultPanel({
 
         {aiState === 'error' && (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{errorMessage || 'Đã có lỗi xảy ra'}</Text>
-            <AikidButton title="Thử lại" variant="danger" onPress={onGenerate} />
+            <AikidText variant="body" style={styles.errorText}>{errorMessage || 'Đã có lỗi xảy ra'}</AikidText>
+            <AikidButton variant="delete" onPress={onGenerate}>Thử lại</AikidButton>
           </View>
         )}
       </View>
@@ -88,33 +88,14 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
-  floatingTopBar: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    right: 20,
+  actionBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    zIndex: 10,
-    pointerEvents: 'box-none',
-  },
-  pillBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#FFFBEB',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  pillText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#4A3D3C',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EBDCD0',
   },
   content: {
     flex: 1,
@@ -123,27 +104,12 @@ const styles = StyleSheet.create({
   },
   idleContainer: {
     alignItems: 'center',
-    padding: 32,
-  },
-  magicIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-    color: '#FF6B93',
+    padding: 24,
+    maxWidth: 440,
   },
   idleText: {
-    fontSize: 16,
-    color: '#6B7280',
     textAlign: 'center',
     marginBottom: 24,
-    lineHeight: 24,
-  },
-  idleTextBold: {
-    fontWeight: 'bold',
-    color: '#FF6B93',
-  },
-  generateBtn: {
-    paddingHorizontal: 32,
-    borderRadius: 100,
   },
   loadingContainer: {
     alignItems: 'center',
@@ -151,9 +117,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 16,
-    color: '#FF6B93',
-    fontWeight: '600',
   },
   resultContainer: {
     flex: 1,
@@ -171,7 +134,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   errorText: {
-    fontSize: 16,
     color: '#EF4444',
     marginBottom: 16,
     textAlign: 'center',

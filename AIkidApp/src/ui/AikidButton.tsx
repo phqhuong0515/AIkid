@@ -26,15 +26,16 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAikidTemplate } from '@/design-system';
+import { AikidMetrics, AikidRadius } from '@/features/kids-ui/theme';
 import { AikidText } from './AikidText';
 
 export type BtnVariant = 'nav' | 'cta' | 'feature' | 'encourage' | 'discourage' | 'delete' | 'icon';
 export type BtnSize = 'sm' | 'md' | 'lg';
 
 const SIZE_MAP: Record<BtnSize, { height: number; paddingH: number; fontSize: number; iconSize: number }> = {
-  sm: { height: 40, paddingH: 16, fontSize: 14, iconSize: 38 },
-  md: { height: 52, paddingH: 24, fontSize: 16, iconSize: 52 },
-  lg: { height: 62, paddingH: 32, fontSize: 18, iconSize: 62 },
+  sm: { height: AikidMetrics.controlHeight.sm, paddingH: AikidMetrics.controlPaddingX.sm, fontSize: 14, iconSize: AikidMetrics.iconButtonSize.sm },
+  md: { height: AikidMetrics.controlHeight.md, paddingH: AikidMetrics.controlPaddingX.md, fontSize: 16, iconSize: AikidMetrics.iconButtonSize.md },
+  lg: { height: AikidMetrics.controlHeight.lg, paddingH: AikidMetrics.controlPaddingX.lg, fontSize: 18, iconSize: AikidMetrics.iconButtonSize.lg },
 };
 
 // Shadow per variant
@@ -81,7 +82,9 @@ export function AikidButton({
 }: AikidButtonProps) {
   const template = useAikidTemplate();
   const sz = SIZE_MAP[size];
-  const gradient = template.gradients[variant];
+  // Keep the UI renderable when an older JavaScript caller sends a legacy
+  // variant during the incremental migration.
+  const gradient = template.gradients[variant] ?? template.gradients.nav;
   const textColor =
     variant === 'feature'
       ? template.colors.text.heading
@@ -89,7 +92,7 @@ export function AikidButton({
   const shadow = SHADOW_MAP[variant];
 
   const isIcon = variant === 'icon';
-  const btnRadius = isIcon ? template.radius.pill : template.radius.btn;
+  const btnRadius = isIcon ? template.radius.pill : AikidRadius.input;
   const btnWidth = isIcon ? sz.iconSize : fullWidth ? '100%' : undefined;
 
   const isDisabled = disabled || loading;
@@ -104,6 +107,7 @@ export function AikidButton({
           ? { width: sz.iconSize, height: sz.iconSize }
           : { height: sz.height, alignSelf: fullWidth ? 'stretch' : 'flex-start' },
         style,
+        styles.touchable,
       ]}
     >
       <LinearGradient
@@ -157,6 +161,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  touchable: {
+    backgroundColor: 'transparent',
   },
   featureBorder: {
     borderWidth: 1.5,

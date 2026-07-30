@@ -125,6 +125,7 @@ type State = {
   removePage: (id: string) => void;
   saveToLibrary: () => Promise<void>;
   loadFromLibrary: (versionId: string) => void;
+  updateLibraryItem: (versionId: string, value: Partial<ComicProject>) => Promise<void>;
   removeFromLibrary: (versionId: string) => Promise<void>;
   exportProjectJson: () => string;
   reset: () => void;
@@ -156,6 +157,13 @@ export const useComicDraft = create<State>((set, get) => {
     removePage: (id) => { if (get().project.pages.length <= 1) return; setProject({ ...get().project, pages: get().project.pages.filter((page) => page.id !== id).map((page, index) => ({ ...page, order: index + 1 })) }); },
     saveToLibrary: async () => { const now = new Date().toISOString(); const version = Math.max(0, ...get().library.filter((item) => item.id === get().project.id).map((item) => item.version)) + 1; const saved = { ...get().project, versionId: `${get().project.id}-v${version}-${Date.now()}`, version, savedAt: now }; const library = [saved, ...get().library]; set({ library }); await AsyncStorage.setItem(LIBRARY_KEY, JSON.stringify(library)); },
     loadFromLibrary: (versionId) => { const item = get().library.find((entry) => entry.versionId === versionId); if (item) setProject(normalize(item)); },
+    updateLibraryItem: async (versionId, value) => {
+      const library = get().library.map((item) => item.versionId === versionId
+        ? { ...item, ...value, updatedAt: new Date().toISOString() }
+        : item);
+      set({ library });
+      await AsyncStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
+    },
     removeFromLibrary: async (versionId) => { const library = get().library.filter((item) => item.versionId !== versionId); set({ library }); await AsyncStorage.setItem(LIBRARY_KEY, JSON.stringify(library)); },
     exportProjectJson: () => JSON.stringify(get().project, null, 2),
     reset: () => setProject(makeProject()),

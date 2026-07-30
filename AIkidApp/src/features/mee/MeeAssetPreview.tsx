@@ -10,7 +10,28 @@ export type MeeAssetPreviewHandle = { toPngDataUrl: () => Promise<string> };
 
 export const MeeAssetPreview = forwardRef<MeeAssetPreviewHandle, { draft: MeeDraft; compact?: boolean }>(function MeeAssetPreview({ draft, compact = false }, ref) {
   const svgRef = useRef<Svg>(null);
-  const ast = useMemo(() => parse(buildMeeAssetSvg(draft)), [draft]);
+  const ast = useMemo(
+    () => parse(buildMeeAssetSvg(draft)),
+    [
+      draft.backgroundColor,
+      draft.bang,
+      draft.behind,
+      draft.customPrimaryColor,
+      draft.customShadowColor,
+      draft.eyebrows,
+      draft.eyes,
+      draft.face,
+      draft.gender,
+      draft.hairColor,
+      draft.mouth,
+      draft.nose,
+      draft.pants,
+      draft.pantsColor,
+      draft.shirt,
+      draft.shirtColor,
+      draft.skinTone,
+    ],
+  );
   useImperativeHandle(ref, () => ({
     toPngDataUrl: () => new Promise((resolve, reject) => {
       if (!svgRef.current) return reject(new Error('Bản xem trước Mee chưa sẵn sàng'));
