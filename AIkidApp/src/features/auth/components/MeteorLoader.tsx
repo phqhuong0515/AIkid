@@ -106,7 +106,7 @@ export const MeteorLoader = () => {
       <Meteor />
       
       <View style={styles.textContainer}>
-        <Text style={styles.loadingText}>Bé đợi chút nhé...</Text>
+        <Text style={styles.loadingText}>Con đợi một chút nhé...</Text>
       </View>
     </View>
   );

@@ -133,7 +133,7 @@ export function MeteorLoadingOverlay({ isVisible, onFadedOut }: { isVisible: boo
       {/* Text */}
       <View style={styles.textContainer}>
         <Text style={styles.loadingText}>
-          Bé đợi chút nhé...
+          Con đợi một chút nhé...
         </Text>
       </View>
     </Animated.View>

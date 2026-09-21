@@ -1,8 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, ImageBackground, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  ImageBackground,
+  Linking,
+  Modal,
+  Platform,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 
@@ -14,20 +28,25 @@ import { mediaApi } from '@/core/storymee';
 import { useCharacterDraft } from '@/features/character';
 import type { SavedCharacter } from '@/features/character/types';
 import { GlobalHeader } from '@/components/GlobalHeader';
+import { mergeComicStories, parseRemoteComicStories } from '@/features/comic/api/comicRemoteLibrary';
 
 type StoredComicStory = {
   id: string;
   title?: string;
   artStyle?: string;
   coverImageUrl?: string;
-  pages?: { id?: string; imageUrl?: string }[];
+  pages?: { id?: string; imageUrl?: string; jobId?: string }[];
+  panels?: { imageUrl?: string; jobId?: string }[];
 };
 
 const COMIC_STORY_KEY = 'aikid.comic.stories.v1';
+const COMIC_IMAGE_JOB_IDS_KEY = 'aikid.comic.image-job-ids.v1';
 
 export default function GalleryScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+
   const childId = useFamily((s) => s.activeChildId);
   const ipId = useWorkspace((s) => s.activeIpId);
   const recentAi = useRecentAiImages((s) => s.items);
@@ -38,15 +57,74 @@ export default function GalleryScreen() {
   );
   const [section, setSection] = useState<'all' | 'ai' | 'uploads' | 'characters' | 'comics'>('all');
   const [selectedCharacter, setSelectedCharacter] = useState<SavedCharacter | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<{
+    uri: string;
+    title: string;
+    typeLabel: string;
+    createdAt?: string | null;
+  } | null>(null);
   const [comicStories, setComicStories] = useState<StoredComicStory[]>([]);
+  const [comicImageJobIds, setComicImageJobIds] = useState<string[]>([]);
+
+  // Responsive column widths
+  const mediaCardWidth = useMemo(() => {
+    if (width >= 1200) return '18.5%';
+    if (width >= 1024) return '23.5%';
+    if (width >= 768) return '31.3%';
+    return '48%';
+  }, [width]);
+
+  const comicCardWidth = useMemo(() => {
+    if (width >= 1024) return '31.5%';
+    if (width >= 640) return '48%';
+    return '100%';
+  }, [width]);
+
+  const handleDownloadMedia = useCallback(async (uri: string, filename?: string) => {
+    try {
+      if (Platform.OS === 'web') {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = filename || `aikid_${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+        Alert.alert('Thành công! 🎉', 'Tác phẩm đã được tải về máy của con!');
+      } else {
+        await Linking.openURL(uri);
+      }
+    } catch {
+      await Linking.openURL(uri);
+    }
+  }, []);
 
   const loadComicStories = useCallback(async () => {
     try {
-      const raw = await AsyncStorage.getItem(COMIC_STORY_KEY);
+      const [raw, rawJobIds] = await Promise.all([
+        AsyncStorage.getItem(COMIC_STORY_KEY),
+        AsyncStorage.getItem(COMIC_IMAGE_JOB_IDS_KEY),
+      ]);
       const parsed = raw ? JSON.parse(raw) : [];
-      setComicStories(Array.isArray(parsed) ? parsed.filter((story) => story?.id) : []);
+      const stories: StoredComicStory[] = Array.isArray(parsed)
+        ? parsed.filter((story) => story?.id)
+        : [];
+      const storedJobIds = rawJobIds ? JSON.parse(rawJobIds) : [];
+      const storyJobIds = stories.flatMap((story) => [
+        ...(story.pages?.map((page) => page.jobId) || []),
+        ...(story.panels?.map((panel) => panel.jobId) || []),
+      ]).filter((id): id is string => Boolean(id));
+      setComicStories(stories);
+      setComicImageJobIds([
+        ...new Set([
+          ...(Array.isArray(storedJobIds) ? storedJobIds.filter((id): id is string => typeof id === 'string') : []),
+          ...storyJobIds,
+        ]),
+      ]);
     } catch {
       setComicStories([]);
+      setComicImageJobIds([]);
     }
   }, []);
   
@@ -72,14 +150,28 @@ export default function GalleryScreen() {
   }, [childId, ipId, loadComicStories, refetchAi, refetchGallery, setRecentScope]));
   
   const remoteAi = aiQuery.data?.pages.flatMap((page) => page.items) ?? [];
+  const visibleComicStories = mergeComicStories(comicStories, parseRemoteComicStories(query.data?.items ?? [])) as StoredComicStory[];
   const allAiItems = [...recentAi, ...remoteAi].filter(
     (item, index, all) => all.findIndex((candidate) => candidate.id === item.id || candidate.uri === item.uri) === index,
   );
+  const normalizeComparableUrl = (url: string) => {
+    try {
+      const parsed = new URL(url);
+      return `${parsed.origin}${parsed.pathname}`.replace(/\/+$/, '');
+    } catch {
+      return url.split('?')[0].replace(/\/+$/, '');
+    }
+  };
   const comicImageUrls = new Set(comicStories.flatMap((story) => [
     story.coverImageUrl,
     ...(story.pages?.map((page) => page.imageUrl) || []),
-  ].filter((url): url is string => Boolean(url))));
-  const aiItems = allAiItems.filter((item) => !comicImageUrls.has(item.uri));
+    ...(story.panels?.map((panel) => panel.imageUrl) || []),
+  ].filter((url): url is string => Boolean(url)).map(normalizeComparableUrl)));
+  const aiItems = allAiItems.filter(
+    (item) =>
+      !comicImageJobIds.includes(item.id) &&
+      !comicImageUrls.has(normalizeComparableUrl(item.uri)),
+  );
 
   return (
     <View style={styles.container}>
@@ -89,7 +181,7 @@ export default function GalleryScreen() {
             <GlobalHeader />
           </View>
           
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 16, marginBottom: 10 }}>
+          <View style={[styles.topActionBar, { maxWidth: 1200, width: '100%', alignSelf: 'center' }]}>
             <Pressable onPress={() => router.push('/(app)/capture')} style={styles.captureButton}>
               <Text style={styles.captureButtonText}>+ Thêm Ảnh</Text>
             </Pressable>
@@ -109,7 +201,7 @@ export default function GalleryScreen() {
                       ['ai', `Ảnh AI · ${aiItems.length}`],
                       ['uploads', `Tải lên · ${query.data?.items.length ?? 0}`],
                       ['characters', `Nhân vật · ${characters.length}`],
-                      ['comics', `Truyện tranh · ${comicStories.length}`],
+                      ['comics', `Truyện tranh · ${visibleComicStories.length}`],
                     ] as const).map(([id, label]) => (
                       <Pressable 
                         accessibilityRole="button" 
@@ -136,37 +228,82 @@ export default function GalleryScreen() {
                             accessibilityLabel={`Xem nhân vật ${character.name}`} 
                             key={character.id} 
                             onPress={() => setSelectedCharacter(character)} 
-                            style={styles.characterCard}
+                            style={({ pressed, hovered }: any) => [
+                              styles.characterCard,
+                              { width: mediaCardWidth },
+                              pressed && styles.mediaCardPressed,
+                              hovered && styles.mediaCardHovered,
+                            ]}
                           >
-                            {character.avatarUri ? (
-                              <Image source={{ uri: character.avatarUri }} style={{ width: '100%', aspectRatio: 1 }} contentFit="cover" />
-                            ) : (
-                              <View style={styles.emptyAvatar}>
-                                <Text style={{ fontSize: 36 }}>🧸</Text>
-                              </View>
-                            )}
-                            <View style={{ padding: 12 }}>
-                              <Text style={{ fontWeight: '800', color: '#0F172A' }} numberOfLines={1}>{character.name}</Text>
-                              <Text style={{ marginTop: 2, fontSize: 11, color: '#94A3B8' }}>{character.source === 'ai' ? 'Nhân vật AI' : 'Bản nháp'}</Text>
+                            <View style={styles.imageWrapper}>
+                              {character.avatarUri ? (
+                                <Image
+                                  source={{ uri: character.avatarUri }}
+                                  style={styles.mediaImage}
+                                  contentFit="cover"
+                                  transition={200}
+                                />
+                              ) : (
+                                <View style={styles.emptyAvatar}>
+                                  <Text style={{ fontSize: 36 }}>🧸</Text>
+                                </View>
+                              )}
+                            </View>
+                            <View style={{ padding: 10 }}>
+                              <Text style={{ fontWeight: '800', color: '#0F172A', fontSize: 13 }} numberOfLines={1}>
+                                {character.name}
+                              </Text>
+                              <Text style={{ marginTop: 2, fontSize: 11, color: '#94A3B8' }}>
+                                {character.source === 'ai' ? 'Nhân vật AI' : 'Bản nháp'}
+                              </Text>
                             </View>
                           </Pressable>
                         ))}
                       </View>
                     </GallerySection>
                   ) : null}
+
                   {(section === 'all' || section === 'ai') && aiItems.length ? (
-                    <GallerySection title="Ảnh AI" hint="Ảnh đơn được tạo trong Xưởng vẽ">
+                    <GallerySection title="Ảnh AI" hint="Ảnh đơn được tạo trong Xưởng vẽ · Chạm để xem lớn">
                       <View style={styles.grid}>
-                        {aiItems.map((item) => (
-                          <Image key={`ai-${item.id}`} source={{ uri: item.uri }} style={styles.mediaImage} contentFit="cover" />
+                        {aiItems.map((item, idx) => (
+                          <Pressable
+                            key={`ai-${item.id || idx}`}
+                            onPress={() =>
+                              setSelectedMedia({
+                                uri: item.uri,
+                                title: (item as any).title || `Ảnh AI #${idx + 1}`,
+                                typeLabel: 'Ảnh vẽ AI',
+                                createdAt: item.createdAt,
+                              })
+                            }
+                            style={({ pressed, hovered }: any) => [
+                              styles.mediaCard,
+                              { width: mediaCardWidth },
+                              pressed && styles.mediaCardPressed,
+                              hovered && styles.mediaCardHovered,
+                            ]}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Xem ảnh AI ${idx + 1}`}
+                          >
+                            <View style={styles.imageWrapper}>
+                              <Image
+                                source={{ uri: item.uri }}
+                                style={styles.mediaImage}
+                                contentFit="cover"
+                                transition={200}
+                              />
+                            </View>
+                          </Pressable>
                         ))}
                       </View>
                     </GallerySection>
                   ) : null}
-                  {(section === 'all' || section === 'comics') && comicStories.length ? (
+
+                  {(section === 'all' || section === 'comics') && visibleComicStories.length ? (
                     <GallerySection title="Truyện tranh" hint="Mỗi thẻ là một bộ truyện">
                       <View style={styles.comicGrid}>
-                        {comicStories.map((story) => {
+                        {visibleComicStories.map((story) => {
                           const pages = story.pages?.filter((page) => page.imageUrl) || [];
                           const cover = story.coverImageUrl || pages[0]?.imageUrl;
                           return (
@@ -175,9 +312,22 @@ export default function GalleryScreen() {
                               accessibilityRole="button"
                               accessibilityLabel={`Mở truyện ${story.title || 'Truyện của em'}`}
                               onPress={() => router.push({ pathname: '/(app)/comic/story-reader', params: { id: story.id, type: 'comic' } })}
-                              style={styles.comicCard}
+                              style={({ pressed, hovered }: any) => [
+                                styles.comicCard,
+                                { width: comicCardWidth },
+                                pressed && styles.mediaCardPressed,
+                                hovered && styles.mediaCardHovered,
+                              ]}
                             >
-                              {cover ? <Image source={{ uri: cover }} style={styles.comicCover} contentFit="cover" /> : <View style={styles.comicCoverEmpty}><Text style={styles.comicCoverEmoji}>📖</Text></View>}
+                              <View style={styles.comicCoverWrapper}>
+                                {cover ? (
+                                  <Image source={{ uri: cover }} style={styles.comicCover} contentFit="cover" transition={200} />
+                                ) : (
+                                  <View style={styles.comicCoverEmpty}>
+                                    <Text style={styles.comicCoverEmoji}>📖</Text>
+                                  </View>
+                                )}
+                              </View>
                               <View style={styles.comicInfo}>
                                 <View style={styles.comicInfoCopy}>
                                   <Text style={styles.comicTitle} numberOfLines={1}>{story.title || 'Truyện của em'}</Text>
@@ -191,21 +341,62 @@ export default function GalleryScreen() {
                       </View>
                     </GallerySection>
                   ) : null}
+
                   {(section === 'all' || section === 'uploads') ? (
-                    <GallerySection title="Ảnh tải lên">
+                    <GallerySection title="Ảnh tải lên" hint="Chạm để xem chi tiết & tải về">
                       <View style={styles.grid}>
                         {query.data?.items.map((item, index) => { 
                           const uri = resolveMediaUri(String(item.url || item.imageUrl || item.previewUrl || '')); 
-                          return uri ? <Image key={`upload-${item.id || `${uri}-${index}`}`} source={{ uri }} style={styles.mediaImage} contentFit="cover" /> : null; 
+                          if (!uri) return null;
+                          return (
+                            <Pressable
+                              key={`upload-${item.id || `${uri}-${index}`}`}
+                              onPress={() =>
+                                setSelectedMedia({
+                                  uri,
+                                  title: (item as any).title || `Ảnh tải lên #${index + 1}`,
+                                  typeLabel: 'Ảnh tải lên',
+                                  createdAt: (item as any).createdAt,
+                                })
+                              }
+                              style={({ pressed, hovered }: any) => [
+                                styles.mediaCard,
+                                { width: mediaCardWidth },
+                                pressed && styles.mediaCardPressed,
+                                hovered && styles.mediaCardHovered,
+                              ]}
+                              accessibilityRole="button"
+                              accessibilityLabel={`Xem ảnh tải lên ${index + 1}`}
+                            >
+                              <View style={styles.imageWrapper}>
+                                <Image
+                                  source={{ uri }}
+                                  style={styles.mediaImage}
+                                  contentFit="cover"
+                                  transition={200}
+                                />
+                              </View>
+                            </Pressable>
+                          );
                         })}
                       </View>
                     </GallerySection>
                   ) : null}
-                  {!query.data?.items.length && !aiItems.length && !characters.length && !comicStories.length ? (
+
+                  {!query.data?.items.length && !aiItems.length && !characters.length && !visibleComicStories.length ? (
                     <Text style={{ paddingVertical: 64, textAlign: 'center', color: '#64748B' }}>Chưa có ảnh. Chụp, chọn ảnh từ thư viện hoặc tạo ảnh AI.</Text>
                   ) : null}
                 </ScrollView>
-                <CharacterPromptModal character={selectedCharacter} onClose={() => setSelectedCharacter(null)} />
+                <CharacterPromptModal
+                  character={selectedCharacter}
+                  onClose={() => setSelectedCharacter(null)}
+                  onDownload={handleDownloadMedia}
+                />
+                <ImagePreviewModal
+                  media={selectedMedia}
+                  onClose={() => setSelectedMedia(null)}
+                  onDownload={handleDownloadMedia}
+                />
               </>
             )}
           </View>
@@ -227,31 +418,114 @@ function GallerySection({ title, hint, children }: { title: string; hint?: strin
   );
 }
 
-function CharacterPromptModal({ character, onClose }: { character: SavedCharacter | null; onClose: () => void }) {
+function CharacterPromptModal({
+  character,
+  onClose,
+  onDownload,
+}: {
+  character: SavedCharacter | null;
+  onClose: () => void;
+  onDownload: (uri: string, filename?: string) => void;
+}) {
   return (
     <Modal visible={Boolean(character)} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(2, 6, 23, 0.4)', padding: 16 }}>
-        <Pressable style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }} onPress={onClose} accessibilityLabel="Đóng chi tiết nhân vật" />
+      <View style={styles.modalOverlay}>
+        <Pressable style={styles.modalBackdrop} onPress={onClose} accessibilityLabel="Đóng chi tiết nhân vật" />
         {character ? (
-          <View style={{ maxHeight: '86%', width: '100%', maxWidth: 620, overflow: 'hidden', borderRadius: 28, backgroundColor: '#FFFFFF' }}>
-            <ScrollView>
-              <View style={{ position: 'relative' }}>
-                {character.avatarUri ? <Image source={{ uri: character.avatarUri }} style={{ width: '100%', aspectRatio: 1.35 }} contentFit="contain" /> : null}
-                <Pressable accessibilityRole="button" onPress={onClose} style={{ position: 'absolute', right: 12, top: 12, height: 40, width: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.9)' }}>
-                  <Text style={{ fontSize: 20, color: '#475569' }}>×</Text>
-                </Pressable>
+          <View style={styles.previewCard}>
+            <View style={styles.previewHeader}>
+              <View style={styles.previewTitleWrap}>
+                <Text style={styles.previewTitle} numberOfLines={1}>{character.name}</Text>
+                <View style={styles.previewBadge}>
+                  <Text style={styles.previewBadgeText}>{character.source === 'ai' ? 'Nhân vật AI' : 'Bản nháp'}</Text>
+                </View>
               </View>
+              <Pressable accessibilityRole="button" onPress={onClose} style={styles.previewCloseBtn}>
+                <Text style={styles.previewCloseBtnText}>✕</Text>
+              </Pressable>
+            </View>
+            <ScrollView style={{ maxHeight: 460 }}>
+              {character.avatarUri ? (
+                <View style={styles.previewImageContainer}>
+                  <Image source={{ uri: character.avatarUri }} style={styles.previewImage} contentFit="contain" transition={200} />
+                </View>
+              ) : null}
               <View style={{ padding: 20 }}>
-                <Text style={{ fontSize: 20, fontWeight: '800', color: '#0F172A' }}>{character.name}</Text>
-                <Text style={{ marginTop: 4, fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, color: '#FF7597' }}>Prompt tạo nhân vật</Text>
-                <Text selectable style={{ marginTop: 12, borderRadius: 16, backgroundColor: '#F8FAFC', padding: 16, fontSize: 14, lineHeight: 24, color: '#334155' }}>
+                <Text style={{ fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, color: '#FF7597' }}>
+                  Prompt tạo nhân vật
+                </Text>
+                <Text selectable style={{ marginTop: 8, borderRadius: 16, backgroundColor: '#F8FAFC', padding: 14, fontSize: 13, lineHeight: 22, color: '#334155' }}>
                   {character.userPrompt || 'Nhân vật này chưa có prompt được lưu.'}
                 </Text>
-                <Text style={{ marginTop: 12, fontSize: 12, color: '#94A3B8' }}>Đã lưu {new Date(character.createdAt).toLocaleString('vi-VN')}</Text>
+                <Text style={{ marginTop: 10, fontSize: 12, color: '#94A3B8' }}>
+                  Đã lưu {new Date(character.createdAt).toLocaleString('vi-VN')}
+                </Text>
               </View>
             </ScrollView>
+            {character.avatarUri ? (
+              <View style={styles.previewFooter}>
+                <Text style={styles.previewDate}>Nhân vật Mee</Text>
+                <Pressable
+                  style={({ pressed }: any) => [styles.downloadBtn, pressed && { opacity: 0.85 }]}
+                  onPress={() => onDownload(character.avatarUri!, `${character.name}.png`)}
+                >
+                  <Text style={styles.downloadBtnText}>📥 Tải ảnh về máy</Text>
+                </Pressable>
+              </View>
+            ) : null}
           </View>
         ) : null}
+      </View>
+    </Modal>
+  );
+}
+
+function ImagePreviewModal({
+  media,
+  onClose,
+  onDownload,
+}: {
+  media: { uri: string; title: string; typeLabel: string; createdAt?: string | null } | null;
+  onClose: () => void;
+  onDownload: (uri: string, filename?: string) => void;
+}) {
+  if (!media) return null;
+  return (
+    <Modal visible={Boolean(media)} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <Pressable style={styles.modalBackdrop} onPress={onClose} accessibilityLabel="Đóng xem trước ảnh" />
+        <View style={styles.previewCard}>
+          <View style={styles.previewHeader}>
+            <View style={styles.previewTitleWrap}>
+              <Text style={styles.previewTitle} numberOfLines={1}>{media.title}</Text>
+              <View style={styles.previewBadge}>
+                <Text style={styles.previewBadgeText}>{media.typeLabel}</Text>
+              </View>
+            </View>
+            <Pressable accessibilityRole="button" onPress={onClose} style={styles.previewCloseBtn}>
+              <Text style={styles.previewCloseBtnText}>✕</Text>
+            </Pressable>
+          </View>
+          <View style={styles.previewImageContainer}>
+            <Image
+              source={{ uri: media.uri }}
+              style={styles.previewImage}
+              contentFit="contain"
+              transition={200}
+            />
+          </View>
+          <View style={styles.previewFooter}>
+            <Text style={styles.previewDate}>
+              {media.createdAt ? `Đã lưu: ${new Date(media.createdAt).toLocaleDateString('vi-VN')}` : 'Tác phẩm sáng tạo'}
+            </Text>
+            <Pressable
+              style={({ pressed }: any) => [styles.downloadBtn, pressed && { opacity: 0.85 }]}
+              onPress={() => onDownload(media.uri, `${media.title || 'aikid_image'}.png`)}
+            >
+              <Text style={styles.downloadBtnText}>📥 Tải ảnh về máy</Text>
+            </Pressable>
+          </View>
+        </View>
       </View>
     </Modal>
   );
@@ -267,8 +541,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  topActionBar: {
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
   mainCard: {
     flex: 1,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
     backgroundColor: '#FDFAF4',
     borderRadius: 40,
     borderWidth: 8,
@@ -329,28 +612,62 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 10,
+  },
+  mediaCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#FFF0F3',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  mediaCardPressed: {
+    transform: [{ scale: 0.97 }],
+    opacity: 0.9,
+  },
+  mediaCardHovered: {
+    transform: [{ scale: 1.02 }],
+    borderColor: '#FFB8C9',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  imageWrapper: {
+    width: '100%',
+    aspectRatio: 1,
+    backgroundColor: '#F1F5F9',
+    overflow: 'hidden',
   },
   characterCard: {
-    width: '48%',
     overflow: 'hidden',
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#FFF7ED',
+    borderWidth: 1.5,
+    borderColor: '#FFF0F3',
     backgroundColor: '#FFFFFF',
     marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   emptyAvatar: {
-    aspectRatio: 1,
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#F5F3FF',
   },
   mediaImage: {
-    width: '48%',
-    aspectRatio: 1,
-    borderRadius: 14,
-    marginBottom: 8,
+    width: '100%',
+    height: '100%',
   },
   comicGrid: {
     flexDirection: 'row',
@@ -358,23 +675,32 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   comicCard: {
-    width: '48%',
-    minWidth: 280,
+    minWidth: 260,
     overflow: 'hidden',
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#F2DED2',
     backgroundColor: '#FFFFFF',
     marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  comicCoverWrapper: {
+    width: '100%',
+    aspectRatio: 1.55,
+    backgroundColor: '#F1F5F9',
+    overflow: 'hidden',
   },
   comicCover: {
     width: '100%',
-    aspectRatio: 1.55,
-    backgroundColor: '#F5EFEA',
+    height: '100%',
   },
   comicCoverEmpty: {
     width: '100%',
-    aspectRatio: 1.55,
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFF7ED',
@@ -412,5 +738,121 @@ const styles = StyleSheet.create({
     color: '#FF5E97',
     fontSize: 10,
     fontWeight: '900',
+  },
+  // Modal Preview styles
+  modalOverlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(2, 6, 23, 0.55)',
+    padding: 16,
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  previewCard: {
+    width: '100%',
+    maxWidth: 580,
+    maxHeight: '90%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  previewTitleWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginRight: 10,
+  },
+  previewTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#0F172A',
+    flexShrink: 1,
+  },
+  previewBadge: {
+    backgroundColor: '#FFF0F3',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  previewBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FF7597',
+  },
+  previewCloseBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  previewCloseBtnText: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: 'bold',
+  },
+  previewImageContainer: {
+    width: '100%',
+    aspectRatio: 1,
+    maxHeight: 440,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+  },
+  previewFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+  },
+  previewDate: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '500',
+  },
+  downloadBtn: {
+    backgroundColor: '#FF7597',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 16,
+    shadowColor: '#FF7597',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  downloadBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 13,
   },
 });

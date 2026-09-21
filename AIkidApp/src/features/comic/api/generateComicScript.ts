@@ -2,7 +2,7 @@ import { generateApi } from '@/core/storymee';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { pollJobUntilDone } from '@/features/jobs/api/jobHooks';
 
-import type { ComicCharacter, ComicPanel, PanelCount } from '../store/useComicDraft';
+import type { ComicCharacter, ComicPanel, PanelCount, StoryPlan } from '../store/useComicDraft';
 
 type LlmPanel = {
   action?: unknown;
@@ -51,6 +51,7 @@ export async function generateComicScriptViaGateway(input: {
   genre: string;
   panelCount: PanelCount;
   cast: ComicCharacter[];
+  storyPlan?: StoryPlan;
   childProfileId?: string;
   provider?: string;
 }): Promise<ComicPanel[]> {
@@ -59,13 +60,21 @@ export async function generateComicScriptViaGateway(input: {
   const castText = input.cast.length
     ? input.cast.map((item) => `${item.name} (${item.role === 'main' ? 'nhân vật chính' : 'nhân vật phụ'}): ${item.personality || item.appearancePrompt || 'đáng yêu'}`).join('; ')
     : 'AI tự đề xuất nhân vật phù hợp';
+  const planText = input.storyPlan ? [
+    `Bối cảnh: ${input.storyPlan.time}, ${input.storyPlan.setting}.`,
+    `Khởi đầu: ${input.storyPlan.openingAction}; cảm xúc: ${input.storyPlan.openingEmotion}.`,
+    `Biến cố: ${input.storyPlan.unexpectedEvent}; phản ứng: ${input.storyPlan.reaction}.`,
+    `Mục đích: ${input.storyPlan.purpose}. Trở ngại: ${input.storyPlan.obstacle}. Cách xử lý: ${input.storyPlan.attempt}.`,
+    `Cao trào: ${input.storyPlan.climax}. Kết thúc: ${input.storyPlan.ending}. Bài học: ${input.storyPlan.lesson}.`,
+  ].join('\n') : input.idea.trim();
   const prompt = [
     'Bạn là người hướng dẫn xây dựng cốt truyện cho học sinh 9–15 tuổi.',
-    `Hãy phát triển ý tưởng sau thành đúng ${input.panelCount} mốc của KHUNG CỐT TRUYỆN: ${input.idea.trim()}`,
+    `Hãy phát triển kế hoạch sau thành đúng ${input.panelCount} mốc của KHUNG CỐT TRUYỆN:\n${planText}`,
     `Thể loại: ${input.genre}. Nhân vật: ${castText}.`,
     'Đây chưa phải truyện chữ và chưa phải kịch bản tranh: không viết văn dài, không chia panel, không tạo lời thoại.',
     'Mỗi mốc chỉ mô tả sự kiện cốt lõi và quan hệ nguyên nhân–kết quả trong 1–2 câu.',
-    'Bốn vai trò theo thứ tự: Mở đầu, Biến cố, Cao trào, Kết quả.',
+    'Giữ đúng nhân vật, bối cảnh, mục đích, trở ngại, cao trào, kết thúc và bài học đã chọn.',
+    'Bốn vai trò theo thứ tự: Mở đầu, Biến cố, Cao trào, Kết quả và bài học.',
     'Chỉ trả JSON hợp lệ theo schema: {"beats":[{"title":"Mở đầu","summary":"..."},{"title":"Biến cố","summary":"..."},{"title":"Cao trào","summary":"..."},{"title":"Kết quả","summary":"..."}]}.',
     `Mảng beats phải có đúng ${input.panelCount} phần tử. Không markdown, không giải thích.`,
   ].join('\n');

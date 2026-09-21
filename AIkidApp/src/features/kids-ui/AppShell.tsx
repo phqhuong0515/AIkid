@@ -8,7 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFamily } from '@/features/family/store/useFamily';
 import { useAuth } from '@/core/auth/useAuth';
 import { useProfile } from '@/features/account/api/accountHooks';
-import { AikidTheme } from './theme';
 import { AccountBottomSheet } from './AccountBottomSheet';
 
 import { useAikidTemplate } from '@/design-system';
@@ -23,7 +22,7 @@ function AppHeader() {
   const isChild = actor === 'child' || !!activeChild;
   
   // Decide what avatar and name to show
-  const displayName = isChild ? activeChild?.name || 'Bé' : user?.name || 'Phụ huynh';
+  const displayName = isChild ? activeChild?.name || 'Học sinh' : user?.name || 'Phụ huynh';
   const avatarUrl = !isChild && user?.avatarUrl ? user.avatarUrl : (activeChild?.avatarUrl || null);
 
   return (

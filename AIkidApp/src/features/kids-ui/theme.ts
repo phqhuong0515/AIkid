@@ -228,7 +228,7 @@ export const AikidShadows = {
 export const AikidBgAssets = {
   lobby: require('../../../public/lobby-assets/images/bg-home.png'),
   art: require('../../../public/lobby-assets/images/bg-art.png'),
-  character: require('../../../public/lobby-assets/images/bg-character.png'),
+  character: require('../../../public/lobby-assets/images/bg-character-feature.png'),
   mee: require('../../../public/lobby-assets/images/bg-mee.png'),
   comic: require('../../../public/lobby-assets/images/bg-art.png'), // TODO: bg-comic.png
   login: require('../../../public/lobby-assets/images/bg-login.jpeg'),

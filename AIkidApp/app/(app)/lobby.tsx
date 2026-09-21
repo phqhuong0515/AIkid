@@ -2,11 +2,9 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import {
-  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -121,20 +119,20 @@ export default function LobbyScreen() {
           </View>
 
           <View style={[styles.mascotContainer, isSmallScreen ? { width: '100%', height: 250 } : { width: '45%' }]}>
-            <Image source={require('../../public/hub-images/mascot.png')} style={styles.mascotImg} contentFit="contain" />
+            <Image source={require('../../public/hub-images/home-cast.png')} style={styles.mascotImg} contentFit="contain" />
           </View>
         </View>
 
         {/* Intro Box */}
         <AikidCard variant="raised" style={styles.descriptionBox}>
           <AikidText variant="bodyBold" style={{ textAlign: 'center', fontSize: 18, lineHeight: 28, color: template.colors.text.heading }}>
-            Chào mừng bé đến với vũ trụ sáng tạo diệu kỳ! Hãy tự tay thiết kế nhân vật Mee đáng yêu, sáng tác những cuốn truyện tranh đầy màu sắc và ghi lại hành trình thú vị của riêng mình nhé!
+            Chào mừng bạn nhỏ đến với vũ trụ sáng tạo diệu kỳ! Hãy tự tay thiết kế nhân vật Mee đáng yêu, sáng tác những cuốn truyện tranh đầy màu sắc và ghi lại hành trình thú vị của riêng mình nhé!
           </AikidText>
         </AikidCard>
 
         {/* Cards Section */}
         <View style={[styles.cardsContainer, isSmallScreen ? { flexDirection: 'column' } : { flexDirection: 'row', flexWrap: 'wrap' }]}>
-          <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/mee')}>
+          <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/mee/new')}>
             <Image source={require('../../public/hub-images/card_mee.jpeg')} style={styles.cardImg} contentFit="cover" />
             <View style={[styles.cardLabel, { backgroundColor: 'rgba(77,148,255,0.75)' }]}>
               <AikidText variant="btnNav" style={styles.cardLabelText}>MEE</AikidText>
@@ -142,21 +140,21 @@ export default function LobbyScreen() {
           </Pressable>
 
           <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/character')}>
-            <Image source={require('../../public/hub-images/home-character.jpeg')} style={styles.cardImg} contentFit="cover" />
+            <Image source={require('../../public/hub-images/home-character-alien.jpeg')} style={styles.cardImg} contentFit="cover" />
             <View style={[styles.cardLabel, { backgroundColor: 'rgba(255,144,64,0.75)' }]}>
               <AikidText variant="btnNav" style={styles.cardLabelText}>NHÂN VẬT</AikidText>
             </View>
           </Pressable>
 
           <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/art')}>
-            <Image source={require('../../public/hub-images/card_art.jpeg')} style={styles.cardImg} contentFit="cover" />
+            <Image source={require('../../public/hub-images/home-creative-dinosaur.jpeg')} style={styles.cardImg} contentFit="cover" />
             <View style={[styles.cardLabel, { backgroundColor: 'rgba(232,64,64,0.75)' }]}>
               <AikidText variant="btnNav" style={styles.cardLabelText}>XƯỞNG SÁNG TẠO</AikidText>
             </View>
           </Pressable>
 
           <Pressable style={[styles.card, isSmallScreen ? { width: '100%' } : { width: '48%' }]} onPress={() => navigateTo('/(app)/gallery')}>
-            <Image source={require('../../public/hub-images/home-explore.jpeg')} style={styles.cardImg} contentFit="cover" />
+            <Image source={require('../../public/hub-images/home-explore-cat.jpeg')} style={styles.cardImg} contentFit="cover" />
             <View style={[styles.cardLabel, { backgroundColor: 'rgba(76,175,138,0.75)' }]}>
               <AikidText variant="btnNav" style={styles.cardLabelText}>KHÁM PHÁ</AikidText>
             </View>

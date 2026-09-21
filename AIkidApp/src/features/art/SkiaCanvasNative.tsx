@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { View, StyleSheet, Text, type LayoutChangeEvent } from 'react-native';
 import {
   Canvas,
   Path,
+  Rect,
   Skia,
   Image,
-  useImage,
 } from '@shopify/react-native-skia';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSharedValue, runOnJS } from 'react-native-reanimated';
@@ -23,30 +23,36 @@ export default function SkiaCanvasNative({
   paths,
   setPaths,
 }: SkiaCanvasProps) {
+  const [canvasSize, setCanvasSize] = React.useState({ width: 1, height: 1 });
   const currentPath = useSharedValue<ReturnType<typeof Skia.Path.Make>>(Skia.Path.Make());
   const currentPathColor = useSharedValue<string>('#000000');
   const currentPathWidth = useSharedValue<number>(5);
   const currentPathOpacity = useSharedValue<number>(1);
   const currentPathTool = useSharedValue<DrawTool>('brush');
 
-  // Skia image for background
-  const bgImage = useImage(backgroundDataUrl || null);
+  // Decode picked images directly. CanvasKit on mobile browsers can fail to
+  // resolve data/blob URLs through useImage even though the picker succeeded.
+  const bgImage = useMemo(() => {
+    if (!backgroundDataUrl?.startsWith('data:')) return null;
+    const base64 = backgroundDataUrl.split(',', 2)[1];
+    if (!base64) return null;
+    try {
+      return Skia.Image.MakeImageFromEncoded(Skia.Data.fromBase64(base64));
+    } catch {
+      return null;
+    }
+  }, [backgroundDataUrl]);
 
   const commitPath = useCallback((p: ReturnType<typeof Skia.Path.Make>, c: string, w: number, t: DrawTool, op: number) => {
-    setPaths((prev) => {
-      const newPaths = [...prev, { path: p, color: c, strokeWidth: w, tool: t, opacity: op }];
-      if (newPaths.length > 30) newPaths.shift();
-      return newPaths;
-    });
+    setPaths((prev) => [...prev, { path: p, color: c, strokeWidth: w, tool: t, opacity: op }]);
     if (onPathAdded) onPathAdded();
   }, [setPaths, onPathAdded]);
 
   const commitStamp = useCallback((x: number, y: number, stamp: string) => {
-    setPaths((prev) => {
-      const newPaths = [...prev, { path: Skia.Path.Make(), color: 'transparent', strokeWidth: 0, tool: 'stamp' as DrawTool, opacity: 1, stamp, x, y }];
-      if (newPaths.length > 30) newPaths.shift();
-      return newPaths;
-    });
+    setPaths((prev) => [
+      ...prev,
+      { path: Skia.Path.Make(), color: 'transparent', strokeWidth: 0, tool: 'stamp' as DrawTool, opacity: 1, stamp, x, y },
+    ]);
     if (onPathAdded) onPathAdded();
   }, [setPaths, onPathAdded]);
 
@@ -103,13 +109,28 @@ export default function SkiaCanvasNative({
 
   const composed = Gesture.Race(panGesture, tapGesture);
 
+  const handleLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setCanvasSize({ width: Math.max(1, width), height: Math.max(1, height) });
+  }, []);
+
   return (
     <View style={[styles.container, style]}>
       <GestureDetector gesture={composed}>
-        <View style={styles.canvasWrapper}>
+        <View style={styles.canvasWrapper} onLayout={handleLayout}>
           <Canvas ref={canvasRef} style={styles.canvas}>
+            {/* Keep snapshots opaque. A transparent Skia surface is decoded as
+                black by some provider upload pipelines. */}
+            <Rect x={0} y={0} width={canvasSize.width} height={canvasSize.height} color="#FDFAF4" />
             {bgImage && (
-              <Image image={bgImage} fit="cover" x={0} y={0} width={1000} height={1000} />
+              <Image
+                image={bgImage}
+                fit="contain"
+                x={0}
+                y={0}
+                width={canvasSize.width}
+                height={canvasSize.height}
+              />
             )}
             {paths.map((p, i) => {
               if (p.tool === 'stamp' && p.stamp) {

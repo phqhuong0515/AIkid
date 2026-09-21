@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { Asset } from 'expo-asset';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -7,16 +8,19 @@ import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 
 import { generateImageViaGateway } from '@/features/creative/generateImageViaGateway';
 import { generateComicPanelsFromSource, reviewComicPanelsAgainstSource } from '@/features/comic/api/generateComicPanelAssist';
+import { saveComicStoryToBalo } from '@/features/comic/api/comicRemoteLibrary';
 import { BubbleCorner, COMIC_BUBBLE_EDITOR_ENABLED, ComicBubble, ComicDialogueOverlay } from '@/features/comic/ComicDialogueOverlay';
+import { COMIC_LAYOUTS, ComicPanelCount, DEFAULT_COMIC_LAYOUT_ID, getComicLayout, getDefaultComicLayoutForCount } from '@/features/comic/comicLayouts';
 import { ComicCharacter, useComicDraft } from '@/features/comic/store/useComicDraft';
 import { ART_STYLES } from '@/features/art/constants';
+import { CharacterPicker } from '@/features/character';
 import { useResponsiveLayout } from '@/features/kids-ui/useResponsiveLayout';
-import { AikidButton, AikidPage, AikidSafeBox } from '@/ui';
+import { AikidButton, AikidPage, AikidSafeBox, AikidStepNavigator } from '@/ui';
 
-type TextStory = { id: string; title?: string; plotVersionId?: string; opening?: string; development?: string; ending?: string };
+type TextStory = { id: string; title?: string; plotVersionId?: string; opening?: string; development?: string; ending?: string; characters?: ComicCharacter[] };
 type SourceChoice = { id: string; type: 'plot' | 'text'; title: string; description: string; beats: string[]; characters: ComicCharacter[] };
 type ComicPanelDraft = { id: string; content: string; characterIds: string[]; dialogue: string; imageUrl: string; jobId: string; error: string };
-type ComicPageDraft = { id: string; imageUrl: string; jobId: string; panels: ComicPanelDraft[]; bubbles: ComicBubble[] };
+type ComicPageDraft = { id: string; imageUrl: string; jobId: string; layoutId?: string; panels: ComicPanelDraft[]; bubbles: ComicBubble[] };
 type StoredComic = {
   id: string;
   sourceId: string;
@@ -27,44 +31,40 @@ type StoredComic = {
   createdAt?: string;
 };
 
-const FLOW_STEPS = ['Chọn nguồn', 'Nét vẽ', 'Số khung', 'Từng khung', 'Hoàn thiện'];
+const FLOW_STEPS = ['Chọn nguồn', 'Nét vẽ', 'Bố cục', 'Từng khung', 'Hoàn thiện'];
 const COMIC_STORY_KEY = 'aikid.comic.stories.v1';
+const COMIC_IMAGE_JOB_IDS_KEY = 'aikid.comic.image-job-ids.v1';
 
 function buildComicPagePrompt(
   stylePrompt: string,
   panels: ComicPanelDraft[],
   characters: ComicCharacter[],
+  layoutLabel: string,
 ) {
-  const layout = panels.length === 2 ? 'a 2-panel horizontal layout' : panels.length === 4 ? 'a clean 2x2 grid' : 'a clean 2x3 grid';
   const characterById = new Map(characters.map((character) => [character.id, character]));
-  const characterBible = characters.map((character) => [
+  const usedCharacterIds = new Set(panels.flatMap((panel) => panel.characterIds));
+  const characterBible = characters.filter((character) => usedCharacterIds.has(character.id)).map((character) => [
     character.name,
     character.appearancePrompt || character.personality,
   ].filter(Boolean).join(': ')).join('; ');
   const panelDirectives = panels.map((panel, index) => {
     const names = panel.characterIds.map((id) => characterById.get(id)?.name).filter(Boolean).join(', ');
-    return [
-      `PANEL ${index + 1}`,
-      `scene: ${panel.content.trim()}`,
-      names ? `characters: ${names}` : 'characters: no named character',
-      panel.dialogue.trim() ? `Vietnamese dialogue to letter naturally in one speech bubble: "${panel.dialogue.trim()}"` : 'no dialogue',
-    ].join('; ');
+    const dialogue = panel.dialogue.trim() ? ` | EXACT VIETNAMESE SPEECH: "${panel.dialogue.trim()}"` : ' | NO SPEECH';
+    return `P${index + 1} | CAST: ${names || 'none'} | SCENE: ${panel.content.trim()}${dialogue}`;
   }).join('\n');
 
   return [
-    'Create ONE finished comic-page illustration with naturally lettered speech bubbles.',
-    `Layout: ${layout}, exactly ${panels.length} clearly separated panels, reading order left-to-right then top-to-bottom.`,
-    `Unified art direction: ${stylePrompt}.`,
-    characterBible ? `Character consistency bible: ${characterBible}. Keep the same face, colors, clothes and proportions in every panel.` : '',
-    'Every panel must depict only its assigned scene. Preserve the story order and visual continuity between adjacent panels.',
+    `MANDATORY STORYBOARD: Create one ${panels.length}-panel comic page. Depict exactly the following scene in each matching panel; never invent or replace the story:`,
     panelDirectives,
-    'Place each supplied dialogue exactly once in its matching panel using a natural white speech bubble. Preserve Vietnamese wording and accents. Keep bubbles away from faces and key actions.',
-    'No page title, no captions, no extra dialogue, no sound effects, no watermark.',
-    'Kid-friendly, polished page composition, balanced gutters, no extra panels, no duplicated characters.',
+    'STORY RULE: each panel shows only its assigned moment. Maintain cause-and-effect continuity and consistent characters. Render each supplied speech line exactly once, verbatim, in its matching panel; do not translate it.',
+    `LAYOUT: the LAST reference image is the strict ${layoutLabel} template; earlier references are characters. Preserve its aspect ratio, panel positions, shapes, borders, margins and white gutters exactly. Reading order is left-to-right, top-to-bottom. Keep artwork clipped inside panels.`,
+    `ART STYLE: ${stylePrompt}.`,
+    characterBible ? `CHARACTERS: ${characterBible}. Match reference identity, face, colors, clothes and proportions throughout.` : '',
+    'No title, captions, extra dialogue, sound effects, watermark, extra panels, duplicated characters or invented story elements.',
   ].filter(Boolean).join('\n');
 }
 
-function buildPanels(beats: string[], count: 2 | 4 | 6, defaultCharacterIds: string[]): ComicPanelDraft[] {
+function buildPanels(beats: string[], count: ComicPanelCount, defaultCharacterIds: string[]): ComicPanelDraft[] {
   const clean = beats.filter(Boolean);
   return Array.from({ length: count }, (_, index) => {
     const sourceIndex = Math.min(clean.length - 1, Math.floor(index * clean.length / count));
@@ -80,6 +80,23 @@ function buildPanels(beats: string[], count: 2 | 4 | 6, defaultCharacterIds: str
   });
 }
 
+async function resolveLayoutDataUrl(thumbnail: number) {
+  const asset = Asset.fromModule(thumbnail);
+  if (!asset.localUri) await asset.downloadAsync();
+  const uri = asset.localUri || asset.uri;
+  if (!uri) throw new Error('Không đọc được ảnh bố cục đã chọn');
+  if (uri.startsWith('data:')) return uri;
+  const response = await fetch(uri);
+  if (!response.ok) throw new Error('Không tải được ảnh bố cục đã chọn');
+  const blob = await response.blob();
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Không chuyển được ảnh bố cục'));
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.readAsDataURL(blob);
+  });
+}
+
 export default function StoryComicScreen() {
   const router = useRouter();
   const responsive = useResponsiveLayout({ maxContent: 1200 });
@@ -92,7 +109,8 @@ export default function StoryComicScreen() {
   const [step, setStep] = useState(1);
   const [maxVisitedStep, setMaxVisitedStep] = useState(1);
   const [artStyleId, setArtStyleId] = useState('');
-  const [panelCount, setPanelCount] = useState<2 | 4 | 6>(4);
+  const [layoutId, setLayoutId] = useState(DEFAULT_COMIC_LAYOUT_ID);
+  const [layoutCountFilter, setLayoutCountFilter] = useState<ComicPanelCount>(4);
   const [pageCharacterIds, setPageCharacterIds] = useState<string[]>([]);
   const [panels, setPanels] = useState<ComicPanelDraft[]>([]);
   const [completedPages, setCompletedPages] = useState<ComicPageDraft[]>([]);
@@ -141,7 +159,7 @@ export default function StoryComicScreen() {
       id: item.versionId,
       type: 'plot' as const,
       title: item.title || item.pages[0]?.title || 'Cốt truyện',
-      description: 'Cốt truyện · chia bốn mốc thành các khung tranh',
+      description: `Cốt truyện · ${item.cast.length} nhân vật · chia các mốc thành khung tranh`,
       beats: item.pages[0]?.panels.map((panel) => panel.action).filter(Boolean) || [],
       characters: item.cast,
     }));
@@ -155,7 +173,7 @@ export default function StoryComicScreen() {
           title: story.title || 'Truyện chữ của em',
           description: 'Truyện chữ · chọn cảnh quan trọng để vẽ',
           beats: [story.opening, story.development, story.ending].filter((value): value is string => Boolean(value)),
-          characters: relatedPlot?.cast || [],
+          characters: story.characters?.length ? story.characters : relatedPlot?.cast || [],
         };
       }),
     ];
@@ -177,7 +195,9 @@ export default function StoryComicScreen() {
     if (requestedIndex !== null && Number.isInteger(requestedIndex) && editingComic.pages[requestedIndex]) {
       const page = editingComic.pages[requestedIndex];
       setEditingPageIndex(requestedIndex);
-      setPanelCount(([2, 4, 6] as const).includes(page.panels.length as 2 | 4 | 6) ? page.panels.length as 2 | 4 | 6 : 4);
+      const restoredLayout = page.layoutId ? getComicLayout(page.layoutId) : getDefaultComicLayoutForCount(page.panels.length);
+      setLayoutId(restoredLayout.id);
+      setLayoutCountFilter(restoredLayout.panelCount);
       setPanels(page.panels);
       setPageImageUrl(page.imageUrl || '');
       setPageJobId(page.jobId || '');
@@ -196,9 +216,11 @@ export default function StoryComicScreen() {
 
   const selected = sources.find((source) => `${source.type}:${source.id}` === selectedKey);
   const selectedStyle = ART_STYLES.find((style) => style.id === artStyleId);
+  const selectedLayout = getComicLayout(layoutId);
+  const panelCount = selectedLayout.panelCount;
   const sourceText = selected?.beats.map((beat, index) => `${index + 1}. ${beat}`).join('\n') || '';
   const pagePrompt = selected && selectedStyle
-    ? buildComicPagePrompt(selectedStyle.canonicalPrompt, panels, selected.characters)
+    ? buildComicPagePrompt(selectedStyle.canonicalPrompt, panels, selected.characters, `${panelCount}-panel layout`)
     : '';
   const usedCharacterIds = new Set(panels.flatMap((panel) => panel.characterIds));
   const referenceCharacters = selected?.characters.filter(
@@ -243,7 +265,23 @@ export default function StoryComicScreen() {
         .filter((character) => usedCharacterIds.has(character.id))
         .map((character) => character.referenceImageUrl)
         .filter((url): url is string => Boolean(url?.startsWith('http')));
-      const result = await generateImageViaGateway({ userPrompt: pagePrompt, referenceHttpsUrls });
+      const result = await generateImageViaGateway({
+        userPrompt: pagePrompt,
+        referenceDataUrl: await resolveLayoutDataUrl(selectedLayout.thumbnail),
+        referenceHttpsUrls,
+        purpose: 'comic-page',
+      });
+      const rawComicJobIds = await AsyncStorage.getItem(COMIC_IMAGE_JOB_IDS_KEY);
+      const comicJobIds = rawComicJobIds ? JSON.parse(rawComicJobIds) : [];
+      await AsyncStorage.setItem(
+        COMIC_IMAGE_JOB_IDS_KEY,
+        JSON.stringify([
+          result.jobId,
+          ...(Array.isArray(comicJobIds)
+            ? comicJobIds.filter((id) => id !== result.jobId)
+            : []),
+        ].slice(0, 300)),
+      );
       setPageImageUrl(result.imageUrl);
       setPageJobId(result.jobId);
       setShowBubbles(false);
@@ -308,7 +346,7 @@ export default function StoryComicScreen() {
     const raw = await AsyncStorage.getItem(COMIC_STORY_KEY);
     const current = raw ? JSON.parse(raw) : [];
     const createdAt = new Date().toISOString();
-    const currentPage = { id: editingPageIndex !== null ? editingComic?.pages[editingPageIndex]?.id || `page-${editingPageIndex + 1}` : `page-${completedPages.length + 1}`, imageUrl: pageImageUrl, jobId: pageJobId, panels, bubbles };
+    const currentPage = { id: editingPageIndex !== null ? editingComic?.pages[editingPageIndex]?.id || `page-${editingPageIndex + 1}` : `page-${completedPages.length + 1}`, imageUrl: pageImageUrl, jobId: pageJobId, layoutId, panels, bubbles };
     const nextPages = editingComic
       ? editingPageIndex !== null
         ? editingComic.pages.map((page, index) => index === editingPageIndex ? currentPage : page)
@@ -330,29 +368,32 @@ export default function StoryComicScreen() {
       ? (Array.isArray(current) ? current.map((item) => item.id === editingComic.id ? comic : item) : [comic])
       : [comic, ...(Array.isArray(current) ? current : [])];
     await AsyncStorage.setItem(COMIC_STORY_KEY, JSON.stringify(nextStories));
-    router.replace({ pathname: '/(app)/comic/story-reader', params: { id: comic.id, type: 'comic' } });
+    try {
+      const remoteAssetId = await saveComicStoryToBalo(comic);
+      const syncedComic = { ...comic, remoteAssetId };
+      const syncedStories = nextStories.map((item) => item.id === comic.id ? syncedComic : item);
+      await AsyncStorage.setItem(COMIC_STORY_KEY, JSON.stringify(syncedStories));
+      router.replace({ pathname: '/(app)/comic/story-reader', params: { id: comic.id, type: 'comic' } });
+    } catch (error) {
+      Alert.alert(
+        'Đã lưu trên thiết bị, chưa lưu được vào Balo',
+        error instanceof Error ? error.message : 'Hãy kiểm tra kết nối và thử lưu lại.',
+      );
+    }
   };
 
   return (
     <AikidPage scene="comic" title="Tạo truyện tranh" backHref="/(app)/comic/create-v2" container="wide" scroll={false}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <AikidSafeBox variant="panel" style={styles.workspace}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.stepper}>
-            {FLOW_STEPS.map((label, index) => {
-              const value = index + 1;
-              const active = value === step;
-              const unlocked = value <= maxVisitedStep;
-              const complete = value < maxVisitedStep;
-              return (
-                <TouchableOpacity key={label} disabled={!unlocked} style={[styles.step, { width: responsive.isTabletUp ? 150 : 80 }, !unlocked && styles.stepLocked]} onPress={() => setStep(value)}>
-                  <View style={[styles.stepDot, complete && styles.stepDotComplete, active && styles.stepDotActive]}>
-                    {complete && !active ? <Ionicons name="checkmark" size={14} color="#FFF" /> : <Text style={styles.stepNumber}>{value}</Text>}
-                  </View>
-                  <Text style={[styles.stepLabel, active && styles.stepLabelActive]}>{label}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+          <View style={styles.stepper}>
+            <AikidStepNavigator
+              steps={FLOW_STEPS}
+              currentStep={step}
+              maxVisitedStep={maxVisitedStep}
+              onStepPress={setStep}
+            />
+          </View>
 
           {step === 1 ? (
             <>
@@ -394,14 +435,33 @@ export default function StoryComicScreen() {
 
           {step === 3 ? (
             <>
-              <Text style={styles.title}>Chọn số khung truyện</Text>
-              <Text style={styles.description}>Chọn số khung phù hợp với câu chuyện. Em có thể sửa từng khung ở bước sau.</Text>
-              <View style={styles.countGrid}>
-                {([2, 4, 6] as const).map((count) => (
-                  <TouchableOpacity key={count} style={[styles.countCard, panelCount === count && styles.optionActive]} onPress={() => setPanelCount(count)}>
-                    <Text style={styles.countNumber}>{count}</Text><Text style={styles.optionTitle}>khung</Text>
+              <Text style={styles.title}>Chọn bố cục trang truyện</Text>
+              <Text style={styles.description}>Chọn số khung, sau đó chọn cách sắp xếp em thích. AI sẽ vẽ cả trang theo đúng mẫu này trong một lần.</Text>
+              <View style={styles.countFilterRow}>
+                {([3, 4, 5, 6] as ComicPanelCount[]).map((count) => (
+                  <TouchableOpacity
+                    key={count}
+                    style={[styles.countFilter, layoutCountFilter === count && styles.countFilterActive]}
+                    onPress={() => {
+                      setLayoutCountFilter(count);
+                      setLayoutId(getDefaultComicLayoutForCount(count).id);
+                    }}
+                  >
+                    <Text style={[styles.countFilterText, layoutCountFilter === count && styles.countFilterTextActive]}>{count} khung</Text>
                   </TouchableOpacity>
                 ))}
+              </View>
+              <View style={styles.layoutGrid}>
+                {COMIC_LAYOUTS.filter((layout) => layout.panelCount === layoutCountFilter).map((layout) => {
+                  const active = layout.id === layoutId;
+                  return (
+                    <TouchableOpacity key={layout.id} style={[styles.layoutCard, active && styles.layoutCardActive]} onPress={() => setLayoutId(layout.id)}>
+                      <Image source={layout.thumbnail} style={styles.layoutThumbnail} contentFit="contain" />
+                      <Text style={[styles.layoutLabel, active && styles.layoutLabelActive]}>{layout.label}</Text>
+                      {active ? <View style={styles.layoutSelectedMark}><Ionicons name="checkmark" size={15} color="#FFF" /></View> : null}
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </>
           ) : null}
@@ -419,43 +479,30 @@ export default function StoryComicScreen() {
                   <Text style={styles.characterPickerCount}>{pageCharacterIds.length} đã chọn</Text>
                 </View>
                 {selected?.characters.length ? (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.characterGallery}>
-                    {selected.characters.map((character) => {
-                      const active = pageCharacterIds.includes(character.id);
-                      const hasReference = Boolean(character.referenceImageUrl?.startsWith('http'));
-                      return (
-                        <TouchableOpacity
-                          key={character.id}
-                          style={[styles.characterCard, active && styles.characterCardActive]}
-                          onPress={() => {
-                            const next = active
-                              ? pageCharacterIds.filter((id) => id !== character.id)
-                              : [...pageCharacterIds, character.id];
-                            setPageCharacterIds(next);
-                            setPanels((current) => current.map((panel) => ({
-                              ...panel,
-                              characterIds: active
-                                ? panel.characterIds.filter((id) => id !== character.id)
-                                : [...new Set([...panel.characterIds, character.id])],
-                            })));
-                            setPageImageUrl('');
-                          }}
-                        >
-                          {character.referenceImageUrl ? (
-                            <Image source={{ uri: character.referenceImageUrl }} style={styles.characterPhoto} contentFit="cover" />
-                          ) : (
-                            <View style={styles.characterPhotoEmpty}><Ionicons name="person-outline" size={28} color="#C8B5A7" /></View>
-                          )}
-                          <Text style={styles.characterName} numberOfLines={1}>{character.name}</Text>
-                          <View style={[styles.referenceBadge, !hasReference && styles.referenceBadgeMissing]}>
-                            <Ionicons name={hasReference ? 'link-outline' : 'alert-circle-outline'} size={12} color={hasReference ? '#287456' : '#A6653A'} />
-                            <Text style={[styles.referenceBadgeText, !hasReference && styles.referenceBadgeTextMissing]}>{hasReference ? 'Có ảnh mẫu' : 'Chưa có ảnh'}</Text>
-                          </View>
-                          {active ? <View style={styles.characterCheck}><Ionicons name="checkmark" size={14} color="#FFF" /></View> : null}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
+                  <CharacterPicker
+                    characters={selected.characters.map((character) => ({
+                      id: character.id,
+                      name: character.name,
+                      imageUri: character.referenceImageUrl,
+                      subtitle: character.referenceImageUrl?.startsWith('http') ? 'Có ảnh mẫu' : 'Chưa có ảnh',
+                    }))}
+                    selectedIds={pageCharacterIds}
+                    maxSelection={selected.characters.length}
+                    onToggle={(id) => {
+                      const active = pageCharacterIds.includes(id);
+                      const next = active
+                        ? pageCharacterIds.filter((characterId) => characterId !== id)
+                        : [...pageCharacterIds, id];
+                      setPageCharacterIds(next);
+                      setPanels((current) => current.map((panel) => ({
+                        ...panel,
+                        characterIds: active
+                          ? panel.characterIds.filter((characterId) => characterId !== id)
+                          : [...new Set([...panel.characterIds, id])],
+                      })));
+                      setPageImageUrl('');
+                    }}
+                  />
                 ) : <Text style={styles.noCharacter}>Cốt truyện này chưa có nhân vật. Hãy quay lại Kho nhân vật để bổ sung.</Text>}
               </View>
               <View style={styles.panelAssistWorkspace}>
@@ -588,7 +635,7 @@ export default function StoryComicScreen() {
                     variant="feature"
                     onPress={() => {
                       if (!pageImageUrl) return;
-                      setCompletedPages((current) => [...current, { id: `page-${current.length + 1}`, imageUrl: pageImageUrl, jobId: pageJobId, panels, bubbles }]);
+                      setCompletedPages((current) => [...current, { id: `page-${current.length + 1}`, imageUrl: pageImageUrl, jobId: pageJobId, layoutId, panels, bubbles }]);
                       setPanels([]);
                       setPageImageUrl('');
                       setPageJobId('');
@@ -622,15 +669,7 @@ export default function StoryComicScreen() {
 const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 24 },
   workspace: { width: '100%', minHeight: 560 },
-  stepper: { minWidth: '100%', flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EBDCD0', paddingBottom: 15, marginBottom: 20 },
-  step: { alignItems: 'center', gap: 5 },
-  stepLocked: { opacity: 0.55 },
-  stepDot: { width: 27, height: 27, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E9DDD3' },
-  stepDotComplete: { backgroundColor: '#43B97F' },
-  stepDotActive: { backgroundColor: '#FF5E97' },
-  stepNumber: { color: '#FFF', fontSize: 11, fontWeight: '900' },
-  stepLabel: { color: '#8A7463', fontSize: 9, fontWeight: '900', textAlign: 'center' },
-  stepLabelActive: { color: '#FF5E97' },
+  stepper: { width: '100%', borderBottomWidth: 1, borderBottomColor: '#EBDCD0', paddingBottom: 15, marginBottom: 20 },
   title: { color: '#475569', fontSize: 24, fontWeight: '900' },
   description: { color: '#8A7463', fontSize: 13, lineHeight: 19, marginTop: 4, marginBottom: 18 },
   sourceGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
@@ -649,9 +688,18 @@ const styles = StyleSheet.create({
   selectedMark: { position: 'absolute', right: 10, top: 10, width: 25, height: 25, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FF5E97' },
   optionActive: { borderColor: '#FF5E97', backgroundColor: '#FFF1F5' },
   optionTitle: { color: '#475569', fontSize: 14, fontWeight: '900', marginTop: 8 },
-  countGrid: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 16 },
-  countCard: { width: 170, height: 130, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#EBDCD0', borderRadius: 20, backgroundColor: '#FFF' },
-  countNumber: { color: '#FF5E97', fontSize: 38, fontWeight: '900' },
+  countFilterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 16 },
+  countFilter: { minWidth: 86, borderWidth: 1.5, borderColor: '#EBDCD0', borderRadius: 999, backgroundColor: '#FFF', paddingHorizontal: 16, paddingVertical: 9, alignItems: 'center' },
+  countFilterActive: { borderColor: '#FF5E97', backgroundColor: '#FF5E97' },
+  countFilterText: { color: '#8A7463', fontSize: 12, fontWeight: '900' },
+  countFilterTextActive: { color: '#FFF' },
+  layoutGrid: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 16 },
+  layoutCard: { position: 'relative', width: 156, borderWidth: 2, borderColor: '#EBDCD0', borderRadius: 18, backgroundColor: '#FFF', padding: 10, alignItems: 'center' },
+  layoutCardActive: { borderColor: '#FF5E97', backgroundColor: '#FFF1F5' },
+  layoutThumbnail: { width: 118, height: 158, borderRadius: 8, backgroundColor: '#FFF' },
+  layoutLabel: { color: '#67584D', fontSize: 11, fontWeight: '900', marginTop: 8 },
+  layoutLabelActive: { color: '#FF5E97' },
+  layoutSelectedMark: { position: 'absolute', right: 7, top: 7, width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FF5E97' },
   panelGrid: { gap: 14 },
   characterPicker: { borderWidth: 1.5, borderColor: '#EBDCD0', borderRadius: 18, backgroundColor: '#FFF', padding: 14, marginBottom: 16 },
   characterPickerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 12 },

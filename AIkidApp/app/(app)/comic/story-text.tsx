@@ -7,7 +7,7 @@ import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import { useComicDraft } from '@/features/comic/store/useComicDraft';
 import { editStoryTextAgainstPlot, generateOutlineFromPlot, generateStoryWritingAssist, reviewOutlineAgainstPlot, StoryWritingStage } from '@/features/comic/api/generateStoryWritingAssist';
 import { usePopSound } from '@/hooks/usePopSound';
-import { AikidButton, AikidIcon, AikidPage, AikidSafeBox } from '@/ui';
+import { AikidButton, AikidIcon, AikidPage, AikidSafeBox, AikidStepNavigator } from '@/ui';
 
 const TEXT_STEPS = ['Chọn cốt truyện', 'Chế độ viết', 'Dàn ý 3 phần', 'Mở đầu', 'Diễn biến', 'Kết thúc', 'Biên tập'] as const;
 type WritingMode = 'self' | 'ai';
@@ -73,6 +73,7 @@ export default function StoryTextScreen() {
     const page = selectedPlot?.pages[0];
     if (!page) return '';
     return [
+      `Nhân vật: ${selectedPlot.cast.map((character) => `${character.name} (${character.role === 'main' ? 'chính' : 'phụ'}; ${character.personality})`).join('; ') || 'Chưa chọn'}`,
       `Ý tưởng gốc: ${page.idea}`,
       ...page.panels.map((beat, index) => `${index + 1}. ${beat.action}`),
     ].join('\n');
@@ -143,6 +144,7 @@ export default function StoryTextScreen() {
       id: `text-${createdAt}`,
       plotVersionId: selectedPlot.versionId,
       title: selectedPlot.title || selectedPlot.pages[0]?.title || 'Truyện chữ của em',
+      characters: selectedPlot.cast,
       mode,
       outline,
       opening,
@@ -161,7 +163,10 @@ export default function StoryTextScreen() {
     setAiLoadingStage(stage);
     try {
       const plotPage = selectedPlot.pages[0];
-      const plotFramework = plotPage?.panels.map((beat, index) => `${index + 1}. ${beat.action}`).filter(Boolean).join('\n');
+      const plotFramework = [
+        `Nhân vật: ${selectedPlot.cast.map((character) => `${character.name} (${character.role === 'main' ? 'chính' : 'phụ'}; ${character.personality})`).join('; ')}`,
+        ...(plotPage?.panels.map((beat, index) => `${index + 1}. ${beat.action}`) || []),
+      ].filter(Boolean).join('\n');
       const suggestion = await generateStoryWritingAssist({
         stage,
         plot: [plotPage?.idea || selectedPlot.title || '', plotFramework].filter(Boolean).join('\n'),
@@ -289,31 +294,15 @@ export default function StoryTextScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <AikidSafeBox variant="panel" style={styles.workspace}>
           <View style={styles.textStepper}>
-            {TEXT_STEPS.map((label, index) => {
-              const value = index + 1;
-              const active = value === step;
-              const complete = value < maxVisitedStep;
-              const unlocked = value <= maxVisitedStep;
-              return (
-                <TouchableOpacity
-                  key={label}
-                  disabled={!unlocked}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Bước ${value}: ${label}`}
-                  accessibilityState={{ disabled: !unlocked, selected: active }}
-                  onPress={() => {
-                    playPop();
-                    setStep(value);
-                  }}
-                  style={[styles.textStep, !unlocked && styles.textStepLocked]}
-                >
-                  <View style={[styles.textStepDot, complete && styles.textStepDotComplete, active && styles.textStepDotActive]}>
-                    {complete && !active ? <Ionicons name="checkmark" size={13} color="#FFF" /> : <Text style={[styles.textStepNumber, active && styles.textStepNumberActive]}>{value}</Text>}
-                  </View>
-                  <Text style={[styles.textStepLabel, active && styles.textStepLabelActive]} numberOfLines={1}>{label}</Text>
-                </TouchableOpacity>
-              );
-            })}
+            <AikidStepNavigator
+              steps={TEXT_STEPS}
+              currentStep={step}
+              maxVisitedStep={maxVisitedStep}
+              onStepPress={(value) => {
+                playPop();
+                setStep(value);
+              }}
+            />
           </View>
 
           <View style={styles.content}>
@@ -411,16 +400,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1, width: '100%' },
   scrollContent: { paddingBottom: 22 },
   workspace: { width: '100%', minHeight: 480 },
-  textStepper: { flexDirection: 'row', gap: 5, borderBottomWidth: 1, borderBottomColor: '#EBDCD0', paddingBottom: 13, marginBottom: 20 },
-  textStep: { flex: 1, minWidth: 0, alignItems: 'center', gap: 4 },
-  textStepLocked: { opacity: 0.72 },
-  textStepDot: { width: 25, height: 25, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E9DDD3' },
-  textStepDotActive: { backgroundColor: '#FF5E97' },
-  textStepDotComplete: { backgroundColor: '#43B97F' },
-  textStepNumber: { color: '#8A7463', fontSize: 10, fontWeight: '900' },
-  textStepNumberActive: { color: '#FFF' },
-  textStepLabel: { maxWidth: '100%', color: '#8A7463', fontSize: 8, fontWeight: '800', textAlign: 'center' },
-  textStepLabelActive: { color: '#FF5E97' },
+  textStepper: { borderBottomWidth: 1, borderBottomColor: '#EBDCD0', paddingBottom: 13, marginBottom: 20 },
   content: { minHeight: 340 },
   sectionTitle: { color: '#475569', fontSize: 24, fontWeight: '900' },
   sectionDescription: { color: '#8A7463', fontSize: 13, lineHeight: 19, marginTop: 4, marginBottom: 18 },

@@ -8,29 +8,11 @@ import type { MeeDraft } from './types';
 
 export type MeeAssetPreviewHandle = { toPngDataUrl: () => Promise<string> };
 
-export const MeeAssetPreview = forwardRef<MeeAssetPreviewHandle, { draft: MeeDraft; compact?: boolean }>(function MeeAssetPreview({ draft, compact = false }, ref) {
+export const MeeAssetPreview = forwardRef<MeeAssetPreviewHandle, { draft: MeeDraft; compact?: boolean; stage?: boolean }>(function MeeAssetPreview({ draft, compact = false, stage = false }, ref) {
   const svgRef = useRef<Svg>(null);
   const ast = useMemo(
-    () => parse(buildMeeAssetSvg(draft)),
-    [
-      draft.backgroundColor,
-      draft.bang,
-      draft.behind,
-      draft.customPrimaryColor,
-      draft.customShadowColor,
-      draft.eyebrows,
-      draft.eyes,
-      draft.face,
-      draft.gender,
-      draft.hairColor,
-      draft.mouth,
-      draft.nose,
-      draft.pants,
-      draft.pantsColor,
-      draft.shirt,
-      draft.shirtColor,
-      draft.skinTone,
-    ],
+    () => parse(buildMeeAssetSvg(draft, { transparentBackground: stage })),
+    [draft, stage],
   );
   useImperativeHandle(ref, () => ({
     toPngDataUrl: () => new Promise((resolve, reject) => {
@@ -41,7 +23,10 @@ export const MeeAssetPreview = forwardRef<MeeAssetPreviewHandle, { draft: MeeDra
       }, { width: 768, height: 768 });
     }),
   }), []);
-  return <View className={`w-full overflow-hidden rounded-[28px] border border-orange-100 flex-1 ${compact ? 'min-h-[200px]' : ''}`} style={{ backgroundColor: draft.backgroundColor }}>
+  return <View
+    className={`w-full overflow-hidden flex-1 ${stage ? '' : 'rounded-[28px] border border-orange-100'} ${compact ? 'min-h-[200px]' : ''}`}
+    style={{ backgroundColor: stage ? 'transparent' : draft.backgroundColor }}
+  >
     {ast ? <Svg ref={svgRef} {...ast.props} width="100%" height="100%">{ast.children}</Svg> : null}
   </View>;
 });

@@ -149,7 +149,7 @@ const at = (values: readonly Bounds[], option: number, fallback: Bounds): Bounds
 const translate = (x: number, y: number) => `translate(${x.toFixed(3)} ${y.toFixed(3)})`;
 
 /** Compose the original Illustrator layers without a DOM/WebView. */
-export function buildMeeAssetSvg(draft: MeeDraft): string {
+export function buildMeeAssetSvg(draft: MeeDraft, options?: { transparentBackground?: boolean }): string {
   const bodyVariant = MEE_ASSETS.body.clothes[draft.gender];
   let body = recolorBody(bodyVariant[draft.skinTone] || bodyVariant.default || bodyVariant[1] || '', draft);
   const behind = meeAssetFor('behind', draft.behind, draft);
@@ -190,7 +190,7 @@ export function buildMeeAssetSvg(draft: MeeDraft): string {
   // Coordinates match the original 180 × 442 body artboard and browser
   // compositor. Back hair is first; bangs/facial details are always on top.
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-33 -48 246 528">
-    <rect x="-33" y="-48" width="246" height="528" rx="28" fill="${draft.backgroundColor}"/>
+    ${options?.transparentBackground ? '' : `<rect x="-33" y="-48" width="246" height="528" rx="28" fill="${draft.backgroundColor}"/>`}
     ${layer(behind, 'behind', translate(90.32 - behindBounds[0], -12.37 - behindBounds[2]))}
     ${layer(body, 'body')}
     ${layer(pants, 'pants', `translate(90.32 ${pantsY.toFixed(3)}) scale(${pantsScaleX.toFixed(4)} 1) translate(${-pantsBounds[0]} 0)`)}

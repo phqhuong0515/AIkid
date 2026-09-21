@@ -159,7 +159,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
       hasActiveStroke: () => activeRef.current != null,
       exportPngDataUrl: () => new Promise<string>((resolve, reject) => {
         if (!strokesRef.current.length) {
-          reject(new Error('Bé chưa vẽ nét nào trên bảng.'));
+          reject(new Error('Con chưa vẽ nét nào trên bảng.'));
           return;
         }
         const timer = setTimeout(() => reject(new Error('Xuất tranh vẽ quá lâu')), 15_000);
@@ -228,7 +228,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
           onResponderTerminate={finish}
           onResponderTerminationRequest={() => false}
           accessibilityRole="image"
-          accessibilityLabel="Bảng vẽ của bé"
+          accessibilityLabel="Bảng vẽ của con"
           style={{ width: '100%', ...(fullscreen ? { flex: 1 } : { aspectRatio: VIEWBOX_WIDTH / VIEWBOX_HEIGHT }), borderRadius: fullscreen ? 14 : 20, overflow: 'hidden', borderWidth: 2, borderColor: '#FED7AA', backgroundColor: '#FFFFFF', ...webCanvasInteractionStyle }}
         >
           <Svg
@@ -245,7 +245,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>
           {!strokes.length && !active ? (
             <View pointerEvents="none" className="absolute inset-0 items-center justify-center">
               <Text className="text-4xl">🎨</Text>
-              <Text className="mt-2 font-bold text-slate-300">Vẽ điều bé tưởng tượng ở đây</Text>
+              <Text className="mt-2 font-bold text-slate-300">Vẽ điều con tưởng tượng ở đây</Text>
             </View>
           ) : null}
           {notice !== 'Chạm và kéo để bắt đầu vẽ.' ? (

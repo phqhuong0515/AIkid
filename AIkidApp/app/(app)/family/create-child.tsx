@@ -78,7 +78,7 @@ export default function CreateChildScreen() {
                   setName(v);
                   setError(null);
                 }}
-                placeholder="Ví dụ: Bé Na"
+                placeholder="Ví dụ: Hoàng Nam"
                 placeholderTextColor="#94A3B8"
                 style={styles.input}
               />

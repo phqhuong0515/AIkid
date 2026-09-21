@@ -3,14 +3,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { useAikidTemplate } from '@/design-system';
 import { useComicDraft } from '@/features/comic/store/useComicDraft';
+import { listRemoteComicStories, mergeComicStories } from '@/features/comic/api/comicRemoteLibrary';
+import { useFamily } from '@/features/family/store/useFamily';
+import { inspectLocalLibrary, migrateLocalLibrary, type LocalMigrationPreview } from '@/features/library/localMigration';
 import { useResponsiveLayout } from '@/features/kids-ui/useResponsiveLayout';
+import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { usePopSound } from '@/hooks/usePopSound';
-import { AikidPage, AikidPanel, AikidText } from '@/ui';
+import { AikidButton, AikidPage, AikidPanel, AikidText } from '@/ui';
 
 type LibraryTab = 'plot' | 'comic' | 'text';
 type LibraryStory = {
@@ -51,6 +55,8 @@ export default function LibraryV2Screen() {
   const { playPop } = usePopSound();
   const template = useAikidTemplate();
   const responsive = useResponsiveLayout({ maxContent: 1512 });
+  const childId = useFamily((state) => state.activeChildId);
+  const ipId = useWorkspace((state) => state.activeIpId);
   const hydrate = useComicDraft((state) => state.hydrate);
   const library = useComicDraft((state) => state.library);
   const project = useComicDraft((state) => state.project);
@@ -59,23 +65,72 @@ export default function LibraryV2Screen() {
   const [activeTab, setActiveTab] = useState<LibraryTab>(params.tab === 'text' || params.tab === 'comic' ? params.tab : 'plot');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'newest' | 'oldest' | 'az'>('newest');
+  const [migrationPreview, setMigrationPreview] = useState<LocalMigrationPreview | null>(null);
+  const [migrationProgress, setMigrationProgress] = useState('');
+  const [isMigrating, setIsMigrating] = useState(false);
 
   useFocusEffect(useCallback(() => {
     void hydrate();
     void Promise.all([
       AsyncStorage.getItem(TEXT_STORY_KEY),
       AsyncStorage.getItem('aikid.comic.stories.v1'),
-    ]).then(([textRaw, comicRaw]) => {
+      ipId ? listRemoteComicStories({ ipId, childId }).catch(() => []) : Promise.resolve([]),
+    ]).then(([textRaw, comicRaw, remoteComics]) => {
       try {
         const parsed = textRaw ? JSON.parse(textRaw) : [];
         setTextStories(Array.isArray(parsed) ? parsed : []);
       } catch { setTextStories([]); }
       try {
         const parsed = comicRaw ? JSON.parse(comicRaw) : [];
-        setComicStories(Array.isArray(parsed) ? parsed : []);
+        setComicStories(mergeComicStories(Array.isArray(parsed) ? parsed : [], remoteComics) as StoredComicStory[]);
       } catch { setComicStories([]); }
     });
-  }, [hydrate]));
+    void inspectLocalLibrary().then(setMigrationPreview);
+  }, [childId, hydrate, ipId]));
+
+  const runMigration = () => {
+    if (!migrationPreview?.total || !ipId || isMigrating) return;
+    setIsMigrating(true);
+    setMigrationProgress(`0/${migrationPreview.total}`);
+    void migrateLocalLibrary({
+      childId,
+      ipId,
+      preview: migrationPreview,
+      onProgress: (done, total) => setMigrationProgress(`${done}/${total}`),
+    }).then((result) => {
+      const details = [
+        `Đã tải lên: ${result.uploaded}`,
+        `Đã có trên DB: ${result.skipped}`,
+        result.failed.length ? `Lỗi: ${result.failed.length}\n${result.failed.slice(0, 3).join('\n')}` : '',
+      ].filter(Boolean).join('\n');
+      Alert.alert(result.failed.length ? 'Đồng bộ chưa hoàn tất' : 'Đồng bộ hoàn tất', details);
+    }).catch((error) => {
+      Alert.alert('Không đồng bộ được', error instanceof Error ? error.message : 'Vui lòng thử lại.');
+    }).finally(() => {
+      setIsMigrating(false);
+      setMigrationProgress('');
+      void inspectLocalLibrary().then(setMigrationPreview);
+    });
+  };
+
+  const startMigration = () => {
+    if (!migrationPreview?.total || !ipId || isMigrating) return;
+    if (Platform.OS === 'web') {
+      runMigration();
+      return;
+    }
+    Alert.alert(
+      'Đồng bộ dữ liệu lên Balo?',
+      `Sẽ đồng bộ ${migrationPreview.characters.length} nhân vật, ${migrationPreview.plots.length + migrationPreview.draftPlots.length} cốt truyện/bản nháp, ${migrationPreview.textStories.length} truyện chữ, ${migrationPreview.comicStories.length} truyện tranh và ${migrationPreview.generatedImages.length} ảnh AI. Dữ liệu trên thiết bị vẫn được giữ nguyên.`,
+      [
+        { text: 'Để sau', style: 'cancel' },
+        {
+          text: 'Đồng bộ',
+          onPress: runMigration,
+        },
+      ],
+    );
+  };
 
   const stories = useMemo<LibraryStory[]>(() => {
     const savedPlots = library.length
@@ -132,6 +187,25 @@ export default function LibraryV2Screen() {
   return (
     <AikidPage scene="art" title="Thư viện truyện" backHref="/(app)/comic" container="workspace" scroll>
       <AikidPanel title="Thư viện truyện" icon="grid" style={styles.workspacePanel}>
+        {migrationPreview?.total ? (
+          <View style={styles.syncBanner}>
+            <View style={styles.syncCopy}>
+              <AikidText variant="bodyBold">Khôi phục dữ liệu từ thiết bị</AikidText>
+              <AikidText variant="caption" style={styles.syncDescription}>
+                Tìm thấy {migrationPreview.total} mục local. Đồng bộ lên DB chung để dùng trên localhost, Vercel và Balo.
+              </AikidText>
+            </View>
+            <AikidButton
+              variant="nav"
+              size="sm"
+              disabled={!ipId || isMigrating}
+              loading={isMigrating}
+              onPress={startMigration}
+            >
+              {isMigrating ? migrationProgress : 'Đồng bộ lên Balo'}
+            </AikidButton>
+          </View>
+        ) : null}
         <View style={[styles.panelHeader, !responsive.isDesktopUp && styles.panelHeaderStack]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
             {TABS.map((tab) => {
@@ -194,6 +268,9 @@ export default function LibraryV2Screen() {
 
 const styles = StyleSheet.create({
   workspacePanel: { minHeight: 420 },
+  syncBanner: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14, padding: 14, marginBottom: 14, borderWidth: 1.5, borderColor: '#BDE5D1', borderRadius: 16, backgroundColor: '#F0FFF7' },
+  syncCopy: { flex: 1, minWidth: 240 },
+  syncDescription: { color: '#527060', marginTop: 3 },
   panelHeader: { minHeight: 64, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 16, borderBottomWidth: 1, borderBottomColor: '#EBDCD0', marginBottom: 20 },
   panelHeaderStack: { alignItems: 'stretch', flexDirection: 'column', paddingVertical: 12 },
   tabs: { alignItems: 'center', gap: 12 },

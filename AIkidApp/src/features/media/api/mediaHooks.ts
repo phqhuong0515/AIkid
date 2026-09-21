@@ -529,6 +529,27 @@ async function fetchAiImagesPage(offset: number): Promise<GalleryPage> {
         const isDone =
           status === 'done' || status === 'success' || status === 'completed';
         if (job.jobType !== 'image' || !isDone) return false;
+        const inputParams = (
+          job.inputParams && typeof job.inputParams === 'object'
+            ? job.inputParams
+            : job.input_params && typeof job.input_params === 'object'
+              ? job.input_params
+              : {}
+        ) as Record<string, unknown>;
+        const purpose = String(
+          inputParams.aikid_purpose ?? inputParams.purpose ?? '',
+        ).toLowerCase();
+        const prompt = String(
+          inputParams.prompt ?? job.prompt ?? '',
+        ).toLowerCase();
+        // Trang truyện vẫn là image job ở backend, nhưng không phải “Ảnh AI”
+        // độc lập. Prompt check giữ tương thích với các job cũ chưa có purpose.
+        if (
+          purpose === 'comic-page' ||
+          prompt.includes('create one finished comic-page illustration')
+        ) {
+          return false;
+        }
         const urls = job.outputUrls;
         if (Array.isArray(urls)) return urls.length > 0;
         if (typeof urls === 'string' && urls.length > 2) return true;

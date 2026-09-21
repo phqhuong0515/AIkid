@@ -7,6 +7,9 @@ import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 
 import { ComicPanel, useComicDraft } from '@/features/comic/store/useComicDraft';
 import { COMIC_BUBBLE_EDITOR_ENABLED, ComicBubble, ComicDialogueOverlay } from '@/features/comic/ComicDialogueOverlay';
+import { listRemoteComicStories } from '@/features/comic/api/comicRemoteLibrary';
+import { useFamily } from '@/features/family/store/useFamily';
+import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { AikidButton, AikidIcon, AikidPage, AikidSafeBox } from '@/ui';
 
 type StoredTextStory = {
@@ -36,9 +39,12 @@ const TEXT_STORY_KEY = 'aikid.comic.text-stories.v1';
 export default function StoryReaderScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string; type?: string }>();
+  const childId = useFamily((state) => state.activeChildId);
+  const ipId = useWorkspace((state) => state.activeIpId);
   const hydrate = useComicDraft((state) => state.hydrate);
   const library = useComicDraft((state) => state.library);
   const project = useComicDraft((state) => state.project);
+  const loadFromLibrary = useComicDraft((state) => state.loadFromLibrary);
   const updateLibraryItem = useComicDraft((state) => state.updateLibraryItem);
   const [textStory, setTextStory] = useState<StoredTextStory | null>(null);
   const [comicStory, setComicStory] = useState<StoredComicStory | null>(null);
@@ -47,15 +53,24 @@ export default function StoryReaderScreen() {
   const [activeComicPage, setActiveComicPage] = useState(0);
   const [textDraft, setTextDraft] = useState({ opening: '', development: '', ending: '' });
   const [panelDrafts, setPanelDrafts] = useState<ComicPanel[]>([]);
-  const plotBeatLabels = ['MỞ ĐẦU', 'BIẾN CỐ', 'CAO TRÀO', 'KẾT QUẢ'];
 
   useEffect(() => {
     void hydrate();
     if (params.type === 'comic') {
-      void AsyncStorage.getItem('aikid.comic.stories.v1').then((raw) => {
+      void AsyncStorage.getItem('aikid.comic.stories.v1').then(async (raw) => {
         try {
           const stories = raw ? JSON.parse(raw) : [];
-          setComicStory(Array.isArray(stories) ? stories.find((story) => story.id === params.id) || null : null);
+          const localStory = Array.isArray(stories) ? stories.find((story) => story.id === params.id) || null : null;
+          if (localStory) {
+            setComicStory(localStory);
+          } else if (ipId) {
+            const remoteStories = await listRemoteComicStories({ ipId, childId });
+            setComicStory(remoteStories.find((story) => story.id === params.id || story.remoteAssetId === params.id) as StoredComicStory || null);
+          } else {
+            setComicStory(null);
+          }
+        } catch {
+          setComicStory(null);
         } finally {
           setLoaded(true);
         }
@@ -76,7 +91,7 @@ export default function StoryReaderScreen() {
         setLoaded(true);
       }
     });
-  }, [hydrate, params.id, params.type]);
+  }, [childId, hydrate, ipId, params.id, params.type]);
 
   const plot = useMemo(() => {
     if (params.type !== 'plot') return null;
@@ -92,6 +107,56 @@ export default function StoryReaderScreen() {
   const plotPage = plot?.pages[0];
   const comicPages = comicStory?.pages?.filter((page) => page.imageUrl) || [];
   const currentComicPage = comicPages[activeComicPage];
+  const storyFramework = useMemo(() => {
+    if (!plot) return [];
+    const plan = plot.storyPlan;
+    if (!plan) {
+      return (plot.pages[0]?.panels || []).map((panel, index) => ({
+        label: ['Mở thế giới', 'Biến cố khởi phát', 'Cao trào', 'Hạ màn'][index] || `Nhịp ${index + 1}`,
+        source: `Dữ liệu cũ · Mốc ${index + 1}`,
+        content: panel.action || 'Chưa có nội dung',
+      }));
+    }
+    const mainCharacter = plot.cast.find((character) => character.role === 'main')?.name
+      || plot.cast[0]?.name
+      || 'Nhân vật chính';
+    const companions = plot.cast
+      .filter((character) => character.name !== mainCharacter)
+      .map((character) => character.name)
+      .join(', ');
+    return [
+      {
+        label: 'Mở thế giới',
+        source: 'Từ bước 1–4',
+        content: `${mainCharacter}${companions ? ` cùng ${companions}` : ''} xuất hiện trong một câu chuyện ${plot.genre.toLocaleLowerCase('vi')}, vào ${plan.time.toLocaleLowerCase('vi')} ${plan.setting.toLocaleLowerCase('vi')}. Khi ấy, ${mainCharacter} đang ${plan.openingAction.toLocaleLowerCase('vi')} với tâm trạng ${plan.openingEmotion.toLocaleLowerCase('vi')}.`,
+      },
+      {
+        label: 'Biến cố khởi phát',
+        source: 'Từ bước 5',
+        content: `${plan.unexpectedEvent}. Biến cố này phá vỡ trạng thái ban đầu và khiến ${mainCharacter} ${plan.reaction.toLocaleLowerCase('vi')}.`,
+      },
+      {
+        label: 'Mục tiêu hành động',
+        source: 'Từ bước 6',
+        content: `Sau biến cố, ${mainCharacter} quyết định ${plan.purpose.toLocaleLowerCase('vi')}. Đây là mục tiêu dẫn dắt toàn bộ phần giữa của câu chuyện.`,
+      },
+      {
+        label: 'Chuỗi thử thách',
+        source: 'Từ bước 7',
+        content: `Trên đường thực hiện mục tiêu, ${mainCharacter} gặp khó khăn: ${plan.obstacle.toLocaleLowerCase('vi')}. Nhân vật lựa chọn ${plan.attempt.toLocaleLowerCase('vi')}, khiến tình huống tiếp tục phát triển.`,
+      },
+      {
+        label: 'Cao trào',
+        source: 'Từ bước 8',
+        content: `Mọi xung đột hội tụ khi ${mainCharacter} phải ${plan.climax.toLocaleLowerCase('vi')}. Đây là khoảnh khắc quyết định nhân vật có đạt được mục tiêu hay không.`,
+      },
+      {
+        label: 'Hạ màn và bài học',
+        source: 'Từ bước 9–10',
+        content: `${plan.ending}. Sau hành trình, ${mainCharacter} hiểu rằng ${plan.lesson.toLocaleLowerCase('vi')}.`,
+      },
+    ];
+  }, [plot]);
 
   useEffect(() => {
     setActiveComicPage((current) => Math.min(current, Math.max(0, comicPages.length - 1)));
@@ -166,35 +231,20 @@ export default function StoryReaderScreen() {
 
   const renderPlot = () => (
     <View style={styles.plotContent}>
-      <View style={styles.plotSummary}>
-        <Text style={styles.plotSummaryLabel}>Ý TƯỞNG GỐC</Text>
-        <Text style={styles.plotSummaryText}>{plotPage?.idea}</Text>
-      </View>
       <View style={styles.frameworkHeader}>
         <View>
           <Text style={styles.beatsTitle}>Khung câu chuyện</Text>
-          <Text style={styles.frameworkDescription}>Bốn mốc chính định hướng câu chuyện; chưa phải đoạn văn hay panel truyện tranh.</Text>
+          <Text style={styles.frameworkDescription}>Sáu nhịp kể chuyện được tổng hợp từ 10 lựa chọn, dùng làm dàn khung để phát triển thành truyện chữ hoặc truyện tranh.</Text>
         </View>
-        <View style={styles.frameworkBadge}><Text style={styles.frameworkBadgeText}>CẤU TRÚC 4 MỐC</Text></View>
+        <View style={styles.frameworkBadge}><Text style={styles.frameworkBadgeText}>6 NHỊP KỂ CHUYỆN</Text></View>
       </View>
       <View style={styles.beatGrid}>
-        {panelDrafts.map((panel, index) => (
-          <View key={panel.id} style={styles.beatCard}>
+        {storyFramework.map((item, index) => (
+          <View key={`${index}-${item.label}`} style={styles.beatCard}>
             <View style={styles.beatNumber}><Text style={styles.beatNumberText}>{index + 1}</Text></View>
-            <Text style={styles.beatRole}>{plotBeatLabels[index] || `MỐC ${index + 1}`}</Text>
-            {editing ? (
-              <>
-                <Text style={styles.fieldLabel}>SỰ KIỆN CỐT LÕI</Text>
-                <TextInput
-                  style={styles.beatEditor}
-                  value={panel.action}
-                  onChangeText={(value) => setPanelDrafts((current) => current.map((item) => item.id === panel.id ? { ...item, action: value } : item))}
-                  multiline
-                />
-              </>
-            ) : (
-              <Text style={styles.beatAction}>{panel.action || 'Chưa có nội dung'}</Text>
-            )}
+            <Text style={styles.beatRole}>{item.label.toUpperCase()}</Text>
+            <Text style={styles.beatSource}>{item.source}</Text>
+            <Text style={styles.beatAction}>{item.content}</Text>
           </View>
         ))}
       </View>
@@ -224,6 +274,20 @@ export default function StoryReaderScreen() {
                       <AikidButton variant="feature" onPress={() => setEditing(false)}>Hủy</AikidButton>
                       <AikidButton variant="nav" onPress={() => void saveEdits()} leftIcon={<AikidIcon name="save" size={16} color="#FFF" />}>Lưu thay đổi</AikidButton>
                     </>
+                  ) : plot ? (
+                    <AikidButton
+                      variant="feature"
+                      onPress={() => {
+                        if (params.id && params.id !== 'current-draft') loadFromLibrary(params.id);
+                        router.push({
+                          pathname: '/(app)/comic/idea-v2',
+                          params: { genre: plot.genre, mode: 'text', edit: '1' },
+                        });
+                      }}
+                      leftIcon={<Ionicons name="pencil-outline" size={16} color="#475569" />}
+                    >
+                      Chỉnh sửa 10 bước
+                    </AikidButton>
                   ) : !comicStory ? (
                     <AikidButton variant="feature" onPress={() => setEditing(true)} leftIcon={<Ionicons name="pencil-outline" size={16} color="#475569" />}>Chỉnh sửa</AikidButton>
                   ) : null}
@@ -336,7 +400,14 @@ const styles = StyleSheet.create({
   editor: { minHeight: 130, borderWidth: 1.5, borderColor: '#EBDCD0', borderRadius: 16, backgroundColor: '#FFF', color: '#475569', fontSize: 14, lineHeight: 22, padding: 14 },
   plotContent: { maxWidth: 960, width: '100%', alignSelf: 'center' },
   plotSummary: { borderRadius: 16, backgroundColor: '#FFF7F1', padding: 16, marginBottom: 20 },
+  plotSummaryHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 },
   plotSummaryLabel: { color: '#FF5E97', fontSize: 10, fontWeight: '900', marginBottom: 6 },
+  plotSummaryCount: { color: '#FF5E97', fontSize: 10, fontWeight: '900', borderRadius: 999, backgroundColor: '#FFE7EF', paddingHorizontal: 10, paddingVertical: 5 },
+  originalIdeaGrid: { gap: 8 },
+  originalIdeaRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.72)', padding: 10 },
+  originalIdeaNumber: { width: 24, height: 24, borderRadius: 12, color: '#FFF', backgroundColor: '#FF7597', textAlign: 'center', lineHeight: 24, fontSize: 10, fontWeight: '900' },
+  originalIdeaCopy: { flex: 1, minWidth: 0 },
+  originalIdeaLabel: { color: '#FF5E97', fontSize: 9, fontWeight: '900', letterSpacing: 0.4, marginBottom: 3 },
   plotSummaryText: { color: '#475569', fontSize: 14, lineHeight: 22 },
   beatsTitle: { color: '#475569', fontSize: 19, fontWeight: '900', marginBottom: 12 },
   frameworkHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 12 },
@@ -348,6 +419,7 @@ const styles = StyleSheet.create({
   beatNumber: { position: 'absolute', left: 14, top: 15, width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FF5E97' },
   beatNumberText: { color: '#FFF', fontSize: 12, fontWeight: '900' },
   beatRole: { color: '#FF5E97', fontSize: 10, fontWeight: '900', letterSpacing: 0.5, marginBottom: 6 },
+  beatSource: { alignSelf: 'flex-start', color: '#8A7463', fontSize: 9, fontWeight: '800', borderRadius: 999, backgroundColor: '#FFF4EE', paddingHorizontal: 8, paddingVertical: 4, marginBottom: 7 },
   beatAction: { color: '#475569', fontSize: 14, lineHeight: 21, fontWeight: '700' },
   beatEditor: { minHeight: 70, borderWidth: 1, borderColor: '#EBDCD0', borderRadius: 12, color: '#475569', padding: 10, marginBottom: 10 },
   convertActions: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 10, borderTopWidth: 1, borderTopColor: '#EBDCD0', paddingTop: 18, marginTop: 22 },

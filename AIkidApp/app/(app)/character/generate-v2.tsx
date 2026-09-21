@@ -10,7 +10,7 @@ import { buildCharacterJobPrompt, generateImageViaGateway } from '@/features/cre
 import { useFamily } from '@/features/family/store/useFamily';
 import { useWorkspace } from '@/core/workspace/useWorkspace';
 import { useRouter } from 'expo-router';
-import { useCharacterDraft, type CharacterCategoryId } from '@/features/character';
+import { saveCharacterToRemote, useCharacterDraft, type CharacterCategoryId } from '@/features/character';
 import { useQuery } from '@tanstack/react-query';
 import { mediaApi } from '@/core/storymee';
 import { resolveMediaUri } from '@/features/media/api/mediaHooks';
@@ -26,44 +26,41 @@ const TABS = [
 
 const CATEGORY_QUESTIONS: Record<string, { label: string; placeholder: string }[]> = {
   shape: [
-    { label: '1. HÌNH DÁNG', placeholder: 'Ví dụ: dáng vẻ tròn xoe, cao gầy, mũm mĩm...' },
-    { label: '2. KẾT CẤU CƠ THỂ', placeholder: 'Ví dụ: tay chân ngắn, bụng tròn, lưng cong...' },
-    { label: '3. KÍCH THƯỚC', placeholder: 'Ví dụ: tí hon, khổng lồ, cỡ vừa...' },
-    { label: '4. DÁI TAI / ĐUÔI', placeholder: 'Ví dụ: tai thỏ dài, đuôi bông trắng...' },
-    { label: '5. MÀU SẮC CƠ BẢN', placeholder: 'Ví dụ: màu cam, màu đen trắng pha...' },
-    { label: '6. CHẤT LIỆU LÔNG DA', placeholder: 'Ví dụ: lông xù mềm mại, da mịn bóng...' },
+    { label: '1. NHÂN VẬT CỦA EM LÀ GÌ?', placeholder: 'Ví dụ: con mèo, con gấu, siêu nhân...' },
+    { label: '2. NHÂN VẬT CÓ DÁNG NGƯỜI THẾ NÀO?', placeholder: 'Ví dụ: dáng vẻ tròn xoe, cao gầy, mũm mĩm...' },
+    { label: '3. NHÂN VẬT CÓ DA MÀU GÌ?', placeholder: 'Ví dụ: da trắng hồng, da rám nắng...' },
+    { label: '4. CHẤT LIỆU CỦA NHÂN VẬT LÀ GÌ?', placeholder: 'Ví dụ: da mềm, vải bông, gỗ...' },
+    { label: '5. NHÂN VẬT CÓ HỌA TIẾT GÌ TRÊN CƠ THỂ?', placeholder: 'Ví dụ: sọc vằn tinh nghịch, đốm tròn...' },
+    { label: '6. TỔNG THỂ NHÂN VẬT TẠO CẢM GIÁC GÌ?', placeholder: 'Ví dụ: đáng yêu, vui nhộn, mạnh mẽ, bí ẩn...' },
   ],
   parts: [
-    { label: '1. BỘ PHẬN ĐẶC TRƯNG', placeholder: 'Ví dụ: sừng nhọn, cánh bướm, vây cá...' },
-    { label: '2. TAY VÀ CỬ CHỈ', placeholder: 'Ví dụ: tay ngắn có vuốt nhọn, tay dài nhỏ...' },
-    { label: '3. CHÂN VÀ DI CHUYỂN', placeholder: 'Ví dụ: chân ếch nhỏ, chân to như gấu...' },
-    { label: '4. PHỤ KIỆN ĐẶC BIỆT', placeholder: 'Ví dụ: túi marsupial, ba lô mini, đuôi phát sáng...' },
-    { label: '5. ĐẶC ĐIỂM NỔI BẬT', placeholder: 'Ví dụ: có đốm, sọc vằn, vết thương anh hùng...' },
-    { label: '6. CẢM GIÁC TỔNG THỂ', placeholder: 'Ví dụ: dễ thương, oai phong, bí ẩn, vui vẻ...' },
+    { label: '1. TAY CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?', placeholder: 'Ví dụ: 4 tay robot dài, tay mèo ngắn...' },
+    { label: '2. CHÂN CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?', placeholder: 'Ví dụ: 2 chân mèo ngắn cũn, bánh xe...' },
+    { label: '3. NHÂN VẬT CÓ CÁNH KHÔNG?', placeholder: 'Ví dụ: cánh chim màu trắng, cánh bướm rực rỡ...' },
+    { label: '4. NHÂN VẬT CÓ ĐUÔI KHÔNG?', placeholder: 'Ví dụ: đuôi sóc xù bông, đuôi mèo dài...' },
+    { label: '5. NHÂN VẬT CÓ SỪNG KHÔNG?', placeholder: 'Ví dụ: sừng tuần lộc nhỏ, không có sừng...' },
   ],
   face: [
-    { label: '1. HÌNH DÁNG MẶT', placeholder: 'Ví dụ: mặt tròn, mặt trái xoan...' },
-    { label: '2. ĐÔI MẮT', placeholder: 'Ví dụ: mắt to tròn lấp lánh, mắt híp...' },
-    { label: '3. CÁI MŨI', placeholder: 'Ví dụ: mũi nhỏ xinh, mũi to buồn cười...' },
-    { label: '4. CÁI MIỆNG', placeholder: 'Ví dụ: cười toe toét, miệng trái tim...' },
-    { label: '5. LÔNG MÀY', placeholder: 'Ví dụ: lông mày cong đáng yêu, mày rậm...' },
-    { label: '6. BIỂU CẢM', placeholder: 'Ví dụ: lúc nào cũng cười, mặt ngây thơ...' },
+    { label: '1. MẮT CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?', placeholder: 'Ví dụ: 3 mắt to tròn màu xanh nước biển...' },
+    { label: '2. MIỆNG CỦA NHÂN VẬT NHƯ THẾ NÀO?', placeholder: 'Ví dụ: miệng cười tươi rói, đang ngậm kẹo...' },
+    { label: '3. MŨI CỦA NHÂN VẬT NHƯ THẾ NÀO?', placeholder: 'Ví dụ: mũi nút áo dễ thương, mũi chú hề đỏ...' },
+    { label: '4. TAI CỦA NHÂN VẬT TRÔNG NHƯ THẾ NÀO?', placeholder: 'Ví dụ: đôi tai mèo tinh nghịch, tai thỏ dài...' },
+    { label: '5. KHUÔN MẶT CÓ GÌ ĐẶC BIỆT KHÔNG?', placeholder: 'Ví dụ: nốt ruồi dưới mắt, sẹo ngang mũi...' },
+    { label: '6. BIỂU CẢM CỦA NHÂN VẬT THẾ NÀO?', placeholder: 'Ví dụ: vui vẻ, ngạc nhiên, lo lắng...' },
   ],
   hair: [
-    { label: '1. KIỂU TÓC', placeholder: 'Ví dụ: tóc ngắn xoăn, tóc dài thẳng...' },
-    { label: '2. MÀU TÓC', placeholder: 'Ví dụ: tóc vàng ánh mặt trời, tóc xanh ocean...' },
-    { label: '3. ĐỘ DÀI TÓC', placeholder: 'Ví dụ: tóc ngắn trên cổ, dài chấm lưng...' },
-    { label: '4. CHI TIẾT TÓC', placeholder: 'Ví dụ: tóc có highlight, tóc buộc nơ hồng...' },
-    { label: '5. LÔNG CƠ THỂ', placeholder: 'Ví dụ: lông bụng trắng, lông mịn màu kem...' },
-    { label: '6. ĐẦU VÀ TAI', placeholder: 'Ví dụ: tai nhọn, tai tròn mềm mại...' },
+    { label: '1. KIỂU TÓC/LÔNG CỦA NHÂN VẬT THẾ NÀO?', placeholder: 'Ví dụ: mượt mà, xoăn tít, dựng đứng...' },
+    { label: '2. TÓC MÁI CỦA NHÂN VẬT TRÔNG THẾ NÀO?', placeholder: 'Ví dụ: mái ngố dễ thương, mái lệch...' },
+    { label: '3. MÀU TÓC/LÔNG CỦA NHÂN VẬT LÀ MÀU GÌ?', placeholder: 'Ví dụ: màu nâu hạt dẻ, hồng pastel...' },
+    { label: '4. ĐỘ DÀI TÓC/LÔNG CỦA NHÂN VẬT THẾ NÀO?', placeholder: 'Ví dụ: tóc ngắn cá tính, tóc dài thướt tha...' },
+    { label: '5. TÓC/LÔNG CÓ ĐIỂM GÌ ĐẶC BIỆT KHÔNG?', placeholder: 'Ví dụ: tóc highlight màu vàng, lông đuôi phát sáng...' },
+    { label: '6. NHÂN VẬT CÓ ĐEO PHỤ KIỆN ĐẦU KHÔNG?', placeholder: 'Ví dụ: kẹp tóc ngôi sao, bờm tai gấu...' },
   ],
   clothes: [
-    { label: '1. TRANG PHỤC CHÍNH', placeholder: 'Ví dụ: váy công chúa, áo siêu nhân...' },
-    { label: '2. MÀU SẮC TRANG PHỤC', placeholder: 'Ví dụ: màu hồng phấn, xanh navy...' },
-    { label: '3. PHỤ KIỆN', placeholder: 'Ví dụ: nơ hồng, khăn quàng, mũ phép thuật...' },
-    { label: '4. GIÀY DÉP', placeholder: 'Ví dụ: giày thể thao, dép đi biển...' },
-    { label: '5. HOẠ TIẾT', placeholder: 'Ví dụ: hoa nhỏ, sao, kẻ sọc...' },
-    { label: '6. PHONG CÁCH', placeholder: 'Ví dụ: đáng yêu Kawaii, cổ trang, hiện đại...' },
+    { label: '1. NHÂN VẬT MẶC ÁO KIỂU GÌ?', placeholder: 'Ví dụ: áo hoodie khủng long, áo thun kẻ sọc...' },
+    { label: '2. NHÂN VẬT MẶC QUẦN HAY VÁY?', placeholder: 'Ví dụ: váy xếp ly hồng, quần yếm bò...' },
+    { label: '3. NHÂN VẬT ĐI GIÀY DÉP GÌ?', placeholder: 'Ví dụ: giày thể thao trắng, ủng đỏ...' },
+    { label: '4. NHÂN VẬT ĐEO PHỤ KIỆN GÌ?', placeholder: 'Ví dụ: khăn quàng cổ đỏ, ba lô gấu trúc...' },
   ],
 };
 
@@ -257,12 +254,26 @@ export default function GenerateV2() {
 
   const handleSaveCharacter = async () => {
     if (!draft.name.trim()) {
-      Alert.alert('Chưa có tên', 'Bé hãy đặt tên cho nhân vật trước khi lưu nhé!');
+      Alert.alert('Chưa có tên', 'Con hãy đặt tên cho nhân vật trước khi lưu nhé!');
       return;
     }
     playPop();
-    await saveCurrentToStorage(activeChild?.id);
-    router.replace('/(app)/character/storage-v2');
+    try {
+      if (!generatedImageUrl || !ipId) {
+        throw new Error('Chưa có ảnh nhân vật hoặc chưa chọn không gian làm việc.');
+      }
+      const remoteUri = await saveCharacterToRemote({
+        imageUri: generatedImageUrl,
+        name: draft.name,
+        childId: activeChild?.id,
+        ipId,
+      });
+      setGeneratedImageUri(remoteUri);
+      await saveCurrentToStorage(activeChild?.id);
+      router.replace('/(app)/character/storage-v2');
+    } catch (error) {
+      Alert.alert('Không lưu được nhân vật', error instanceof Error ? error.message : 'Vui lòng thử lại.');
+    }
   };
 
   // ─── Helpers ────────────────────────────────────────────────────────────────

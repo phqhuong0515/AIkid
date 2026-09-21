@@ -42,6 +42,7 @@ export default function AppLayout() {
         name="mee/index"
         options={{ contentStyle: { backgroundColor: '#e8f4fa', flex: 1 } }}
       />
+      <Stack.Screen name="mee/new" options={{ headerShown: false }} />
     </Stack>
   );
 }

@@ -7,7 +7,7 @@
  * Scenes (từ design guide backgrounds column):
  *   lobby      — Green hills / countryside (bg-home.png)
  *   art        — Clouds / sky (bg-art.png)
- *   character  — Indoor / cozy room (bg-character.png)
+ *   character  — Indoor / cozy room (bg-character-feature.png)
  *   mee        — Soft pastel (bg-mee.png)
  *   comic      — (tạm dùng bg-art.png — TODO: dedicated bg)
  *   login      — Login (bg-login.jpeg)
@@ -50,13 +50,15 @@ export function PageBackground({
   overlayOpacity,
   source,
 }: PageBackgroundProps) {
-  const src = source ?? useAikidTemplate().assets[scene];
+  const template = useAikidTemplate();
+  const src = source ?? template.assets[scene];
   const opacity = overlayOpacity ?? OVERLAY_OPACITY[scene];
 
   return (
     <ImageBackground
       source={src}
       style={[styles.root, style]}
+      imageStyle={styles.image}
       resizeMode="cover"
     >
       {/* Subtle white overlay to soften bg and keep text readable */}
@@ -76,5 +78,9 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     width: '100%',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
 });

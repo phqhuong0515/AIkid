@@ -72,7 +72,7 @@ export function AccountBottomSheet({
                 >
                   <Image
                     source={{
-                      uri: child.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(child.name || 'Bé')}`,
+                      uri: child.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(child.name || 'Học sinh')}`,
                     }}
                     style={styles.avatar}
                   />

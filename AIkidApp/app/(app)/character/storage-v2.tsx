@@ -6,12 +6,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
 import { usePopSound } from '@/hooks/usePopSound';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { AikidButton, AikidIcon, AikidModal, AikidPage, AikidPanel, AikidText } from '@/ui';
-import { useCharacterDraft } from '@/features/character';
+import { listRemoteCharacters, mergeCharacterLibrary, useCharacterDraft } from '@/features/character';
+import { useFamily } from '@/features/family/store/useFamily';
+import { useWorkspace } from '@/core/workspace/useWorkspace';
 
-// ─── Seed Data ─────────────────────────────────────────────────────────────────
 type UiCharacter = {
   id: string;
   name: string;
@@ -23,12 +25,6 @@ type UiCharacter = {
   avatar: string | null;
 };
 
-const SEED_CHARS: UiCharacter[] = [
-  { id: '1', name: 'Yuu', species: 'Nhân vật phiêu lưu', age: 10, dob: '01/01', gender: 'Nam', bio: 'Bé Yuu năng động, thích khám phá thế giới xung quanh.', avatar: null },
-  { id: '2', name: 'Nori', species: 'Nhân vật nghệ sĩ', age: 8, dob: '15/05', gender: 'Nữ', bio: 'Nori rất thích vẽ tranh và nghe nhạc.', avatar: null },
-  { id: '3', name: 'Bông', species: 'Nhân vật đáng yêu', age: 5, dob: '20/10', gender: 'Nữ', bio: 'Bé Bông đáng yêu, thích ăn kẹo.', avatar: null },
-];
-
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function StorageV2() {
   const { playPop } = usePopSound();
@@ -39,8 +35,15 @@ export default function StorageV2() {
   const hydrateCharacters = useCharacterDraft((state) => state.hydrate);
   const removeSavedCharacter = useCharacterDraft((state) => state.removeSaved);
 
-  const [characters, setCharacters] = useState<UiCharacter[]>(SEED_CHARS);
-  const [activeCharId, setActiveCharId] = useState(SEED_CHARS[0].id);
+  const childId = useFamily((state) => state.activeChildId);
+  const ipId = useWorkspace((state) => state.activeIpId);
+  const remoteCharacters = useQuery({
+    queryKey: ['character-library', childId ?? null, ipId ?? null],
+    enabled: Boolean(ipId),
+    queryFn: () => listRemoteCharacters({ ipId: ipId!, childId }),
+  });
+  const [characters, setCharacters] = useState<UiCharacter[]>([]);
+  const [activeCharId, setActiveCharId] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOption, setFilterOption] = useState('Tất cả');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
@@ -55,8 +58,8 @@ export default function StorageV2() {
   }, [hydrateCharacters]);
 
   useEffect(() => {
-    if (!savedCharacters.length) return;
-    const mapped: UiCharacter[] = savedCharacters.map((character) => ({
+    const merged = mergeCharacterLibrary(remoteCharacters.data ?? [], savedCharacters);
+    const mapped: UiCharacter[] = merged.map((character) => ({
       id: character.id,
       name: character.name,
       species: character.species || '',
@@ -67,8 +70,8 @@ export default function StorageV2() {
       avatar: character.avatarUri || null,
     }));
     setCharacters(mapped);
-    setActiveCharId((current) => mapped.some((character) => character.id === current) ? current : mapped[0].id);
-  }, [savedCharacters]);
+    setActiveCharId((current) => mapped.some((character) => character.id === current) ? current : mapped[0]?.id || '');
+  }, [remoteCharacters.data, savedCharacters]);
 
   const activeChar = characters.find(c => c.id === activeCharId) || characters[0];
 
@@ -307,7 +310,7 @@ export default function StorageV2() {
   return (
     <AikidPage
       scene="character"
-      title="Nhân vật của bé"
+      title="Nhân vật của con"
       backHref="/(app)/character"
       container="wide"
       scroll={false}

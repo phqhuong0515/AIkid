@@ -89,7 +89,7 @@ export default function DrawV2() {
           <View style={styles.panelHeader}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <Ionicons name="brush-outline" size={24} color="#3182CE" />
-              <Text style={styles.panelTitle}>Bé Vẽ</Text>
+              <Text style={styles.panelTitle}>Họa Sĩ Nhí</Text>
             </View>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <TouchableOpacity onPress={() => playPop()} style={styles.toolBtn}>

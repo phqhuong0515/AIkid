@@ -22,6 +22,8 @@ export type CreativeGenerateInput = {
   provider?: string;
   childProfileId?: string;
   ipId?: string;
+  /** Loại nội dung được tạo, dùng để phân loại đúng trong kho. */
+  purpose?: 'standalone-image' | 'character' | 'comic-page';
   signal?: AbortSignal;
 };
 
@@ -57,6 +59,7 @@ export async function generateImageViaGateway(
     ipId: input.ipId,
     referenceImageUrls: uniqueRefs.length ? uniqueRefs : undefined,
     childProfileId: input.childProfileId,
+    purpose: input.purpose,
   });
 
   const job = await pollJobUntilDone(jobId, { signal: input.signal });

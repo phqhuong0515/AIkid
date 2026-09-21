@@ -16,6 +16,20 @@ export type ComicCharacter = {
   appearancePrompt: string;
   referenceImageUrl: string | null;
 };
+export type StoryPlan = {
+  time: string;
+  setting: string;
+  openingAction: string;
+  openingEmotion: string;
+  unexpectedEvent: string;
+  reaction: string;
+  purpose: string;
+  obstacle: string;
+  attempt: string;
+  climax: string;
+  ending: string;
+  lesson: string;
+};
 export type ComicPanel = {
   id: string;
   order: number;
@@ -48,6 +62,7 @@ export type ComicProject = {
   genre: string;
   artStyle: string;
   cast: ComicCharacter[];
+  storyPlan?: StoryPlan;
   pages: ComicPage[];
   createdAt: string;
   updatedAt: string;
@@ -59,7 +74,7 @@ function panel(id: string, order: number, action = '', speaker = '', dialogue = 
 }
 
 export function scaffoldPanels(pageId: string, idea: string, count: PanelCount): ComicPanel[] {
-  const story = idea.trim() || 'Câu chuyện của bé';
+  const story = idea.trim() || 'Câu chuyện của con';
   const beats = count === 2
     ? [`Mở đầu: giới thiệu ${story}`, 'Kết thúc: điều bất ngờ được giải quyết']
     : count === 4
@@ -85,6 +100,23 @@ function normalize(raw: unknown): ComicProject {
   const legacyIdea = typeof legacy.idea === 'string' ? legacy.idea : '';
   const legacyCharacters = typeof legacy.characters === 'string' ? legacy.characters : '';
   const rawCast = Array.isArray(legacy.cast) ? legacy.cast : [];
+  const rawStoryPlan = legacy.storyPlan && typeof legacy.storyPlan === 'object'
+    ? legacy.storyPlan as Partial<StoryPlan>
+    : undefined;
+  const storyPlan = rawStoryPlan ? {
+    time: String(rawStoryPlan.time || ''),
+    setting: String(rawStoryPlan.setting || ''),
+    openingAction: String(rawStoryPlan.openingAction || ''),
+    openingEmotion: String(rawStoryPlan.openingEmotion || ''),
+    unexpectedEvent: String(rawStoryPlan.unexpectedEvent || ''),
+    reaction: String(rawStoryPlan.reaction || ''),
+    purpose: String(rawStoryPlan.purpose || ''),
+    obstacle: String(rawStoryPlan.obstacle || ''),
+    attempt: String(rawStoryPlan.attempt || ''),
+    climax: String(rawStoryPlan.climax || ''),
+    ending: String(rawStoryPlan.ending || ''),
+    lesson: String(rawStoryPlan.lesson || ''),
+  } : undefined;
   const cast: ComicCharacter[] = rawCast.filter((item) => item && typeof item === 'object').map((item, index) => {
     const value = item as Partial<ComicCharacter>;
     return { id: value.id || `legacy-character-${index}`, sourceId: value.sourceId, name: value.name || `Nhân vật ${index + 1}`, role: value.role === 'supporting' ? 'supporting' : 'main', personality: value.personality || '', appearancePrompt: value.appearancePrompt || '', referenceImageUrl: value.referenceImageUrl || null };
@@ -105,7 +137,7 @@ function normalize(raw: unknown): ComicProject {
     const imageUrl = typeof value.imageUrl === 'string' ? value.imageUrl : null;
     return { id, order: index + 1, title: typeof value.title === 'string' ? value.title : '', idea, panelCount, panels, imageUrl, jobId: typeof value.jobId === 'string' ? value.jobId : null, batchId: typeof value.batchId === 'string' ? value.batchId : null, imageContractVersion: typeof value.imageContractVersion === 'number' ? value.imageContractVersion : imageUrl ? 1 : 3, status: value.status === 'done' || value.status === 'queued' || value.status === 'working' || value.status === 'composing' || value.status === 'error' ? value.status : 'draft', error: typeof value.error === 'string' ? value.error : null } as ComicPage;
   });
-  return { ...base, id: typeof legacy.id === 'string' ? legacy.id : base.id, title: typeof legacy.title === 'string' ? legacy.title : '', genre: typeof legacy.genre === 'string' ? legacy.genre : 'Phiêu lưu', artStyle: typeof legacy.artStyle === 'string' ? legacy.artStyle : 'Hoạt hình', cast, pages, createdAt: typeof legacy.createdAt === 'string' ? legacy.createdAt : base.createdAt, updatedAt: typeof legacy.updatedAt === 'string' ? legacy.updatedAt : base.updatedAt };
+  return { ...base, id: typeof legacy.id === 'string' ? legacy.id : base.id, title: typeof legacy.title === 'string' ? legacy.title : '', genre: typeof legacy.genre === 'string' ? legacy.genre : 'Phiêu lưu', artStyle: typeof legacy.artStyle === 'string' ? legacy.artStyle : 'Hoạt hình', cast, storyPlan, pages, createdAt: typeof legacy.createdAt === 'string' ? legacy.createdAt : base.createdAt, updatedAt: typeof legacy.updatedAt === 'string' ? legacy.updatedAt : base.updatedAt };
 }
 
 type State = {
@@ -113,7 +145,7 @@ type State = {
   library: ComicLibraryItem[];
   hydrated: boolean;
   hydrate: () => Promise<void>;
-  patchProject: (value: Partial<Pick<ComicProject, 'title' | 'genre' | 'artStyle' | 'cast'>>) => void;
+  patchProject: (value: Partial<Pick<ComicProject, 'title' | 'genre' | 'artStyle' | 'cast' | 'storyPlan'>>) => void;
   addPage: () => void;
   updatePage: (id: string, value: Partial<ComicPage>) => void;
   scaffoldPage: (id: string) => void;

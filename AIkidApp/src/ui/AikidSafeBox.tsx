@@ -21,7 +21,7 @@ export function AikidSafeBox({
   variant = 'surface',
 }: Props) {
   const template = useAikidTemplate();
-  const { isCompact, isDesktopUp } = useResponsiveLayout();
+  const { isCompact } = useResponsiveLayout();
 
   return (
     <View

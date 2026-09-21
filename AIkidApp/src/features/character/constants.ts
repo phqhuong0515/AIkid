@@ -23,7 +23,7 @@ export const CATEGORY_QUESTIONS: Record<
       choices: [
         'tròn trịa',
         'mảnh mai',
-        'nhỏ bé',
+        'nhỏ nhắn',
         'cao lớn',
         'mũm mĩm',
         'vuông vức',

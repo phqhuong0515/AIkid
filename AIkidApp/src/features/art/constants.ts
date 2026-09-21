@@ -43,7 +43,7 @@ export const ART_STYLES: readonly ArtStyle[] = [
   {
     id: 'semirealistic',
     labelVi: 'Bán Tả Thực',
-    descriptionVi: 'Chi tiết chân thật vừa đủ nhưng vẫn thân thiện với bé.',
+    descriptionVi: 'Chi tiết chân thật vừa đủ nhưng vẫn thân thiện với học sinh.',
     canonicalPrompt: 'Warm semi-realistic storybook illustration, believable anatomy and materials simplified for children, finely rendered eyes and hair, natural soft light, painterly edges, charming rather than photographic.',
     templateKey: 'aikid.art.semirealistic',
     thumbnail: require('../../../public/art-styles/art-style-semirealistic.jpeg'),

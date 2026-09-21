@@ -132,7 +132,7 @@ export default function MeeScreen() {
       const url = await uploadMeePreview(draft, { childId: child.id, ipId });
       setField('savedMediaUrl', url);
       invalidateMedia();
-      setFeedback({ tone: 'success', title: 'Đã lưu Mee', message: 'Mee đã xuất hiện trong Gallery của bé.' });
+      setFeedback({ tone: 'success', title: 'Đã lưu Mee', message: 'Mee đã xuất hiện trong Gallery của con.' });
       Alert.alert('Đã lưu Mee', 'Bản xem trước đã được lưu vĩnh viễn trong media của hồ sơ.');
       return url;
     } catch (error) { const message = error instanceof Error ? error.message : 'Thử lại sau'; setFeedback({ tone: 'error', title: 'Không lưu được Mee', message }); Alert.alert('Không lưu được Mee', message); return null; }
@@ -169,7 +169,7 @@ export default function MeeScreen() {
       await useRecentAiImages.getState().setScope(child.id);
       useRecentAiImages.getState().add({ id: result.jobId, uri: result.imageUrl, driveUrl: result.imageUrl, assetType: 'ai-image', tags: [`child:${child.id}`, 'mee-ai'], createdAt: new Date().toISOString() });
       invalidateMedia();
-      setFeedback({ tone: 'success', title: 'Mee AI đã sẵn sàng', message: 'Tác phẩm mới đã được lưu vào Gallery của bé.' });
+      setFeedback({ tone: 'success', title: 'Mee AI đã sẵn sàng', message: 'Tác phẩm mới đã được lưu vào Gallery của con.' });
     } catch (error) { const message = error instanceof Error ? error.message : 'Thử lại sau'; setFeedback({ tone: 'error', title: 'Không tạo được Mee AI', message }); Alert.alert('Không tạo được Mee AI', message); }
     finally { actionLock.current = false; setAiStage(null); setBusy(null); }
   }
@@ -185,8 +185,8 @@ export default function MeeScreen() {
     try {
       const updated = actor === 'child' ? await familyApi.updateMyAvatar(avatarUrl) : await updateChild(child.id, { avatarUrl });
       replaceChild(updated as never);
-      setFeedback({ tone: 'success', title: 'Đã cập nhật avatar', message: actor === 'child' ? 'Bé đã đổi avatar của chính mình.' : `Đã đổi avatar cho ${child.name}.` });
-      Alert.alert('Đã cập nhật', actor === 'child' ? 'Bé đã đổi avatar của chính mình.' : `Đã đổi avatar cho ${child.name}.`);
+      setFeedback({ tone: 'success', title: 'Đã cập nhật avatar', message: actor === 'child' ? 'Con đã đổi avatar của chính mình.' : `Đã đổi avatar cho ${child.name}.` });
+      Alert.alert('Đã cập nhật', actor === 'child' ? 'Con đã đổi avatar của chính mình.' : `Đã đổi avatar cho ${child.name}.`);
     } catch (error) { const message = error instanceof Error ? error.message : 'Thử lại sau'; setFeedback({ tone: 'error', title: 'Không đổi được avatar', message }); Alert.alert('Không đổi được avatar', message); }
     finally { actionLock.current = false; setBusy(null); }
   }

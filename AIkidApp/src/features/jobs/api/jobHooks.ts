@@ -41,6 +41,8 @@ export type CreateImageJobInput = {
   referenceImageUrls?: string[];
   /** Family: gắn job với hồ sơ con */
   childProfileId?: string;
+  /** Phân loại đầu ra để Gallery không trộn trang truyện với ảnh AI đơn. */
+  purpose?: 'standalone-image' | 'character' | 'comic-page';
 };
 
 export const TERMINAL_OK = new Set(['done', 'success', 'completed']);
@@ -102,6 +104,9 @@ export async function createImageJob(input: CreateImageJobInput): Promise<string
   }
   if (input.childProfileId) {
     inputParams.child_profile_id = input.childProfileId;
+  }
+  if (input.purpose) {
+    inputParams.aikid_purpose = input.purpose;
   }
 
   return generateApi.createImageJob({

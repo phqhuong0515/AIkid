@@ -6,6 +6,7 @@ export type AikidIconName =
   | 'eraser'
   | 'stamp'
   | 'upload'
+  | 'camera'
   | 'trash'
   | 'undo'
   | 'redo'
@@ -63,6 +64,11 @@ export function AikidIcon({ name, size = 20, color = '#334155' }: Props) {
         <>
           <Path {...common} d="M12 16V4m0 0L8 8m4-4 4 4" />
           <Path {...common} d="M5 14v5h14v-5" />
+        </>
+      ) : name === 'camera' ? (
+        <>
+          <Path {...common} d="M4 8h3l1.5-2h7L17 8h3v11H4V8Z" />
+          <Circle {...common} cx="12" cy="13" r="3.5" />
         </>
       ) : name === 'trash' ? (
         <>

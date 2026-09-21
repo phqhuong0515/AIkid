@@ -36,6 +36,18 @@ export function extractErrorMessage(err: unknown, fallback: string): string {
     return 'Bạn không có quyền thực hiện thao tác này';
   }
 
+  if (ax.response?.status === 402) {
+    const remaining = (ax.response.data as { remaining?: number } | undefined)?.remaining;
+    if (typeof remaining === 'number' && remaining <= 0) {
+      return 'Đã hết lượt tạo ảnh AI. Nhờ phụ huynh kiểm tra hoặc bổ sung lượt AI nhé.';
+    }
+    return (
+      ax.response.data?.message ||
+      ax.response.data?.error ||
+      'Không thể dùng lượt AI lúc này. Vui lòng thử lại sau.'
+    );
+  }
+
   if (ax.response?.status === 409) {
     return (
       ax.response.data?.message ||

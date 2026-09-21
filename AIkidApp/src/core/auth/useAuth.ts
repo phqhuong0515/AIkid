@@ -198,6 +198,10 @@ export const useAuth = create<AuthState>((set) => ({
       }
       
       await setAccessToken(token);
+      if (responseData.child) {
+        const child = familyApi.normalizeChild(responseData.child);
+        await useFamily.getState().applyChildSession(child as never);
+      }
       set({
         token,
         user: user ?? { name: nickname.trim() },

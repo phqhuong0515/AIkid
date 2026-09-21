@@ -3,12 +3,12 @@
  *
  * Hiển thị trên mọi màn hình trong app (auth):
  *   LEFT  → Logo Alkid (→ về lobby khi tap)
- *   RIGHT → Avatar circle (→ mở Account bottom sheet)
+ *   RIGHT → Chip lượt AI (→ mở chi tiết lượt AI) + Avatar circle (→ mở Account bottom sheet)
  *
  * Account bottom sheet:
  *   - Thông tin user / child
  *   - Số lượt AI còn lại
- *   - Quick actions: Tài khoản, Gallery, Gói AI, Hồ sơ bé
+ *   - Quick actions: Tài khoản, Gallery, Gói AI, Hồ sơ học sinh
  *   - Đăng xuất
  */
 
@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -38,11 +39,121 @@ import {
   AikidTextColors,
 } from '@/features/kids-ui/theme';
 import { AikidModal } from '@/ui/AikidModal';
+import { AskParentCreditsModal } from '@/features/billing/components/AskParentCreditsModal';
 
 function formatExpiry(value?: string | null) {
   if (!value) return 'Không giới hạn';
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('vi-VN');
+}
+
+// ─── Credits Detail Modal ──────────────────────────────────────────────────────
+
+type CreditsDetailModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onAskParent: () => void;
+  onGoPlans: () => void;
+};
+
+function CreditsDetailModal({
+  isOpen,
+  onClose,
+  onAskParent,
+  onGoPlans,
+}: CreditsDetailModalProps) {
+  const { actor } = useAuth();
+  const summary = useQuery({
+    queryKey: ['billing', 'summary'],
+    queryFn: () => billingApi.getAiSummary(),
+    staleTime: 30_000,
+    enabled: isOpen,
+  });
+
+  if (!isOpen) return null;
+
+  return (
+    <Modal visible={isOpen} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={creditModalStyles.overlay}>
+        <Pressable style={creditModalStyles.backdrop} onPress={onClose} />
+        <View style={creditModalStyles.card}>
+          <View style={creditModalStyles.iconWrap}>
+            <Text style={{ fontSize: 32 }}>⚡</Text>
+          </View>
+
+          <Text style={creditModalStyles.title}>Lượt Phép Thuật AI</Text>
+          <Text style={creditModalStyles.sub}>
+            {actor === 'child'
+              ? 'Dùng để vẽ tranh AI và biến hóa nhân vật Mee'
+              : 'Hạn mức tạo ảnh AI của tài khoản gia đình'}
+          </Text>
+
+          {/* Big number */}
+          <View style={creditModalStyles.numberBox}>
+            <Text style={creditModalStyles.bigNumber}>
+              {summary.isLoading ? '...' : summary.data?.remainingCreateCredits ?? 0}
+            </Text>
+            <Text style={creditModalStyles.bigNumberLabel}>lượt còn lại</Text>
+          </View>
+
+          {/* Breakdowns */}
+          <View style={creditModalStyles.breakdownBox}>
+            <View style={creditModalStyles.breakdownRow}>
+              <Text style={creditModalStyles.rowLabel}>Lượt theo tháng:</Text>
+              <Text style={creditModalStyles.rowVal}>
+                {summary.data?.monthlyRemainingCreateCredits ?? 0} / {summary.data?.monthlyCreateCredits ?? 0}
+              </Text>
+            </View>
+            <View style={creditModalStyles.breakdownRow}>
+              <Text style={creditModalStyles.rowLabel}>Lượt mua thêm:</Text>
+              <Text style={creditModalStyles.rowVal}>
+                {summary.data?.bonusCreateCredits ?? 0} lượt (không hết hạn)
+              </Text>
+            </View>
+            <View style={[creditModalStyles.breakdownRow, { borderBottomWidth: 0 }]}>
+              <Text style={creditModalStyles.rowLabel}>Gói hiện tại:</Text>
+              <Text style={[creditModalStyles.rowVal, { color: '#FF7597', fontWeight: '800' }]}>
+                {(summary.data?.plan || 'Miễn phí').toUpperCase()}
+              </Text>
+            </View>
+          </View>
+
+          {/* Actions */}
+          {actor === 'child' ? (
+            <TouchableOpacity
+              style={creditModalStyles.actionBtnPrimary}
+              onPress={() => {
+                onClose();
+                onAskParent();
+              }}
+              activeOpacity={0.85}
+            >
+              <Text style={creditModalStyles.actionBtnPrimaryText}>
+                💌 Nhờ Phụ huynh nạp thêm
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={creditModalStyles.actionBtnPrimary}
+              onPress={() => {
+                onClose();
+                onGoPlans();
+              }}
+              activeOpacity={0.85}
+            >
+              <Text style={creditModalStyles.actionBtnPrimaryText}>
+                ⚡ Nạp thêm lượt / Nâng cấp gói
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity style={creditModalStyles.closeBtn} onPress={onClose}>
+            <Text style={creditModalStyles.closeBtnText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 }
 
 // ─── Account Bottom Sheet ──────────────────────────────────────────────────────
@@ -69,7 +180,7 @@ function AccountSheet({
   const displayName = String(
     user?.name ||
     user?.email ||
-    (actor === 'child' ? activeChild?.name || 'Bé sáng tạo' : 'Phụ huynh'),
+    (actor === 'child' ? activeChild?.name || 'Nhà sáng tạo nhí' : 'Phụ huynh'),
   );
   const avatarUrl = typeof user?.avatarUrl === 'string' ? user.avatarUrl : null;
   const initial = displayName.trim().charAt(0).toUpperCase() || 'A';
@@ -165,7 +276,7 @@ function AccountSheet({
                 <Text style={[sheet.actionBtnText, { color: AikidBrandColors.pink }]}>✨ Gói AI</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => go('/(app)/family')}>
-                <Text style={[sheet.actionBtnText, { color: '#334155' }]}>👨‍👩‍👧 Hồ sơ bé</Text>
+                <Text style={[sheet.actionBtnText, { color: '#334155' }]}>👨‍👩‍👧 Hồ sơ học sinh</Text>
               </TouchableOpacity>
             </>
           )}
@@ -192,14 +303,23 @@ export function GlobalHeader({ noMargin }: GlobalHeaderProps) {
   const { user, actor } = useAuth();
   const activeChild = useFamily((state) => state.getActiveChild());
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [creditsOpen, setCreditsOpen] = useState(false);
+  const [askParentOpen, setAskParentOpen] = useState(false);
+
+  const summary = useQuery({
+    queryKey: ['billing', 'summary'],
+    queryFn: () => billingApi.getAiSummary(),
+    staleTime: 30_000,
+  });
 
   const displayName = String(
     user?.name ||
     user?.email ||
-    (actor === 'child' ? activeChild?.name || 'Bé sáng tạo' : 'Phụ huynh'),
+    (actor === 'child' ? activeChild?.name || 'Nhà sáng tạo nhí' : 'Phụ huynh'),
   );
   const avatarUrl = typeof user?.avatarUrl === 'string' ? user.avatarUrl : null;
   const initial = displayName.trim().charAt(0).toUpperCase() || 'A';
+  const remainingCredits = summary.data?.remainingCreateCredits ?? 0;
 
   return (
     <>
@@ -217,27 +337,60 @@ export function GlobalHeader({ noMargin }: GlobalHeaderProps) {
           />
         </Pressable>
 
-        {/* Avatar → account */}
-        <Pressable
-          onPress={() => setSheetOpen(true)}
-          style={styles.avatarBtn}
-          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-        >
-          {avatarUrl ? (
-            <Image
-              source={{ uri: avatarUrl }}
-              style={styles.avatarImg}
-              contentFit="cover"
-            />
-          ) : (
-            <View style={styles.avatarFallback}>
-              <Text style={styles.avatarInitial}>{initial}</Text>
-            </View>
-          )}
-        </Pressable>
+        {/* Right side: AI Credits Chip + Avatar */}
+        <View style={styles.rightSection}>
+          {/* AI Credits Chip */}
+          <Pressable
+            onPress={() => setCreditsOpen(true)}
+            style={styles.creditsChip}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            accessibilityRole="button"
+            accessibilityLabel={`Số lượt AI: ${remainingCredits} lượt`}
+          >
+            <Text style={styles.creditsChipIcon}>⚡</Text>
+            <Text style={styles.creditsChipText}>
+              {summary.isLoading ? '...' : `${remainingCredits} lượt`}
+            </Text>
+          </Pressable>
+
+          {/* Avatar → account */}
+          <Pressable
+            onPress={() => setSheetOpen(true)}
+            style={styles.avatarBtn}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          >
+            {avatarUrl ? (
+              <Image
+                source={{ uri: avatarUrl }}
+                style={styles.avatarImg}
+                contentFit="cover"
+              />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <Text style={styles.avatarInitial}>{initial}</Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
       </View>
 
+      {/* Account Bottom Sheet */}
       <AccountSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
+
+      {/* Credits Detail Modal */}
+      <CreditsDetailModal
+        isOpen={creditsOpen}
+        onClose={() => setCreditsOpen(false)}
+        onAskParent={() => setAskParentOpen(true)}
+        onGoPlans={() => router.push('/(app)/plans')}
+      />
+
+      {/* Ask Parent Credits Modal */}
+      <AskParentCreditsModal
+        isOpen={askParentOpen}
+        onClose={() => setAskParentOpen(false)}
+        studentName={activeChild?.name}
+      />
     </>
   );
 }
@@ -249,7 +402,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 10,
     marginBottom: 8,
     // Pill-shaped frosted header
@@ -270,9 +423,40 @@ const styles = StyleSheet.create({
     width: 120,
     height: 38,
   },
+  rightSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  creditsChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1.5,
+    borderColor: '#FDE68A',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  creditsChipIcon: {
+    fontSize: 14,
+    color: '#D97706',
+  },
+  creditsChipText: {
+    fontFamily: AikidFonts.headingBold,
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#92400E',
+  },
   avatarBtn: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     borderRadius: AikidRadius.pill,
     backgroundColor: AikidFrameColors.white,
     borderWidth: 2.5,
@@ -299,7 +483,7 @@ const styles = StyleSheet.create({
   },
   avatarInitial: {
     fontFamily: AikidFonts.headingBold,
-    fontSize: 20,
+    fontSize: 18,
     color: AikidTextColors.white,
   },
 });
@@ -411,5 +595,130 @@ const sheet = StyleSheet.create({
     fontFamily: AikidFonts.bodySemi,
     fontSize: 14,
     color: '#EF4444',
+  },
+});
+
+const creditModalStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    padding: 20,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFill,
+  },
+  card: {
+    backgroundColor: '#FDFAF4',
+    borderRadius: 32,
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    elevation: 10,
+  },
+  iconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FEF3C7',
+    borderWidth: 2,
+    borderColor: '#FDE68A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 19,
+    fontWeight: '900',
+    color: '#0F172A',
+  },
+  sub: {
+    fontSize: 12,
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  numberBox: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
+    backgroundColor: '#0F172A',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  bigNumber: {
+    fontSize: 36,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  bigNumberLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#CBD5E1',
+  },
+  breakdownBox: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 18,
+  },
+  breakdownRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  rowLabel: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  rowVal: {
+    fontSize: 13,
+    color: '#0F172A',
+    fontWeight: '700',
+  },
+  actionBtnPrimary: {
+    width: '100%',
+    height: 50,
+    borderRadius: 16,
+    backgroundColor: '#FF7597',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#FF7597',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 3,
+    marginBottom: 10,
+  },
+  actionBtnPrimaryText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  closeBtn: {
+    paddingVertical: 6,
+  },
+  closeBtnText: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '600',
   },
 });

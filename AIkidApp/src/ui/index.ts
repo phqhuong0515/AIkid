@@ -28,6 +28,7 @@ export { AikidBackButton } from './AikidBackButton';
 export { AikidSafeBox } from './AikidSafeBox';
 export { AikidPanel } from './AikidPanel';
 export { AikidWizard } from './AikidWizard';
+export { AikidStepNavigator } from './AikidStepNavigator';
 
 // Re-export tokens for convenience
 export {

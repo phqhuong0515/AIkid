@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { AikidButton, AikidIcon, AikidText } from '@/ui';
@@ -11,6 +11,7 @@ export type AiResultPanelProps = {
   onDownload: () => void;
   errorMessage?: string | null;
   onChooseStyle?: () => void;
+  onAskCredits?: () => void;
 };
 
 export function AiResultPanel({
@@ -21,7 +22,17 @@ export function AiResultPanel({
   onDownload,
   errorMessage,
   onChooseStyle,
+  onAskCredits,
 }: AiResultPanelProps) {
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    if (aiImageUrl) {
+      setImageError(false);
+      setImageLoading(true);
+    }
+  }, [aiImageUrl]);
   return (
     <View style={styles.container}>
       <View style={styles.actionBar}>
@@ -32,7 +43,7 @@ export function AiResultPanel({
           Làm lại
         </AikidButton>
         <AikidButton variant="feature" size="sm" onPress={onDownload} leftIcon={<AikidIcon name="download" size={18} color="#704E48" />}>
-          Tải về
+          Lưu ảnh
         </AikidButton>
       </View>
 
@@ -46,6 +57,7 @@ export function AiResultPanel({
             <AikidButton
               variant="cta"
               size="lg"
+              style={styles.centeredButton}
               leftIcon={<AikidIcon name="wand" size={20} color="#FFFFFF" />}
               onPress={onGenerate}
             >
@@ -63,19 +75,62 @@ export function AiResultPanel({
 
         {aiState === 'done' && aiImageUrl && (
           <View style={styles.resultContainer}>
-            <Image
-              source={{ uri: aiImageUrl }}
-              style={styles.image}
-              contentFit="contain"
-              transition={300}
-            />
+            {imageLoading && (
+              <View style={styles.imageOverlayLoading}>
+                <ActivityIndicator size="small" color="#FF6B93" />
+                <AikidText variant="caption" style={{ color: '#888', marginTop: 8 }}>
+                  Đang tải ảnh...
+                </AikidText>
+              </View>
+            )}
+            {imageError ? (
+              <View style={styles.imageErrorBox}>
+                <AikidIcon name="alert-circle" size={36} color="#F59E0B" />
+                <AikidText variant="body" style={styles.imageErrorText}>
+                  Không thể tải ảnh kết quả
+                </AikidText>
+                <AikidButton
+                  variant="feature"
+                  size="sm"
+                  onPress={() => {
+                    setImageError(false);
+                    setImageLoading(true);
+                  }}
+                >
+                  Thử tải lại
+                </AikidButton>
+              </View>
+            ) : (
+              <Image
+                source={{ uri: aiImageUrl }}
+                style={styles.image}
+                contentFit="contain"
+                transition={300}
+                onLoadStart={() => setImageLoading(true)}
+                onLoad={() => {
+                  setImageLoading(false);
+                  setImageError(false);
+                }}
+                onError={() => {
+                  setImageLoading(false);
+                  setImageError(true);
+                }}
+              />
+            )}
           </View>
         )}
 
         {aiState === 'error' && (
           <View style={styles.errorContainer}>
             <AikidText variant="body" style={styles.errorText}>{errorMessage || 'Đã có lỗi xảy ra'}</AikidText>
-            <AikidButton variant="delete" onPress={onGenerate}>Thử lại</AikidButton>
+            <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <AikidButton variant="delete" style={styles.centeredButton} onPress={onGenerate}>Thử lại</AikidButton>
+              {onAskCredits && (
+                <AikidButton variant="cta" style={styles.centeredButton} onPress={onAskCredits}>
+                  💌 Nhờ Phụ huynh nạp lượt
+                </AikidButton>
+              )}
+            </View>
           </View>
         )}
       </View>
@@ -101,6 +156,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    minHeight: 0,
   },
   idleContainer: {
     alignItems: 'center',
@@ -129,13 +185,43 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 16,
   },
-  errorContainer: {
+  imageOverlayLoading: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 248, 242, 0.6)',
+    borderRadius: 16,
+    zIndex: 2,
+  },
+  imageErrorBox: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#FFF1F2',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FECDD3',
+    gap: 12,
+  },
+  imageErrorText: {
+    color: '#E11D48',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  errorContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 24,
   },
   errorText: {
     color: '#EF4444',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  centeredButton: {
+    alignSelf: 'center',
   },
 });

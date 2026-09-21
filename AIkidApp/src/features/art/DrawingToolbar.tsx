@@ -42,6 +42,7 @@ export function DrawingToolbar({
   return (
     <View style={[styles.container, horizontal && styles.containerHorizontal]}>
       <ScrollView
+        style={horizontal ? styles.scrollHorizontal : undefined}
         horizontal={horizontal}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
@@ -104,7 +105,7 @@ export function DrawingToolbar({
           <View style={styles.sliderSection}>
             <Text style={styles.sliderLabel}>Cỡ nét</Text>
             <Slider
-              style={{ width: '100%', height: 40 }}
+              style={styles.verticalSlider}
               minimumValue={3}
               maximumValue={40}
               step={1}
@@ -152,6 +153,10 @@ const styles = StyleSheet.create({
   scrollContentHorizontal: {
     flexDirection: 'row',
     paddingRight: 8,
+  },
+  scrollHorizontal: {
+    width: '100%',
+    flexGrow: 0,
   },
   section: {
     alignItems: 'center',
@@ -216,17 +221,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   sliderSection: {
-    width: 140, // Increased width
-    height: 140, // Set fixed height to give space for rotated slider
+    width: 44,
+    height: 152,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   sliderLabel: {
     fontSize: 12,
     fontWeight: 'bold',
     color: '#6B7280',
-    marginBottom: 8,
     position: 'absolute',
-    top: 0,
+    bottom: 2,
+  },
+  verticalSlider: {
+    width: 112,
+    height: 40,
+    position: 'absolute',
+    top: 42,
+    transform: [{ rotate: '-90deg' }],
   },
 });
