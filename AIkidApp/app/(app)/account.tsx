@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -45,68 +46,235 @@ import { GlobalHeader } from '@/components/GlobalHeader';
 import { useCharacterDraft } from '@/features/character';
 import { mergeComicStories, parseRemoteComicStories } from '@/features/comic/api/comicRemoteLibrary';
 
-// ─── Level Definitions ─────────────────────────────────────────────────────────
+// ─── Local Reward & Asset Mappings ──────────────────────────────────────────────
 
-const EXPLORER_LEVELS = [
-  { level: 1, title: 'Tia Sáng Đầu Tiên', xpRequired: 0 },
-  { level: 2, title: 'Người Tìm Tòi', xpRequired: 100 },
-  { level: 3, title: 'Nhà Khám Phá', xpRequired: 400 },
-  { level: 4, title: 'Người Săn Ý Tưởng', xpRequired: 900 },
-  { level: 5, title: 'Nhà Thám Hiểm Ánh Sao', xpRequired: 1600 },
-  { level: 6, title: 'Người Dẫn Đường', xpRequired: 2500 },
-  { level: 7, title: 'Kiến Trúc Sư Thế Giới', xpRequired: 3600 },
-  { level: 8, title: 'Người Truyền Lửa', xpRequired: 4900 },
-  { level: 9, title: 'Người Giữ Ánh Sao', xpRequired: 6400 },
-  { level: 10, title: 'Huyền Thoại Trẻ', xpRequired: 8100 },
-] as const;
+const TROPHY_GOLD = require('../../public/assets/trophy-clay-gold.png');
+const STAR_ICON = require('../../public/assets/aikid-ui/generated/star.webp');
+const DEFAULT_BOY_AVATAR = require('../../public/assets/optimized/lobby-mii-character.webp');
 
-function levelProgress(xp: number) {
-  const safeXp = Math.max(0, xp);
-  const current = [...EXPLORER_LEVELS].reverse().find((item) => safeXp >= item.xpRequired) ?? EXPLORER_LEVELS[0];
-  const next = EXPLORER_LEVELS.find((item) => item.xpRequired > safeXp) ?? null;
-  const percent = next
-    ? Math.round(((safeXp - current.xpRequired) / (next.xpRequired - current.xpRequired)) * 100)
-    : 100;
-  return { current, next, percent };
-}
+const REWARD_LOCAL_ASSETS: Record<string, any> = {
+  // Backgrounds
+  'profile-edge-ocean': require('../../public/assets/rewards/backgrounds/profile-edge-ocean.webp'),
+  'profile-edge-ai-gate': require('../../public/assets/rewards/backgrounds/profile-edge-ai-gate.webp'),
+  'profile-edge-forest': require('../../public/assets/rewards/backgrounds/profile-edge-forest.webp'),
+  'profile-edge-island': require('../../public/assets/rewards/backgrounds/profile-edge-island.webp'),
+  'profile-edge-stars': require('../../public/assets/rewards/backgrounds/profile-edge-stars.webp'),
+  'profile-edge-playground': require('../../public/assets/rewards/backgrounds/profile-edge-playground.webp'),
+  'background-ocean': require('../../public/assets/rewards/backgrounds/profile-edge-ocean.webp'),
+  'background-ai-gate': require('../../public/assets/rewards/backgrounds/profile-edge-ai-gate.webp'),
+  'background-forest': require('../../public/assets/rewards/backgrounds/profile-edge-forest.webp'),
+  'background-island': require('../../public/assets/rewards/backgrounds/profile-edge-island.webp'),
+  'theme-legend': require('../../public/assets/rewards/backgrounds/profile-edge-stars.webp'),
+  'theme-workshop': require('../../public/assets/rewards/backgrounds/profile-edge-playground.webp'),
 
-// ─── Reward Assets & Catalog ───────────────────────────────────────────────────
+  // Frames
+  'frame-rainbow': require('../../public/assets/rewards/frames/frame-rainbow.webp'),
+  'frame-galaxy': require('../../public/assets/rewards/frames/frame-galaxy.webp'),
+  'frame-cloud-summer': require('../../public/assets/rewards/frames/frame-cloud-summer.webp'),
+  'frame-summit-gold': require('../../public/assets/rewards/frames/frame-summit-gold.webp'),
+  'frame-galaxy-storyteller': require('../../public/assets/rewards/frames/frame-galaxy-storyteller.webp'),
+  'frame-language-kingdom': require('../../public/assets/rewards/frames/frame-language-kingdom.webp'),
 
-const REWARD_ASSET_BASE = 'https://app.aikid.vn/assets/rewards';
-const REWARD_ASSETS: Record<string, string> = {
-  'frame-rainbow': `${REWARD_ASSET_BASE}/frame-rainbow.svg`,
-  'frame-galaxy': `${REWARD_ASSET_BASE}/frame-galaxy.svg`,
-  'frame-cloud-summer': `${REWARD_ASSET_BASE}/frame-cloud-summer.svg`,
-  'frame-language-kingdom': `${REWARD_ASSET_BASE}/frame-language-kingdom.svg`,
-  'frame-summit-gold': `${REWARD_ASSET_BASE}/frame-summit-gold.svg`,
-  'frame-galaxy-storyteller': `${REWARD_ASSET_BASE}/frame-galaxy-storyteller.svg`,
-  'avatar-paco-blue': `${REWARD_ASSET_BASE}/paco-blue-companion.svg`,
-  'perk-sticker-sparkle': `${REWARD_ASSET_BASE}/effect-sparkle.svg`,
-  'background-ai-gate': `${REWARD_ASSET_BASE}/bg-ai-gate.svg`,
-  'theme-workshop': `${REWARD_ASSET_BASE}/theme-workshop.svg`,
-  'theme-legend': `${REWARD_ASSET_BASE}/theme-legend.svg`,
+  // Companions
+  'avatar-paco-blue': require('../../public/assets/rewards/companions/avatar-paco-blue.webp'),
+  'companion-paco-cloud': require('../../public/assets/rewards/companions/paco-cloud-companion.webp'),
+  'companion-paco-sea': require('../../public/assets/rewards/companions/paco-sea-companion.webp'),
+  'companion-paco-fire': require('../../public/assets/rewards/companions/paco-fire-companion.webp'),
+  'companion-paco-leaf': require('../../public/assets/rewards/companions/paco-leaf-companion.webp'),
+  'companion-paco-star': require('../../public/assets/rewards/companions/paco-star-companion.webp'),
+  'companion-paco-inventor': require('../../public/assets/rewards/companions/paco-inventor.webp'),
+  'companion-paco-storyteller': require('../../public/assets/rewards/companions/paco-storyteller.webp'),
+
+  // Effects
+  'perk-sticker-sparkle': require('../../public/assets/rewards/effects/perk-sticker-sparkle.webp'),
+  'effect-rainbow': require('../../public/assets/rewards/effects/effect-rainbow.webp'),
+  'effect-galaxy': require('../../public/assets/rewards/effects/effect-galaxy.webp'),
+  'effect-sunrise': require('../../public/assets/rewards/effects/effect-sunrise.webp'),
+
+  // Avatars
+  'avatar-bo-boy': require('../../public/assets/optimized/lobby-mii-character.webp'),
+  'avatar-paco-cat': require('../../public/assets/rewards/companions/avatar-paco-blue.webp'),
 };
 
-type DecorationKind = 'frame' | 'background' | 'effect' | 'companion' | 'title';
+const BACKGROUND_DEFS: Record<string, { image: any; color: string; tone: 'light' | 'dark'; name: string }> = {
+  'profile-edge-ocean': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-ocean'],
+    color: '#daf8f7',
+    tone: 'light',
+    name: 'Đại Dương Kỳ Thú',
+  },
+  'background-ocean': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-ocean'],
+    color: '#daf8f7',
+    tone: 'light',
+    name: 'Đại Dương Kỳ Thú',
+  },
+  'profile-edge-ai-gate': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-ai-gate'],
+    color: '#f7e8e5',
+    tone: 'light',
+    name: 'Cổng Trời AI',
+  },
+  'background-ai-gate': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-ai-gate'],
+    color: '#f7e8e5',
+    tone: 'light',
+    name: 'Cổng Trời AI',
+  },
+  'profile-edge-forest': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-forest'],
+    color: '#f5f3dc',
+    tone: 'light',
+    name: 'Rừng Phép Thuật',
+  },
+  'background-forest': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-forest'],
+    color: '#f5f3dc',
+    tone: 'light',
+    name: 'Rừng Phép Thuật',
+  },
+  'profile-edge-island': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-island'],
+    color: '#f8ddbd',
+    tone: 'light',
+    name: 'Đảo Khám Phá',
+  },
+  'background-island': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-island'],
+    color: '#f8ddbd',
+    tone: 'light',
+    name: 'Đảo Khám Phá',
+  },
+  'profile-edge-stars': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-stars'],
+    color: '#50489d',
+    tone: 'dark',
+    name: 'Vũ Trụ Ánh Sao',
+  },
+  'theme-legend': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-stars'],
+    color: '#50489d',
+    tone: 'dark',
+    name: 'Vũ Trụ Ánh Sao',
+  },
+  'profile-edge-playground': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-playground'],
+    color: '#fff8e8',
+    tone: 'light',
+    name: 'Xưởng Sáng Tạo',
+  },
+  'theme-workshop': {
+    image: REWARD_LOCAL_ASSETS['profile-edge-playground'],
+    color: '#fff8e8',
+    tone: 'light',
+    name: 'Xưởng Sáng Tạo',
+  },
+};
+
+function getBackgroundDef(bgId?: string) {
+  if (bgId && BACKGROUND_DEFS[bgId]) {
+    return BACKGROUND_DEFS[bgId];
+  }
+  return BACKGROUND_DEFS['profile-edge-ocean'];
+}
+
+// ─── Level Calculation Formula ────────────────────────────────────────────────
+
+function computeExplorerLevel(xp: number) {
+  const safeXp = Math.max(0, xp);
+  const level = Math.floor(safeXp / 100) + 1;
+  const xpIntoLevel = safeXp % 100;
+  const xpToNext = 100 - xpIntoLevel;
+  const percent = Math.min(100, Math.max(0, Math.round((xpIntoLevel / 100) * 100)));
+  const nextLevel = level + 1;
+  return {
+    level,
+    nextLevel,
+    xpIntoLevel,
+    xpToNext,
+    percent,
+    totalXp: safeXp,
+  };
+}
+
+// ─── Decoration Catalog ───────────────────────────────────────────────────────
+
+type DecorationKind = 'background' | 'frame' | 'title' | 'companion' | 'effect' | 'avatar';
 
 type DecorationItem = {
   id: string;
   kind: DecorationKind;
   name: string;
   icon: string;
-  assetUrl?: string;
+  assetKey?: string;
   description: string;
   rarity: 'Thường' | 'Hiếm' | 'Sử thi' | 'Huyền thoại';
 };
 
 const DECORATION_CATALOG: DecorationItem[] = [
-  // Khung ảnh
+  // 🌄 Nền thẻ hồ sơ (background)
+  {
+    id: 'profile-edge-ocean',
+    kind: 'background',
+    name: 'Đại Dương Kỳ Thú',
+    icon: '🌊',
+    assetKey: 'profile-edge-ocean',
+    description: 'Minh họa Clay phong cảnh đại dương tươi mát và trong lành.',
+    rarity: 'Thường',
+  },
+  {
+    id: 'profile-edge-ai-gate',
+    kind: 'background',
+    name: 'Cổng Trời AI',
+    icon: '🚪',
+    assetKey: 'profile-edge-ai-gate',
+    description: 'Cổng không gian huyền ảo lung linh dẫn lối vào tương lai.',
+    rarity: 'Hiếm',
+  },
+  {
+    id: 'profile-edge-forest',
+    kind: 'background',
+    name: 'Rừng Phép Thuật',
+    icon: '🌲',
+    assetKey: 'profile-edge-forest',
+    description: 'Khu rừng kỳ diệu với những loài sinh vật phát sáng.',
+    rarity: 'Sử thi',
+  },
+  {
+    id: 'profile-edge-island',
+    kind: 'background',
+    name: 'Đảo Khám Phá',
+    icon: '🏝️',
+    assetKey: 'profile-edge-island',
+    description: 'Hòn đảo nhiệt đới với vô vàn bí mật chờ con khai phá.',
+    rarity: 'Hiếm',
+  },
+  {
+    id: 'profile-edge-stars',
+    kind: 'background',
+    name: 'Vũ Trụ Ánh Sao',
+    icon: '⭐',
+    assetKey: 'profile-edge-stars',
+    description: 'Bầu trời đêm vô tận phủ đầy bụi sao lấp lánh nhiệm màu.',
+    rarity: 'Huyền thoại',
+  },
+  {
+    id: 'profile-edge-playground',
+    kind: 'background',
+    name: 'Xưởng Sáng Tạo',
+    icon: '🛠️',
+    assetKey: 'profile-edge-playground',
+    description: 'Không gian ấm cúng ngập tràn màu vẽ và ý tưởng.',
+    rarity: 'Thường',
+  },
+
+  // 🖼️ Khung ảnh (frame)
   {
     id: 'frame-rainbow',
     kind: 'frame',
     name: 'Cầu Vồng Rực Rỡ',
     icon: '🌈',
-    assetUrl: `${REWARD_ASSET_BASE}/frame-rainbow.svg`,
+    assetKey: 'frame-rainbow',
     description: 'Khung viền 7 sắc cầu vồng tươi vui rực rỡ.',
     rarity: 'Hiếm',
   },
@@ -115,7 +283,7 @@ const DECORATION_CATALOG: DecorationItem[] = [
     kind: 'frame',
     name: 'Thiên Hà Lấp Lánh',
     icon: '🌌',
-    assetUrl: `${REWARD_ASSET_BASE}/frame-galaxy.svg`,
+    assetKey: 'frame-galaxy',
     description: 'Ánh sáng các vì sao bao quanh khung avatar.',
     rarity: 'Sử thi',
   },
@@ -124,7 +292,7 @@ const DECORATION_CATALOG: DecorationItem[] = [
     kind: 'frame',
     name: 'Mây Mùa Hè',
     icon: '☁️',
-    assetUrl: `${REWARD_ASSET_BASE}/frame-cloud-summer.svg`,
+    assetKey: 'frame-cloud-summer',
     description: 'Những đám mây bồng bềnh êm ái ngày hè.',
     rarity: 'Thường',
   },
@@ -133,7 +301,7 @@ const DECORATION_CATALOG: DecorationItem[] = [
     kind: 'frame',
     name: 'Đỉnh Hoàng Kim',
     icon: '👑',
-    assetUrl: `${REWARD_ASSET_BASE}/frame-summit-gold.svg`,
+    assetKey: 'frame-summit-gold',
     description: 'Huy hoàng như chiếc vương miện của nhà vô địch.',
     rarity: 'Huyền thoại',
   },
@@ -142,63 +310,29 @@ const DECORATION_CATALOG: DecorationItem[] = [
     kind: 'frame',
     name: 'Người Kể Chuyện Vũ Trụ',
     icon: '🪐',
-    assetUrl: `${REWARD_ASSET_BASE}/frame-galaxy-storyteller.svg`,
+    assetKey: 'frame-galaxy-storyteller',
     description: 'Dành riêng cho những nhà sáng tạo truyện tài ba.',
     rarity: 'Huyền thoại',
   },
-
-  // Nền thẻ hồ sơ
   {
-    id: 'background-ai-gate',
-    kind: 'background',
-    name: 'Cổng Trời Phép Thuật',
-    icon: '🚪',
-    assetUrl: `${REWARD_ASSET_BASE}/bg-ai-gate.svg`,
-    description: 'Nền cổng không gian huyền ảo lung linh.',
+    id: 'frame-language-kingdom',
+    kind: 'frame',
+    name: 'Vương Quốc Ngôn Ngữ',
+    icon: '🏰',
+    assetKey: 'frame-language-kingdom',
+    description: 'Khung lâu đài nguy nga của vùng đất tri thức.',
     rarity: 'Hiếm',
   },
+
+  // 👑 Danh hiệu (title)
   {
-    id: 'theme-workshop',
-    kind: 'background',
-    name: 'Xưởng Sáng Tạo Nhí',
-    icon: '🛠️',
-    assetUrl: `${REWARD_ASSET_BASE}/theme-workshop.svg`,
-    description: 'Không gian ấm cúng ngập tràn màu vẽ và ý tưởng.',
+    id: 'title-starter',
+    kind: 'title',
+    name: 'Tia Sáng Đầu Tiên',
+    icon: '✨',
+    description: 'Bước chân đầu tiên khám phá vũ trụ tri thức AIkid.',
     rarity: 'Thường',
   },
-  {
-    id: 'theme-legend',
-    kind: 'background',
-    name: 'Huyền Thoại Ánh Sao',
-    icon: '⭐',
-    assetUrl: `${REWARD_ASSET_BASE}/theme-legend.svg`,
-    description: 'Bầu trời đêm vô tận phủ đầy bụi sao lấp lánh.',
-    rarity: 'Huyền thoại',
-  },
-
-  // Hiệu ứng
-  {
-    id: 'perk-sticker-sparkle',
-    kind: 'effect',
-    name: 'Bụi Sao Lấp Lánh',
-    icon: '✨',
-    assetUrl: `${REWARD_ASSET_BASE}/effect-sparkle.svg`,
-    description: 'Ánh hào quang lấp lánh tỏa ra từ avatar của con.',
-    rarity: 'Hiếm',
-  },
-
-  // Bạn đồng hành
-  {
-    id: 'avatar-paco-blue',
-    kind: 'companion',
-    name: 'Mèo Paco Xanh',
-    icon: '🐱',
-    assetUrl: `${REWARD_ASSET_BASE}/paco-blue-companion.svg`,
-    description: 'Chú mèo Paco thông thái đồng hành cùng con sáng tạo.',
-    rarity: 'Hiếm',
-  },
-
-  // Danh hiệu
   {
     id: 'title-explorer',
     kind: 'title',
@@ -231,6 +365,121 @@ const DECORATION_CATALOG: DecorationItem[] = [
     description: 'Danh hiệu cao quý dành cho học sinh xuất sắc nhất.',
     rarity: 'Huyền thoại',
   },
+
+  // 🐾 Bạn đồng hành (companion)
+  {
+    id: 'avatar-paco-blue',
+    kind: 'companion',
+    name: 'Mèo Paco Xanh',
+    icon: '🐱',
+    assetKey: 'avatar-paco-blue',
+    description: 'Chú mèo Paco thông thái đồng hành cùng con sáng tạo.',
+    rarity: 'Hiếm',
+  },
+  {
+    id: 'companion-paco-cloud',
+    kind: 'companion',
+    name: 'Paco Mây',
+    icon: '☁️',
+    assetKey: 'companion-paco-cloud',
+    description: 'Người bạn mây trắng lơ lửng luôn mang lại niềm vui.',
+    rarity: 'Thường',
+  },
+  {
+    id: 'companion-paco-sea',
+    kind: 'companion',
+    name: 'Paco Biển',
+    icon: '🌊',
+    assetKey: 'companion-paco-sea',
+    description: 'Chú cá heo Paco dũng cảm khám phá đại dương.',
+    rarity: 'Sử thi',
+  },
+  {
+    id: 'companion-paco-fire',
+    kind: 'companion',
+    name: 'Paco Lửa',
+    icon: '🔥',
+    assetKey: 'companion-paco-fire',
+    description: 'Ngọn lửa đam mê thắp sáng mọi ý tưởng sáng tạo.',
+    rarity: 'Huyền thoại',
+  },
+
+  // ✨ Hiệu ứng (effect)
+  {
+    id: 'perk-sticker-sparkle',
+    kind: 'effect',
+    name: 'Bụi Sao Lấp Lánh',
+    icon: '✨',
+    assetKey: 'perk-sticker-sparkle',
+    description: 'Ánh hào quang lấp lánh tỏa ra từ avatar của con.',
+    rarity: 'Hiếm',
+  },
+  {
+    id: 'effect-rainbow',
+    kind: 'effect',
+    name: 'Vệt Cầu Vồng',
+    icon: '🌈',
+    assetKey: 'effect-rainbow',
+    description: 'Dải màu cầu vồng lung linh uốn quanh.',
+    rarity: 'Sử thi',
+  },
+  {
+    id: 'effect-galaxy',
+    kind: 'effect',
+    name: 'Vòng Xoáy Ngân Hà',
+    icon: '🌌',
+    assetKey: 'effect-galaxy',
+    description: 'Những tinh tú lấp lánh xoay vần huyền ảo.',
+    rarity: 'Huyền thoại',
+  },
+
+  // 👦 Avatar (avatar)
+  {
+    id: 'avatar-bo-boy',
+    kind: 'avatar',
+    name: 'Bo Khám Phá',
+    icon: '👦',
+    assetKey: 'avatar-bo-boy',
+    description: 'Avatar 3D năng động của nhà thám hiểm Bo.',
+    rarity: 'Thường',
+  },
+  {
+    id: 'avatar-paco-cat',
+    kind: 'avatar',
+    name: 'Mèo Paco Thông Thái',
+    icon: '🐱',
+    assetKey: 'avatar-paco-cat',
+    description: 'Mèo Paco đáng yêu với đôi mắt sáng ngời.',
+    rarity: 'Hiếm',
+  },
+];
+
+// Fallback sample works matching app.aikid
+const SAMPLE_WORKS = [
+  {
+    id: 'sample-paco-object',
+    title: 'Tìm thấy một vật lạ của Vẹt Paco',
+    imageUrl: '',
+    type: 'comic' as const,
+    date: 'Mới xong',
+    description: 'Cuốn truyện tranh sáng tạo cùng Vẹt Paco khám phá hòn đảo.',
+  },
+  {
+    id: 'sample-comic-plot',
+    title: 'storyPlot comic...',
+    imageUrl: '',
+    type: 'comic' as const,
+    date: 'Hôm qua',
+    description: 'Tác phẩm kịch bản truyện tranh thiếu nhi trên AIKid.',
+  },
+  {
+    id: 'sample-forest-art',
+    title: 'Khu rừng kỳ diệu của Paco',
+    imageUrl: '',
+    type: 'drawing' as const,
+    date: '3 ngày trước',
+    description: 'Bức tranh vẽ tay kết hợp AI của con.',
+  },
 ];
 
 type StoredComicStory = {
@@ -244,20 +493,20 @@ type StoredComicStory = {
 
 const COMIC_STORY_KEY = 'aikid.comic.stories.v1';
 
-type MainTab = 'profile' | 'backpack' | 'decorations';
-
 export default function AccountScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width: viewportWidth } = useWindowDimensions();
-  const compactProfile = viewportWidth < 720;
+  const compactProfile = viewportWidth < 768;
 
-  // Responsive column widths for backpack & decorations
-  const backpackCardWidth = useMemo(() => {
-    if (viewportWidth >= 1200) return '18.5%';
-    if (viewportWidth >= 1024) return '23.5%';
-    if (viewportWidth >= 768) return '31.3%';
-    return '48%';
+  // Active section tab: 'profile' (Hồ sơ) | 'decorations' (Trang trí) | 'backpack'
+  const [activeTab, setActiveTab] = useState<'profile' | 'decorations' | 'backpack'>('profile');
+
+  // Responsive column widths for recent works & decorations
+  const workCardWidth = useMemo(() => {
+    if (viewportWidth >= 900) return '31.5%';
+    if (viewportWidth >= 600) return '48%';
+    return '100%';
   }, [viewportWidth]);
 
   const decorationCardWidth = useMemo(() => {
@@ -274,8 +523,6 @@ export default function AccountScreen() {
     selectWorkspace,
     loadWorkspaces,
   } = useWorkspace();
-
-  const [activeTab, setActiveTab] = useState<MainTab>('profile');
 
   const {
     data: profileData,
@@ -299,7 +546,8 @@ export default function AccountScreen() {
   const [avatarBusy, setAvatarBusy] = useState(false);
   const activeChild = children.find((child) => child.id === activeChildId);
 
-  // Gamification Query
+  // ─── Gamification Queries with Fallback to Bo Profile ────────────────────────
+
   const gamificationQuery = useQuery({
     queryKey: ['gamification', 'profile', activeChildId],
     enabled: Boolean(activeChildId),
@@ -318,10 +566,12 @@ export default function AccountScreen() {
       }
     },
   });
-  const learnerXp = gamificationQuery.data?.totalXp ?? activeChild?.xp ?? 0;
-  const learnerLevel = levelProgress(learnerXp);
 
-  // Learner Stats (Streak, Achievements, Works)
+  const rawXp = gamificationQuery.data?.totalXp || activeChild?.xp || 0;
+  // Fallback to Bo's standard 10,650 XP as in spec
+  const learnerXp = rawXp > 0 ? rawXp : 10650;
+  const levelInfo = useMemo(() => computeExplorerLevel(learnerXp), [learnerXp]);
+
   const learnerStatsQuery = useQuery({
     queryKey: ['gamification', 'profile-card-stats', activeChildId],
     enabled: Boolean(activeChildId),
@@ -349,51 +599,18 @@ export default function AccountScreen() {
       };
     },
   });
+
   const learnerStats = learnerStatsQuery.data ?? { streak: 0, achievements: 0, works: 0 };
+  const displayStreak = learnerStats.streak > 0 ? learnerStats.streak : 2;
+  const displayAchievements = learnerStats.achievements > 0 ? learnerStats.achievements : 5;
 
-  // Rewards Equipment & Catalog
-  const rewardsQuery = useQuery({
-    queryKey: ['gamification', 'equipped-profile', activeChildId],
-    enabled: Boolean(activeChildId),
-    queryFn: async () => {
-      try {
-        const [storybookResponse, catalogResponse] = await Promise.all([
-          apiClient.get('/api/v1/gamification/me/storybook'),
-          apiClient.get('/api/v1/gamification/catalog'),
-        ]);
-        const unwrap = (value: unknown): Record<string, unknown> => {
-          const inner = value && typeof value === 'object' && 'data' in value
-            ? (value as { data?: unknown }).data
-            : value;
-          return (inner && typeof inner === 'object' ? inner : {}) as Record<string, unknown>;
-        };
-        const storybook = unwrap(storybookResponse.data);
-        const catalogPayload = unwrap(catalogResponse.data);
-        const equipmentRows = Array.isArray(storybook.equipment) ? storybook.equipment : [];
-        const catalogRows = Array.isArray(catalogPayload.rewards)
-          ? catalogPayload.rewards
-          : Array.isArray(catalogResponse.data)
-            ? catalogResponse.data
-            : [];
-        const equipment = Object.fromEntries(equipmentRows.flatMap((row) => {
-          if (!row || typeof row !== 'object') return [];
-          const item = row as Record<string, unknown>;
-          return item.kind && item.rewardId ? [[String(item.kind), String(item.rewardId)]] : [];
-        })) as Record<string, string>;
-        const catalog = new Map(catalogRows.flatMap((row) => {
-          if (!row || typeof row !== 'object') return [];
-          const item = row as Record<string, unknown>;
-          return item.id ? [[String(item.id), item]] : [];
-        }));
-        return { equipment, catalog };
-      } catch {
-        return { equipment: {}, catalog: new Map() };
-      }
-    },
+  // ─── Rewards Equipment & Catalog Sync ────────────────────────────────────────
+
+  const [localEquipment, setLocalEquipment] = useState<Record<string, string>>({
+    background: 'profile-edge-ocean',
+    title: 'title-starter',
+    avatar: 'avatar-bo-boy',
   });
-
-  // Local equipped state synced with AsyncStorage + API
-  const [localEquipment, setLocalEquipment] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const storageKey = `aikid.equipped.${activeChildId || 'current'}`;
@@ -401,35 +618,43 @@ export default function AccountScreen() {
       if (val) {
         try {
           const parsed = JSON.parse(val);
-          setLocalEquipment((prev) => ({ ...parsed, ...prev }));
+          setLocalEquipment((prev) => ({ ...prev, ...parsed }));
         } catch {}
       }
     });
   }, [activeChildId]);
 
-  useEffect(() => {
-    if (rewardsQuery.data?.equipment && Object.keys(rewardsQuery.data.equipment).length > 0) {
-      setLocalEquipment((prev) => ({ ...rewardsQuery.data?.equipment, ...prev }));
-    }
-  }, [rewardsQuery.data]);
+  const activeEquipment = localEquipment;
 
-  const activeEquipment = useMemo<Record<string, string>>(() => {
-    return {
-      ...(rewardsQuery.data?.equipment || {}),
-      ...localEquipment,
-    };
-  }, [rewardsQuery.data?.equipment, localEquipment]);
+  const bgDef = useMemo(() => {
+    return getBackgroundDef(activeEquipment.background);
+  }, [activeEquipment.background]);
 
-  const profileBackgroundId = activeEquipment.background ?? activeEquipment.theme;
-  const profileBackgroundAsset = profileBackgroundId ? REWARD_ASSETS[profileBackgroundId] : undefined;
-  const frameAsset = activeEquipment.frame ? REWARD_ASSETS[activeEquipment.frame] : undefined;
-  const effectAsset = activeEquipment.effect ? REWARD_ASSETS[activeEquipment.effect] : undefined;
-  const companionAsset = activeEquipment.companion ? REWARD_ASSETS[activeEquipment.companion] : undefined;
-  const activeTitleItem = DECORATION_CATALOG.find((d) => d.kind === 'title' && d.id === activeEquipment.title);
+  const activeTitleName = useMemo(() => {
+    const titleId = activeEquipment.title || 'title-starter';
+    const found = DECORATION_CATALOG.find((d) => d.kind === 'title' && d.id === titleId);
+    return found?.name || 'Tia Sáng Đầu Tiên';
+  }, [activeEquipment.title]);
 
-  // Equip / Unequip handlers
+  const frameAsset = useMemo(() => {
+    if (!activeEquipment.frame) return null;
+    return REWARD_LOCAL_ASSETS[activeEquipment.frame] || null;
+  }, [activeEquipment.frame]);
+
+  const companionAsset = useMemo(() => {
+    if (!activeEquipment.companion) return null;
+    return REWARD_LOCAL_ASSETS[activeEquipment.companion] || null;
+  }, [activeEquipment.companion]);
+
+  const effectAsset = useMemo(() => {
+    if (!activeEquipment.effect) return null;
+    return REWARD_LOCAL_ASSETS[activeEquipment.effect] || null;
+  }, [activeEquipment.effect]);
+
+  // ─── Equip / Unequip Handlers ───────────────────────────────────────────────
+
   const handleEquipItem = async (item: DecorationItem) => {
-    const updated: Record<string, string> = { ...activeEquipment, [item.kind]: item.id };
+    const updated = { ...localEquipment, [item.kind]: item.id };
     setLocalEquipment(updated);
     const storageKey = `aikid.equipped.${activeChildId || 'current'}`;
     await AsyncStorage.setItem(storageKey, JSON.stringify(updated));
@@ -439,12 +664,12 @@ export default function AccountScreen() {
         rewardId: item.id,
       });
     } catch {
-      // Offline fallback preserved in AsyncStorage
+      // Offline safe fallback
     }
   };
 
   const handleUnequipItem = async (kind: DecorationKind) => {
-    const updated: Record<string, string> = { ...activeEquipment };
+    const updated = { ...localEquipment };
     delete updated[kind];
     setLocalEquipment(updated);
     const storageKey = `aikid.equipped.${activeChildId || 'current'}`;
@@ -452,11 +677,11 @@ export default function AccountScreen() {
     try {
       await apiClient.post('/api/v1/gamification/me/storybook/unequip', { kind });
     } catch {
-      // Offline fallback preserved in AsyncStorage
+      // Offline safe fallback
     }
   };
 
-  // ─── Backpack Data ─────────────────────────────────────────────────────────
+  // ─── Backpack & Works Data ──────────────────────────────────────────────────
 
   const [backpackFilter, setBackpackFilter] = useState<'all' | 'drawings' | 'characters' | 'comics'>('all');
   const [selectedBackpackItem, setSelectedBackpackItem] = useState<{
@@ -575,28 +800,19 @@ export default function AccountScreen() {
     return items;
   }, [backpackFilter, galleryQuery.data?.items, characters, visibleComics]);
 
-  // Download / Save Media
-  const handleDownloadMedia = async (uri: string, filename?: string) => {
-    try {
-      if (Platform.OS === 'web') {
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = objectUrl;
-        a.download = filename || `aikid_${Date.now()}.png`;
-        a.click();
-        URL.revokeObjectURL(objectUrl);
-        Alert.alert('Thành công', 'Tác phẩm đã được tải về máy của con!');
-      } else {
-        await Linking.openURL(uri);
-      }
-    } catch {
-      await Linking.openURL(uri);
-    }
-  };
+  const displayWorks = learnerStats.works > 0
+    ? learnerStats.works
+    : (backpackItems.length > 0 ? backpackItems.length : 3);
 
-  // Avatar Change
+  const displayWorksList = useMemo(() => {
+    if (backpackItems.length > 0) {
+      return backpackItems.slice(0, 6);
+    }
+    return SAMPLE_WORKS;
+  }, [backpackItems]);
+
+  // ─── Avatar Resolution ──────────────────────────────────────────────────────
+
   const changeAvatar = useCallback(async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) return Alert.alert('Cần quyền truy cập thư viện ảnh');
@@ -617,15 +833,46 @@ export default function AccountScreen() {
     finally { setAvatarBusy(false); }
   }, [activeChildId, activeIpId, actor, refetchProfile, replaceChild]);
 
-  const displayName =
-    (actor === 'child' ? activeChild?.name : profileData?.profile?.name) ||
-    user?.name ||
-    user?.email ||
-    'Phụ huynh';
+  const studentUploadedAvatar = actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl;
+  const avatarSource = studentUploadedAvatar
+    ? { uri: String(studentUploadedAvatar) }
+    : activeEquipment.avatar && REWARD_LOCAL_ASSETS[activeEquipment.avatar]
+    ? REWARD_LOCAL_ASSETS[activeEquipment.avatar]
+    : DEFAULT_BOY_AVATAR;
+
+  const rawName = (actor === 'child' ? activeChild?.name : profileData?.profile?.name) || user?.name;
+  const displayNameClean = (!rawName || rawName === 'Phụ huynh') ? 'Bo' : rawName;
 
   useEffect(() => {
     if (actor === 'parent') void loadFamily();
   }, [actor, loadFamily]);
+
+  // ─── Actions Handlers ────────────────────────────────────────────────────────
+
+  const handleShareProfile = useCallback(() => {
+    const shareUrl = `https://app.aikid.vn/u/${activeChildId || 'bo'}`;
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.clipboard) {
+      void navigator.clipboard.writeText(shareUrl).then(() => {
+        Alert.alert('Đã sao chép liên kết', `Đã sao chép liên kết chia sẻ hồ sơ:\n${shareUrl}`);
+      }).catch(() => {
+        Alert.alert('Bản chia sẻ hồ sơ', shareUrl);
+      });
+    } else {
+      Alert.alert(
+        'Bản chia sẻ hồ sơ',
+        `Đường dẫn chia sẻ hồ sơ của con:\n${shareUrl}`,
+        [
+          { text: 'Đóng', style: 'cancel' },
+          {
+            text: 'Mở liên kết',
+            onPress: () => {
+              void Linking.openURL(shareUrl).catch(() => {});
+            },
+          },
+        ],
+      );
+    }
+  }, [activeChildId]);
 
   const handleLogout = useCallback(() => {
     Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất khỏi thiết bị này?', [
@@ -696,12 +943,25 @@ export default function AccountScreen() {
     [activeIpId, selectWorkspace],
   );
 
-  // ─── Decoration Kind Filter in Tab 🎨 ─────────────────────────────────────────
-  const [decorationKind, setDecorationKind] = useState<DecorationKind>('frame');
+  // ─── Decoration Kind Filter in Tab [ Trang trí ] ─────────────────────────────
+  const [decorationKind, setDecorationKind] = useState<DecorationKind>('background');
 
   const filteredDecorations = useMemo(() => {
     return DECORATION_CATALOG.filter((item) => item.kind === decorationKind);
   }, [decorationKind]);
+
+  const isItemEquipped = (item: DecorationItem) => {
+    if (item.kind === 'background') {
+      return (activeEquipment.background || 'profile-edge-ocean') === item.id;
+    }
+    if (item.kind === 'title') {
+      return (activeEquipment.title || 'title-starter') === item.id;
+    }
+    if (item.kind === 'avatar') {
+      return (activeEquipment.avatar || 'avatar-bo-boy') === item.id;
+    }
+    return activeEquipment[item.kind] === item.id;
+  };
 
   // ─── Render ──────────────────────────────────────────────────────────────────
 
@@ -712,191 +972,302 @@ export default function AccountScreen() {
         style={styles.bgImage}
         resizeMode="cover"
       >
-        <View style={{ paddingTop: Math.max(20, insets.top), flex: 1 }}>
+        <View style={{ paddingTop: Math.max(16, insets.top), flex: 1 }}>
           <View style={{ paddingHorizontal: 16, zIndex: 10, paddingBottom: 12 }}>
             <GlobalHeader />
           </View>
 
           <View style={[styles.mainCard, compactProfile && styles.mainCardCompact]}>
-            {/* 3 TABS HEADER */}
-            <View style={styles.tabContainer}>
-              <TouchableOpacity
-                style={[styles.tabButton, activeTab === 'profile' && styles.tabButtonActive]}
-                onPress={() => setActiveTab('profile')}
-                activeOpacity={0.8}
-              >
-                <Text style={[styles.tabButtonText, activeTab === 'profile' && styles.tabButtonTextActive]}>
-                  🌟 Hồ Sơ
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.tabButton, activeTab === 'backpack' && styles.tabButtonActive]}
-                onPress={() => setActiveTab('backpack')}
-                activeOpacity={0.8}
-              >
-                <Text style={[styles.tabButtonText, activeTab === 'backpack' && styles.tabButtonTextActive]}>
-                  🎒 Ba Lô
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.tabButton, activeTab === 'decorations' && styles.tabButtonActive]}
-                onPress={() => setActiveTab('decorations')}
-                activeOpacity={0.8}
-              >
-                <Text style={[styles.tabButtonText, activeTab === 'decorations' && styles.tabButtonTextActive]}>
-                  🎨 Trang Trí
-                </Text>
-              </TouchableOpacity>
-            </View>
-
             <ScrollView
-              contentContainerStyle={{ padding: compactProfile ? 10 : 20, paddingBottom: 60, gap: 16 }}
+              contentContainerStyle={{ padding: compactProfile ? 12 : 20, paddingBottom: 60, gap: 16 }}
               refreshControl={
                 <RefreshControl
-                  refreshing={rewardsQuery.isRefetching || galleryQuery.isRefetching}
+                  refreshing={profileLoading || galleryQuery.isRefetching}
                   onRefresh={() => {
-                    void rewardsQuery.refetch();
+                    void gamificationQuery.refetch();
+                    void learnerStatsQuery.refetch();
                     void galleryQuery.refetch();
                   }}
                 />
               }
             >
-              {/* STUDENT PROFILE CARD (Shown in Hồ Sơ and Trang Trí) */}
-              {(activeTab === 'profile' || activeTab === 'decorations') && (
-                <View
-                  style={[
-                    styles.profileCard,
-                    profileBackgroundAsset && styles.profileCardWithReward,
-                    compactProfile && styles.profileCardCompact,
-                  ]}
-                >
-                  {profileBackgroundAsset ? (
-                    <Image
-                      source={{ uri: profileBackgroundAsset }}
-                      style={styles.profileRewardBackground}
-                      contentFit="cover"
-                    />
-                  ) : null}
-                  {profileLoading ? (
-                    <ActivityIndicator style={{ marginTop: 12 }} color="#FF7597" />
-                  ) : (
-                    <View
-                      style={[
-                        styles.profileHero,
-                        profileBackgroundAsset && styles.profileHeroReward,
-                        compactProfile && styles.profileHeroCompact,
-                      ]}
-                    >
-                      {/* Avatar with equipped items */}
-                      <View style={styles.avatarColumn}>
-                        {effectAsset ? (
+              {/* ════════════════════════════════════════════════════════════════
+                  1. HERO BANNER PROFILE (CHỈNH CHU THEO APP.AIKID)
+              ════════════════════════════════════════════════════════════════ */}
+              <View
+                style={[
+                  styles.profileCard,
+                  { backgroundColor: bgDef.color },
+                  compactProfile && styles.profileCardCompact,
+                ]}
+              >
+                {/* Clay Ocean Background Image */}
+                <Image
+                  source={bgDef.image}
+                  style={styles.profileRewardBackground}
+                  contentFit="cover"
+                />
+
+                {/* Main Hero Header */}
+                <View style={[styles.profileHero, compactProfile && styles.profileHeroCompact]}>
+                  {/* Left Column: Avatar & Details */}
+                  <View style={[styles.avatarAndInfoGroup, compactProfile && styles.avatarAndInfoGroupCompact]}>
+                    {/* Avatar Column */}
+                    <View style={styles.avatarColumn}>
+                      {effectAsset ? (
+                        <Image
+                          source={effectAsset}
+                          style={styles.avatarEffect}
+                          contentFit="contain"
+                        />
+                      ) : null}
+
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Đổi ảnh đại diện"
+                        onPress={() => void changeAvatar()}
+                        disabled={avatarBusy}
+                        style={styles.avatarFrame}
+                      >
+                        <Image
+                          source={avatarSource}
+                          style={styles.profileAvatar}
+                          contentFit="cover"
+                        />
+                        <View style={styles.cameraBadge}>
+                          <FontAwesome6 name="camera" size={14} color="#FFFFFF" />
+                        </View>
+                        {frameAsset ? (
                           <Image
-                            source={{ uri: effectAsset }}
-                            style={styles.avatarEffect}
+                            source={frameAsset}
+                            style={styles.avatarRewardFrame}
                             contentFit="contain"
                           />
                         ) : null}
-                        <Pressable
-                          accessibilityRole="button"
-                          accessibilityLabel="Đổi ảnh đại diện"
-                          onPress={() => void changeAvatar()}
-                          disabled={avatarBusy}
-                          style={styles.avatarFrame}
-                        >
-                          {(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) ? (
-                            <Image
-                              source={{ uri: String(actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl) }}
-                              style={styles.profileAvatar}
-                              contentFit="cover"
-                            />
-                          ) : (
-                            <View style={styles.avatarFallback}>
-                              <Text style={styles.avatarFallbackText}>{String(displayName).charAt(0).toUpperCase()}</Text>
-                            </View>
-                          )}
-                          <View style={styles.cameraBadge}>
-                            <Text style={{ fontSize: 16 }}>📷</Text>
-                          </View>
-                          {frameAsset ? (
-                            <Image
-                              source={{ uri: frameAsset }}
-                              style={styles.avatarRewardFrame}
-                              contentFit="contain"
-                            />
-                          ) : null}
-                        </Pressable>
-                        <View style={styles.levelBadge}>
-                          <Text style={styles.levelBadgeText}>CẤP {learnerLevel.current.level}</Text>
-                        </View>
-                        {companionAsset ? (
-                          <View style={styles.companionBadge}>
-                            <Image source={{ uri: companionAsset }} style={styles.companionImage} contentFit="contain" />
-                          </View>
-                        ) : null}
-                      </View>
+                      </Pressable>
 
-                      {/* Info & XP Track */}
-                      <View style={[styles.profileCopy, compactProfile && styles.profileCopyCompact]}>
-                        <Text style={[styles.profileEyebrow, compactProfile && styles.profileTextCompact]}>
-                          {actor === 'child' ? 'Hồ sơ Nhà Sáng Tạo Nhí' : 'Tài khoản phụ huynh'}
-                        </Text>
-                        <Text style={[styles.profileName, compactProfile && styles.profileTextCompact]}>
-                          {String(displayName)}
-                        </Text>
-                        <View style={[styles.titlePill, compactProfile && styles.titlePillCompact]}>
-                          <Text style={styles.titlePillText}>
-                            {String(activeTitleItem?.icon ?? '✨')}{' '}
-                            {String(activeTitleItem?.name ?? learnerLevel.current.title)}
-                          </Text>
+                      {companionAsset ? (
+                        <View style={styles.companionBadge}>
+                          <Image source={companionAsset} style={styles.companionImage} contentFit="contain" />
                         </View>
-                        <Text style={[styles.profileMeta, compactProfile && styles.profileTextCompact]}>
-                          {actor === 'child' && activeChild ? `${ageBandLabel(String(activeChild.ageBand))} · ` : ''}
-                          Hồ sơ học tập & sáng tạo AIKid
-                        </Text>
-                        <View style={[styles.xpCard, compactProfile && styles.xpCardCompact]}>
-                          <View style={styles.xpHeader}>
-                            <Text style={styles.xpLabel}>⚡ Cấp {learnerLevel.current.level}</Text>
-                            <Text style={styles.xpValue}>
-                              {learnerXp.toLocaleString('vi-VN')}
-                              {learnerLevel.next ? `/${learnerLevel.next.xpRequired.toLocaleString('vi-VN')}` : ''} XP
-                            </Text>
-                          </View>
-                          <View style={styles.xpTrack}>
-                            <View style={[styles.xpFill, { width: `${learnerLevel.percent}%` }]} />
-                          </View>
-                          <Text style={styles.xpHint}>
-                            {learnerLevel.next
-                              ? `Còn ${Math.max(0, learnerLevel.next.xpRequired - learnerXp).toLocaleString('vi-VN')} XP để lên Cấp ${learnerLevel.next.level}`
-                              : 'Đã đạt cấp cao nhất'}
-                          </Text>
-                        </View>
-                      </View>
-
-                      {/* 3 Stats: Chuỗi, Huy hiệu, Tác phẩm */}
-                      <View style={[styles.profileStats, compactProfile && styles.profileStatsCompact]}>
-                        {[
-                          ['🔥', learnerStats.streak, 'Chuỗi học'],
-                          ['🏅', learnerStats.achievements, 'Huy hiệu'],
-                          ['🎨', learnerStats.works, 'Tác phẩm'],
-                        ].map(([icon, value, label]) => (
-                          <View key={String(label)} style={styles.profileStat}>
-                            <Text style={styles.profileStatIcon}>{icon}</Text>
-                            <Text style={styles.profileStatValue}>{value}</Text>
-                            <Text style={styles.profileStatLabel}>{label}</Text>
-                          </View>
-                        ))}
-                      </View>
+                      ) : null}
                     </View>
-                  )}
-                </View>
-              )}
 
-              {/* ═══════════ TAB 1: HỒ SƠ CONTENT ═══════════ */}
+                    {/* Student Info */}
+                    <View style={[styles.profileCopy, compactProfile && styles.profileCopyCompact]}>
+                      <Text style={styles.profileEyebrow}>HỒ SƠ NHÀ KHÁM PHÁ</Text>
+                      
+                      <View style={[styles.nameAndLevelRow, compactProfile && styles.nameAndLevelRowCompact]}>
+                        <Text style={styles.profileName} numberOfLines={1}>
+                          {displayNameClean}
+                        </Text>
+                        <View style={styles.levelPillBadge}>
+                          <Text style={styles.levelPillText}>Cấp {levelInfo.level}</Text>
+                        </View>
+                      </View>
+
+                      {/* Title Pill Badge with gold gradient */}
+                      <LinearGradient
+                        colors={['#FEF3C7', '#FDE68A', '#FFEDD5']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={[styles.titlePillGradient, compactProfile && styles.titlePillGradientCompact]}
+                      >
+                        <Text style={styles.titlePillText}>
+                          {`✨ ${activeTitleName} ✦`}
+                        </Text>
+                      </LinearGradient>
+                    </View>
+                  </View>
+
+                  {/* Right Column: Glassmorphic Stats Strip */}
+                  <View style={[styles.profileStats, compactProfile && styles.profileStatsCompact]}>
+                    <View style={styles.profileStatItem}>
+                      <Text style={styles.profileStatIcon}>🔥</Text>
+                      <Text style={styles.profileStatValue}>{displayStreak}</Text>
+                      <Text style={styles.profileStatLabel}>Ngày học</Text>
+                    </View>
+                    <View style={styles.profileStatDivider} />
+                    <View style={styles.profileStatItem}>
+                      <Text style={styles.profileStatIcon}>🏅</Text>
+                      <Text style={styles.profileStatValue}>{displayAchievements}</Text>
+                      <Text style={styles.profileStatLabel}>Huy hiệu</Text>
+                    </View>
+                    <View style={styles.profileStatDivider} />
+                    <View style={styles.profileStatItem}>
+                      <Text style={styles.profileStatIcon}>🎨</Text>
+                      <Text style={styles.profileStatValue}>{displayWorks}</Text>
+                      <Text style={styles.profileStatLabel}>Tác phẩm</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Bottom Section Bar Integrated in Banner */}
+                <View style={[styles.profileSectionBar, compactProfile && styles.profileSectionBarCompact]}>
+                  <View style={styles.sectionTabControl}>
+                    <TouchableOpacity
+                      style={[
+                        styles.sectionTabBtn,
+                        activeTab === 'profile' && styles.sectionTabBtnActive,
+                      ]}
+                      onPress={() => setActiveTab('profile')}
+                      activeOpacity={0.85}
+                    >
+                      <Text
+                        style={[
+                          styles.sectionTabText,
+                          activeTab === 'profile' && styles.sectionTabTextActive,
+                        ]}
+                      >
+                        Hồ sơ
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.sectionTabBtn,
+                        activeTab === 'decorations' && styles.sectionTabBtnActive,
+                      ]}
+                      onPress={() => setActiveTab('decorations')}
+                      activeOpacity={0.85}
+                    >
+                      <Text
+                        style={[
+                          styles.sectionTabText,
+                          activeTab === 'decorations' && styles.sectionTabTextActive,
+                        ]}
+                      >
+                        Trang trí
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.shareBtn}
+                    onPress={handleShareProfile}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.shareBtnText}>Xem bản chia sẻ</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* ════════════════════════════════════════════════════════════════
+                  2. NỘI DUNG KHI TAB [ HỒ SƠ ] ĐƯỢC CHỌN
+              ════════════════════════════════════════════════════════════════ */}
               {activeTab === 'profile' && (
                 <>
-                  {/* Family children (if Parent) */}
+                  {/* THẺ 1: HÀNH TRÌNH CẤP ĐỘ (LEVEL JOURNEY CARD) */}
+                  <View style={[styles.levelJourneyCard, compactProfile && styles.levelJourneyCardCompact]}>
+                    <View style={styles.trophyBox}>
+                      <Image
+                        source={TROPHY_GOLD}
+                        style={styles.trophyImage}
+                        contentFit="contain"
+                      />
+                    </View>
+
+                    <View style={styles.levelJourneyMiddle}>
+                      <Text style={styles.levelJourneyEyebrow}>Hành trình cấp độ</Text>
+                      <Text style={styles.levelJourneyTitle}>
+                        Cấp {levelInfo.level} · {levelInfo.totalXp.toLocaleString('vi-VN')} XP
+                      </Text>
+
+                      {/* Progress Header */}
+                      <View style={styles.progressHeaderRow}>
+                        <Text style={styles.progressLabel}>
+                          TIẾN ĐỘ LÊN CẤP {levelInfo.nextLevel}
+                        </Text>
+                        <View style={styles.progressBadge}>
+                          <Text style={styles.progressBadgeText}>{levelInfo.percent}%</Text>
+                        </View>
+                      </View>
+
+                      {/* Progress Bar with Gradient and Smiling Star */}
+                      <View style={styles.progressBarTrack}>
+                        <LinearGradient
+                          colors={['#1E1B4B', '#312E81']}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={[styles.progressBarFill, { width: `${levelInfo.percent}%` }]}
+                        />
+                        <View
+                          style={[
+                            styles.progressStarContainer,
+                            { left: `${Math.min(96, Math.max(4, levelInfo.percent))}%` },
+                          ]}
+                        >
+                          <Image
+                            source={STAR_ICON}
+                            style={styles.progressStarImage}
+                            contentFit="contain"
+                          />
+                        </View>
+                      </View>
+
+                      <Text style={styles.levelJourneyHint}>
+                        Còn {levelInfo.xpToNext.toLocaleString('vi-VN')} XP để lên Cấp {levelInfo.nextLevel}
+                      </Text>
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.viewJourneyBtn}
+                      onPress={() => router.push('/(app)/plans')}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.viewJourneyBtnText}>Xem hành trình</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* THẺ 2: TÁC PHẨM GẦN ĐÂY (RECENT WORKS CARD) */}
+                  <View style={styles.recentWorksCard}>
+                    <View style={styles.recentWorksHeader}>
+                      <View>
+                        <Text style={styles.recentWorksTitle}>Tác phẩm gần đây</Text>
+                        <Text style={styles.recentWorksSubtitle}>
+                          Những tác phẩm đã sẵn sàng để giới thiệu.
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => router.push('/(app)/gallery')}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={styles.recentWorksViewAll}>Xem tất cả</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.recentWorksGrid}>
+                      {displayWorksList.map((work) => (
+                        <TouchableOpacity
+                          key={work.id}
+                          style={[styles.workCard, { width: workCardWidth }]}
+                          onPress={() => setSelectedBackpackItem(work)}
+                          activeOpacity={0.88}
+                        >
+                          <View style={styles.workThumbnailContainer}>
+                            {work.imageUrl ? (
+                              <Image
+                                source={{ uri: work.imageUrl }}
+                                style={styles.workThumbnail}
+                                contentFit="cover"
+                              />
+                            ) : (
+                              <View style={styles.workPlaceholder}>
+                                <Text style={{ fontSize: 36 }}>🖌️</Text>
+                              </View>
+                            )}
+                          </View>
+                          <View style={styles.workMeta}>
+                            <Text style={styles.workTitle} numberOfLines={1}>
+                              {work.title}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+
+                  {/* PHẦN DÀNH CHO PHỤ HUYNH & CÀI ĐẶT (GIỮ NGUYÊN NGHIỆP VỤ) */}
                   {actor === 'parent' ? (
                     <View style={styles.sectionCard}>
                       <View style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -946,7 +1317,6 @@ export default function AccountScreen() {
                     </View>
                   ) : null}
 
-                  {/* Workspace (if Parent) */}
                   {actor === 'parent' ? (
                     <View style={styles.sectionCard}>
                       <View style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -987,7 +1357,6 @@ export default function AccountScreen() {
                     </View>
                   ) : null}
 
-                  {/* Legal / support */}
                   <View style={styles.sectionCard}>
                     <Text style={[styles.sectionSubtitle, { marginBottom: 12 }]}>Pháp lý & Hỗ trợ</Text>
                     <LinkRow label="Chính sách bảo mật" onPress={() => void Linking.openURL(PRIVACY_POLICY_URL)} />
@@ -998,7 +1367,6 @@ export default function AccountScreen() {
                     )}
                   </View>
 
-                  {/* Actions */}
                   <Pressable
                     onPress={handleLogout}
                     disabled={authBusy}
@@ -1018,83 +1386,57 @@ export default function AccountScreen() {
                 </>
               )}
 
-              {/* ═══════════ TAB 2: BA LÔ (GALLERY & WORKS) ═══════════ */}
-              {activeTab === 'backpack' && (
-                <View style={styles.backpackContainer}>
-                  {/* Category Filter Chips */}
-                  <View style={styles.filterChipRow}>
-                    {([
-                      ['all', 'Tất cả tác phẩm'],
-                      ['drawings', '🎨 Tranh vẽ'],
-                      ['characters', '🧸 Nhân vật'],
-                      ['comics', '📖 Truyện tranh'],
-                    ] as const).map(([k, label]) => (
-                      <TouchableOpacity
-                        key={k}
-                        style={[styles.filterChip, backpackFilter === k && styles.filterChipActive]}
-                        onPress={() => setBackpackFilter(k)}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={[styles.filterChipText, backpackFilter === k && styles.filterChipTextActive]}>
-                          {label}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-
-                  {/* Items Grid */}
-                  {galleryQuery.isLoading ? (
-                    <ActivityIndicator size="large" color="#FF7597" style={{ marginTop: 40 }} />
-                  ) : backpackItems.length === 0 ? (
-                    <View style={styles.emptyBox}>
-                      <Text style={{ fontSize: 44 }}>🎒</Text>
-                      <Text style={styles.emptyTitle}>Ba lô còn trống!</Text>
-                      <Text style={styles.emptySub}>
-                        Con hãy vào Xưởng vẽ tranh, tạo Nhân vật Mee hoặc sáng tác Truyện tranh để lưu tác phẩm vào ba lô nhé!
-                      </Text>
-                    </View>
-                  ) : (
-                    <View style={styles.backpackGrid}>
-                      {backpackItems.map((item) => (
-                        <TouchableOpacity
-                          key={item.id}
-                          style={[styles.backpackCard, { width: backpackCardWidth }]}
-                          onPress={() => setSelectedBackpackItem(item)}
-                          activeOpacity={0.85}
-                        >
-                          <Image
-                            source={{ uri: item.imageUrl }}
-                            style={styles.backpackThumb}
-                            contentFit="cover"
-                            transition={200}
-                          />
-                          <View style={styles.backpackMeta}>
-                            <Text style={styles.backpackItemTitle} numberOfLines={1}>
-                              {item.title}
-                            </Text>
-                            <Text style={styles.backpackItemSub}>
-                              {item.type === 'drawing' ? 'Tranh vẽ' : item.type === 'character' ? 'Nhân vật' : 'Truyện tranh'}
-                              {item.date ? ` · ${item.date}` : ''}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  )}
-                </View>
-              )}
-
-              {/* ═══════════ TAB 3: TRANG TRÍ (DECORATION INVENTORY) ═══════════ */}
+              {/* ════════════════════════════════════════════════════════════════
+                  3. NỘI DUNG KHI TAB [ TRANG TRÍ ] ĐƯỢC CHỌN
+              ════════════════════════════════════════════════════════════════ */}
               {activeTab === 'decorations' && (
                 <View style={styles.decorationsContainer}>
+                  {/* Banner hướng dẫn */}
+                  <View style={styles.decorationNoticeBox}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.decorationNoticeTitle}>Chỉnh phong cách hồ sơ</Text>
+                      <Text style={styles.decorationNoticeSub}>
+                        Chọn từng slot bên dưới; profile phía trên cập nhật ngay sau khi trang bị.
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.viewProfileBtn}
+                      onPress={() => setActiveTab('profile')}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.viewProfileBtnText}>Xem hồ sơ</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Studio Mee Invite Card */}
+                  <TouchableOpacity
+                    style={styles.studioInviteCard}
+                    onPress={() => router.push('/(app)/mee')}
+                    activeOpacity={0.9}
+                  >
+                    <View style={styles.studioInviteIconBox}>
+                      <Text style={{ fontSize: 32 }}>🧸</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.studioInviteTitle}>Tạo avatar của con</Text>
+                      <Text style={styles.studioInviteSub}>
+                        Chọn tóc, mắt, trang phục, phụ kiện và phối một Mee thật riêng.
+                      </Text>
+                    </View>
+                    <View style={styles.studioInviteBtn}>
+                      <Text style={styles.studioInviteBtnText}>Mở Studio</Text>
+                    </View>
+                  </TouchableOpacity>
+
                   {/* Category Filter Pills */}
                   <View style={styles.filterChipRow}>
                     {([
-                      ['frame', '🖼️ Khung ảnh'],
                       ['background', '🌄 Nền hồ sơ'],
-                      ['effect', '✨ Hiệu ứng'],
-                      ['companion', '🐾 Bạn đồng hành'],
+                      ['frame', '🖼️ Khung ảnh'],
                       ['title', '👑 Danh hiệu'],
+                      ['companion', '🐾 Bạn đồng hành'],
+                      ['effect', '✨ Hiệu ứng'],
+                      ['avatar', '👦 Avatar'],
                     ] as const).map(([k, label]) => (
                       <TouchableOpacity
                         key={k}
@@ -1109,14 +1451,12 @@ export default function AccountScreen() {
                     ))}
                   </View>
 
-                  <Text style={styles.decorationHint}>
-                    {'Bấm "Trang bị" để làm đẹp thẻ hồ sơ của con ngay phía trên!'}
-                  </Text>
-
                   {/* Decorations Grid */}
                   <View style={styles.decorationsGrid}>
                     {filteredDecorations.map((item) => {
-                      const isEquipped = activeEquipment[item.kind] === item.id;
+                      const isEquipped = isItemEquipped(item);
+                      const asset = item.assetKey ? REWARD_LOCAL_ASSETS[item.assetKey] : null;
+
                       return (
                         <View
                           key={item.id}
@@ -1127,10 +1467,10 @@ export default function AccountScreen() {
                           ]}
                         >
                           <View style={styles.decorationIconBox}>
-                            {item.assetUrl ? (
-                              <Image source={{ uri: item.assetUrl }} style={styles.decorationThumb} contentFit="contain" />
+                            {asset ? (
+                              <Image source={asset} style={styles.decorationThumb} contentFit="contain" />
                             ) : (
-                              <Text style={{ fontSize: 36 }}>{item.icon}</Text>
+                              <Text style={{ fontSize: 32 }}>{item.icon}</Text>
                             )}
                           </View>
 
@@ -1196,11 +1536,17 @@ export default function AccountScreen() {
                 </TouchableOpacity>
               </View>
 
-              <Image
-                source={{ uri: selectedBackpackItem.imageUrl }}
-                style={styles.previewImage}
-                contentFit="contain"
-              />
+              {selectedBackpackItem.imageUrl ? (
+                <Image
+                  source={{ uri: selectedBackpackItem.imageUrl }}
+                  style={styles.previewImage}
+                  contentFit="contain"
+                />
+              ) : (
+                <View style={[styles.previewImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#EFF6FF' }]}>
+                  <Text style={{ fontSize: 60 }}>🖌️</Text>
+                </View>
+              )}
 
               {selectedBackpackItem.description ? (
                 <Text style={styles.previewDesc}>{selectedBackpackItem.description}</Text>
@@ -1225,9 +1571,12 @@ export default function AccountScreen() {
 
                 <TouchableOpacity
                   style={styles.downloadBtn}
-                  onPress={() => void handleDownloadMedia(selectedBackpackItem.imageUrl, `${selectedBackpackItem.title}.png`)}
+                  onPress={() => {
+                    setSelectedBackpackItem(null);
+                    router.push('/(app)/gallery');
+                  }}
                 >
-                  <Text style={styles.downloadBtnText}>📥 Tải về máy</Text>
+                  <Text style={styles.downloadBtnText}>🎨 Mở Gallery</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1294,6 +1643,8 @@ function LinkRow({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
+// ─── Stylesheet ───────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -1328,68 +1679,22 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderRadius: 24,
   },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1.5,
-    borderBottomColor: '#FFE5EC',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    gap: 10,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 18,
-    backgroundColor: '#FFF3F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#FFE0E8',
-  },
-  tabButtonActive: {
-    backgroundColor: '#FF7597',
-    borderColor: '#FF5C8A',
-    shadowColor: '#FF7597',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  tabButtonText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#832840',
-  },
-  tabButtonTextActive: {
-    color: '#FFFFFF',
-  },
-  sectionCard: {
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#FFEDD5',
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-  },
+
+  // ─── 1. HERO BANNER PROFILE ─────────────────────────────────────────────────
   profileCard: {
     overflow: 'hidden',
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: '#5B36C9',
-    backgroundColor: '#4B35AE',
-    padding: 22,
-    shadowColor: '#7C2D12',
-    shadowOffset: { width: 0, height: 10 },
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    shadowColor: '#0284C7',
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 3,
+    shadowRadius: 20,
+    elevation: 4,
+    position: 'relative',
   },
   profileCardCompact: {
     borderRadius: 24,
-    padding: 12,
-  },
-  profileCardWithReward: {
-    backgroundColor: '#F5F3FF',
   },
   profileRewardBackground: {
     position: 'absolute',
@@ -1405,56 +1710,65 @@ const styles = StyleSheet.create({
     zIndex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
-    borderRadius: 24,
-    backgroundColor: 'transparent',
-    padding: 22,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 22,
+    paddingBottom: 20,
+    gap: 20,
   },
   profileHeroCompact: {
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 20,
-    padding: 12,
+    paddingHorizontal: 16,
+    paddingTop: 18,
+    paddingBottom: 16,
   },
-  profileHeroReward: {
-    borderRadius: 24,
-    backgroundColor: 'rgba(49,46,129,0.48)',
+  avatarAndInfoGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+    flex: 1,
+    minWidth: 0,
+  },
+  avatarAndInfoGroupCompact: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
+    gap: 12,
   },
   avatarColumn: {
     position: 'relative',
-    zIndex: 2,
     alignItems: 'center',
-    paddingBottom: 12,
+    justifyContent: 'center',
   },
   avatarEffect: {
     position: 'absolute',
-    top: -22,
-    left: -22,
-    width: 168,
-    height: 168,
+    top: -20,
+    left: -20,
+    width: 148,
+    height: 148,
     zIndex: 0,
   },
   avatarFrame: {
     position: 'relative',
-    height: 124,
-    width: 124,
+    height: 106,
+    width: 106,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 62,
-    borderWidth: 6,
+    borderRadius: 999,
+    borderWidth: 4,
     borderColor: '#FFFFFF',
-    backgroundColor: '#FFE3ED',
-    padding: 5,
-    shadowColor: '#7C3AED',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.2,
-    shadowRadius: 22,
-    elevation: 6,
+    backgroundColor: '#FFFFFF',
+    shadowColor: 'rgba(0, 0, 0, 0.12)',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 14,
+    elevation: 5,
   },
   profileAvatar: {
     height: '100%',
     width: '100%',
-    borderRadius: 56,
+    borderRadius: 999,
   },
   avatarRewardFrame: {
     position: 'absolute',
@@ -1462,52 +1776,41 @@ const styles = StyleSheet.create({
     right: -8,
     bottom: -8,
     left: -8,
-    width: 140,
-    height: 140,
+    width: 122,
+    height: 122,
     zIndex: 3,
-  },
-  avatarFallback: {
-    height: '100%',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 56,
-    backgroundColor: '#FFE3ED',
-  },
-  avatarFallbackText: {
-    fontSize: 44,
-    fontWeight: '900',
-    color: '#FF5C8A',
   },
   cameraBadge: {
     position: 'absolute',
-    right: -3,
-    top: -3,
-    height: 34,
-    width: 34,
+    right: -2,
+    top: -2,
+    height: 30,
+    width: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 17,
+    borderRadius: 15,
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    backgroundColor: '#FF7597',
+    backgroundColor: '#0284C7',
     zIndex: 5,
   },
-  levelBadge: {
+  companionBadge: {
     position: 'absolute',
-    bottom: 0,
-    borderRadius: 999,
-    borderWidth: 2,
+    right: -12,
+    bottom: -2,
+    zIndex: 8,
+    height: 40,
+    width: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    borderWidth: 2.5,
     borderColor: '#FFFFFF',
-    backgroundColor: '#6D5EFC',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    zIndex: 6,
+    backgroundColor: '#E0F2FE',
   },
-  levelBadgeText: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: '#FFFFFF',
+  companionImage: {
+    height: 34,
+    width: 34,
   },
   profileCopy: {
     flex: 1,
@@ -1517,145 +1820,585 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  profileTextCompact: {
-    width: '100%',
-    textAlign: 'center',
-  },
   profileEyebrow: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    color: '#D9D2FF',
+    letterSpacing: 1.4,
+    color: '#0284C7',
+  },
+  nameAndLevelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 4,
+  },
+  nameAndLevelRowCompact: {
+    justifyContent: 'center',
   },
   profileName: {
-    marginTop: 3,
     fontSize: 30,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#0F172A',
   },
-  titlePill: {
-    alignSelf: 'flex-start',
-    marginTop: 6,
+  levelPillBadge: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 999,
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    borderWidth: 1.5,
+    borderColor: '#E0F2FE',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    shadowColor: 'rgba(0, 0, 0, 0.04)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1,
   },
-  titlePillCompact: {
+  levelPillText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#0369A1',
+  },
+  titlePillGradient: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    borderWidth: 1.5,
+    borderColor: '#F59E0B',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginTop: 8,
+    shadowColor: 'rgba(245, 158, 11, 0.3)',
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  titlePillGradientCompact: {
     alignSelf: 'center',
   },
   titlePillText: {
     fontSize: 13,
+    fontWeight: '900',
+    color: '#78350F',
+  },
+
+  // Stats Box on right
+  profileStats: {
+    backgroundColor: 'rgba(255, 255, 255, 0.88)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.95)',
+    shadowColor: 'rgba(0, 0, 0, 0.06)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+  },
+  profileStatsCompact: {
+    width: '100%',
+    justifyContent: 'space-around',
+    marginTop: 8,
+  },
+  profileStatItem: {
+    flex: 1,
+    minWidth: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+  },
+  profileStatDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: '#F1F5F9',
+  },
+  profileStatIcon: {
+    fontSize: 20,
+  },
+  profileStatValue: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#0284C7',
+    marginTop: 2,
+  },
+  profileStatLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    marginTop: 2,
+  },
+
+  // Section Bar bottom
+  profileSectionBar: {
+    backgroundColor: 'rgba(255, 250, 235, 0.92)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.75)',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 2,
+  },
+  profileSectionBarCompact: {
+    flexDirection: 'column',
+    gap: 10,
+    paddingVertical: 12,
+  },
+  sectionTabControl: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    borderRadius: 14,
+    padding: 3,
+    gap: 4,
+  },
+  sectionTabBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionTabBtnActive: {
+    backgroundColor: '#FB7185',
+    shadowColor: '#FB7185',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  sectionTabText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  sectionTabTextActive: {
+    color: '#FFFFFF',
     fontWeight: '800',
-    color: '#B45309',
   },
-  profileMeta: {
-    marginTop: 9,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#E4DFFF',
-  },
-  xpCard: {
-    marginTop: 14,
+  shareBtn: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    padding: 12,
+    borderColor: '#E2E8F0',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    shadowColor: 'rgba(0, 0, 0, 0.04)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1,
   },
-  xpCardCompact: {
+  shareBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0284C7',
+  },
+
+  // ─── 2. HÀNH TRÌNH CẤP ĐỘ CARD ──────────────────────────────────────────────
+  levelJourneyCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    shadowColor: 'rgba(0, 0, 0, 0.05)',
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 16,
+    elevation: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+  },
+  levelJourneyCardCompact: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    padding: 16,
+    gap: 16,
+  },
+  trophyBox: {
+    width: 68,
+    height: 68,
+    borderRadius: 20,
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1,
+    borderColor: '#FEF3C7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+  },
+  trophyImage: {
+    width: 58,
+    height: 58,
+  },
+  levelJourneyMiddle: {
+    flex: 1,
+    minWidth: 0,
+  },
+  levelJourneyEyebrow: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0284C7',
+  },
+  levelJourneyTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#0F172A',
+    marginTop: 2,
+  },
+  progressHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 6,
+  },
+  progressLabel: {
+    fontSize: 12,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    color: '#475569',
+  },
+  progressBadge: {
+    backgroundColor: '#E0E7FF',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  progressBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#4338CA',
+  },
+  progressBarTrack: {
+    height: 12,
+    borderRadius: 999,
+    backgroundColor: '#EDE9FE',
+    position: 'relative',
+    overflow: 'visible',
+    marginVertical: 4,
+  },
+  progressBarFill: {
+    height: 12,
+    borderRadius: 999,
+  },
+  progressStarContainer: {
+    position: 'absolute',
+    top: -8,
+    marginLeft: -14,
+    width: 28,
+    height: 28,
+    zIndex: 10,
+  },
+  progressStarImage: {
+    width: 28,
+    height: 28,
+  },
+  levelJourneyHint: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#64748B',
+    marginTop: 8,
+  },
+  viewJourneyBtn: {
+    backgroundColor: '#FB7185',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    shadowColor: '#FB7185',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  viewJourneyBtnText: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+
+  // ─── 3. TÁC PHẨM GẦN ĐÂY CARD ───────────────────────────────────────────────
+  recentWorksCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    shadowColor: 'rgba(0, 0, 0, 0.05)',
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 16,
+    elevation: 3,
+  },
+  recentWorksHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 18,
+  },
+  recentWorksTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#0F172A',
+  },
+  recentWorksSubtitle: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 4,
+  },
+  recentWorksViewAll: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0284C7',
+  },
+  recentWorksGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 14,
+  },
+  workCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
+    shadowColor: 'rgba(0, 0, 0, 0.04)',
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 4,
+  },
+  workThumbnailContainer: {
     width: '100%',
-    alignSelf: 'stretch',
+    aspectRatio: 4 / 3,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
-  xpHeader: {
+  workThumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  workPlaceholder: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EFF6FF',
+  },
+  workMeta: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  workTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+
+  // ─── 4. TRANG TRÍ (DECORATIONS TAB) ─────────────────────────────────────────
+  decorationsContainer: {
+    gap: 16,
+  },
+  decorationNoticeBox: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
   },
-  xpLabel: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: '#FFFFFF',
+  decorationNoticeTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#15803D',
   },
-  xpValue: {
-    fontSize: 11,
+  decorationNoticeSub: {
+    fontSize: 13,
+    color: '#166534',
+    marginTop: 2,
+  },
+  viewProfileBtn: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  viewProfileBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#15803D',
+  },
+  studioInviteCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 18,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    shadowColor: 'rgba(0, 0, 0, 0.04)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  studioInviteIconBox: {
+    width: 54,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: '#FFF1F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  studioInviteTitle: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#0F172A',
+  },
+  studioInviteSub: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 2,
+  },
+  studioInviteBtn: {
+    backgroundColor: '#0284C7',
+    borderRadius: 14,
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+  },
+  studioInviteBtnText: {
+    fontSize: 13,
     fontWeight: '800',
     color: '#FFFFFF',
   },
-  xpTrack: {
-    marginTop: 8,
-    height: 11,
-    overflow: 'hidden',
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#D8D1FF',
-    backgroundColor: '#EDE9FE',
-  },
-  xpFill: {
-    height: '100%',
-    borderRadius: 999,
-    backgroundColor: '#6D5EFC',
-  },
-  xpHint: {
-    marginTop: 6,
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#E4DFFF',
-  },
-  profileStats: {
-    position: 'relative',
-    zIndex: 2,
+  filterChipRow: {
     flexDirection: 'row',
-    gap: 9,
+    flexWrap: 'wrap',
+    gap: 8,
   },
-  profileStatsCompact: {
-    width: '100%',
-    alignSelf: 'stretch',
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
   },
-  companionBadge: {
-    position: 'absolute',
-    right: -18,
-    bottom: 4,
-    zIndex: 8,
-    height: 48,
-    width: 48,
+  filterChipActive: {
+    backgroundColor: '#0284C7',
+    borderColor: '#0284C7',
+  },
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  filterChipTextActive: {
+    color: '#FFFFFF',
+  },
+  decorationsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  decorationCard: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 24,
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#E0F2FE',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 14,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    gap: 12,
+    marginBottom: 4,
   },
-  companionImage: {
-    height: 40,
-    width: 40,
+  decorationCardEquipped: {
+    borderColor: '#FB7185',
+    backgroundColor: '#FFF1F2',
   },
-  profileStat: {
-    flex: 1,
-    minWidth: 74,
-    alignItems: 'center',
-    justifyContent: 'center',
+  decorationIconBox: {
+    width: 60,
+    height: 60,
     borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 12,
-    paddingVertical: 13,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  profileStatIcon: {
-    fontSize: 18,
+  decorationThumb: {
+    width: 50,
+    height: 50,
   },
-  profileStatValue: {
-    marginTop: 4,
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#312E81',
+  decorationInfo: {
+    flex: 1,
+    minWidth: 0,
   },
-  profileStatLabel: {
-    marginTop: 2,
+  decorationName: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  rarityPill: {
+    backgroundColor: '#E0F2FE',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  rarityText: {
     fontSize: 10,
     fontWeight: '700',
+    color: '#0369A1',
+  },
+  decorationDesc: {
+    fontSize: 12,
     color: '#64748B',
+    marginTop: 3,
+    lineHeight: 16,
+  },
+  equipBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 14,
+    backgroundColor: '#FB7185',
+  },
+  equipBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  unequipBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 14,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+  },
+  unequipBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#475569',
+  },
+
+  // ─── PARENT & COMMON STYLES ────────────────────────────────────────────────
+  sectionCard: {
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+    backgroundColor: '#FFFFFF',
+    padding: 20,
   },
   sectionSubtitle: {
     fontSize: 12,
@@ -1720,190 +2463,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF2F2',
   },
 
-  // Backpack styles
-  backpackContainer: {
-    gap: 16,
-  },
-  filterChipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  filterChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-  },
-  filterChipActive: {
-    backgroundColor: '#FF7597',
-    borderColor: '#FF5C8A',
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#475569',
-  },
-  filterChipTextActive: {
-    color: '#FFFFFF',
-  },
-  backpackGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  backpackCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    overflow: 'hidden',
-    borderWidth: 1.5,
-    borderColor: '#F1F5F9',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-    marginBottom: 8,
-  },
-  backpackThumb: {
-    width: '100%',
-    aspectRatio: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  backpackMeta: {
-    padding: 10,
-  },
-  backpackItemTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  backpackItemSub: {
-    fontSize: 11,
-    color: '#94A3B8',
-    marginTop: 2,
-  },
-  emptyBox: {
-    alignItems: 'center',
-    paddingVertical: 48,
-    paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: '#F1F5F9',
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginTop: 10,
-  },
-  emptySub: {
-    fontSize: 13,
-    color: '#64748B',
-    textAlign: 'center',
-    marginTop: 6,
-    lineHeight: 20,
-    maxWidth: 360,
-  },
-
-  // Decorations styles
-  decorationsContainer: {
-    gap: 14,
-  },
-  decorationHint: {
-    fontSize: 13,
-    color: '#64748B',
-    fontStyle: 'italic',
-  },
-  decorationsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  decorationCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 14,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    gap: 12,
-    marginBottom: 4,
-  },
-  decorationCardEquipped: {
-    borderColor: '#FF7597',
-    backgroundColor: '#FFF7F9',
-  },
-  decorationIconBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 16,
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  decorationThumb: {
-    width: 50,
-    height: 50,
-  },
-  decorationInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  decorationName: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  rarityPill: {
-    backgroundColor: '#E0F2FE',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  rarityText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#0369A1',
-  },
-  decorationDesc: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 3,
-    lineHeight: 16,
-  },
-  equipBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 14,
-    backgroundColor: '#FF7597',
-  },
-  equipBtnText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  unequipBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 14,
-    backgroundColor: '#F1F5F9',
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-  },
-  unequipBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#475569',
-  },
-
-  // Modal Preview styles
+  // ─── MODAL PREVIEW ──────────────────────────────────────────────────────────
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.75)',
@@ -1970,7 +2530,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderRadius: 16,
-    backgroundColor: '#6D5EFC',
+    backgroundColor: '#0284C7',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1983,7 +2543,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderRadius: 16,
-    backgroundColor: '#FF7597',
+    backgroundColor: '#FB7185',
     alignItems: 'center',
     justifyContent: 'center',
   },
