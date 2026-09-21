@@ -22,6 +22,8 @@ export type GalleryMediaItem = {
   createdAt?: string | null;
   width?: number | null;
   height?: number | null;
+  prompt?: string | null;
+  title?: string | null;
 };
 
 export type GalleryFilters = {
@@ -455,7 +457,7 @@ export async function uploadPickedImageAsPublicRef(input: {
     const uploaded = await mediaApi.upload(form, {
       ipId: input.ipId,
       assetType: input.assetType ?? 'uploaded',
-      tags: `child:${input.childId},${input.tags || 'art-reference'}`,
+      tags: `ref-temp:${input.childId},art-reference${input.tags && input.tags !== 'art-reference' ? `,${input.tags}` : ''}`,
       permanent: 'true',
     });
     const publicUrl = pickUploadPublicUrl(uploaded);
@@ -591,11 +593,21 @@ async function fetchAiImagesPage(offset: number): Promise<GalleryPage> {
         }
         const uri = resolveMediaUri(first);
         if (!uri) return null;
+        const inputParams = (
+          job.inputParams && typeof job.inputParams === 'object'
+            ? job.inputParams
+            : job.input_params && typeof job.input_params === 'object'
+              ? job.input_params
+              : {}
+        ) as Record<string, unknown>;
+        const rawPrompt = String(inputParams.prompt ?? job.prompt ?? '').trim();
         return {
           id: String(job.id ?? job.jobId ?? `ai-${offset}-${index}`),
           uri,
           createdAt: (job.createdAt as string) ?? null,
           assetType: 'ai-image',
+          prompt: rawPrompt || null,
+          title: rawPrompt || null,
         };
       })
       .filter((item): item is GalleryMediaItem => item != null);

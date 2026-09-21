@@ -55,7 +55,7 @@ export default function GalleryScreen() {
   const characters = allCharacters.filter(
     (character) => !character.childProfileId || character.childProfileId === childId,
   );
-  const [section, setSection] = useState<'all' | 'ai' | 'uploads' | 'characters' | 'comics'>('all');
+  const [section, setSection] = useState<'all' | 'ai' | 'characters' | 'comics'>('all');
   const [selectedCharacter, setSelectedCharacter] = useState<SavedCharacter | null>(null);
   const [selectedMedia, setSelectedMedia] = useState<{
     uri: string;
@@ -193,12 +193,6 @@ export default function GalleryScreen() {
           <View style={styles.pageWrapper}>
             <GlobalHeader />
 
-            <View style={styles.topActionBar}>
-              <Pressable onPress={() => router.push('/(app)/capture')} style={styles.captureButton}>
-                <Text style={styles.captureButtonText}>+ Thêm Ảnh</Text>
-              </Pressable>
-            </View>
-
             <View style={styles.galleryCard}>
               {!childId ? (
                 <Text style={{ margin: 20, padding: 16, backgroundColor: '#FEF3C7', borderRadius: 12 }}>Chọn hồ sơ con trước khi xem ảnh.</Text>
@@ -211,7 +205,6 @@ export default function GalleryScreen() {
                       {([
                         ['all', 'Tất cả'],
                         ['ai', `Ảnh AI · ${aiItems.length}`],
-                        ['uploads', `Tải lên · ${query.data?.items.length ?? 0}`],
                         ['characters', `Nhân vật · ${characters.length}`],
                         ['comics', `Truyện tranh · ${visibleComicStories.length}`],
                       ] as const).map(([id, label]) => (
@@ -361,48 +354,8 @@ export default function GalleryScreen() {
                       </GallerySection>
                     ) : null}
 
-                    {(section === 'all' || section === 'uploads') ? (
-                      <GallerySection title="Ảnh tải lên" hint="Chạm để xem chi tiết & tải về">
-                        <View style={styles.grid}>
-                          {query.data?.items.map((item, index) => { 
-                            const uri = resolveMediaUri(String(item.url || item.imageUrl || item.previewUrl || '')); 
-                            if (!uri) return null;
-                            return (
-                              <Pressable
-                                key={`upload-${item.id || `${uri}-${index}`}`}
-                                onPress={() =>
-                                  setSelectedMedia({
-                                    uri,
-                                    title: (item as any).title || `Ảnh tải lên #${index + 1}`,
-                                    typeLabel: 'Ảnh tải lên',
-                                    createdAt: (item as any).createdAt,
-                                  })
-                                }
-                                style={({ pressed, hovered }: any) => [
-                                  styles.mediaCard,
-                                  { width: mediaCardWidth },
-                                  pressed && styles.mediaCardPressed,
-                                  hovered && styles.mediaCardHovered,
-                                ]}
-                                accessibilityRole="button"
-                                accessibilityLabel={`Xem ảnh tải lên ${index + 1}`}
-                              >
-                                <View style={styles.imageWrapper}>
-                                  <GalleryMediaImage
-                                    uri={uri}
-                                    style={styles.mediaImage}
-                                    fallbackEmoji="🎨"
-                                  />
-                                </View>
-                              </Pressable>
-                            );
-                          })}
-                        </View>
-                      </GallerySection>
-                    ) : null}
-
-                    {!query.data?.items.length && !aiItems.length && !characters.length && !visibleComicStories.length ? (
-                      <Text style={{ paddingVertical: 64, textAlign: 'center', color: '#64748B' }}>Chưa có ảnh. Chụp, chọn ảnh từ thư viện hoặc tạo ảnh AI.</Text>
+                    {!aiItems.length && !characters.length && !visibleComicStories.length ? (
+                      <Text style={{ paddingVertical: 64, textAlign: 'center', color: '#64748B' }}>Chưa có tác phẩm AI nào. Hãy tạo ảnh AI, nhân vật hoặc truyện tranh nhé!</Text>
                     ) : null}
                   </View>
                 </>

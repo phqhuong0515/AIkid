@@ -46,7 +46,7 @@ import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { useCharacterDraft } from '@/features/character';
 import { mergeComicStories, parseRemoteComicStories } from '@/features/comic/api/comicRemoteLibrary';
-import { resolveMediaUri } from '@/features/media/api/mediaHooks';
+import { resolveMediaUri, useAiImages } from '@/features/media/api/mediaHooks';
 
 // ─── Local Reward & Asset Mappings ──────────────────────────────────────────────
 
@@ -478,9 +478,9 @@ const SAMPLE_WORKS = [
     id: 'sample-forest-art',
     title: 'Khu rừng kỳ diệu của Paco',
     imageUrl: '',
-    type: 'drawing' as const,
+    type: 'ai' as const,
     date: '3 ngày trước',
-    description: 'Bức tranh vẽ tay kết hợp AI của con.',
+    description: 'Bức tranh được sáng tạo bằng AI của con.',
   },
 ];
 
@@ -504,7 +504,7 @@ export default function AccountScreen() {
   // Active section tab: 'profile' (Hồ sơ) | 'decorations' (Trang trí) | 'backpack'
   const [activeTab, setActiveTab] = useState<'profile' | 'decorations' | 'backpack'>('profile');
 
-  // Responsive column widths for recent works & decorations
+  // Responsive column widths for recent works & decorations & backpack
   const workCardWidth = useMemo(() => {
     if (viewportWidth >= 900) return '31.5%';
     if (viewportWidth >= 600) return '48%';
@@ -513,6 +513,13 @@ export default function AccountScreen() {
 
   const decorationCardWidth = useMemo(() => {
     if (viewportWidth >= 768) return '48.8%';
+    return '100%';
+  }, [viewportWidth]);
+
+  const backpackCardWidth = useMemo(() => {
+    if (viewportWidth >= 1024) return '23.5%';
+    if (viewportWidth >= 768) return '31.3%';
+    if (viewportWidth >= 480) return '48%';
     return '100%';
   }, [viewportWidth]);
 
@@ -540,6 +547,7 @@ export default function AccountScreen() {
     replaceChild,
   } = useFamily();
   const setRecentScope = useRecentAiImages((s) => s.setScope);
+  const recentAi = useRecentAiImages((s) => s.items);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
@@ -685,12 +693,12 @@ export default function AccountScreen() {
 
   // ─── Backpack & Works Data ──────────────────────────────────────────────────
 
-  const [backpackFilter, setBackpackFilter] = useState<'all' | 'drawings' | 'characters' | 'comics'>('all');
+  const [backpackFilter, setBackpackFilter] = useState<'all' | 'ai' | 'characters' | 'comics'>('all');
   const [selectedBackpackItem, setSelectedBackpackItem] = useState<{
     id: string;
     title: string;
     imageUrl: string;
-    type: 'drawing' | 'character' | 'comic';
+    type: 'ai' | 'character' | 'comic';
     date?: string;
     description?: string;
     comicId?: string;
@@ -720,6 +728,13 @@ export default function AccountScreen() {
     void loadComicStories();
   }, [hydrateCharacters, loadComicStories]);
 
+  const aiQuery = useAiImages({
+    enabled: !!activeChildId && !!activeIpId,
+    childId: activeChildId || undefined,
+    ipId: activeIpId || undefined,
+  });
+  const remoteAi = aiQuery.data?.pages.flatMap((page) => page.items) ?? [];
+
   const galleryQuery = useQuery({
     queryKey: ['media', 'gallery-backpack', activeChildId, activeIpId],
     enabled: !!activeChildId,
@@ -739,82 +754,99 @@ export default function AccountScreen() {
     return mergeComicStories(comicStories, remoteComics) as StoredComicStory[];
   }, [comicStories, remoteComics]);
 
-  const backpackItems = useMemo(() => {
+  const aiItems = useMemo(() => {
+    const combined = [...recentAi, ...remoteAi];
+    return combined
+      .map((item) => ({
+        ...item,
+        uri: resolveMediaUri(item.uri) || item.uri,
+      }))
+      .filter(
+        (item, index, all) =>
+          Boolean(item.uri) &&
+          all.findIndex(
+            (candidate) =>
+              (candidate.id && candidate.id === item.id) || candidate.uri === item.uri,
+          ) === index,
+      );
+  }, [recentAi, remoteAi]);
+
+  const allBackpackItems = useMemo(() => {
     const items: {
       id: string;
       title: string;
       imageUrl: string;
-      type: 'drawing' | 'character' | 'comic';
+      type: 'ai' | 'character' | 'comic';
       date?: string;
       description?: string;
       comicId?: string;
     }[] = [];
 
-    // Drawings
-    if (backpackFilter === 'all' || backpackFilter === 'drawings') {
-      galleryQuery.data?.items.forEach((item, idx) => {
-        const rawUrl = String(item.url || item.imageUrl || item.previewUrl || '');
-        const url = resolveMediaUri(rawUrl) || rawUrl;
-        if (url) {
-          items.push({
-            id: `draw-${item.id || idx}`,
-            title: `Tranh vẽ #${idx + 1}`,
-            imageUrl: url,
-            type: 'drawing',
-            date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : undefined,
-          });
-        }
-      });
-    }
+    // AI Images
+    aiItems.forEach((item, idx) => {
+      const url = resolveMediaUri(item.uri) || item.uri;
+      if (url) {
+        const itemPrompt = (item as any).prompt || (item as any).title;
+        items.push({
+          id: `ai-${item.id || idx}`,
+          title: itemPrompt || `Tranh AI #${idx + 1}`,
+          imageUrl: url,
+          type: 'ai',
+          date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : undefined,
+          description: itemPrompt || 'Bức tranh được sáng tạo bằng AI của con.',
+        });
+      }
+    });
 
     // Characters
-    if (backpackFilter === 'all' || backpackFilter === 'characters') {
-      characters.forEach((char) => {
-        const avatarUri = resolveMediaUri(char.avatarUri) || char.avatarUri;
-        if (avatarUri) {
-          items.push({
-            id: `char-${char.id}`,
-            title: char.name || 'Nhân vật nhí',
-            imageUrl: avatarUri,
-            type: 'character',
-            date: char.createdAt ? new Date(char.createdAt).toLocaleDateString('vi-VN') : undefined,
-            description: char.userPrompt,
-          });
-        }
-      });
-    }
+    characters.forEach((char) => {
+      const avatarUri = resolveMediaUri(char.avatarUri) || char.avatarUri;
+      if (avatarUri) {
+        items.push({
+          id: `char-${char.id}`,
+          title: char.name || 'Nhân vật nhí',
+          imageUrl: avatarUri,
+          type: 'character',
+          date: char.createdAt ? new Date(char.createdAt).toLocaleDateString('vi-VN') : undefined,
+          description: char.userPrompt,
+        });
+      }
+    });
 
     // Comics
-    if (backpackFilter === 'all' || backpackFilter === 'comics') {
-      visibleComics.forEach((story) => {
-        const rawCover = story.coverImageUrl || story.pages?.[0]?.imageUrl || story.panels?.[0]?.imageUrl;
-        const cover = resolveMediaUri(rawCover) || rawCover;
-        if (cover) {
-          items.push({
-            id: `comic-${story.id}`,
-            title: story.title || 'Truyện tranh của con',
-            imageUrl: cover,
-            type: 'comic',
-            comicId: story.id,
-            description: `${story.pages?.length || 1} trang · ${story.artStyle || 'Nét vẽ tự do'}`,
-          });
-        }
-      });
-    }
+    visibleComics.forEach((story) => {
+      const rawCover = story.coverImageUrl || story.pages?.[0]?.imageUrl || story.panels?.[0]?.imageUrl;
+      const cover = resolveMediaUri(rawCover) || rawCover;
+      if (cover) {
+        items.push({
+          id: `comic-${story.id}`,
+          title: story.title || 'Truyện tranh của con',
+          imageUrl: cover,
+          type: 'comic',
+          comicId: story.id,
+          description: `${story.pages?.length || 1} trang · ${story.artStyle || 'Nét vẽ tự do'}`,
+        });
+      }
+    });
 
     return items;
-  }, [backpackFilter, galleryQuery.data?.items, characters, visibleComics]);
+  }, [aiItems, characters, visibleComics]);
+
+  const backpackItems = useMemo(() => {
+    if (backpackFilter === 'all') return allBackpackItems;
+    return allBackpackItems.filter((item) => item.type === backpackFilter);
+  }, [backpackFilter, allBackpackItems]);
 
   const displayWorks = learnerStats.works > 0
     ? learnerStats.works
-    : (backpackItems.length > 0 ? backpackItems.length : 3);
+    : (allBackpackItems.length > 0 ? allBackpackItems.length : 3);
 
   const displayWorksList = useMemo(() => {
-    if (backpackItems.length > 0) {
-      return backpackItems.slice(0, 6);
+    if (allBackpackItems.length > 0) {
+      return allBackpackItems.slice(0, 6);
     }
     return SAMPLE_WORKS;
-  }, [backpackItems]);
+  }, [allBackpackItems]);
 
   // ─── Avatar Resolution ──────────────────────────────────────────────────────
 
@@ -1139,6 +1171,24 @@ export default function AccountScreen() {
                     <TouchableOpacity
                       style={[
                         styles.sectionTabBtn,
+                        activeTab === 'backpack' && styles.sectionTabBtnActive,
+                      ]}
+                      onPress={() => setActiveTab('backpack')}
+                      activeOpacity={0.85}
+                    >
+                      <Text
+                        style={[
+                          styles.sectionTabText,
+                          activeTab === 'backpack' && styles.sectionTabTextActive,
+                        ]}
+                      >
+                        Ba lô
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.sectionTabBtn,
                         activeTab === 'decorations' && styles.sectionTabBtnActive,
                       ]}
                       onPress={() => setActiveTab('decorations')}
@@ -1378,6 +1428,74 @@ export default function AccountScreen() {
                     </Pressable>
                   ) : null}
                 </>
+              )}
+
+              {/* ════════════════════════════════════════════════════════════════
+                  2. NỘI DUNG KHI TAB [ BA LÔ ] ĐƯỢC CHỌN
+              ════════════════════════════════════════════════════════════════ */}
+              {activeTab === 'backpack' && (
+                <View style={styles.backpackContainer}>
+                  {/* Category Filter Chips */}
+                  <View style={styles.filterChipRow}>
+                    {([
+                      ['all', 'Tất cả'],
+                      ['ai', `🎨 Tranh AI (${aiItems.length})`],
+                      ['characters', `🧸 Nhân vật (${characters.length})`],
+                      ['comics', `📖 Truyện tranh (${visibleComics.length})`],
+                    ] as const).map(([k, label]) => (
+                      <TouchableOpacity
+                        key={k}
+                        style={[styles.filterChip, backpackFilter === k && styles.filterChipActive]}
+                        onPress={() => setBackpackFilter(k)}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={[styles.filterChipText, backpackFilter === k && styles.filterChipTextActive]}>
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  {/* Items Grid */}
+                  {aiQuery.isLoading ? (
+                    <ActivityIndicator size="large" color="#FF7597" style={{ marginTop: 40 }} />
+                  ) : backpackItems.length === 0 ? (
+                    <View style={styles.emptyBox}>
+                      <Text style={{ fontSize: 44 }}>🎒</Text>
+                      <Text style={styles.emptyTitle}>Ba lô còn trống!</Text>
+                      <Text style={styles.emptySub}>
+                        Con hãy vào Xưởng vẽ tranh, tạo Nhân vật Mee hoặc sáng tác Truyện tranh để lưu tác phẩm vào ba lô nhé!
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={styles.backpackGrid}>
+                      {backpackItems.map((item) => (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={[styles.backpackCard, { width: backpackCardWidth }]}
+                          onPress={() => setSelectedBackpackItem(item)}
+                          activeOpacity={0.85}
+                        >
+                          <Image
+                            source={{ uri: item.imageUrl }}
+                            style={styles.backpackThumb}
+                            contentFit="cover"
+                            transition={200}
+                          />
+                          <View style={styles.backpackMeta}>
+                            <Text style={styles.backpackItemTitle} numberOfLines={1}>
+                              {item.title}
+                            </Text>
+                            <Text style={styles.backpackItemSub}>
+                              {item.type === 'ai' ? 'Tranh AI' : item.type === 'character' ? 'Nhân vật' : 'Truyện tranh'}
+                              {item.date ? ` · ${item.date}` : ''}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
               )}
 
               {/* ════════════════════════════════════════════════════════════════
@@ -2478,6 +2596,70 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
     backgroundColor: '#FEF2F2',
+  },
+
+  // ─── 3. BA LÔ (BACKPACK TAB) ───────────────────────────────────────────────
+  backpackContainer: {
+    gap: 16,
+  },
+  backpackGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  backpackCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: '#F1F5F9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+    marginBottom: 8,
+  },
+  backpackThumb: {
+    width: '100%',
+    aspectRatio: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  backpackMeta: {
+    padding: 10,
+  },
+  backpackItemTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  backpackItemSub: {
+    fontSize: 11,
+    color: '#94A3B8',
+    marginTop: 2,
+  },
+  emptyBox: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: '#F1F5F9',
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginTop: 10,
+  },
+  emptySub: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 20,
+    maxWidth: 360,
   },
 
   // ─── MODAL PREVIEW ──────────────────────────────────────────────────────────
