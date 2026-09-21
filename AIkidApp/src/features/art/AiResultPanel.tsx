@@ -85,7 +85,7 @@ export function AiResultPanel({
             )}
             {imageError ? (
               <View style={styles.imageErrorBox}>
-                <AikidIcon name="alert-circle" size={36} color="#F59E0B" />
+                <AikidIcon name="info" size={36} color="#F59E0B" />
                 <AikidText variant="body" style={styles.imageErrorText}>
                   Không thể tải ảnh kết quả
                 </AikidText>
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   imageOverlayLoading: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 248, 242, 0.6)',
