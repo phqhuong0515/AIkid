@@ -151,9 +151,14 @@ export default function GalleryScreen() {
   
   const remoteAi = aiQuery.data?.pages.flatMap((page) => page.items) ?? [];
   const visibleComicStories = mergeComicStories(comicStories, parseRemoteComicStories(query.data?.items ?? [])) as StoredComicStory[];
-  const allAiItems = [...recentAi, ...remoteAi].filter(
-    (item, index, all) => all.findIndex((candidate) => candidate.id === item.id || candidate.uri === item.uri) === index,
-  );
+  const allAiItems = [...recentAi, ...remoteAi]
+    .map((item) => ({
+      ...item,
+      uri: resolveMediaUri(item.uri) || item.uri,
+    }))
+    .filter(
+      (item, index, all) => all.findIndex((candidate) => candidate.id === item.id || candidate.uri === item.uri) === index,
+    );
   const normalizeComparableUrl = (url: string) => {
     try {
       const parsed = new URL(url);
@@ -166,7 +171,7 @@ export default function GalleryScreen() {
     story.coverImageUrl,
     ...(story.pages?.map((page) => page.imageUrl) || []),
     ...(story.panels?.map((panel) => panel.imageUrl) || []),
-  ].filter((url): url is string => Boolean(url)).map(normalizeComparableUrl)));
+  ].filter((url): url is string => Boolean(url)).map((u) => normalizeComparableUrl(resolveMediaUri(u) || u))));
   const aiItems = allAiItems.filter(
     (item) =>
       !comicImageJobIds.includes(item.id) &&
@@ -176,233 +181,289 @@ export default function GalleryScreen() {
   return (
     <View style={styles.container}>
       <ImageBackground source={require('../../public/lobby-assets/images/bg-art.png')} style={styles.bgImage} resizeMode="cover">
-        <View style={{ paddingTop: Math.max(20, insets.top), flex: 1 }}>
-          <View style={{ paddingHorizontal: 16, zIndex: 10, paddingBottom: 10 }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingTop: Math.max(20, insets.top),
+            paddingHorizontal: 16,
+            paddingBottom: 60,
+          }}
+          refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} />}
+        >
+          <View style={styles.pageWrapper}>
             <GlobalHeader />
-          </View>
-          
-          <View style={[styles.topActionBar, { maxWidth: 1200, width: '100%', alignSelf: 'center' }]}>
-            <Pressable onPress={() => router.push('/(app)/capture')} style={styles.captureButton}>
-              <Text style={styles.captureButtonText}>+ Thêm Ảnh</Text>
-            </Pressable>
-          </View>
-          
-          <View style={styles.mainCard}>
-            {!childId ? (
-              <Text style={{ margin: 20, padding: 16, backgroundColor: '#FEF3C7', borderRadius: 12 }}>Chọn hồ sơ con trước khi xem ảnh.</Text>
-            ) : query.isLoading ? (
-              <ActivityIndicator style={{ marginTop: 48 }} size="large" color="#FF7597" />
-            ) : (
-              <>
-                <View style={styles.tabContainer}>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                    {([
-                      ['all', 'Tất cả'],
-                      ['ai', `Ảnh AI · ${aiItems.length}`],
-                      ['uploads', `Tải lên · ${query.data?.items.length ?? 0}`],
-                      ['characters', `Nhân vật · ${characters.length}`],
-                      ['comics', `Truyện tranh · ${visibleComicStories.length}`],
-                    ] as const).map(([id, label]) => (
-                      <Pressable 
-                        accessibilityRole="button" 
-                        accessibilityState={{ selected: section === id }} 
-                        key={id} 
-                        onPress={() => setSection(id)} 
-                        style={[styles.tabButton, section === id ? styles.tabButtonActive : styles.tabButtonInactive]}
-                      >
-                        <Text style={[styles.tabText, section === id ? styles.tabTextActive : styles.tabTextInactive]}>{label}</Text>
-                      </Pressable>
-                    ))}
-                  </ScrollView>
-                </View>
-                <ScrollView 
-                  refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} />} 
-                  contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
-                >
-                  {(section === 'all' || section === 'characters') && characters.length ? (
-                    <GallerySection title="Nhân vật" hint="Chạm vào ảnh để xem prompt">
-                      <View style={styles.grid}>
-                        {characters.map((character) => (
-                          <Pressable 
-                            accessibilityRole="button" 
-                            accessibilityLabel={`Xem nhân vật ${character.name}`} 
-                            key={character.id} 
-                            onPress={() => setSelectedCharacter(character)} 
-                            style={({ pressed, hovered }: any) => [
-                              styles.characterCard,
-                              { width: mediaCardWidth },
-                              pressed && styles.mediaCardPressed,
-                              hovered && styles.mediaCardHovered,
-                            ]}
-                          >
-                            <View style={styles.imageWrapper}>
-                              {character.avatarUri ? (
-                                <Image
-                                  source={{ uri: character.avatarUri }}
-                                  style={styles.mediaImage}
-                                  contentFit="cover"
-                                  transition={200}
-                                />
-                              ) : (
-                                <View style={styles.emptyAvatar}>
-                                  <Text style={{ fontSize: 36 }}>🧸</Text>
+
+            <View style={styles.topActionBar}>
+              <Pressable onPress={() => router.push('/(app)/capture')} style={styles.captureButton}>
+                <Text style={styles.captureButtonText}>+ Thêm Ảnh</Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.galleryCard}>
+              {!childId ? (
+                <Text style={{ margin: 20, padding: 16, backgroundColor: '#FEF3C7', borderRadius: 12 }}>Chọn hồ sơ con trước khi xem ảnh.</Text>
+              ) : query.isLoading ? (
+                <ActivityIndicator style={{ marginVertical: 48 }} size="large" color="#FF7597" />
+              ) : (
+                <>
+                  <View style={styles.tabContainer}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                      {([
+                        ['all', 'Tất cả'],
+                        ['ai', `Ảnh AI · ${aiItems.length}`],
+                        ['uploads', `Tải lên · ${query.data?.items.length ?? 0}`],
+                        ['characters', `Nhân vật · ${characters.length}`],
+                        ['comics', `Truyện tranh · ${visibleComicStories.length}`],
+                      ] as const).map(([id, label]) => (
+                        <Pressable 
+                          accessibilityRole="button" 
+                          accessibilityState={{ selected: section === id }} 
+                          key={id} 
+                          onPress={() => setSection(id)} 
+                          style={[styles.tabButton, section === id ? styles.tabButtonActive : styles.tabButtonInactive]}
+                        >
+                          <Text style={[styles.tabText, section === id ? styles.tabTextActive : styles.tabTextInactive]}>{label}</Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                  </View>
+
+                  <View style={styles.galleryCardBody}>
+                    {(section === 'all' || section === 'characters') && characters.length ? (
+                      <GallerySection title="Nhân vật" hint="Chạm vào ảnh để xem prompt">
+                        <View style={styles.grid}>
+                          {characters.map((character) => {
+                            const avatarUri = resolveMediaUri(character.avatarUri) || character.avatarUri;
+                            return (
+                              <Pressable 
+                                accessibilityRole="button" 
+                                accessibilityLabel={`Xem nhân vật ${character.name}`} 
+                                key={character.id} 
+                                onPress={() => setSelectedCharacter({ ...character, avatarUri })} 
+                                style={({ pressed, hovered }: any) => [
+                                  styles.characterCard,
+                                  { width: mediaCardWidth },
+                                  pressed && styles.mediaCardPressed,
+                                  hovered && styles.mediaCardHovered,
+                                ]}
+                              >
+                                <View style={styles.imageWrapper}>
+                                  {avatarUri ? (
+                                    <GalleryMediaImage
+                                      uri={avatarUri}
+                                      style={styles.mediaImage}
+                                      fallbackEmoji="🧸"
+                                    />
+                                  ) : (
+                                    <View style={styles.emptyAvatar}>
+                                      <Text style={{ fontSize: 36 }}>🧸</Text>
+                                    </View>
+                                  )}
                                 </View>
-                              )}
-                            </View>
-                            <View style={{ padding: 10 }}>
-                              <Text style={{ fontWeight: '800', color: '#0F172A', fontSize: 13 }} numberOfLines={1}>
-                                {character.name}
-                              </Text>
-                              <Text style={{ marginTop: 2, fontSize: 11, color: '#94A3B8' }}>
-                                {character.source === 'ai' ? 'Nhân vật AI' : 'Bản nháp'}
-                              </Text>
-                            </View>
-                          </Pressable>
-                        ))}
-                      </View>
-                    </GallerySection>
-                  ) : null}
+                                <View style={{ padding: 10 }}>
+                                  <Text style={{ fontWeight: '800', color: '#0F172A', fontSize: 13 }} numberOfLines={1}>
+                                    {character.name}
+                                  </Text>
+                                  <Text style={{ marginTop: 2, fontSize: 11, color: '#94A3B8' }}>
+                                    {character.source === 'ai' ? 'Nhân vật AI' : 'Bản nháp'}
+                                  </Text>
+                                </View>
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      </GallerySection>
+                    ) : null}
 
-                  {(section === 'all' || section === 'ai') && aiItems.length ? (
-                    <GallerySection title="Ảnh AI" hint="Ảnh đơn được tạo trong Xưởng vẽ · Chạm để xem lớn">
-                      <View style={styles.grid}>
-                        {aiItems.map((item, idx) => (
-                          <Pressable
-                            key={`ai-${item.id || idx}`}
-                            onPress={() =>
-                              setSelectedMedia({
-                                uri: item.uri,
-                                title: (item as any).title || `Ảnh AI #${idx + 1}`,
-                                typeLabel: 'Ảnh vẽ AI',
-                                createdAt: item.createdAt,
-                              })
-                            }
-                            style={({ pressed, hovered }: any) => [
-                              styles.mediaCard,
-                              { width: mediaCardWidth },
-                              pressed && styles.mediaCardPressed,
-                              hovered && styles.mediaCardHovered,
-                            ]}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Xem ảnh AI ${idx + 1}`}
-                          >
-                            <View style={styles.imageWrapper}>
-                              <Image
-                                source={{ uri: item.uri }}
-                                style={styles.mediaImage}
-                                contentFit="cover"
-                                transition={200}
-                              />
-                            </View>
-                          </Pressable>
-                        ))}
-                      </View>
-                    </GallerySection>
-                  ) : null}
+                    {(section === 'all' || section === 'ai') && aiItems.length ? (
+                      <GallerySection title="Ảnh AI" hint="Ảnh đơn được tạo trong Xưởng vẽ · Chạm để xem lớn">
+                        <View style={styles.grid}>
+                          {aiItems.map((item, idx) => {
+                            const uri = resolveMediaUri(item.uri) || item.uri;
+                            return (
+                              <Pressable
+                                key={`ai-${item.id || idx}`}
+                                onPress={() =>
+                                  setSelectedMedia({
+                                    uri,
+                                    title: (item as any).title || `Ảnh AI #${idx + 1}`,
+                                    typeLabel: 'Ảnh vẽ AI',
+                                    createdAt: item.createdAt,
+                                  })
+                                }
+                                style={({ pressed, hovered }: any) => [
+                                  styles.mediaCard,
+                                  { width: mediaCardWidth },
+                                  pressed && styles.mediaCardPressed,
+                                  hovered && styles.mediaCardHovered,
+                                ]}
+                                accessibilityRole="button"
+                                accessibilityLabel={`Xem ảnh AI ${idx + 1}`}
+                              >
+                                <View style={styles.imageWrapper}>
+                                  <GalleryMediaImage
+                                    uri={uri}
+                                    style={styles.mediaImage}
+                                    fallbackEmoji="🎨"
+                                  />
+                                </View>
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      </GallerySection>
+                    ) : null}
 
-                  {(section === 'all' || section === 'comics') && visibleComicStories.length ? (
-                    <GallerySection title="Truyện tranh" hint="Mỗi thẻ là một bộ truyện">
-                      <View style={styles.comicGrid}>
-                        {visibleComicStories.map((story) => {
-                          const pages = story.pages?.filter((page) => page.imageUrl) || [];
-                          const cover = story.coverImageUrl || pages[0]?.imageUrl;
-                          return (
-                            <Pressable
-                              key={story.id}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Mở truyện ${story.title || 'Truyện của em'}`}
-                              onPress={() => router.push({ pathname: '/(app)/comic/story-reader', params: { id: story.id, type: 'comic' } })}
-                              style={({ pressed, hovered }: any) => [
-                                styles.comicCard,
-                                { width: comicCardWidth },
-                                pressed && styles.mediaCardPressed,
-                                hovered && styles.mediaCardHovered,
-                              ]}
-                            >
-                              <View style={styles.comicCoverWrapper}>
-                                {cover ? (
-                                  <Image source={{ uri: cover }} style={styles.comicCover} contentFit="cover" transition={200} />
-                                ) : (
-                                  <View style={styles.comicCoverEmpty}>
-                                    <Text style={styles.comicCoverEmoji}>📖</Text>
+                    {(section === 'all' || section === 'comics') && visibleComicStories.length ? (
+                      <GallerySection title="Truyện tranh" hint="Mỗi thẻ là một bộ truyện">
+                        <View style={styles.comicGrid}>
+                          {visibleComicStories.map((story) => {
+                            const pages = story.pages?.filter((page) => page.imageUrl) || [];
+                            const rawCover = story.coverImageUrl || pages[0]?.imageUrl;
+                            const cover = resolveMediaUri(rawCover) || rawCover;
+                            return (
+                              <Pressable
+                                key={story.id}
+                                accessibilityRole="button"
+                                accessibilityLabel={`Mở truyện ${story.title || 'Truyện của em'}`}
+                                onPress={() => router.push({ pathname: '/(app)/comic/story-reader', params: { id: story.id, type: 'comic' } })}
+                                style={({ pressed, hovered }: any) => [
+                                  styles.comicCard,
+                                  { width: comicCardWidth },
+                                  pressed && styles.mediaCardPressed,
+                                  hovered && styles.mediaCardHovered,
+                                ]}
+                              >
+                                <View style={styles.comicCoverWrapper}>
+                                  {cover ? (
+                                    <GalleryMediaImage
+                                      uri={cover}
+                                      style={styles.comicCover}
+                                      fallbackEmoji="📖"
+                                    />
+                                  ) : (
+                                    <View style={styles.comicCoverEmpty}>
+                                      <Text style={styles.comicCoverEmoji}>📖</Text>
+                                    </View>
+                                  )}
+                                </View>
+                                <View style={styles.comicInfo}>
+                                  <View style={styles.comicInfoCopy}>
+                                    <Text style={styles.comicTitle} numberOfLines={1}>{story.title || 'Truyện của em'}</Text>
+                                    <Text style={styles.comicMeta}>{pages.length} trang · {story.artStyle || 'Nét vẽ tự do'}</Text>
                                   </View>
-                                )}
-                              </View>
-                              <View style={styles.comicInfo}>
-                                <View style={styles.comicInfoCopy}>
-                                  <Text style={styles.comicTitle} numberOfLines={1}>{story.title || 'Truyện của em'}</Text>
-                                  <Text style={styles.comicMeta}>{pages.length} trang · {story.artStyle || 'Nét vẽ tự do'}</Text>
+                                  <View style={styles.comicOpen}><Text style={styles.comicOpenText}>Mở truyện →</Text></View>
                                 </View>
-                                <View style={styles.comicOpen}><Text style={styles.comicOpenText}>Mở truyện →</Text></View>
-                              </View>
-                            </Pressable>
-                          );
-                        })}
-                      </View>
-                    </GallerySection>
-                  ) : null}
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      </GallerySection>
+                    ) : null}
 
-                  {(section === 'all' || section === 'uploads') ? (
-                    <GallerySection title="Ảnh tải lên" hint="Chạm để xem chi tiết & tải về">
-                      <View style={styles.grid}>
-                        {query.data?.items.map((item, index) => { 
-                          const uri = resolveMediaUri(String(item.url || item.imageUrl || item.previewUrl || '')); 
-                          if (!uri) return null;
-                          return (
-                            <Pressable
-                              key={`upload-${item.id || `${uri}-${index}`}`}
-                              onPress={() =>
-                                setSelectedMedia({
-                                  uri,
-                                  title: (item as any).title || `Ảnh tải lên #${index + 1}`,
-                                  typeLabel: 'Ảnh tải lên',
-                                  createdAt: (item as any).createdAt,
-                                })
-                              }
-                              style={({ pressed, hovered }: any) => [
-                                styles.mediaCard,
-                                { width: mediaCardWidth },
-                                pressed && styles.mediaCardPressed,
-                                hovered && styles.mediaCardHovered,
-                              ]}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Xem ảnh tải lên ${index + 1}`}
-                            >
-                              <View style={styles.imageWrapper}>
-                                <Image
-                                  source={{ uri }}
-                                  style={styles.mediaImage}
-                                  contentFit="cover"
-                                  transition={200}
-                                />
-                              </View>
-                            </Pressable>
-                          );
-                        })}
-                      </View>
-                    </GallerySection>
-                  ) : null}
+                    {(section === 'all' || section === 'uploads') ? (
+                      <GallerySection title="Ảnh tải lên" hint="Chạm để xem chi tiết & tải về">
+                        <View style={styles.grid}>
+                          {query.data?.items.map((item, index) => { 
+                            const uri = resolveMediaUri(String(item.url || item.imageUrl || item.previewUrl || '')); 
+                            if (!uri) return null;
+                            return (
+                              <Pressable
+                                key={`upload-${item.id || `${uri}-${index}`}`}
+                                onPress={() =>
+                                  setSelectedMedia({
+                                    uri,
+                                    title: (item as any).title || `Ảnh tải lên #${index + 1}`,
+                                    typeLabel: 'Ảnh tải lên',
+                                    createdAt: (item as any).createdAt,
+                                  })
+                                }
+                                style={({ pressed, hovered }: any) => [
+                                  styles.mediaCard,
+                                  { width: mediaCardWidth },
+                                  pressed && styles.mediaCardPressed,
+                                  hovered && styles.mediaCardHovered,
+                                ]}
+                                accessibilityRole="button"
+                                accessibilityLabel={`Xem ảnh tải lên ${index + 1}`}
+                              >
+                                <View style={styles.imageWrapper}>
+                                  <GalleryMediaImage
+                                    uri={uri}
+                                    style={styles.mediaImage}
+                                    fallbackEmoji="🎨"
+                                  />
+                                </View>
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      </GallerySection>
+                    ) : null}
 
-                  {!query.data?.items.length && !aiItems.length && !characters.length && !visibleComicStories.length ? (
-                    <Text style={{ paddingVertical: 64, textAlign: 'center', color: '#64748B' }}>Chưa có ảnh. Chụp, chọn ảnh từ thư viện hoặc tạo ảnh AI.</Text>
-                  ) : null}
-                </ScrollView>
-                <CharacterPromptModal
-                  character={selectedCharacter}
-                  onClose={() => setSelectedCharacter(null)}
-                  onDownload={handleDownloadMedia}
-                />
-                <ImagePreviewModal
-                  media={selectedMedia}
-                  onClose={() => setSelectedMedia(null)}
-                  onDownload={handleDownloadMedia}
-                />
-              </>
-            )}
+                    {!query.data?.items.length && !aiItems.length && !characters.length && !visibleComicStories.length ? (
+                      <Text style={{ paddingVertical: 64, textAlign: 'center', color: '#64748B' }}>Chưa có ảnh. Chụp, chọn ảnh từ thư viện hoặc tạo ảnh AI.</Text>
+                    ) : null}
+                  </View>
+                </>
+              )}
+            </View>
           </View>
-        </View>
+        </ScrollView>
+
+        <CharacterPromptModal
+          character={selectedCharacter}
+          onClose={() => setSelectedCharacter(null)}
+          onDownload={handleDownloadMedia}
+        />
+        <ImagePreviewModal
+          media={selectedMedia}
+          onClose={() => setSelectedMedia(null)}
+          onDownload={handleDownloadMedia}
+        />
       </ImageBackground>
     </View>
+  );
+}
+
+function GalleryMediaImage({
+  uri,
+  style,
+  fallbackEmoji = '🎨',
+  transition = 200,
+}: {
+  uri?: string | null;
+  style: any;
+  fallbackEmoji?: string;
+  transition?: number;
+}) {
+  const [loadError, setLoadError] = useState(false);
+
+  if (!uri || loadError) {
+    return (
+      <View
+        style={[
+          style,
+          {
+            backgroundColor: '#FDF4FF',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+        ]}
+      >
+        <Text style={{ fontSize: 32 }}>{fallbackEmoji}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <Image
+      source={{ uri }}
+      style={style}
+      contentFit="cover"
+      transition={transition}
+      onError={() => setLoadError(true)}
+    />
   );
 }
 
@@ -447,7 +508,11 @@ function CharacterPromptModal({
             <ScrollView style={{ maxHeight: 460 }}>
               {character.avatarUri ? (
                 <View style={styles.previewImageContainer}>
-                  <Image source={{ uri: character.avatarUri }} style={styles.previewImage} contentFit="contain" transition={200} />
+                  <GalleryMediaImage
+                    uri={resolveMediaUri(character.avatarUri) || character.avatarUri}
+                    style={styles.previewImage}
+                    fallbackEmoji="🧸"
+                  />
                 </View>
               ) : null}
               <View style={{ padding: 20 }}>
@@ -467,7 +532,7 @@ function CharacterPromptModal({
                 <Text style={styles.previewDate}>Nhân vật Mee</Text>
                 <Pressable
                   style={({ pressed }: any) => [styles.downloadBtn, pressed && { opacity: 0.85 }]}
-                  onPress={() => onDownload(character.avatarUri!, `${character.name}.png`)}
+                  onPress={() => onDownload(resolveMediaUri(character.avatarUri) || character.avatarUri!, `${character.name}.png`)}
                 >
                   <Text style={styles.downloadBtnText}>📥 Tải ảnh về máy</Text>
                 </Pressable>
@@ -489,7 +554,14 @@ function ImagePreviewModal({
   onClose: () => void;
   onDownload: (uri: string, filename?: string) => void;
 }) {
+  const [loadError, setLoadError] = useState(false);
+  useEffect(() => {
+    setLoadError(false);
+  }, [media?.uri]);
+
   if (!media) return null;
+  const resolvedUri = resolveMediaUri(media.uri) || media.uri;
+
   return (
     <Modal visible={Boolean(media)} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
@@ -507,12 +579,19 @@ function ImagePreviewModal({
             </Pressable>
           </View>
           <View style={styles.previewImageContainer}>
-            <Image
-              source={{ uri: media.uri }}
-              style={styles.previewImage}
-              contentFit="contain"
-              transition={200}
-            />
+            {resolvedUri && !loadError ? (
+              <Image
+                source={{ uri: resolvedUri }}
+                style={styles.previewImage}
+                contentFit="contain"
+                transition={200}
+                onError={() => setLoadError(true)}
+              />
+            ) : (
+              <View style={[styles.previewImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDF4FF' }]}>
+                <Text style={{ fontSize: 64 }}>🎨</Text>
+              </View>
+            )}
           </View>
           <View style={styles.previewFooter}>
             <Text style={styles.previewDate}>
@@ -520,7 +599,7 @@ function ImagePreviewModal({
             </Text>
             <Pressable
               style={({ pressed }: any) => [styles.downloadBtn, pressed && { opacity: 0.85 }]}
-              onPress={() => onDownload(media.uri, `${media.title || 'aikid_image'}.png`)}
+              onPress={() => onDownload(resolvedUri, `${media.title || 'aikid_image'}.png`)}
             >
               <Text style={styles.downloadBtnText}>📥 Tải ảnh về máy</Text>
             </Pressable>
@@ -541,29 +620,33 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  topActionBar: {
-    paddingHorizontal: 16,
-    marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  mainCard: {
-    flex: 1,
+  pageWrapper: {
     width: '100%',
     maxWidth: 1200,
     alignSelf: 'center',
+    gap: 16,
+    paddingBottom: 60,
+  },
+  topActionBar: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  galleryCard: {
+    width: '100%',
     backgroundColor: '#FDFAF4',
-    borderRadius: 40,
-    borderWidth: 8,
+    borderRadius: 32,
+    borderWidth: 6,
     borderColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginBottom: 16,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.08,
     shadowRadius: 20,
     elevation: 5,
+  },
+  galleryCardBody: {
+    padding: 16,
   },
   captureButton: {
     backgroundColor: '#FF7597',

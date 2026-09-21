@@ -81,8 +81,15 @@ export const galleryQueryKey = (filters?: GalleryFilters) =>
  */
 export function resolveMediaUri(raw?: string | null): string | null {
   if (!raw) return null;
-  const value = raw.trim();
+  let value = raw.trim();
   if (!value) return null;
+
+  if (
+    value.startsWith('http://') &&
+    (value.includes('storymee.com') || value.includes('aikid.vn'))
+  ) {
+    value = value.replace(/^http:\/\//, 'https://');
+  }
 
   if (
     value.startsWith('http://') ||
@@ -108,12 +115,26 @@ export function resolveMediaUri(raw?: string | null): string | null {
     value.startsWith('/media/public/')
   ) {
     const base = apiClient.defaults.baseURL?.replace(/\/$/, '') ?? '';
-    return base ? `${base}${value.startsWith('/') ? value : `/${value}`}` : value;
+    const resolved = base ? `${base}${value.startsWith('/') ? value : `/${value}`}` : value;
+    if (
+      resolved.startsWith('http://') &&
+      (resolved.includes('storymee.com') || resolved.includes('aikid.vn'))
+    ) {
+      return resolved.replace(/^http:\/\//, 'https://');
+    }
+    return resolved;
   }
 
   if (value.startsWith('/')) {
     const base = apiClient.defaults.baseURL?.replace(/\/$/, '') ?? '';
-    return `${base}${value}`;
+    const resolved = `${base}${value}`;
+    if (
+      resolved.startsWith('http://') &&
+      (resolved.includes('storymee.com') || resolved.includes('aikid.vn'))
+    ) {
+      return resolved.replace(/^http:\/\//, 'https://');
+    }
+    return resolved;
   }
 
   return value;

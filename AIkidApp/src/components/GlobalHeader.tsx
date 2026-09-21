@@ -19,6 +19,7 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -198,94 +199,128 @@ function AccountSheet({
     router.push(path);
   }
 
-  return (
+  const renderSheetContent = () => (
+    <>
+      {/* Avatar + Name row */}
+      <View style={sheet.profileRow}>
+        <View style={sheet.avatarLg}>
+          {avatarUrl ? (
+            <Image source={{ uri: avatarUrl }} style={sheet.avatarImg} contentFit="cover" />
+          ) : (
+            <View style={sheet.avatarFallback}>
+              <Text style={sheet.avatarInitial}>{initial}</Text>
+            </View>
+          )}
+        </View>
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={sheet.profileName} numberOfLines={1}>{displayName}</Text>
+          {actor !== 'child' ? (
+            <Text style={sheet.profileSub} numberOfLines={1}>
+              Tài khoản phụ huynh · {isHydrated ? workspaceName : '…'}
+            </Text>
+          ) : null}
+        </View>
+      </View>
+
+      {/* AI Credits block */}
+      <View style={sheet.creditsBlock}>
+        {summary.isLoading ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <ActivityIndicator color="#FDBA74" />
+            <Text style={sheet.creditsMuted}>Đang tải số lượt AI…</Text>
+          </View>
+        ) : summary.isError ? (
+          <View>
+            <Text style={[sheet.creditsCount, { color: '#F87171' }]}>
+              Không tải được số lượt AI
+            </Text>
+            <TouchableOpacity
+              onPress={() => void summary.refetch()}
+              style={sheet.retryBtn}
+            >
+              <Text style={sheet.retryBtnText}>Thử lại</Text>
+            </TouchableOpacity>
+          </View>
+        ) : actor === 'child' ? (
+          <Text style={sheet.creditsCount}>
+            ✨ {summary.data?.remainingCreateCredits ?? 0} lượt còn lại
+          </Text>
+        ) : (
+          <>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={sheet.planBadge}>GÓI {summary.data?.plan?.toUpperCase() || 'FREE'}</Text>
+              <Text style={sheet.creditsMuted}>HH: {formatExpiry(summary.data?.expiresAt)}</Text>
+            </View>
+            <Text style={sheet.creditsCount}>
+              {summary.data?.remainingCreateCredits ?? 0} lượt còn lại
+            </Text>
+            <Text style={sheet.creditsMuted}>
+              Tháng: {summary.data?.monthlyRemainingCreateCredits ?? 0}/{summary.data?.monthlyCreateCredits ?? 0}
+              {' · '}Mua thêm: {summary.data?.bonusCreateCredits ?? 0}
+            </Text>
+          </>
+        )}
+      </View>
+
+      {/* Quick actions */}
+      <View style={sheet.actionGrid}>
+        <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#FFF7ED' }]} onPress={() => go('/(app)/account')}>
+          <Text style={[sheet.actionBtnText, { color: '#92400E' }]}>🧑 Tài khoản</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => go('/(app)/gallery')}>
+          <Text style={[sheet.actionBtnText, { color: '#334155' }]}>🖼️ Gallery</Text>
+        </TouchableOpacity>
+        {actor !== 'child' && (
+          <>
+            <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: AikidBrandColors.pinkLight }]} onPress={() => go('/(app)/plans')}>
+              <Text style={[sheet.actionBtnText, { color: AikidBrandColors.pink }]}>✨ Gói AI</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => go('/(app)/family')}>
+              <Text style={[sheet.actionBtnText, { color: '#334155' }]}>👨‍👩‍👧 Hồ sơ học sinh</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+
+      {/* Logout */}
+      <TouchableOpacity style={sheet.logoutBtn} onPress={() => void handleLogout()}>
+        <Text style={sheet.logoutText}>Đăng xuất</Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  return Platform.OS === 'web' ? (
+    <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={{ flex: 1, backgroundColor: 'transparent' }} onPress={onClose}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 56,
+            right: 16,
+            width: 380,
+            maxWidth: '92%',
+            backgroundColor: '#FFFFFF',
+            borderRadius: 24,
+            borderWidth: 2,
+            borderColor: '#F1F5F9',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.15,
+            shadowRadius: 20,
+            elevation: 8,
+            padding: 18,
+            gap: 14,
+          }}
+          onStartShouldSetResponder={() => true}
+        >
+          {renderSheetContent()}
+        </View>
+      </Pressable>
+    </Modal>
+  ) : (
     <AikidModal isOpen={open} onClose={onClose} position="bottom" maxWidth={560} noPadding>
       <View style={sheet.inner}>
-        {/* Avatar + Name row */}
-        <View style={sheet.profileRow}>
-          <View style={sheet.avatarLg}>
-            {avatarUrl ? (
-              <Image source={{ uri: avatarUrl }} style={sheet.avatarImg} contentFit="cover" />
-            ) : (
-              <View style={sheet.avatarFallback}>
-                <Text style={sheet.avatarInitial}>{initial}</Text>
-              </View>
-            )}
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={sheet.profileName} numberOfLines={1}>{displayName}</Text>
-            {actor !== 'child' ? (
-              <Text style={sheet.profileSub} numberOfLines={1}>
-                Tài khoản phụ huynh · {isHydrated ? workspaceName : '…'}
-              </Text>
-            ) : null}
-          </View>
-        </View>
-
-        {/* AI Credits block */}
-        <View style={sheet.creditsBlock}>
-          {summary.isLoading ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <ActivityIndicator color="#FDBA74" />
-              <Text style={sheet.creditsMuted}>Đang tải số lượt AI…</Text>
-            </View>
-          ) : summary.isError ? (
-            <View>
-              <Text style={[sheet.creditsCount, { color: '#F87171' }]}>
-                Không tải được số lượt AI
-              </Text>
-              <TouchableOpacity
-                onPress={() => void summary.refetch()}
-                style={sheet.retryBtn}
-              >
-                <Text style={sheet.retryBtnText}>Thử lại</Text>
-              </TouchableOpacity>
-            </View>
-          ) : actor === 'child' ? (
-            <Text style={sheet.creditsCount}>
-              ✨ {summary.data?.remainingCreateCredits ?? 0} lượt còn lại
-            </Text>
-          ) : (
-            <>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={sheet.planBadge}>GÓI {summary.data?.plan?.toUpperCase() || 'FREE'}</Text>
-                <Text style={sheet.creditsMuted}>HH: {formatExpiry(summary.data?.expiresAt)}</Text>
-              </View>
-              <Text style={sheet.creditsCount}>
-                {summary.data?.remainingCreateCredits ?? 0} lượt còn lại
-              </Text>
-              <Text style={sheet.creditsMuted}>
-                Tháng: {summary.data?.monthlyRemainingCreateCredits ?? 0}/{summary.data?.monthlyCreateCredits ?? 0}
-                {' · '}Mua thêm: {summary.data?.bonusCreateCredits ?? 0}
-              </Text>
-            </>
-          )}
-        </View>
-
-        {/* Quick actions */}
-        <View style={sheet.actionGrid}>
-          <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#FFF7ED' }]} onPress={() => go('/(app)/account')}>
-            <Text style={[sheet.actionBtnText, { color: '#92400E' }]}>🧑 Tài khoản</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => go('/(app)/gallery')}>
-            <Text style={[sheet.actionBtnText, { color: '#334155' }]}>🖼️ Gallery</Text>
-          </TouchableOpacity>
-          {actor !== 'child' && (
-            <>
-              <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: AikidBrandColors.pinkLight }]} onPress={() => go('/(app)/plans')}>
-                <Text style={[sheet.actionBtnText, { color: AikidBrandColors.pink }]}>✨ Gói AI</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[sheet.actionBtn, { backgroundColor: '#F1F5F9' }]} onPress={() => go('/(app)/family')}>
-                <Text style={[sheet.actionBtnText, { color: '#334155' }]}>👨‍👩‍👧 Hồ sơ học sinh</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-
-        {/* Logout */}
-        <TouchableOpacity style={sheet.logoutBtn} onPress={() => void handleLogout()}>
-          <Text style={sheet.logoutText}>Đăng xuất</Text>
-        </TouchableOpacity>
+        {renderSheetContent()}
       </View>
     </AikidModal>
   );
@@ -603,7 +638,7 @@ const creditModalStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    backgroundColor: 'rgba(15, 23, 42, 0.2)',
     padding: 20,
   },
   backdrop: {

@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  DimensionValue,
   ImageBackground,
   Linking,
   Modal,
@@ -45,6 +46,7 @@ import { useRecentAiImages } from '@/features/jobs/store/recentAiImages';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { useCharacterDraft } from '@/features/character';
 import { mergeComicStories, parseRemoteComicStories } from '@/features/comic/api/comicRemoteLibrary';
+import { resolveMediaUri } from '@/features/media/api/mediaHooks';
 
 // ─── Local Reward & Asset Mappings ──────────────────────────────────────────────
 
@@ -751,7 +753,8 @@ export default function AccountScreen() {
     // Drawings
     if (backpackFilter === 'all' || backpackFilter === 'drawings') {
       galleryQuery.data?.items.forEach((item, idx) => {
-        const url = String(item.url || item.imageUrl || item.previewUrl || '');
+        const rawUrl = String(item.url || item.imageUrl || item.previewUrl || '');
+        const url = resolveMediaUri(rawUrl) || rawUrl;
         if (url) {
           items.push({
             id: `draw-${item.id || idx}`,
@@ -767,11 +770,12 @@ export default function AccountScreen() {
     // Characters
     if (backpackFilter === 'all' || backpackFilter === 'characters') {
       characters.forEach((char) => {
-        if (char.avatarUri) {
+        const avatarUri = resolveMediaUri(char.avatarUri) || char.avatarUri;
+        if (avatarUri) {
           items.push({
             id: `char-${char.id}`,
             title: char.name || 'Nhân vật nhí',
-            imageUrl: char.avatarUri,
+            imageUrl: avatarUri,
             type: 'character',
             date: char.createdAt ? new Date(char.createdAt).toLocaleDateString('vi-VN') : undefined,
             description: char.userPrompt,
@@ -783,7 +787,8 @@ export default function AccountScreen() {
     // Comics
     if (backpackFilter === 'all' || backpackFilter === 'comics') {
       visibleComics.forEach((story) => {
-        const cover = story.coverImageUrl || story.pages?.[0]?.imageUrl || story.panels?.[0]?.imageUrl;
+        const rawCover = story.coverImageUrl || story.pages?.[0]?.imageUrl || story.panels?.[0]?.imageUrl;
+        const cover = resolveMediaUri(rawCover) || rawCover;
         if (cover) {
           items.push({
             id: `comic-${story.id}`,
@@ -834,8 +839,16 @@ export default function AccountScreen() {
   }, [activeChildId, activeIpId, actor, refetchProfile, replaceChild]);
 
   const studentUploadedAvatar = actor === 'child' ? activeChild?.avatarUrl : profileData?.profile.avatarUrl;
-  const avatarSource = studentUploadedAvatar
-    ? { uri: String(studentUploadedAvatar) }
+  const isLegacyMascot = typeof studentUploadedAvatar === 'string' && (
+    studentUploadedAvatar.includes('mascot') ||
+    studentUploadedAvatar.includes('brand') ||
+    studentUploadedAvatar.includes('avatar-star') ||
+    studentUploadedAvatar.includes('paco') ||
+    studentUploadedAvatar.includes('course-wave')
+  );
+  const validAvatar = isLegacyMascot ? null : studentUploadedAvatar;
+  const avatarSource = validAvatar
+    ? { uri: resolveMediaUri(String(validAvatar)) || String(validAvatar) }
     : activeEquipment.avatar && REWARD_LOCAL_ASSETS[activeEquipment.avatar]
     ? REWARD_LOCAL_ASSETS[activeEquipment.avatar]
     : DEFAULT_BOY_AVATAR;
@@ -972,25 +985,25 @@ export default function AccountScreen() {
         style={styles.bgImage}
         resizeMode="cover"
       >
-        <View style={{ paddingTop: Math.max(16, insets.top), flex: 1 }}>
-          <View style={{ paddingHorizontal: 16, zIndex: 10, paddingBottom: 12 }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingTop: Math.max(16, insets.top),
+            paddingHorizontal: compactProfile ? 12 : 20,
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={profileLoading || galleryQuery.isRefetching}
+              onRefresh={() => {
+                void gamificationQuery.refetch();
+                void learnerStatsQuery.refetch();
+                void galleryQuery.refetch();
+              }}
+            />
+          }
+        >
+          <View style={styles.pageWrapper}>
             <GlobalHeader />
-          </View>
-
-          <View style={[styles.mainCard, compactProfile && styles.mainCardCompact]}>
-            <ScrollView
-              contentContainerStyle={{ padding: compactProfile ? 12 : 20, paddingBottom: 60, gap: 16 }}
-              refreshControl={
-                <RefreshControl
-                  refreshing={profileLoading || galleryQuery.isRefetching}
-                  onRefresh={() => {
-                    void gamificationQuery.refetch();
-                    void learnerStatsQuery.refetch();
-                    void galleryQuery.refetch();
-                  }}
-                />
-              }
-            >
               {/* ════════════════════════════════════════════════════════════════
                   1. HERO BANNER PROFILE (CHỈNH CHU THEO APP.AIKID)
               ════════════════════════════════════════════════════════════════ */}
@@ -1238,31 +1251,12 @@ export default function AccountScreen() {
 
                     <View style={styles.recentWorksGrid}>
                       {displayWorksList.map((work) => (
-                        <TouchableOpacity
+                        <RecentWorkItem
                           key={work.id}
-                          style={[styles.workCard, { width: workCardWidth }]}
+                          work={work}
+                          cardWidth={workCardWidth}
                           onPress={() => setSelectedBackpackItem(work)}
-                          activeOpacity={0.88}
-                        >
-                          <View style={styles.workThumbnailContainer}>
-                            {work.imageUrl ? (
-                              <Image
-                                source={{ uri: work.imageUrl }}
-                                style={styles.workThumbnail}
-                                contentFit="cover"
-                              />
-                            ) : (
-                              <View style={styles.workPlaceholder}>
-                                <Text style={{ fontSize: 36 }}>🖌️</Text>
-                              </View>
-                            )}
-                          </View>
-                          <View style={styles.workMeta}>
-                            <Text style={styles.workTitle} numberOfLines={1}>
-                              {work.title}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
+                        />
                       ))}
                     </View>
                   </View>
@@ -1508,9 +1502,8 @@ export default function AccountScreen() {
                   </View>
                 </View>
               )}
-            </ScrollView>
           </View>
-        </View>
+        </ScrollView>
       </ImageBackground>
 
       {/* Backpack Item Preview Modal */}
@@ -1536,15 +1529,15 @@ export default function AccountScreen() {
                 </TouchableOpacity>
               </View>
 
-              {selectedBackpackItem.imageUrl ? (
+              {selectedBackpackItem.imageUrl && resolveMediaUri(selectedBackpackItem.imageUrl) ? (
                 <Image
-                  source={{ uri: selectedBackpackItem.imageUrl }}
+                  source={{ uri: resolveMediaUri(selectedBackpackItem.imageUrl)! }}
                   style={styles.previewImage}
                   contentFit="contain"
                 />
               ) : (
                 <View style={[styles.previewImage, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#EFF6FF' }]}>
-                  <Text style={{ fontSize: 60 }}>🖌️</Text>
+                  <Text style={{ fontSize: 60 }}>🎨</Text>
                 </View>
               )}
 
@@ -1643,6 +1636,47 @@ function LinkRow({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
+function RecentWorkItem({
+  work,
+  cardWidth,
+  onPress,
+}: {
+  work: { id: string; title: string; imageUrl?: string };
+  cardWidth: DimensionValue;
+  onPress: () => void;
+}) {
+  const [loadFailed, setLoadFailed] = useState(false);
+  const resolvedUri = resolveMediaUri(work.imageUrl);
+
+  return (
+    <TouchableOpacity
+      style={[styles.workCard, { width: cardWidth }]}
+      onPress={onPress}
+      activeOpacity={0.88}
+    >
+      <View style={styles.workThumbnailContainer}>
+        {resolvedUri && !loadFailed ? (
+          <Image
+            source={{ uri: resolvedUri }}
+            style={styles.workThumbnail}
+            contentFit="cover"
+            onError={() => setLoadFailed(true)}
+          />
+        ) : (
+          <View style={[styles.workPlaceholder, { backgroundColor: '#FDF4FF', alignItems: 'center', justifyContent: 'center' }]}>
+            <Text style={{ fontSize: 36 }}>🎨</Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.workMeta}>
+        <Text style={styles.workTitle} numberOfLines={1}>
+          {work.title}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
 // ─── Stylesheet ───────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
@@ -1655,29 +1689,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  mainCard: {
-    flex: 1,
+  pageWrapper: {
     width: '100%',
-    maxWidth: 1100,
+    maxWidth: 1200,
     alignSelf: 'center',
-    backgroundColor: '#FDFAF4',
-    borderRadius: 32,
-    borderWidth: 6,
-    borderColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    elevation: 5,
-    overflow: 'hidden',
-  },
-  mainCardCompact: {
-    marginHorizontal: 6,
-    marginBottom: 6,
-    borderWidth: 3,
-    borderRadius: 24,
+    gap: 16,
+    paddingBottom: 60,
   },
 
   // ─── 1. HERO BANNER PROFILE ─────────────────────────────────────────────────
